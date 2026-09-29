@@ -9,6 +9,9 @@ import { testConnection } from '../core/gemini.js';
 import { loadFxPrefs, vibrate, sound } from '../ui/fx.js';
 import { applyTheme } from '../main.js';
 import { openInstall, isInstalled } from '../ui/install.js';
+import { checkCode, enableCreator, disableCreator, isCreator, creatorName, setCreatorName } from '../core/creator.js';
+import { creatorWelcome } from '../ui/creator-scene.js';
+import { refresh } from '../main.js';
 
 // Modèles proposés dans la liste (tu peux en taper un autre).
 const SUGGESTED_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
@@ -83,15 +86,63 @@ export async function render(el) {
       <p class="tiny muted">La clé API et les photos ne sont pas dans la sauvegarde. ${usage}</p>
     </div>
 
+    ${isCreator() ? `
+    <div class="tile" style="margin-bottom:12px;border-color:#FFD23F">
+      <h2 style="margin-top:0">👑 Mode Créateur</h2>
+      <label class="field" for="cname">Nom affiché</label>
+      <div class="row nowrap"><input id="cname" type="text" class="grow" maxlength="24" value="${esc(creatorName())}">
+        <button class="btn small" id="cname-ok">OK</button></div>
+      <div class="row nowrap" style="margin-top:10px">
+        <a class="btn small grow" href="#/createur">Panneau créateur</a>
+        <button class="btn ghost small grow" id="creator-off">Désactiver</button>
+      </div>
+    </div>` : ''}
+
     <div class="tile" style="margin-bottom:12px;border-color:var(--bad)">
       <h2 style="margin-top:0">🗑️ Zone dangereuse</h2>
       <button class="btn danger block" id="wipe">Effacer toutes mes données</button>
     </div>
+    ${isCreator() ? '' : `
+    <details class="tiny dim" style="margin:0 4px 12px">
+      <summary style="cursor:pointer">🔒 Code créateur</summary>
+      <div class="row nowrap" style="margin-top:8px">
+        <input id="ccode" type="password" class="grow" autocomplete="off" placeholder="Code">
+        <button class="btn ghost small" id="ccode-ok">OK</button>
+      </div>
+    </details>`}
     <p class="tiny dim center">Révision IA · marche hors ligne pour réviser</p>
   `;
 
   const $ = (q) => el.querySelector(q);
   $('#install').onclick = () => openInstall();
+
+  // --- Mode Créateur ---
+  const codeBtn = $('#ccode-ok');
+  if (codeBtn) {
+    const tryCode = async () => {
+      const input = $('#ccode');
+      const ok = await checkCode(input.value);
+      input.value = ''; // on n'enregistre jamais ce qui a été tapé
+      if (!ok) { toast('Code incorrect.', 'error'); vibrate([30, 30, 30]); return; }
+      const first = await enableCreator();
+      if (first) await creatorWelcome();
+      else toast('👑 Mode Créateur réactivé. Re-bonjour, sensei !', 'ok');
+      refresh();
+    };
+    codeBtn.onclick = tryCode;
+    $('#ccode').onkeydown = (e) => { if (e.key === 'Enter') tryCode(); };
+  }
+  if ($('#creator-off')) {
+    $('#creator-off').onclick = async () => {
+      await disableCreator();
+      toast('Mode Créateur désactivé.');
+      refresh();
+    };
+    $('#cname-ok').onclick = async () => {
+      await setCreatorName($('#cname').value);
+      toast('Nom enregistré ✅', 'ok');
+    };
+  }
   $('#eye').onclick = () => { $('#key').type = $('#key').type === 'password' ? 'text' : 'password'; };
 
   async function saveKey() {

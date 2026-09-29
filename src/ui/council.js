@@ -22,9 +22,15 @@ import { CHARACTERS, TEAM } from '../data/characters.js';
 import { characterHTML, play, setExpression } from './character.js';
 import { esc, progress } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
+import { isCreator, creatorName } from '../core/creator.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
+/** Réplique du conseil (version spéciale si c'est le créateur qui passe l'épreuve). */
+const councilLine = (id, key) => {
+  const pool = (isCreator() && CHARACTERS[id].createur?.conseil?.[key]) || CHARACTERS[id].council[key];
+  return pick(pool).replace(/\{prenom\}/g, creatorName());
+};
 const shuffle = (l) => l.map((v) => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
 const LEVEL_COLOR = { excellent: 'var(--neon-green)', bon: 'var(--neon-cyan)', moyen: 'var(--neon-yellow)', a_retravailler: 'var(--neon-pink)' };
 const LEVEL_LABEL = { excellent: 'Excellent !', bon: 'Bon travail !', moyen: 'Ça se construit', a_retravailler: 'On progresse ensemble' };
@@ -142,8 +148,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     if (res && elapsed >= minDuration && (spokeAfterResult >= (short ? 0 : 1))) break;
     const id = speakers[turn % speakers.length];
     turn++;
-    const pool = res ? CHARACTERS[id].council[res.level] : CHARACTERS[id].council.deliberation;
-    say(id, pick(pool));
+    say(id, councilLine(id, res ? res.level : 'deliberation'));
     if (res) spokeAfterResult++;
     const chEl = seats[id]?.querySelector('.ch');
     if (chEl) { setExpression(chEl, res ? (res.level === 'excellent' ? 'surprise' : res.level === 'a_retravailler' ? 'encouragement' : 'joie') : pick(['reflexion', 'concentration', 'surprise'])); play(chEl, 'bounce'); }
@@ -173,7 +178,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
       ${res.level === 'excellent' ? `<div class="shockwave" style="--c:${color}"></div><div class="burst"></div>` : ''}
       ${res.level === 'a_retravailler' || res.level === 'moyen' ? '<div class="warm-glow"></div>' : ''}
       <div class="reveal" style="--c:${color}"><div class="note">${esc(res.label)}</div><div class="lbl">${LEVEL_LABEL[res.level]}</div>
-        <div class="bubble" style="--c:${rc.color}"><span class="who">${esc(rc.name)}</span>${esc(pick(rc.council[res.level]))}</div></div>`;
+        <div class="bubble" style="--c:${rc.color}"><span class="who">${esc(rc.name)}</span>${esc(councilLine(revealer, res.level))}</div></div>`;
     el.appendChild(rv);
     if (res.level === 'excellent') { // explosion d'énergie
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'celebration'));

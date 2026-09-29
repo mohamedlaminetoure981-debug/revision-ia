@@ -158,3 +158,24 @@
   .council::before, .council *, .ultimate * { animation: none !important; }
 }
 :root[data-motion="off"] .council::before, :root[data-motion="off"] .council *, :root[data-motion="off"] .ultimate * { animation: none !important; }
+
+/* ================= MODE CRÉATEUR ================= */
+/* Aura unique or / violet autour du compagnon du créateur */
+.creator-aura { position: relative; display: inline-block; isolation: isolate; }
+.creator-aura::before {
+  content: ""; position: absolute; inset: -6%; z-index: -1; border-radius: 50%;
+  background: conic-gradient(from 0deg, #FFD23F, #A855F7, #FFD23F, #8B5CF6, #FFD23F);
+  filter: blur(14px); opacity: .75;
+  animation: fx-spin 5s linear infinite;
+}
+.creator-aura::after { /* petite couronne */
+  content: "👑"; position: absolute; top: -8%; right: 4%; font-size: 1.4rem;
+  filter: drop-shadow(0 0 6px #FFD23F); animation: a-bounce 2.4s ease-in-out infinite;
+}
+.creator-title { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 99px; font-weight: 800; font-size: .72rem;
+  background: linear-gradient(135deg, #FFD23F, #A855F7); color: #1A1030; }
+.creator-scene .creator-hello { position: absolute; left: 16px; right: 16px; bottom: calc(24px + env(safe-area-inset-bottom)); width: auto; animation: a-pop .5s cubic-bezier(.3, 1.8, .5, 1) both; }
+.creator-scene .seat .ch { --size: 84px; }
+.panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.panel-grid .btn { min-height: 40px; padding: 6px 4px; font-size: .75rem; }
+@media (prefers-reduced-motion: reduce) { .creator-aura::before, .creator-aura::after { animation: none; } }

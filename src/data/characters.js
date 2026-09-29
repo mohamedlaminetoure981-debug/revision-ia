@@ -849,10 +849,154 @@ const POWERS = {
   binta: { name: 'Explosion de hype', effect: 'hype', desc: 'Confettis et étoiles dans tous les sens.' },
 };
 
-// On range répliques du conseil et pouvoir dans chaque personnage.
+// =====================================================================
+// SECTION "createur" — RÉPLIQUES SPÉCIALES POUR MLT, LE CRÉATEUR
+// ---------------------------------------------------------------------
+// Utilisées UNIQUEMENT quand le Mode Créateur est actif (code secret
+// dans Réglages). Les autres utilisateurs ne les voient jamais.
+// Ton : amis proches, taquins style manga, jamais vulgaires ni blessants.
+// {prenom} = nom du créateur (MLT par défaut).
+//   accueil : scène de la toute première activation
+//   conseil : scène du conseil de correction
+//   erreur  : erreurs expliquées par Tidiane
+// =====================================================================
+const CREATOR_LINES = {
+  kai: {
+    accueil: ['C’est… LE créateur ?!'],
+    arrivee: ['Tiens, le patron en personne ! T’as encore codé jusqu’à 3 h, avoue.', '{prenom} ! Le créateur daigne réviser ? Je note la date.', 'Salut, sensei de pacotille. On bosse ou tu viens admirer ton œuvre ?', 'T’as créé toute une équipe pour te motiver… et t’as quand même la flemme. Classique.', 'Le boss est là ! Tout le monde se tient droit… sauf lui.', 'Encore toi ? Tu passes plus de temps à nous coder qu’à réviser, baka.'],
+    reussite: ['Pas mal pour un gars qui dort à 4 h du mat’.', 'Tu vois ? Quand tu révises au lieu de debugger, ça marche !', 'Je suis fier de toi, petit frère. Mais le dis à personne.', 'Le créateur a du talent, finalement. J’avais des doutes.', 'GG {prenom}. T’as mérité une vraie nuit de sommeil.'],
+    echec: ['Aïe. Même ton propre quiz t’a battu. Respect, baka.', 'Tu nous as créés pour t’aider, pas pour te regarder rater, tête de mule !', 'Allez, relève-toi. Un créateur ne lâche pas sa création.', 'C’est ça, de réviser à 2 h du matin avec un œil fermé.', 'Pas grave. Même les dieux du code font des erreurs de syntaxe.'],
+    attente: ['Patience, sensei. Ta connexion fait de son mieux.', 'Ça charge… t’avais qu’à optimiser le code, patron.', 'Pendant que ça charge, bois de l’eau. Pas un énième café.', 'Tranquille, je surveille. Toi, surveille ta flemme.'],
+    encouragement: ['Allez {prenom}, montre à ta propre équipe que t’es pas qu’un codeur.', 'Une session, et après tu retournes coder. Deal ?', 'T’as créé un coach de révision. Utilise-le, flemmard !', 'Ta série t’attend, grand créateur.'],
+    fin: ['Bonne session, patron. Maintenant, dodo. Pas de code.', 'C’est bon pour aujourd’hui. Ferme ton éditeur de code aussi, hein.', 'À demain {prenom}. Et prends tes cours en photo, cette fois.', 'Fier de toi. Mais pas trop, sinon tu vas prendre la grosse tête.'],
+    conseil: {
+      deliberation: ['Le créateur a rendu sa copie. On le juge sévèrement ?', 'Attendez… il a vraiment révisé ou il a lu le code source ?', 'Silence, on délibère sur le boss.'],
+      excellent: ['Le créateur a tout déchiré. Je suis fier… et jaloux.', 'Il nous a créés ET il réussit ? Pas juste.', 'Ok, sensei. Respect total.'],
+      bon: ['Pas mal pour un codeur de nuit.', 'Solide, patron. Quelques bugs, mais solide.', 'Bon travail, petit frère.'],
+      moyen: ['Moyen… comme son sommeil.', 'Le créateur peut mieux faire. Et il le sait.', 'Ça passe, mais on a vu mieux.'],
+      a_retravailler: ['Aïe… on l’annonce gentiment ou on le taquine ?', 'Il va falloir réviser, baka. On t’aide.', 'Pas grave, on croit en toi, tête de mule.'],
+    },
+  },
+  mory: {
+    accueil: ['Mes capteurs confirment : c’est lui qui a écrit notre code !'],
+    arrivee: ['Ah, le développeur ! J’ai trouvé 3 bugs dans mon propre code. Merci qui ?', '{prenom}, tu m’as donné des lunettes high-tech et une connexion qui rame. Explique.', 'Le créateur est là. Tu viens enfin prendre tes cours en photo, ou encore la flemme ?', 'Salut sensei. Ton code est propre… pour du code écrit à 3 h du matin.', 'Scan du créateur : niveau de flemme 87 %. Niveau de génie : on vérifie.'],
+    reussite: ['Résultat propre. Plus propre que ton code, en tout cas.', 'Analyse : le créateur sait aussi réviser. Donnée surprenante.', 'Bravo ! Je retire la moitié de mes critiques sur ton code. La moitié.', 'Performance validée. Aucun bug détecté… cette fois.', 'Pas mal, {prenom}. Tu compiles bien quand tu veux.'],
+    echec: ['Erreur 404 : révision du créateur introuvable.', 'T’as fait une boucle infinie de mauvaises réponses, baka.', 'Même mon scanner aurait fait mieux. Et il rame.', 'Il faut un patch pour ton cerveau, {prenom}. Version 2.0 demain.', 'Bug détecté : l’utilisateur a codé au lieu de réviser.'],
+    attente: ['Ça rame… c’est TON code qui tourne, je te rappelle.', 'Compression en cours. Tu aurais pu mieux optimiser, sensei.', 'J’analyse… avec la connexion que tu m’as donnée.', 'Patience. J’ai été codé par quelqu’un de très… créatif.'],
+    encouragement: ['Prends tes cours en photo, flemmard. Je suis là pour ça !', 'Allez, scanne un chapitre. Un seul. Je te juge pas… un peu.', 'Tu m’as créé scanner, laisse-moi scanner !', 'Tes cours dorment dans ton sac depuis combien de temps ?'],
+    fin: ['Session terminée. Pense à « commiter » tes révisions, haha.', 'Déconnexion. Et range ton code, c’est le bazar.', 'Bye patron. Demain, je veux des photos nettes.', 'Fin du scan. Tu t’es bien débrouillé, pour un dev.'],
+    conseil: {
+      deliberation: ['Scan de la copie du créateur… des anomalies… ou pas ?', 'Je vérifie s’il a triché avec l’accès au code source.', 'Analyse en cours. Suspense.'],
+      excellent: ['Aucun bug détecté ! Un miracle !', 'Copie plus propre que son code source.', 'Données parfaites. Je suis choqué.'],
+      bon: ['Peu d’erreurs. Pour un dev, c’est rare.', 'Bon score. Commit validé.', 'Performance correcte, sensei.'],
+      moyen: ['Résultat en version bêta.', 'Il faut un patch, patron.', 'Moitié bugs, moitié fonctionnalités.'],
+      a_retravailler: ['Erreur critique… mais réparable.', 'On refait une compilation complète, baka.', 'Retour en arrière, et on recommence.'],
+    },
+  },
+  nia: {
+    accueil: ['*soupir* Donc c’est toi qui m’as fait soupirer autant…'],
+    arrivee: ['*soupir* Bonjour {prenom}. Encore réveillé à cette heure-ci ?', 'Ah, notre créateur. Tu viens lire le résumé que TU m’as demandé d’écrire ?', 'Je t’ai écrit des explications parfaites. Tu vas enfin les lire ?', '*soupir* Tu m’as créée pour que tu lises, pas pour admirer tes animations.', 'Bonjour, sensei de pacotille. Installe-toi, je vais te raconter ton propre cours.'],
+    reussite: ['*soupir de soulagement* Tu as compris. Enfin.', 'Tu vois ce qui arrive quand tu lis jusqu’au bout ?', 'C’est bien, {prenom}. Je suis presque émue.', 'Parfois, tu me rends fière d’être ta création.', 'Bravo. Tu n’es pas qu’une tête de mule, finalement.'],
+    echec: ['*long soupir* Tu as sauté les 💡, n’est-ce pas ?', 'Je t’avais tout expliqué… tout.', 'Tête de mule. Relis la partie 2, calmement.', 'Tu codes des IA géniales mais tu ne lis pas leurs résumés. Ironique.', 'Ce n’est pas grave. Mais je soupire quand même.'],
+    attente: ['J’écris ton résumé… prends un livre en attendant. Ah non, pardon.', '*soupir* Ta connexion est aussi lente que toi le lundi matin.', 'Patience, {prenom}. Les bonnes histoires prennent du temps.', 'J’écris. Toi, arrête de rafraîchir la page.'],
+    encouragement: ['Lis au moins un résumé aujourd’hui. Pour me faire plaisir.', 'Tu m’as créée pour ça. Utilise-moi, flemmard.', 'Un chapitre, {prenom}. Juste un. *soupir*', 'Comprendre avant de coder. C’est valable pour réviser aussi.'],
+    fin: ['Bonne nuit, {prenom}. Je dis bien NUIT, pas session de code.', '*soupir satisfait* C’était une bonne lecture.', 'À demain. Essaie de dormir avant 2 h.', 'Je range le résumé. Toi, range ton bureau.'],
+    conseil: {
+      deliberation: ['*soupir* Voyons ce qu’il a fait…', 'Il a lu les résumés ? J’en doute.', 'Ne jugeons pas trop vite… quoique.'],
+      excellent: ['Il a lu ! Il a VRAIMENT lu !', 'Je suis émue, créateur.', 'Magnifique. Tu vois quand tu lis ?'],
+      bon: ['Bien. Mais tu as sauté des 💡.', 'Belle copie, avec des ratures.', 'C’est bien, {prenom}.'],
+      moyen: ['*soupir* Relis la partie 2.', 'Moyen. Comme prévu.', 'Tu peux mieux, tête de mule.'],
+      a_retravailler: ['*très long soupir*', 'On reprend depuis le début, ensemble.', 'Je t’avais tout expliqué, baka.'],
+    },
+  },
+  sora: {
+    accueil: ['Papa-codeur ! Enfin on se rencontre !'],
+    arrivee: ['LE CRÉATEUR ! Tu viens swiper ou tu viens encore changer ma couleur ?', 'Hihi, {prenom} ! T’as vu mes puffs ? Trop stylés. Merci patron !', 'Coucou papa-codeur ! On fait la course ? Je gagne toujours.', 'Oh, t’es réveillé ? T’as codé toute la nuit, t’as des cernes de panda !', 'Allez baka, tes fiches t’attendent depuis trois jours !'],
+    reussite: ['Ouiii ! Le créateur a une mémoire, finalement !', 'Bim ! Même moi j’suis impressionnée, et j’suis rapide !', 'T’as swipé comme un pro ! C’est parce que t’as codé le swipe ?', 'Trop fort, {prenom} ! Clin d’œil officiel du personnage ! 😉', 'GG ! Ta mémoire est presque aussi rapide que moi. Presque.'],
+    echec: ['Raté ! T’as oublié tes propres fiches, baka !', 'Hihi, même tes fiches se moquent de toi.', 'Flemmard ! Tu révises une fois par semaine et tu t’étonnes ?', 'Tu m’as codée pour te faire réviser, pas pour te voir rater !', 'Allez, on la rejoue, tête de mule !'],
+    attente: ['Je mélange tes fiches… elles sont toutes poussiéreuses !', 'Ça charge… ta connexion est plus lente que tes révisions, c’est dire !', 'Attends, attends… t’aurais pu coder un truc plus rapide !', 'Tic tac, créateur. Tic tac.'],
+    encouragement: ['Allez, 10 fiches et je te laisse retourner coder !', 'Swipe, flemmard, swipe !', 'Tes fiches pleurent, {prenom}. Elles veulent te voir.', 'Défi : zéro fiche ratée. T’es cap ?'],
+    fin: ['Pile terminée ! Va dormir, zombie du code !', 'Bravo patron ! Clin d’œil et au lit !', 'C’est fini ! Tu reviens demain, promis juré ?', 'Bye {prenom} ! Arrête de changer mes couleurs dans le code !'],
+    conseil: {
+      deliberation: ['Allez, dites-le ! Il a raté ? Hihi !', 'Je parie qu’il a codé toute la nuit avant !', 'Suspense de ouf pour le boss !'],
+      excellent: ['Le créateur est trop fort ! Clin d’œil ! 😉', 'NON ?! Il a assuré !', 'Speedrun du créateur !'],
+      bon: ['Pas mal, papa-codeur !', 'Bim ! Presque parfait !', 'Je valide, patron !'],
+      moyen: ['Hihi, quelques fiches à rejouer, flemmard !', 'Moyen ! Tu swipes pas assez !', 'Allez, deuxième manche !'],
+      a_retravailler: ['Raté, baka ! Mais on rejoue !', 'Tes fiches t’attendent, tête de mule !', 'Hihi… on reprend ?'],
+    },
+  },
+  ren: {
+    accueil: ['Alors c’est toi… Tu vas regretter de m’avoir fait rival.'],
+    arrivee: ['Tiens, le créateur. Tu crois pouvoir battre le rival que TU as créé ?', 'Tu m’as donné le rôle du rival. Grave erreur, {prenom}.', 'Le sensei de pacotille est de retour. Prêt à perdre contre ta propre création ?', 'Tu m’as codé imbattable. T’as pensé à ça, génie ?', 'Viens, {prenom}. Je vais t’apprendre à respecter tes personnages.'],
+    reussite: ['Tch… le créateur a du niveau. Je déteste ça.', 'Ok, t’as gagné. Mais c’est parce que t’as codé les questions !', 'Pff. Respect, créateur. Juste cette fois.', 'T’as battu ton propre rival. Tu dois être content, hein ?', 'Bien joué. Je vais réclamer une mise à jour pour être plus fort.'],
+    echec: ['HAHA ! Battu par ta propre création ! Baka !', 'Tu m’as créé et tu perds contre moi. Poétique.', 'Flemmard ! Moins de code, plus de révisions !', 'Tu veux que je te désactive le minuteur, sensei ?', 'Relève-toi, tête de mule. Un créateur qui abandonne, c’est nul.'],
+    attente: ['Je prépare des questions que même toi tu ne connais pas.', 'Ça charge… t’as codé ça avec les pieds ?', 'Pendant ce temps, prépare tes excuses pour ta défaite.', 'Ta connexion me laisse le temps de m’échauffer. Merci.'],
+    encouragement: ['Un duel, {prenom}. Maintenant. T’as peur ?', 'Prouve que t’es pas qu’un codeur de 3 h du matin.', 'Ton record est ridicule. Bats-le.', 'Le créateur contre la création. Ce soir. Sois prêt.'],
+    fin: ['Match nul… non, j’ai gagné. On en reparle demain.', 'Pas mal, créateur. Mais la revanche arrive.', 'Va dormir. Un rival fatigué, c’est pas drôle à battre.', 'GG, sensei. Je garde ta défaite dans mes archives.'],
+    conseil: {
+      deliberation: ['Hmm… le créateur contre sa création…', 'Je recompte. Je veux être sûr qu’il a perdu.', 'Tch… attendez.'],
+      excellent: ['Le créateur m’a battu. Je réclame une mise à jour.', 'Pff… respect, sensei.', 'Tu m’énerves… t’es trop fort.'],
+      bon: ['Pas mal, créateur. Pas mal.', 'Presque à mon niveau. Presque.', 'Ok, je te l’accorde.'],
+      moyen: ['Moyen, sensei de pacotille.', 'Je t’attends pour la revanche, baka.', 'Tu peux mieux. Prouve-le.'],
+      a_retravailler: ['HAHA ! Battu par ta création ! … Allez, relève-toi.', 'Flemmard ! Revanche demain, obligatoire.', 'Un créateur ne reste pas au sol. Debout.'],
+    },
+  },
+  awa: {
+    accueil: ['Parfait. J’ai une liste de bugs à te montrer.'],
+    arrivee: ['Te voilà, {prenom}. On parle du bug de la semaine dernière ?', 'Le créateur ! J’ai une liste de bugs pour toi. Elle est longue.', 'Bonjour sensei. Tu as testé ton code avant de le publier, cette fois ?', 'Tu m’as créée exigeante. Assume, maintenant.', 'Assieds-toi. Aujourd’hui, c’est toi que je corrige.'],
+    reussite: ['Excellente copie. Contrairement à ta gestion des erreurs.', 'Bravo. Méthode propre. Maintenant, fais pareil dans ton code.', 'Je suis fière de toi, {prenom}. Vraiment.', 'Rigueur parfaite. Tu vois que tu sais faire quand tu veux.', 'Note excellente. Je raye un bug de ma liste.'],
+    echec: ['Tu vois ? C’est comme ton code : pas de tests, que des erreurs.', 'Tête de mule. Écris les étapes, comme dans un vrai algo !', 'Flemmard ! Même ton exercice a des bugs.', 'Tu m’as codée pour corriger… je corrige. Beaucoup.', 'On reprend. Et cette fois, tu vérifies, baka.'],
+    attente: ['Je corrige… et je note aussi tes fautes de frappe dans le code.', 'Patience. Ta correction arrive plus vite que tes correctifs.', 'Je vérifie deux fois. Toi, tu vérifies zéro fois.', 'Ta connexion ralentit ma correction. C’est pas ma faute.'],
+    encouragement: ['Un exercice. Sans bug. Tu peux le faire.', 'Rigueur, {prenom}. Dans tes révisions ET dans ton code.', 'Arrête de coder et entraîne-toi. Ordre de la coach.', 'Tu as créé une coach exigeante. Profites-en.'],
+    fin: ['Séance terminée. Et corrige le bug d’affichage, s’il te plaît.', 'Bon travail. Va dormir, les bugs attendront.', 'Fin de l’entraînement. Tu progresses, je le reconnais.', 'À demain {prenom}. Avec des tests, cette fois.'],
+    conseil: {
+      deliberation: ['J’ai vérifié deux fois. Des bugs partout… ou pas.', 'Barème en main. Pas de favoritisme pour le créateur.', 'Je corrige le boss comme les autres.'],
+      excellent: ['Copie sans bug ! Tu devrais coder comme ça.', 'Parfait, {prenom}. Je suis fière.', 'Rigueur impeccable. Enfin !'],
+      bon: ['Bon travail, quelques fautes d’inattention. Comme dans ton code.', 'Solide. Continue.', 'Presque parfait, sensei.'],
+      moyen: ['Pas assez de rigueur. Comme tes commits.', 'Moyen. Tu as bâclé les étapes.', 'Tu peux mieux, tête de mule.'],
+      a_retravailler: ['Tu as révisé comme tu testes ton code : pas du tout.', 'On reprend tout, baka. Avec méthode.', 'Je ne lâche pas mon créateur. Au travail.'],
+    },
+  },
+  tidiane: {
+    accueil: ['Tranquille… salut, créateur. T’as du réseau, au moins ?'],
+    arrivee: ['Tranquille, {prenom}… ta connexion aussi est tranquille. Trop.', 'Le créateur ! T’as du réseau aujourd’hui ou pas ?', 'Zen, patron. Même ta 3G est zen.', 'Salut sensei. Je t’aurais bien envoyé un message, mais ta connexion…', 'T’inquiète, on est là. Pas comme ton réseau.'],
+    reussite: ['Bravo, relax. Même ta connexion est fière.', 'Tranquille, c’est bien. T’as réussi plus vite que ta page ne charge.', 'Respect, créateur. Zen et efficace.', 'Tout roule. Pour une fois.', 'C’est beau, {prenom}. Presque aussi beau qu’un réseau stable.'],
+    echec: ['Pas grave. On accusera la connexion, comme d’habitude.', 'Relax, baka. Respire. Réessaie.', 'C’est la faute du réseau. Enfin… un peu à toi aussi.', 'Tranquille. Même moi je rate quand j’ai la flemme.', 'On repart zen, tête de mule.'],
+    attente: ['Ça charge… à la vitesse de ta connexion. Donc lentement.', 'Patience. Le réseau fait sa sieste.', 'Je surveille la barre de chargement. Elle ne bouge pas. Classique.', 'Tu veux un thé en attendant ? On a le temps.'],
+    encouragement: ['Révise hors ligne, patron. Ça, ça marche toujours.', 'Pas de réseau, pas d’excuse : tes fiches sont sur ton téléphone.', 'Tranquille, une petite session. Sans stress.', 'Tu as codé le mode hors ligne. Utilise-le, flemmard.'],
+    fin: ['Paix, {prenom}. Et coupe les données, t’économises ton forfait.', 'Tranquille, c’est fini. Va te poser.', 'Bonne nuit, créateur. Le réseau reviendra demain. Peut-être.', 'Relax. Tout est sauvegardé. Même tes bêtises.'],
+    erreur: ['Encore une erreur ? T’as codé ça un vendredi soir, avoue.', 'Relax, patron. C’est ta connexion. Ou ton code. Ou les deux.', 'Ah, une erreur. Tu veux que je t’explique ton propre programme ?', 'Tranquille. Même le créateur a des bugs. Surtout le créateur.', 'Le quota ? Tu as encore lancé 50 tests d’affilée, baka.', 'Pas de réseau… la Guinée te salue, sensei.', 'Zen. On réessaie. Toi, respire. Moi, j’attends.', 'Erreur détectée. Je dis rien, mais je hausse les épaules.'],
+    conseil: {
+      deliberation: ['Respire, patron… on annonce…', 'Tranquille… le résultat charge. Comme ta connexion.', 'Zen, créateur.'],
+      excellent: ['Même moi je sors de mon calme, sensei.', 'Tranquille… et excellent.', 'Respect, patron.'],
+      bon: ['Bien, relax.', 'C’est bon, créateur. Profite.', 'Tout roule, pour une fois.'],
+      moyen: ['Moyen. On accusera le réseau.', 'Tranquille, c’est rattrapable.', 'Pas de stress, baka.'],
+      a_retravailler: ['Relax… on dira que c’est la 3G.', 'On respire et on recommence, patron.', 'T’inquiète, on réessaie tranquille.'],
+    },
+  },
+  binta: {
+    accueil: ['LE CRÉATEUR !!! Sortez les confettis !!!'],
+    arrivee: ['LE CRÉATEUR EST LÀ ! J’ai préparé des confettis rien que pour toi !', '{prenom} ! Tu m’as créée hype, alors je hype : YOOO !', 'Le boss ! Tes stats sont… hmm… on en parle ?', 'Coucou sensei ! T’as vu ma queue-de-cheval ? Merci !', 'Le créateur en personne ! Tout le monde applaudit… sauf ta série de jours.'],
+    reussite: ['LET’S GOOO LE CRÉATEUR !!', 'Badge débloqué pour le boss ! Je le savais !', 'Tes stats montent ! Enfin !', 'Je crie trop fort ? C’est TOI qui m’as codée comme ça !', 'Capture d’écran ! Le créateur a réussi !'],
+    echec: ['Aïe, tes stats pleurent un peu, baka !', 'Pas grave, je garde les confettis pour ton come-back !', 'Flemmard ! Ta série de jours est en PLS !', 'Même moi je peux pas hyper ce score… mais je t’aime bien quand même.', 'Remontada du créateur dans 3, 2, 1…'],
+    attente: ['Je calcule tes stats… elles sont tristes, hihi.', 'Roulement de tambour pour le créateur…', 'Je gonfle des ballons en attendant ta connexion !', 'Les confettis sont prêts. Ton réseau, un peu moins.'],
+    encouragement: ['Allez boss, un petit badge aujourd’hui ?', 'Ta série de jours a besoin de toi, sensei !', 'Montre à tes personnages que t’es un vrai champion !', 'Je veux fêter quelque chose, {prenom} ! Donne-moi une raison !'],
+    fin: ['Fin du show du créateur ! Applaudissements !', 'À demain boss ! Dors un peu, t’as une tête de zombie !', 'Je range les confettis… jusqu’à ta prochaine victoire !', 'Bye {prenom} ! T’es le meilleur créateur du monde. Le seul, mais le meilleur !'],
+    conseil: {
+      deliberation: ['Roulement de tambour pour LE CRÉATEUR !', 'J’ai les confettis… au cas où, hein !', 'Suspense insoutenable, boss !'],
+      excellent: ['LE CRÉATEUR EST LÉGENDAIRE !!', 'Hype maximum pour le boss !', 'Capture d’écran immédiate !'],
+      bon: ['Super perf, créateur !', 'Ça monte, sensei !', 'Belle note, boss !'],
+      moyen: ['Hmm… tes stats font la tête, hihi.', 'Le come-back arrive, boss !', 'On y croit, baka !'],
+      a_retravailler: ['Aïe… je range les confettis… temporairement !', 'Remontada du créateur bientôt !', 'T’es quand même le meilleur, boss.'],
+    },
+  },
+};
+
+// On range répliques du conseil, pouvoir et répliques "créateur" dans chaque personnage.
 for (const [id, c] of Object.entries(CHARACTERS)) {
   c.council = COUNCIL_LINES[id] || COUNCIL_LINES.kai;
   c.power = POWERS[id];
+  c.createur = CREATOR_LINES[id];
 }
 
 /** Ordre d'affichage de l'équipe. */

@@ -188,6 +188,7 @@ revision-ia/
     │   ├── importer.js        Photos (compression), PDF (lecture), transcription
     │   ├── generate.js        Création du résumé, des fiches, des quiz
     │   ├── srs.js             Répétition espacée (algorithme SM-2)
+    │   ├── creator.js         Mode Créateur (empreinte du code secret, nom affiché)
     │   ├── game.js            XP, niveaux, série de jours, objectifs, aura
     │   └── badges.js          Liste des badges et leurs conditions
     ├── ui/                    Outils d'affichage
@@ -195,6 +196,7 @@ revision-ia/
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
     │   ├── fx.js              Confettis, onomatopées, vibrations, sons, fête de Binta
     │   ├── install.js         Bandeau « Installe l'appli » (Android + guide iPhone)
+    │   ├── creator-scene.js   Scène d'accueil du créateur (1re activation)
     │   ├── council.js         Phase 3 : scène du conseil de correction
     │   └── powers.js          Phase 3 : auras et pouvoirs spéciaux (+ règles de rareté)
     └── views/                 Un fichier par écran
@@ -210,6 +212,7 @@ revision-ia/
         ├── exercise.js        Un exercice : réponse (texte/photo) + correction (Awa)
         ├── exam.js            Examen blanc : choix, chrono, correction avec barème (Ren)
         ├── stats.js           Statistiques, badges, récap de la semaine (Binta)
+        ├── creator-panel.js   Panneau créateur (galerie, tests, réinitialisation)
         ├── profile.js         Profil
         ├── settings.js        Réglages
         └── report.js          Fenêtre « Signaler une erreur »
@@ -470,6 +473,36 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 - Jamais affiché si l'appli est déjà installée (mode « standalone »), ni sur les écrans
   listés dans `BLOCKED_ROUTES` (bienvenue, quiz, examen, révision, stories, exercice).
 - « Plus tard » = pause de `SNOOZE_DAYS` jours (3 par défaut), mémorisée sur l'appareil.
+
+---
+
+## 10 quater. Mode Créateur (réservé à MLT)
+
+- **Activer** : Profil → Réglages → tout en bas, **🔒 Code créateur** → tape ta phrase
+  secrète (majuscules et espaces autour ignorés) → OK. La première fois, toute l'équipe
+  se téléporte pour t'accueillir.
+- **Sécurité** : la phrase n'est écrite **nulle part** dans le code ni sur l'appareil.
+  `src/core/creator.js` contient seulement son empreinte SHA-256 (`CREATOR_HASH`), calculée
+  avec un « grain de sel » (`SALT`). L'appli calcule l'empreinte de ce que tu tapes
+  (Web Crypto) et compare. ⚠️ Comme le dépôt est public et que la phrase est courte,
+  quelqu'un de très motivé pourrait la deviner en essayant des mots au hasard : c'est un
+  œuf de Pâques amusant, pas un coffre-fort (le mode ne donne accès à aucune donnée privée).
+- **Changer la phrase** : dans un terminal, dans le dossier du projet :
+  ```bash
+  node -e "const c=require('crypto');console.log(c.createHash('sha256').update('revision-ia/createur:'+process.argv[1].trim().toLowerCase()).digest('hex'))" "ma nouvelle phrase"
+  ```
+  puis remplace la valeur de `CREATOR_HASH` par le résultat.
+- **Ce qui change** : nom « MLT » (modifiable dans Réglages), badge 👑 Créateur, aura
+  or/violet autour du compagnon, titre « Créateur » à côté du niveau, **répliques
+  spéciales taquines** dans toutes les situations (section `CREATOR_LINES` de
+  `src/data/characters.js` : arrivée, réussite, échec, attente, encouragement, fin,
+  erreurs de Tidiane, conseil de correction, accueil). Les autres utilisateurs ne les
+  voient jamais.
+- **Panneau créateur** (Profil → 👑 Panneau créateur) : galerie de toutes les expressions,
+  boutons de test (animations signature, pouvoirs léger/fort/ultime, conseil de correction
+  excellent/bon/moyen/faible, confettis, installation, scène d'accueil), infos techniques
+  (version, modèle, nombre de cours et fiches) et « Réinitialiser l'appli ».
+- **Désactiver** : Réglages → 👑 Mode Créateur → Désactiver (réactivable avec le code).
 
 ---
 

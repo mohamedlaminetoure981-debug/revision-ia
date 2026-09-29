@@ -7,7 +7,8 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, mascot, say, line, subjectColor, subjectEmoji } from '../ui/ui.js';
+import { esc, mascot, say, line, subjectColor, subjectEmoji, displayName } from '../ui/ui.js';
+import { isCreator } from '../core/creator.js';
 import { isDue, today } from '../core/srs.js';
 import { getProfileSync, currentStreak, activeToday, levelInfo, goals, auraLevel } from '../core/game.js';
 
@@ -44,7 +45,7 @@ export async function render(el) {
 
   el.innerHTML = `
     <div class="hello">
-      ${mascot('kai', { text: `${hello} ${p.name} ! ${line('kai', streak ? 'arrivee' : 'encouragement')}`, expression: 'joie', size: 96 })}
+      ${mascot('kai', { text: `${hello} ${displayName()} ! ${line('kai', streak ? 'arrivee' : 'encouragement')}`, expression: 'joie', size: 96 })}
     </div>
 
     ${apiKey ? '' : `
@@ -56,9 +57,9 @@ export async function render(el) {
 
     <div class="bento">
       <div class="tile span-2 speedlines companion-tile" style="--c:${comp.color};background:linear-gradient(135deg, color-mix(in srgb, ${comp.color} 30%, var(--surface)), var(--surface) 70%)">
-        <div id="comp">${characterHTML(p.companion, { expression: 'joie', size: 118, aura })}</div>
+        <div id="comp">${isCreator() ? `<span class="creator-aura">${characterHTML(p.companion, { expression: 'joie', size: 118, aura })}</span>` : characterHTML(p.companion, { expression: 'joie', size: 118, aura })}</div>
         <div class="grow">
-          <div class="label">Niveau</div>
+          <div class="label">Niveau ${isCreator() ? '<span class="creator-title">👑 Créateur</span>' : ''}</div>
           <div class="big"><span class="count" id="lvl">${lv.level}</span></div>
           <div class="bar" style="margin:8px 0 4px"><div id="xpbar" style="width:0%"></div></div>
           <div class="tiny muted"><span class="count" id="xp">0</span> / ${lv.to} XP</div>

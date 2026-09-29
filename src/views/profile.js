@@ -9,6 +9,8 @@ import { esc, modal, toast, line } from '../ui/ui.js';
 import { getProfileSync, saveProfile, currentStreak, levelInfo, auraLevel, AURA_STEPS } from '../core/game.js';
 import { vibrate } from '../ui/fx.js';
 import { refresh } from '../main.js';
+import { isCreator } from '../core/creator.js';
+import { displayName } from '../ui/ui.js';
 
 export async function render(el) {
   const p = getProfileSync();
@@ -28,11 +30,11 @@ export async function render(el) {
       <a class="icon-btn" href="#/reglages" title="Réglages" style="text-decoration:none">⚙️</a></div>
 
     <div class="tile speedlines center" style="--c:${comp.color};background:linear-gradient(160deg, color-mix(in srgb, ${comp.color} 35%, var(--surface)), var(--surface) 70%);margin-bottom:12px">
-      <div id="comp" style="display:flex;justify-content:center">${characterHTML(p.companion, { expression: 'joie', size: 170, aura })}</div>
-      <h2 style="margin:6px 0 0">${esc(p.name)}</h2>
+      <div id="comp" style="display:flex;justify-content:center">${isCreator() ? `<span class="creator-aura">${characterHTML(p.companion, { expression: 'joie', size: 170, aura })}</span>` : characterHTML(p.companion, { expression: 'joie', size: 170, aura })}</div>
+      <h2 style="margin:6px 0 0">${esc(displayName())} ${isCreator() ? '<span class="chip" style="background:linear-gradient(135deg,#FFD23F,#A855F7);color:#1A1030;border:0">👑 Créateur</span>' : ''}</h2>
       <div class="small muted">avec ${esc(comp.name)}, ${esc(comp.role.toLowerCase())}</div>
       <div class="bar" style="margin:12px auto 4px;max-width:320px"><div style="width:${Math.round(lv.progress * 100)}%"></div></div>
-      <div class="tiny muted">Niveau ${lv.level} · ${p.xp} / ${lv.to} XP</div>
+      <div class="tiny muted">Niveau ${lv.level}${isCreator() ? ' · <span class="creator-title">Créateur</span>' : ''} · ${p.xp} / ${lv.to} XP</div>
       <div class="tiny dim" style="margin-top:6px">${nextAura ? `Aura suivante à ${nextAura} jours de série (encore ${nextAura - streak})` : 'Aura maximale atteinte 👑'}</div>
     </div>
 
@@ -50,6 +52,7 @@ export async function render(el) {
     </div>
 
     <div class="stack">
+      ${isCreator() ? '<a class="btn block" href="#/createur" style="background:linear-gradient(135deg,#FFD23F,#A855F7);color:#1A1030">👑 Panneau créateur</a>' : ''}
       <button class="btn block ghost" id="change">🔄 Changer de compagnon</button>
       <button class="btn block ghost" id="rename">✏️ Modifier mon prénom</button>
       <a class="btn block ghost" href="#/bienvenue">👋 Revoir la présentation de l'équipe</a>

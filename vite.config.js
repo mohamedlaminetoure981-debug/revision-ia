@@ -20,6 +20,7 @@ import { join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 
 const base = process.env.BASE_PATH || '/';
+const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 
 /** Liste récursive des fichiers du dossier public/ (icônes, manifeste…). */
 function listPublic(dir = 'public') {
@@ -57,6 +58,11 @@ function serviceWorker() {
 export default defineConfig({
   base,
   plugins: [serviceWorker()],
+  // Infos affichées dans le Panneau Créateur.
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')),
+  },
   build: {
     target: 'es2020', // compatible avec les téléphones Android un peu anciens
     assetsInlineLimit: 0,

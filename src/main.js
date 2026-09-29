@@ -15,6 +15,7 @@
 import './styles/main.css';
 import * as db from './core/db.js';
 import { loadProfile } from './core/game.js';
+import { loadCreator, isCreator } from './core/creator.js';
 import { loadFxPrefs } from './ui/fx.js';
 import { esc, showError } from './ui/ui.js';
 import { initInstall, onRoute } from './ui/install.js';
@@ -33,6 +34,7 @@ import * as settings from './views/settings.js';
 import * as exercise from './views/exercise.js';
 import * as exam from './views/exam.js';
 import * as stats from './views/stats.js';
+import * as creatorPanel from './views/creator-panel.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -51,6 +53,7 @@ const ROUTES = {
   exo: { view: exercise }, //                     #/exo/ID_EXERCICE
   exam: { view: exam }, //                        #/exam[/ID_EXAMEN]
   stats: { view: stats }, //                      #/stats
+  createur: { view: creatorPanel }, //            #/createur (Mode Créateur seulement)
 };
 
 const app = document.getElementById('app');
@@ -71,10 +74,11 @@ async function route() {
     location.replace('#/bienvenue');
     return;
   }
+  if (name === 'createur' && !isCreator()) name = 'profil'; // panneau réservé au créateur
   const r = ROUTES[name] || ROUTES[''];
   nav.hidden = !!r.fullscreen;
   onRoute(ROUTES[name] ? name : ''); // bandeau d'installation (caché sur certains écrans)
-  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
+  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats', 'createur'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
   try {
     const box = document.createElement('div');
@@ -152,6 +156,7 @@ initInstall();
 
 (async () => {
   applyTheme(await db.getSetting('theme'));
+  await loadCreator();
   await loadFxPrefs();
   window.addEventListener('online', updateNet);
   window.addEventListener('offline', updateNet);

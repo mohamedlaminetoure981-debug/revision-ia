@@ -160,7 +160,7 @@ function ultimate(charId, { text, sub } = {}) {
       <button class="ult-skip">Passer ⏭</button>`;
     document.body.appendChild(el);
     if (!reduced()) {
-      if (ch.power?.effect === 'lightning') document.body.classList.add('shake');
+      if (ch.power?.effect === 'lightning') el.querySelector('.ult-fx').classList.add('shake'); // secousse limitée au pouvoir (pas à la page)
       setTimeout(() => onomatopoeia(text || 'POUVOIR ULTIME!'), 250);
       if (ch.power?.effect === 'hype') confetti(140);
     }
@@ -171,7 +171,6 @@ function ultimate(charId, { text, sub } = {}) {
     const close = () => {
       if (done) return;
       done = true;
-      document.body.classList.remove('shake');
       el.remove();
       resolve();
     };

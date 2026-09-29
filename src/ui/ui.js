@@ -18,6 +18,7 @@ import 'katex/dist/katex.min.css';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from './character.js';
 import { getProfileSync } from '../core/game.js';
+import { isCreator, creatorName } from '../core/creator.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
 export function esc(s) {
@@ -122,16 +123,23 @@ const recent = {}; // dernières répliques utilisées (pour éviter les répét
  * en évitant de répéter les dernières. {prenom} est remplacé.
  */
 export function line(charId, situation) {
-  const list = CHARACTERS[charId]?.lines?.[situation] || [];
+  const ch = CHARACTERS[charId];
+  // Mode Créateur : répliques spéciales pour MLT (section "createur" de characters.js).
+  const creator = isCreator() && ch?.createur?.[situation];
+  const list = (creator || ch?.lines?.[situation] || ch?.lines?.arrivee || []);
   if (!list.length) return '';
-  const key = `${charId}:${situation}`;
+  const key = `${creator ? 'c:' : ''}${charId}:${situation}`;
   const used = (recent[key] ||= []);
   const free = list.map((_, i) => i).filter((i) => !used.includes(i));
   const i = free[Math.floor(Math.random() * free.length)];
   used.push(i);
   if (used.length > Math.min(6, list.length - 1)) used.shift();
-  const prenom = getProfileSync()?.name || 'toi';
-  return list[i].replace(/\{prenom\}/g, prenom);
+  return list[i].replace(/\{prenom\}/g, displayName());
+}
+
+/** Nom affiché de l'utilisateur ("MLT" en Mode Créateur). */
+export function displayName() {
+  return isCreator() ? creatorName() : (getProfileSync()?.name || 'toi');
 }
 
 /**
@@ -273,7 +281,7 @@ export function showError(e, retry) {
   const m = modal(`
     <div class="center" style="--c:${CHARACTERS.tidiane.color}">
       ${characterHTML('tidiane', { expression: 'encouragement', size: 120 })}
-      <div class="bubble top" style="margin:10px 0 12px;text-align:left"><span class="who">Tidiane</span>${esc(line('tidiane', 'arrivee'))}</div>
+      <div class="bubble top" style="margin:10px 0 12px;text-align:left"><span class="who">Tidiane</span>${esc(line('tidiane', 'erreur'))}</div>
       <p style="font-weight:700;font-size:1.02rem">${esc(msg)}</p>
       <div class="row" style="justify-content:center;margin-top:14px">
         ${retry ? '<button class="btn" id="err-retry">🔁 Réessayer</button>' : ''}
