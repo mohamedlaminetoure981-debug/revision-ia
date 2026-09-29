@@ -17,6 +17,7 @@ import * as db from './core/db.js';
 import { loadProfile } from './core/game.js';
 import { loadFxPrefs } from './ui/fx.js';
 import { esc, showError } from './ui/ui.js';
+import { initInstall, onRoute } from './ui/install.js';
 
 import * as welcome from './views/welcome.js';
 import * as home from './views/home.js';
@@ -72,6 +73,7 @@ async function route() {
   }
   const r = ROUTES[name] || ROUTES[''];
   nav.hidden = !!r.fullscreen;
+  onRoute(ROUTES[name] ? name : ''); // bandeau d'installation (caché sur certains écrans)
   nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
   try {
@@ -145,6 +147,9 @@ function registerSW() {
 // ---------------------------------------------------------------------
 // Démarrage
 // ---------------------------------------------------------------------
+// On écoute tout de suite l'événement d'installation (il peut arriver très tôt).
+initInstall();
+
 (async () => {
   applyTheme(await db.getSetting('theme'));
   await loadFxPrefs();

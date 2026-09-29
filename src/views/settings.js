@@ -8,6 +8,7 @@ import { esc, toast, showError, confirmBox, progress, mascot } from '../ui/ui.js
 import { testConnection } from '../core/gemini.js';
 import { loadFxPrefs, vibrate, sound } from '../ui/fx.js';
 import { applyTheme } from '../main.js';
+import { openInstall, isInstalled } from '../ui/install.js';
 
 // Modèles proposés dans la liste (tu peux en taper un autre).
 const SUGGESTED_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
@@ -50,6 +51,12 @@ export async function render(el) {
     </div>
 
     <div class="tile" style="margin-bottom:12px">
+      <h2 style="margin-top:0">📲 Application</h2>
+      <p class="small muted">Installée, l'appli s'ouvre comme une vraie appli et marche sans connexion pour réviser.</p>
+      <button class="btn block ${isInstalled() ? 'ghost' : ''}" id="install">${isInstalled() ? '✅ Appli déjà installée' : '📲 Installer l’appli'}</button>
+    </div>
+
+    <div class="tile" style="margin-bottom:12px">
       <h2 style="margin-top:0">🎨 Ambiance</h2>
       <div class="seg" id="theme">
         <button data-t="dark" class="${s.theme !== 'light' ? 'active' : ''}">🌙 Sombre</button>
@@ -84,6 +91,7 @@ export async function render(el) {
   `;
 
   const $ = (q) => el.querySelector(q);
+  $('#install').onclick = () => openInstall();
   $('#eye').onclick = () => { $('#key').type = $('#key').type === 'password' ? 'text' : 'password'; };
 
   async function saveKey() {

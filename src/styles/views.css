@@ -154,5 +154,22 @@ details > summary .rich p { display: inline; margin: 0; }
 .badge-won { animation: a-pop .5s cubic-bezier(.3, 1.8, .5, 1); }
 
 /* ---------- Examen blanc : chrono collant en haut ---------- */
-.exam-timer { position: sticky; top: calc(8px + env(safe-area-inset-top)); z-index: 15; margin-bottom: 12px; padding: 10px 14px; }
+.tile.exam-timer { position: sticky; top: calc(8px + env(safe-area-inset-top)); z-index: 15; margin-bottom: 12px; padding: 10px 14px; }
 .exam-timer .display { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Bandeau d'installation (Kaï) ---------- */
+.tile.install-banner { /* ".tile" dans le sélecteur : passe devant .tile { position: relative } */
+  position: fixed; left: 50%; z-index: 25; width: min(calc(100% - 20px), 520px);
+  bottom: calc(var(--nav-h) + 22px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); padding: 12px 14px;
+  animation: install-in .5s cubic-bezier(.3, 1.5, .5, 1) both;
+}
+.install-banner .ch { margin-bottom: -4px; }
+.tile.install-banner.install-out { animation: install-out .3s ease-in forwards; }
+@keyframes install-in { from { transform: translate(-50%, 120%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes install-out { to { transform: translate(-50%, 120%); opacity: 0; } }
+.install-steps { display: grid; gap: 8px; margin-top: 10px; }
+.install-steps .step { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--border); font-size: .88rem; line-height: 1.25; }
+.install-steps .step small { color: var(--text-dim); font-size: .72rem; }
+.install-steps .num { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c, var(--neon-violet)); color: #fff; font-weight: 800; font-size: .75rem; flex: none; }
+.install-steps .ico { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-2); color: var(--neon-cyan); flex: none; }

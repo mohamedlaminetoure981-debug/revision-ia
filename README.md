@@ -99,8 +99,13 @@ le fichier `.github/workflows/deploy.yml` donne à Vite `BASE_PATH=/NOM-DU-DEPOT
 ## 3. Installer l'appli sur ton téléphone
 
 1. Ouvre le lien du site dans **Chrome** (Android) ou **Safari** (iPhone).
-2. Android : menu **⋮ → « Installer l'application »** (ou « Ajouter à l'écran d'accueil »).
-   iPhone : bouton **Partager → « Sur l'écran d'accueil »**.
+2. Un **bandeau de Kaï** apparaît en bas : « Installe l'appli pour réviser même sans
+   connexion 📲 ».
+   - Android / Chrome / Edge : touche **Installer** (vraie installation).
+   - iPhone : suis le petit guide : **Partager ⬆️** puis **Sur l'écran d'accueil ➕**.
+   - « Plus tard » : le bandeau ne revient pas pendant 3 jours.
+   - Tu peux aussi passer par **Profil → Réglages → 📲 Installer l'appli**, ou par le menu
+     du navigateur (**⋮ → « Installer l'application »**).
 3. L'icône apparaît comme une vraie appli. Après la première ouverture avec internet,
    tout est gardé en cache : **tu peux réviser sans connexion**.
 
@@ -189,6 +194,7 @@ revision-ia/
     │   ├── character.js       Dessin SVG des persos en calques + animations
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
     │   ├── fx.js              Confettis, onomatopées, vibrations, sons, fête de Binta
+    │   ├── install.js         Bandeau « Installe l'appli » (Android + guide iPhone)
     │   ├── council.js         Phase 3 : scène du conseil de correction
     │   └── powers.js          Phase 3 : auras et pouvoirs spéciaux (+ règles de rareté)
     └── views/                 Un fichier par écran
@@ -456,6 +462,14 @@ du navigateur (F12) :
 ```js
 const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('ren', 'ultimate');
 ```
+
+### Bandeau d'installation (`src/ui/install.js`)
+- Android / Chrome / Edge : le navigateur envoie l'événement `beforeinstallprompt` ;
+  l'appli le garde et affiche son propre bandeau. « Installer » lance la vraie installation.
+- iPhone / iPad : Safari ne permet pas d'installer automatiquement → guide illustré.
+- Jamais affiché si l'appli est déjà installée (mode « standalone »), ni sur les écrans
+  listés dans `BLOCKED_ROUTES` (bienvenue, quiz, examen, révision, stories, exercice).
+- « Plus tard » = pause de `SNOOZE_DAYS` jours (3 par défaut), mémorisée sur l'appareil.
 
 ---
 
