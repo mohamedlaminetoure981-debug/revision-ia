@@ -42,7 +42,7 @@ export const CHARACTERS = {
     screens: ['accueil', 'bienvenue', 'navigation', 'objectifs'],
     signature: 'salut', // animation propre (voir src/styles/characters.css)
     look: {
-      skin: '#6B4226', hair: 'hightop', hairColor: '#17100D',
+      style: 'manga', skin: '#6B4226', hair: 'hightop', hairColor: '#17100D',
       outfit: 'hoodie', outfitColor: '#8B5CF6', outfitColor2: '#2A1F55',
       eyeColor: '#6A3F1F', accessories: ['headphones'],
     },
