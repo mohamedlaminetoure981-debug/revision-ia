@@ -315,7 +315,7 @@ export const CHARACTERS = {
     screens: ['fiches', 'revision', 'swipe'],
     signature: 'clin',
     look: {
-      skin: '#8D5A3B', hair: 'puffs', hairColor: '#1F140E',
+      style: 'manga', face: 'soft', skin: '#8D5A3B', hair: 'puffs', hairColor: '#1F140E',
       outfit: 'hoodie', outfitColor: '#26330F', outfitColor2: '#C6FF3D',
       eyeColor: '#4E2E17', accessories: ['clips'],
     },

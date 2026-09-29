@@ -580,6 +580,20 @@ function mBraid(x0, y0, qx, qy, x1, y1, w, P, L, bead = true) {
     ${bead ? `<circle cx="${x1}" cy="${y1 + w / 2 + 2}" r="${w / 2 + 0.6}" fill="${L.color}" stroke="${INK}" stroke-width="1.4"/>` : ''}`;
 }
 
+/** Contour festonné d'une masse ronde de cheveux bouclés (puff, chignon…). */
+function lobes(cx, cy, r, n = 11, bump = 6) {
+  let d = '';
+  for (let k = 0; k <= n; k++) {
+    const a = (k / n) * Math.PI * 2;
+    const x = (cx + r * Math.cos(a)).toFixed(1);
+    const y = (cy + r * Math.sin(a)).toFixed(1);
+    if (k === 0) { d = `M${x},${y}`; continue; }
+    const m = a - Math.PI / n;
+    d += ` Q${(cx + (r + bump) * Math.cos(m)).toFixed(1)},${(cy + (r + bump) * Math.sin(m)).toFixed(1)} ${x},${y}`;
+  }
+  return `${d} Z`;
+}
+
 /** Cheveux style manga : { back, front }. */
 function mHair(L, P) {
   const o = `stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"`;
@@ -661,6 +675,27 @@ function mHair(L, P) {
           ${mBraid(69, 94, 62, 140, 60, 186, 8, P, L)}${mBraid(131, 94, 138, 140, 140, 186, 8, P, L)}`,
       };
     }
+    case 'puffs': { // Sora : deux gros puffs + frange en pointes
+      const puff = (cx, cy) => {
+        const d = lobes(cx, cy, 21, 10, 6);
+        return `<path d="${d}" fill="${P.hair}"/>
+          <path d="M${cx - 22},${cy + 4} Q${cx - 18},${cy + 20} ${cx + 2},${cy + 24} Q${cx - 12},${cy + 12} ${cx - 14},${cy - 6} Z" fill="${P.hairSh}"/>
+          <path d="M${cx + 2},${cy - 16} Q${cx + 12},${cy - 16} ${cx + 16},${cy - 6} Q${cx + 10},${cy - 12} ${cx + 2},${cy - 16} Z" fill="${P.hairHi}"/>
+          <path d="M${cx - 6},${cy - 4} q4,-4 8,0 M${cx + 6},${cy + 8} q4,-4 8,0" fill="none" stroke="${P.hairHi}" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="${d}" fill="none" ${o}/>`;
+      };
+      const cap = 'M68,98 L68,74 Q72,56 100,53 Q128,56 132,74 L132,98 L128,84 L124,90 L120,76 L112,85 L107,71 L100,83 L94,70 L87,82 L82,73 L76,88 L72,81 Z';
+      return {
+        back: `${puff(64, 40)}${puff(136, 40)}
+          <path d="M72,54 L80,62 M128,54 L120,62" stroke="${INK}" stroke-width="7.4" stroke-linecap="round"/>
+          <path d="M72,54 L80,62 M128,54 L120,62" stroke="${L.color}" stroke-width="4.6" stroke-linecap="round"/>`,
+        front: `<path d="${cap}" fill="${P.hair}"/>
+          <path d="M68,98 L68,74 Q72,58 88,54 Q80,64 82,73 L76,88 L72,81 Z" fill="${P.hairSh}"/>
+          <path d="M104,57 Q116,58 124,66" fill="none" stroke="${P.hairHi}" stroke-width="2" stroke-linecap="round"/>
+          <path d="M70,96 q-4,3 -1,7 q3,2 4,-1 M130,96 q4,3 1,7 q-3,2 -4,-1" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="${cap}" fill="none" ${o}/>`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -716,6 +751,10 @@ function mAccessories(L, P) {
   let body = '';
   let head = '';
   let glasses = '';
+  if (acc.has('clips')) {
+    head += `${sparkle(74, 64, 6.5, L.color, '')}${sparkle(126, 64, 6.5, L.color, '')}
+      <path d="M74,57.5 L75.8,64 L74,70.5 L72.2,64 Z" fill="none" stroke="${INK}" stroke-width=".8"/>`;
+  }
   if (acc.has('earrings')) {
     head += `<circle cx="66" cy="118" r="3.4" fill="none" stroke="#FFD23F" stroke-width="2"/><circle cx="134" cy="118" r="3.4" fill="none" stroke="#FFD23F" stroke-width="2"/>
       <circle cx="66" cy="121.4" r="1.4" fill="#FFD23F"/><circle cx="134" cy="121.4" r="1.4" fill="#FFD23F"/>`;
