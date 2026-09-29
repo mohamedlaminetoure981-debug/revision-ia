@@ -1,0 +1,70 @@
+# =====================================================================
+# Publication automatique sur GitHub Pages
+# ---------------------------------------------------------------------
+# À chaque "push" sur la branche main, GitHub (dans le cloud, pas sur
+# ton téléphone ni ton PC) :
+#   1. récupère le code,
+#   2. installe les dépendances (npm ci),
+#   3. construit le site (npm run build) avec le bon CHEMIN DE BASE,
+#   4. publie le dossier dist/ sur GitHub Pages.
+# Tu peux aussi lancer la publication à la main : onglet "Actions" →
+# "Publier sur GitHub Pages" → "Run workflow".
+# =====================================================================
+name: Publier sur GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Une seule publication à la fois.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v5
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Construire le site
+        env:
+          # Chemin de base = /NOM-DU-DEPOT/ (calculé automatiquement).
+          # Le site sera à https://PSEUDO.github.io/NOM-DU-DEPOT/
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Configurer GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Envoyer le site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publier
+        id: deployment
+        uses: actions/deploy-pages@v4

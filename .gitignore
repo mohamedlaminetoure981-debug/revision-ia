@@ -1,0 +1,10 @@
+# Fichiers à ne jamais publier dans le dépôt
+node_modules/
+dist/
+*.log
+.env
+.env.*
+# Sauvegardes de l'application (contiennent tes cours)
+revision-ia-sauvegarde-*.json
+# Réglages locaux de Claude Code
+.claude/

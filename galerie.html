@@ -1,0 +1,41 @@
+<!doctype html>
+<!--
+  galerie.html — Page d'OUTIL pour voir tous les personnages et leurs expressions.
+  Utilisation : lance "npm run dev", puis ouvre http://localhost:5173/galerie.html
+  (Cette page n'est pas publiée sur le site.)
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie des personnages</title>
+  <style>
+    body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 18px; }
+    .cell { text-align: center; font-size: 11px; color: var(--text-soft); }
+    h2 { margin: 18px 0 6px; font-size: 16px; }
+    button { margin: 2px; }
+  </style>
+</head>
+<body>
+  <div id="g"></div>
+  <script type="module">
+    import './src/styles/main.css';
+    import { CHARACTERS, EXPRESSIONS } from './src/data/characters.js';
+    import { characterHTML, play } from './src/ui/character.js';
+    const g = document.getElementById('g');
+    const params = new URLSearchParams(location.search);
+    const size = Number(params.get('size') || 110);
+    const aura = Number(params.get('aura') || 0);
+    const only = params.get('only');
+    g.innerHTML = Object.entries(CHARACTERS).filter(([id]) => !only || only.split(',').includes(id)).map(([id, c]) => `
+      <h2 style="color:${c.color}">${c.name} — ${c.role}
+        <button data-sig="${id}">▶ animation signature</button></h2>
+      <div class="row">${EXPRESSIONS.map((e) => `<div class="cell">${characterHTML(id, { expression: e, size, aura, enter: false })}${e}</div>`).join('')}</div>
+    `).join('');
+    g.querySelectorAll('[data-sig]').forEach((b) => {
+      b.onclick = () => g.querySelectorAll(`.ch-${b.dataset.sig}`).forEach((el) => play(el, 'signature'));
+    });
+  </script>
+</body>
+</html>

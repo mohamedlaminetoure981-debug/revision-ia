@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Révision IA</title>
+  <meta name="description" content="Révise tes cours avec l'IA et ton équipe de persos. Marche hors ligne.">
+  <meta name="theme-color" content="#0B0A14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Les chemins commençant par / sont corrigés automatiquement par Vite
+       avec le chemin de base de GitHub Pages (voir vite.config.js). -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <script>
+    // Applique le thème (sombre/clair) AVANT l'affichage, pour éviter un flash.
+    try { if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
+  </script>
+</head>
+<body>
+  <!-- Chaque écran est dessiné ici par src/main.js -->
+  <main id="app"><div class="spinner"></div></main>
+
+  <!-- Barre de navigation du bas -->
+  <nav class="nav" id="nav">
+    <a href="#/" data-route=""><span class="ico">🏠</span>Accueil</a>
+    <a href="#/cours" data-route="cours"><span class="ico">📚</span>Cours</a>
+    <a href="#/ajouter" data-route="ajouter" class="fab" aria-label="Ajouter un cours"><span class="ico">+</span></a>
+    <a href="#/quiz" data-route="quiz"><span class="ico">🎯</span>Quiz</a>
+    <a href="#/profil" data-route="profil"><span class="ico">👤</span>Profil</a>
+  </nav>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

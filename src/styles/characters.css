@@ -1,0 +1,153 @@
+/* =====================================================================
+   characters.css — Animations des personnages
+   ---------------------------------------------------------------------
+   Seules les propriétés "transform" et "opacity" sont animées :
+   c'est ce qui reste fluide sur un téléphone d'entrée de gamme.
+   Tout est désactivé si le téléphone demande de réduire les animations.
+   ===================================================================== */
+
+.ch {
+  position: relative;
+  width: var(--size, 140px);
+  aspect-ratio: 200 / 232;
+  flex: none;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+}
+.ch svg, .ch .ch-img { width: 100%; height: 100%; display: block; overflow: visible; }
+.ch svg g { transform-box: view-box; }
+
+/* ---------- Animations de base (au repos) ---------- */
+/* Respiration : le buste gonfle légèrement, la tête suit. */
+.ch .ch-body { transform-origin: 100px 232px; animation: ch-breathe 3.2s ease-in-out infinite; }
+.ch .ch-head { transform-origin: 100px 150px; animation: ch-bob 3.2s ease-in-out infinite; }
+/* Cheveux : léger balancement. */
+.ch .ch-hair-back { transform-origin: 100px 60px; animation: ch-sway 4.5s ease-in-out infinite; }
+/* Clignement des yeux (délai aléatoire par perso). */
+.ch .ch-eye { transform-box: fill-box; transform-origin: center; animation: ch-blink 4.6s infinite; animation-delay: var(--blink-delay, 0s); }
+
+@keyframes ch-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.018); } }
+@keyframes ch-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.8px); } }
+@keyframes ch-sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+@keyframes ch-blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+/* ---------- Effets anime ---------- */
+.ch .fx-twinkle { transform-box: fill-box; transform-origin: center; animation: fx-twinkle 1.6s ease-in-out infinite; }
+.ch .fx-twinkle:nth-child(2n) { animation-delay: .5s; }
+.ch .fx-twinkle:nth-child(3n) { animation-delay: 1s; }
+.ch .fx-drop { transform-box: fill-box; animation: fx-drop 1.8s ease-in infinite; }
+.ch .fx-dots circle { animation: fx-fade 1.5s infinite; }
+.ch .fx-dots circle:nth-child(2) { animation-delay: .25s; }
+.ch .fx-dots circle:nth-child(3) { animation-delay: .5s; }
+.ch .fx-pop { transform-box: fill-box; transform-origin: center; animation: fx-pop .5s cubic-bezier(.3, 1.8, .5, 1) both; }
+.ch .fx-speed { animation: fx-fade .6s ease-in-out infinite alternate; }
+.ch .fx-flame { transform-box: fill-box; transform-origin: bottom center; animation: fx-flame .5s ease-in-out infinite alternate; }
+.ch .fx-blink { animation: fx-fade 1.2s steps(2) infinite; }
+.ch .fx-pulse { transform-origin: 100px 120px; animation: fx-pulse 2.6s ease-in-out infinite; }
+.ch .fx-spin { transform-origin: 100px 120px; animation: fx-spin 9s linear infinite; }
+.ch .fx-spin-rev { transform-origin: 100px 120px; animation: fx-spin 6s linear infinite reverse; }
+.ch .fx-rise { transform-box: fill-box; animation: fx-rise 3s ease-out infinite; }
+
+@keyframes fx-twinkle { 0%, 100% { transform: scale(.6) rotate(0); opacity: .5; } 50% { transform: scale(1.15) rotate(20deg); opacity: 1; } }
+@keyframes fx-drop { 0% { transform: translateY(-4px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
+@keyframes fx-fade { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+@keyframes fx-pop { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes fx-flame { from { transform: scaleY(.85); } to { transform: scaleY(1.12); } }
+@keyframes fx-pulse { 0%, 100% { transform: scale(.94); opacity: .8; } 50% { transform: scale(1.04); opacity: 1; } }
+@keyframes fx-spin { to { transform: rotate(360deg); } }
+@keyframes fx-rise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px); opacity: 0; } }
+
+/* ---------- Apparition ---------- */
+.ch-enter { animation: ch-enter .6s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes ch-enter { from { transform: scale(.4) translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- Réactions génériques ---------- */
+.anim-bounce { animation: a-bounce .6s cubic-bezier(.3, 1.6, .5, 1); }
+.anim-jump { animation: a-jump .8s cubic-bezier(.3, 1.4, .5, 1); }
+.anim-shake { animation: a-shake .5s ease-in-out; }
+.anim-pop { animation: a-pop .45s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes a-bounce { 0%, 100% { transform: none; } 40% { transform: translateY(-12px) scale(1.04); } 70% { transform: translateY(2px) scale(.98); } }
+@keyframes a-jump { 0%, 100% { transform: none; } 30% { transform: translateY(-34px) rotate(-6deg); } 55% { transform: translateY(-34px) rotate(6deg); } 80% { transform: translateY(3px); } }
+@keyframes a-shake { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-7px) rotate(-3deg); } 40%, 80% { transform: translateX(7px) rotate(3deg); } }
+@keyframes a-pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* ---------- Animations SIGNATURE (une par personnage) ---------- */
+/* Kaï : salut enthousiaste (petit saut + tête penchée). */
+.sig-salut { animation: s-salut 1.2s cubic-bezier(.3, 1.5, .5, 1); }
+.sig-salut .ch-head { animation: s-tilt 1.2s ease-in-out; }
+@keyframes s-salut { 0%, 100% { transform: none; } 25% { transform: translateY(-14px); } 50% { transform: none; } 70% { transform: translateY(-6px); } }
+@keyframes s-tilt { 0%, 100% { transform: none; } 30%, 70% { transform: rotate(-8deg); } }
+
+/* Mory : remonte ses lunettes. */
+.sig-lunettes .ch-glasses { animation: s-glasses 1.2s ease-in-out; }
+.sig-lunettes .ch-head { animation: s-nod 1.2s ease-in-out; }
+@keyframes s-glasses { 0%, 100% { transform: none; } 30%, 55% { transform: translateY(-5px); } 70% { transform: translateY(1px); } }
+@keyframes s-nod { 0%, 100% { transform: none; } 40% { transform: rotate(3deg) translateY(2px); } }
+
+/* Nia : flotte doucement en réfléchissant. */
+.sig-reflexion { animation: s-float 1.8s ease-in-out; }
+.sig-reflexion .ch-head { animation: s-think 1.8s ease-in-out; }
+@keyframes s-float { 0%, 100% { transform: none; } 50% { transform: translateY(-8px); } }
+@keyframes s-think { 0%, 100% { transform: none; } 30%, 70% { transform: rotate(7deg); } }
+
+/* Sora : clin d'œil + petit saut rapide. */
+.sig-clin { animation: s-hop .9s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes s-hop { 0%, 100% { transform: none; } 30% { transform: translateY(-16px) rotate(5deg); } 60% { transform: translateY(0) rotate(-3deg); } }
+
+/* Ren : se penche en arrière, bras croisés, sourire en coin. */
+.sig-bras-croises { animation: s-lean 1.4s ease-in-out; }
+.sig-bras-croises .ch-body { animation: s-cross 1.4s ease-in-out; }
+@keyframes s-lean { 0%, 100% { transform: none; } 25%, 75% { transform: rotate(-5deg) translateX(-4px); } }
+@keyframes s-cross { 0%, 100% { transform: none; } 25%, 75% { transform: scaleX(1.05); } }
+
+/* Awa : coup de poing motivant (double rebond ferme). */
+.sig-poing { animation: s-punch 1s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes s-punch { 0%, 100% { transform: none; } 20% { transform: translateY(-10px) scale(1.05); } 40% { transform: none; } 60% { transform: translateY(-10px) scale(1.05); } 80% { transform: none; } }
+
+/* Tidiane : hausse les épaules calmement. */
+.sig-haussement .ch-body { animation: s-shrug 1.4s ease-in-out; }
+.sig-haussement .ch-head { animation: s-shrug-head 1.4s ease-in-out; }
+@keyframes s-shrug { 0%, 100% { transform: none; } 30%, 60% { transform: translateY(-6px) scaleY(1.03); } }
+@keyframes s-shrug-head { 0%, 100% { transform: none; } 30%, 60% { transform: rotate(-6deg) translateY(-2px); } }
+
+/* Binta (phase 2) : explosion de hype. */
+.sig-hype { animation: a-jump .8s cubic-bezier(.3, 1.4, .5, 1) 2; }
+
+/* ---------- Bulle de dialogue ---------- */
+.bubble {
+  position: relative;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 2px solid var(--c, var(--neon-violet));
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: .95rem;
+  line-height: 1.35;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--c, #8B5CF6) 30%, transparent);
+  animation: bubble-in .4s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+.bubble::before { /* petite pointe de la bulle, vers le personnage */
+  content: "";
+  position: absolute;
+  left: -9px;
+  bottom: 16px;
+  width: 14px;
+  height: 14px;
+  background: var(--surface-2);
+  border-left: 2px solid var(--c, var(--neon-violet));
+  border-bottom: 2px solid var(--c, var(--neon-violet));
+  transform: rotate(45deg);
+}
+.bubble .who { display: block; font-family: var(--font-display); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--c); margin-bottom: 2px; }
+.bubble.top::before { left: 28px; bottom: -9px; transform: rotate(-45deg); }
+@keyframes bubble-in { from { transform: scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Perso + bulle côte à côte */
+.mascot { display: flex; align-items: flex-end; gap: 12px; }
+.mascot .bubble { flex: 1; margin-bottom: 18px; }
+
+/* ---------- Réduction des animations (accessibilité) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ch *, .ch, .bubble { animation: none !important; }
+}
+:root[data-motion="off"] .ch *, :root[data-motion="off"] .ch, :root[data-motion="off"] .bubble { animation: none !important; }
