@@ -71,7 +71,7 @@ const EXPR = {
 
 // Petites touches de personnalité : certaines expressions changent selon le perso.
 const PERSONAL = {
-  ren: { neutre: { mouth: 'smirk', brows: 'smug' }, joie: { mouth: 'smirk', eyes: 'normal', brows: 'smug' } },
+  ren: { neutre: { mouth: 'smirk', brows: 'smug' }, joie: { mouth: 'smirk', eyes: 'normal', brows: 'smug' }, concentration: { eyes: 'blank', fx: ['speed', 'vein'] } },
   tidiane: { neutre: { eyes: 'chill', mouth: 'soft' }, encouragement: { eyes: 'chill' } },
   awa: { neutre: { brows: 'furrow' } },
   nia: { neutre: { mouth: 'soft' } },
@@ -348,6 +348,10 @@ function accessories(L) {
   let body = '';
   let head = '';
   let glasses = '';
+  if (acc.has('chain')) { // Ren : chaîne argentée
+    body += `<path d="M84,184 Q100,212 116,184" fill="none" stroke="${INK}" stroke-width="3.6"/>
+      <path d="M84,184 Q100,212 116,184" fill="none" stroke="#dcdce6" stroke-width="2" stroke-dasharray="3 1.6"/>`;
+  }
   if (acc.has('headphones')) {
     body += `<path d="M72,176 C74,160 126,160 128,176" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
       <rect x="62" y="168" width="18" height="22" rx="8" fill="#1d1d24"/><rect x="120" y="168" width="18" height="22" rx="8" fill="#1d1d24"/>
@@ -594,6 +598,27 @@ function lobes(cx, cy, r, n = 11, bump = 6) {
   return `${d} Z`;
 }
 
+/** Une lock (dreadlock) manga : corde épaisse encrée, segments et reflet. */
+function mLoc(x0, y0, qx, qy, x1, y1, w, P) {
+  const d = `M${x0},${y0} Q${qx},${qy} ${x1},${y1}`;
+  let ticks = '';
+  const n = Math.max(3, Math.round(Math.hypot(x1 - x0, y1 - y0) / 8));
+  for (let i = 1; i < n; i++) {
+    const t = i / n;
+    const x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * qx + t * t * x1;
+    const y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * qy + t * t * y1;
+    const dx = 2 * (1 - t) * (qx - x0) + 2 * t * (x1 - qx);
+    const dy = 2 * (1 - t) * (qy - y0) + 2 * t * (y1 - qy);
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len; const ny = dx / len;
+    const h = w / 2 - 0.8;
+    ticks += `<path d="M${(x - nx * h).toFixed(1)},${(y - ny * h).toFixed(1)} Q${(x + dx / len * 1.5).toFixed(1)},${(y + dy / len * 1.5).toFixed(1)} ${(x + nx * h).toFixed(1)},${(y + ny * h).toFixed(1)}" fill="none" stroke="${P.hairSh}" stroke-width="1.2"/>`;
+  }
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 3}" stroke-linecap="round"/>
+    <path d="${d}" fill="none" stroke="${P.hair}" stroke-width="${w}" stroke-linecap="round"/>${ticks}
+    <path d="M${x0 + 1.8},${y0 + 2} Q${qx + 1.8},${qy} ${x1 + 1.4},${y1 - 3}" fill="none" stroke="${P.hairHi}" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>`;
+}
+
 /** Cheveux style manga : { back, front }. */
 function mHair(L, P) {
   const o = `stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"`;
@@ -696,6 +721,20 @@ function mHair(L, P) {
           <path d="${cap}" fill="none" ${o}/>`,
       };
     }
+    case 'locks': { // Ren : locks épaisses, mèches en travers du front
+      const cap = 'M68,92 L68,72 Q72,50 100,47 Q128,50 132,72 L132,92 Q126,76 112,71 L88,71 Q74,76 68,92 Z';
+      return {
+        back: [
+          mLoc(74, 70, 62, 118, 60, 166, 9, P), mLoc(82, 62, 76, 120, 72, 172, 9, P),
+          mLoc(118, 62, 126, 120, 128, 172, 9, P), mLoc(126, 70, 140, 118, 142, 166, 9, P),
+        ].join(''),
+        front: `<path d="${cap}" fill="${P.hair}"/>
+          <path d="M68,92 L68,72 Q72,52 90,48 Q80,62 80,74 Q72,80 68,92 Z" fill="${P.hairSh}"/>
+          <path d="${cap}" fill="none" ${o}/>
+          ${mLoc(124, 58, 136, 80, 135, 114, 8.5, P)}${mLoc(130, 66, 140, 92, 139, 124, 8, P)}
+          ${mLoc(96, 51, 78, 62, 70, 96, 9, P)}${mLoc(106, 51, 88, 60, 79, 88, 9, P)}${mLoc(116, 53, 102, 60, 94, 82, 8.5, P)}`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -739,6 +778,15 @@ function mOutfit(L, P) {
         <path d="M84,168 L88,200 L80,232 M116,168 L112,200 L120,232" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>
         <path d="M86,172 L90,200 M114,172 L110,200" stroke="${P.mainHi}" stroke-width="1.4" opacity=".7"/>
         <circle cx="85" cy="208" r="2.4" fill="${P.acc}" stroke="${INK}" stroke-width="1.1"/><circle cx="83" cy="222" r="2.4" fill="${P.acc}" stroke="${INK}" stroke-width="1.1"/>
+        ${outline}`;
+    case 'bomber': // Ren : bomber à col côtelé
+      return `${base}
+        <path d="M80,170 Q100,184 120,170 L121,178 Q100,193 79,178 Z" fill="${P.acc}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M81,174 Q100,188 119,174 M80.5,176.5 Q100,191 119.5,176.5" fill="none" stroke="${shade(P.acc, -0.45)}" stroke-width="1.2"/>
+        <path d="M100,187 L100,232" stroke="${INK}" stroke-width="2"/>
+        <path d="M100,187 L100,232" stroke="#c9c9d4" stroke-width="1" stroke-dasharray="2 2"/>
+        <path d="M46,184 Q60,196 58,232 M154,184 Q140,196 142,232" fill="none" stroke="${INK}" stroke-width="${INN}" opacity=".7"/>
+        <path d="M20,214 L58,214 M142,214 L180,214" stroke="${P.acc}" stroke-width="3" opacity=".8"/>
         ${outline}`;
     default:
       return `${base}${outline}`;
@@ -833,6 +881,7 @@ function characterSVGManga(id, expression, opts) {
       <path d="${FACE_SHADOW}" fill="${P.skinSh}"/>
       <path d="M72,84 Q100,74 128,84 L128,91 Q100,82 72,91 Z" fill="${P.skinSh}"/>
       <path d="M112,112 Q118,110 123,113" fill="none" stroke="${P.skinHi}" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      <path d="M127.4,98 L127.8,104 C127.6,112 124.6,120 119.6,126 L108,140" fill="none" stroke="${P.skinHi}" stroke-width="2" stroke-linecap="round" opacity=".75"/>
       <path d="${face}" fill="none" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
       ${blush}
       <path d="M101,108 L104,118 L99.5,119.5" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>

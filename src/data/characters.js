@@ -406,7 +406,7 @@ export const CHARACTERS = {
     screens: ['quiz', 'examen'],
     signature: 'bras-croises',
     look: {
-      skin: '#4A2C1D', hair: 'locks', hairColor: '#150E0B',
+      style: 'manga', skin: '#4A2C1D', hair: 'locks', hairColor: '#150E0B',
       outfit: 'bomber', outfitColor: '#3A1410', outfitColor2: '#FF5A3D',
       eyeColor: '#3A2214', accessories: ['chain'],
     },
