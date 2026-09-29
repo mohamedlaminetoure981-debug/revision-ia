@@ -348,10 +348,6 @@ function accessories(L) {
   let body = '';
   let head = '';
   let glasses = '';
-  if (acc.has('chain')) { // Ren : chaîne argentée
-    body += `<path d="M84,184 Q100,212 116,184" fill="none" stroke="${INK}" stroke-width="3.6"/>
-      <path d="M84,184 Q100,212 116,184" fill="none" stroke="#dcdce6" stroke-width="2" stroke-dasharray="3 1.6"/>`;
-  }
   if (acc.has('headphones')) {
     body += `<path d="M72,176 C74,160 126,160 128,176" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
       <rect x="62" y="168" width="18" height="22" rx="8" fill="#1d1d24"/><rect x="120" y="168" width="18" height="22" rx="8" fill="#1d1d24"/>
@@ -735,6 +731,23 @@ function mHair(L, P) {
           ${mLoc(96, 51, 78, 62, 70, 96, 9, P)}${mLoc(106, 51, 88, 60, 79, 88, 9, P)}${mLoc(116, 53, 102, 60, 94, 82, 8.5, P)}`,
       };
     }
+    case 'bun': { // Awa : chignon haut de twists noué d'un foulard, cheveux plaqués
+      const bun = lobes(100, 30, 17, 9, 5);
+      const cap = 'M68,96 L68,74 Q72,54 100,50 Q128,54 132,74 L132,96 Q128,82 118,76 Q100,70 82,76 Q72,82 68,96 Z';
+      return {
+        back: `<path d="${bun}" fill="${P.hair}"/>
+          <path d="M84,32 Q86,46 100,48 Q88,40 90,24 Z" fill="${P.hairSh}"/>
+          <path d="M92,24 Q100,18 108,24 M96,34 Q104,28 112,34 M88,34 Q94,40 100,38" fill="none" stroke="${P.hairHi}" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="${bun}" fill="none" ${o}/>
+          <path d="M86,46 Q100,52 114,46 L113,52 Q100,58 87,52 Z" fill="${P.acc}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M112,50 L124,44 L121,54 Z M112,51 L122,60 L114,58 Z" fill="${P.acc}" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/>`,
+        front: `<path d="${cap}" fill="${P.hair}"/>
+          <path d="M68,96 L68,74 Q72,56 90,51 Q78,64 80,76 Q72,82 68,96 Z" fill="${P.hairSh}"/>
+          <path d="M80,76 Q86,60 100,51 M92,72 Q95,60 100,51 M108,72 Q105,60 100,51 M120,76 Q114,60 100,51" fill="none" stroke="${P.hairSh}" stroke-width="1.4"/>
+          <path d="M112,58 Q118,62 124,72" fill="none" stroke="${P.hairHi}" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="${cap}" fill="none" ${o}/>`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -788,6 +801,15 @@ function mOutfit(L, P) {
         <path d="M46,184 Q60,196 58,232 M154,184 Q140,196 142,232" fill="none" stroke="${INK}" stroke-width="${INN}" opacity=".7"/>
         <path d="M20,214 L58,214 M142,214 L180,214" stroke="${P.acc}" stroke-width="3" opacity=".8"/>
         ${outline}`;
+    case 'track': // Awa : veste de survêtement, col montant zippé
+      return `${base}
+        <path d="M34,194 Q58,178 84,170 M166,194 Q142,178 116,170" fill="none" stroke="${INK}" stroke-width="6.4" stroke-linecap="round"/>
+        <path d="M34,194 Q58,178 84,170 M166,194 Q142,178 116,170" fill="none" stroke="${P.acc}" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M83,156 L117,156 L119,180 L81,180 Z" fill="${P.main}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M83,156 L100,156 L100,180 L81,180 Z" fill="${P.mainSh}"/>
+        <path d="M100,156 L100,232" stroke="${INK}" stroke-width="2"/>
+        <rect x="97.6" y="176" width="4.8" height="9" rx="1.4" fill="#d9d9e3" stroke="${INK}" stroke-width="1"/>
+        ${outline}`;
     default:
       return `${base}${outline}`;
   }
@@ -818,6 +840,16 @@ function mAccessories(L, P) {
       <path d="M97,99 Q100,97 103,99" fill="none" stroke="${INK}" stroke-width="2"/>
       <path d="M73,98 L66,99 M127,98 L134,99" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
       <circle cx="124" cy="97.6" r="1.3" fill="${L.color}" class="fx-blink"/></g>`;
+  }
+  if (acc.has('whistle')) { // Awa : sifflet de coach
+    body += `<path d="M88,178 L108,203 M112,178 L111,203" fill="none" stroke="${L.color}" stroke-width="1.6"/>
+      <rect x="103" y="201" width="15" height="9" rx="4" fill="#d9d9e3" stroke="${INK}" stroke-width="1.6"/>
+      <rect x="116" y="203" width="6" height="4" rx="1" fill="#b9b9c6" stroke="${INK}" stroke-width="1.2"/>
+      <circle cx="108" cy="205.5" r="1.6" fill="${INK}"/>`;
+  }
+  if (acc.has('chain')) { // Ren : chaîne argentée
+    body += `<path d="M84,184 Q100,212 116,184" fill="none" stroke="${INK}" stroke-width="3.6"/>
+      <path d="M84,184 Q100,212 116,184" fill="none" stroke="#dcdce6" stroke-width="2" stroke-dasharray="3 1.6"/>`;
   }
   if (acc.has('headphones')) {
     body += `<path d="M78,170 C80,187 120,187 122,170" fill="none" stroke="${INK}" stroke-width="6.5" stroke-linecap="round"/>

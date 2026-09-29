@@ -12,7 +12,7 @@
 //    Coiffures possibles : 'hightop', 'afro', 'braids', 'puffs', 'locks',
 //    'bun', 'waves', 'ponytail'.
 //    Tenues possibles : 'hoodie', 'jacket', 'cardigan', 'bomber', 'track'.
-//    Accessoires : 'headphones', 'visor', 'earrings', 'hoops', 'headband',
+//    Accessoires : 'headphones', 'visor', 'earrings', 'hoops', 'whistle',
 //    'earbuds', 'chain', 'clips', 'beard'.
 // 👉 REMPLACER PAR UNE IMAGE   : dépose ton image dans public/characters/
 //    puis indique son chemin dans `images`, par expression :
@@ -497,9 +497,9 @@ export const CHARACTERS = {
     screens: ['exercices', 'corrections'],
     signature: 'poing',
     look: {
-      skin: '#6B3E26', hair: 'bun', hairColor: '#1A110C',
+      style: 'manga', face: 'soft', skin: '#6B3E26', hair: 'bun', hairColor: '#1A110C',
       outfit: 'track', outfitColor: '#3A2A0A', outfitColor2: '#FFC53D',
-      eyeColor: '#4A2A15', accessories: ['headband'],
+      eyeColor: '#4A2A15', accessories: ['whistle'],
     },
     images: {},
     voice: {},
