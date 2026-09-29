@@ -9,6 +9,7 @@
 //    {prenom} est remplacé par le prénom de l'utilisateur.
 // 👉 Changer la COULEUR        : modifie `color` (couleur signature).
 // 👉 Changer l'APPARENCE       : modifie `look` (peau, coiffure, tenue…).
+//    face: 'soft' = traits plus doux (mâchoire arrondie, cils marqués).
 //    Coiffures possibles : 'hightop', 'afro', 'braids', 'puffs', 'locks',
 //    'bun', 'waves', 'ponytail'.
 //    Tenues possibles : 'hoodie', 'jacket', 'cardigan', 'bomber', 'track'.
@@ -42,7 +43,7 @@ export const CHARACTERS = {
     screens: ['accueil', 'bienvenue', 'navigation', 'objectifs'],
     signature: 'salut', // animation propre (voir src/styles/characters.css)
     look: {
-      style: 'manga', skin: '#6B4226', hair: 'hightop', hairColor: '#17100D',
+      skin: '#6B4226', hair: 'hightop', hairColor: '#17100D',
       outfit: 'hoodie', outfitColor: '#8B5CF6', outfitColor2: '#2A1F55',
       eyeColor: '#6A3F1F', accessories: ['headphones'],
     },
@@ -133,7 +134,7 @@ export const CHARACTERS = {
     screens: ['ajouter', 'photo', 'pdf', 'analyse'],
     signature: 'lunettes',
     look: {
-      style: 'manga', skin: '#5A3825', hair: 'afro', hairColor: '#1C1310',
+      skin: '#5A3825', hair: 'afro', hairColor: '#1C1310',
       outfit: 'jacket', outfitColor: '#1E2A3F', outfitColor2: '#22D3EE',
       eyeColor: '#3B2616', accessories: ['visor'],
     },
@@ -224,7 +225,7 @@ export const CHARACTERS = {
     screens: ['resume', 'stories', 'explications'],
     signature: 'reflexion',
     look: {
-      style: 'manga', face: 'soft', skin: '#7A4A2E', hair: 'braids', hairColor: '#20140F',
+      face: 'soft', skin: '#7A4A2E', hair: 'braids', hairColor: '#20140F',
       outfit: 'cardigan', outfitColor: '#3B1F4A', outfitColor2: '#E879F9',
       eyeColor: '#5C3417', accessories: ['earrings'],
     },
@@ -315,7 +316,7 @@ export const CHARACTERS = {
     screens: ['fiches', 'revision', 'swipe'],
     signature: 'clin',
     look: {
-      style: 'manga', face: 'soft', skin: '#8D5A3B', hair: 'puffs', hairColor: '#1F140E',
+      face: 'soft', skin: '#8D5A3B', hair: 'puffs', hairColor: '#1F140E',
       outfit: 'hoodie', outfitColor: '#26330F', outfitColor2: '#C6FF3D',
       eyeColor: '#4E2E17', accessories: ['clips'],
     },
@@ -406,7 +407,7 @@ export const CHARACTERS = {
     screens: ['quiz', 'examen'],
     signature: 'bras-croises',
     look: {
-      style: 'manga', skin: '#4A2C1D', hair: 'locks', hairColor: '#150E0B',
+      skin: '#4A2C1D', hair: 'locks', hairColor: '#150E0B',
       outfit: 'bomber', outfitColor: '#3A1410', outfitColor2: '#FF5A3D',
       eyeColor: '#3A2214', accessories: ['chain'],
     },
@@ -497,7 +498,7 @@ export const CHARACTERS = {
     screens: ['exercices', 'corrections'],
     signature: 'poing',
     look: {
-      style: 'manga', face: 'soft', skin: '#6B3E26', hair: 'bun', hairColor: '#1A110C',
+      face: 'soft', skin: '#6B3E26', hair: 'bun', hairColor: '#1A110C',
       outfit: 'track', outfitColor: '#3A2A0A', outfitColor2: '#FFC53D',
       eyeColor: '#4A2A15', accessories: ['whistle'],
     },
@@ -588,7 +589,7 @@ export const CHARACTERS = {
     screens: ['erreurs', 'reseau', 'quota', 'chargements'],
     signature: 'haussement',
     look: {
-      style: 'manga', skin: '#3E2418', hair: 'waves', hairColor: '#120C09',
+      skin: '#3E2418', hair: 'waves', hairColor: '#120C09',
       outfit: 'hoodie', outfitColor: '#1B2A44', outfitColor2: '#60A5FA',
       eyeColor: '#2F1B10', accessories: ['earbuds', 'beard'],
     },
@@ -682,7 +683,7 @@ Object.assign(CHARACTERS, {
     screens: ['badges', 'niveaux', 'statistiques', 'recap'],
     signature: 'hype',
     look: {
-      skin: '#9A6444', hair: 'ponytail', hairColor: '#1E120C',
+      face: 'soft', skin: '#9A6444', hair: 'ponytail', hairColor: '#1E120C',
       outfit: 'bomber', outfitColor: '#3D0F28', outfitColor2: '#FF3D9A',
       eyeColor: '#5A3317', accessories: ['hoops'],
     },

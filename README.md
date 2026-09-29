@@ -277,7 +277,7 @@ kai: {
     outfit: 'hoodie',          // tenue : hoodie, jacket, cardigan, bomber, track
     outfitColor: '#8B5CF6', outfitColor2: '#2A1F55',
     eyeColor: '#6A3F1F',
-    accessories: ['headphones'],  // headphones, visor, earrings, hoops, headband, earbuds, chain, clips, beard
+    accessories: ['headphones'],  // headphones, visor, earrings, hoops, whistle, earbuds, chain, clips, beard
   },
   images: {},                  // ← images qui remplacent le dessin (voir plus bas)
   voice: {},                   // ← voix audio (plus tard)
@@ -293,7 +293,10 @@ Modifie simplement le texte. `{prenom}` est remplacé par le prénom de l'utilis
 Tu peux ajouter autant de répliques que tu veux dans chaque liste.
 
 ### Changer l'apparence
-Modifie `look` puis regarde le résultat dans `galerie.html` (section 5).
+Les persos sont dessinés en **style manga shōnen** (portraits en buste, encrage épais,
+ombres franches). Modifie `look` (peau, coiffure, tenue, `face: 'soft'` pour des traits
+plus doux) puis regarde le résultat dans `galerie.html` (section 5) ou dans le
+Panneau créateur.
 Pour dessiner une nouvelle coiffure ou tenue : `src/ui/character.js`, fonctions `hair()`
 et `outfit()` (chaque style est un `case` avec des formes SVG).
 
