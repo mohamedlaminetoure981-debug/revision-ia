@@ -4,7 +4,7 @@
 
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
-import { esc, mascot, subjectColor } from '../ui/ui.js';
+import { esc, mascot, subjectColor, modal } from '../ui/ui.js';
 import { isTranscribed } from '../core/importer.js';
 import * as gen from '../core/generate.js';
 import { runAI } from './course.js';
@@ -30,8 +30,10 @@ export async function render(el) {
     </div>
 
     <div class="bento" style="margin-bottom:12px">
-      <div class="tile" style="opacity:.75"><div class="label">Awa</div><h3 style="margin:4px 0">✍️ Exercices</h3><div class="tiny muted">Bientôt</div></div>
-      <div class="tile" style="opacity:.75"><div class="label">Ren</div><h3 style="margin:4px 0">📝 Examen blanc</h3><div class="tiny muted">Bientôt</div></div>
+      <button class="tile neon" id="exos" style="--c:${CHARACTERS.awa.color};text-align:left;color:inherit;font:inherit;cursor:pointer">
+        <div class="label">Avec Awa</div><h3 style="margin:4px 0">✍️ Exercices</h3><div class="tiny muted">Corrigés étape par étape</div></button>
+      <a class="tile neon" href="#/exam" style="--c:${ren.color}">
+        <div class="label">Contre Ren</div><h3 style="margin:4px 0">📝 Examen blanc</h3><div class="tiny muted">Chrono + barème /20</div></a>
     </div>
 
     <h2>⚔️ Choisis ton terrain</h2>
@@ -55,6 +57,15 @@ export async function render(el) {
   `;
 
   el.querySelector('#timer').onchange = (e) => db.setSetting('quizTimer', e.target.checked);
+
+  // Exercices : on choisit d'abord le cours.
+  el.querySelector('#exos').onclick = () => {
+    if (!ready.length) { location.hash = '#/ajouter'; return; }
+    if (ready.length === 1) { location.hash = `#/course/${ready[0].id}/exercices`; return; }
+    modal(`<h3>✍️ Exercices sur quel cours ?</h3>
+      ${ready.map((c) => `<a class="tile course-card" href="#/course/${c.id}/exercices" data-close style="--c:${subjectColor(c.subject)};display:block;margin-bottom:8px">
+        <div class="tiny muted">${esc(c.subject)}</div><strong>${esc(c.title)}</strong></a>`).join('')}`);
+  };
   el.querySelectorAll('[data-new]').forEach((b) => {
     b.onclick = async () => {
       const course = await db.get('courses', b.dataset.new);

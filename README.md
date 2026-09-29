@@ -10,9 +10,10 @@ qui **marche hors ligne** pour réviser. Tu importes un cours (photos ou PDF), e
 | **Mory** 🩵 | le scanner | ajouter un cours (photo / PDF), analyse par l'IA |
 | **Nia** 🩷 | la conteuse | résumé en stories, explications ajoutées 💡 |
 | **Sora** 💚 | la mémoire | fiches à swiper, répétition espacée |
-| **Ren** 🧡 | le rival | quiz (et examen blanc en phase 2) |
-| **Awa** 💛 | la coach | exercices corrigés (phase 2) |
+| **Ren** 🧡 | le rival | quiz et examen blanc chronométré |
+| **Awa** 💛 | la coach | exercices corrigés étape par étape |
 | **Tidiane** 💙 | le calme | erreurs, coupures réseau, quota, chargements |
+| **Binta** 💗 | la hype | badges, niveaux gagnés, statistiques, récap de la semaine |
 
 > **Technique en une phrase :** HTML/CSS/JavaScript simple (sans framework) construit avec
 > **Vite**, IA **Google Gemini** appelée directement depuis le navigateur, données dans
@@ -181,7 +182,8 @@ revision-ia/
     │   ├── importer.js        Photos (compression), PDF (lecture), transcription
     │   ├── generate.js        Création du résumé, des fiches, des quiz
     │   ├── srs.js             Répétition espacée (algorithme SM-2)
-    │   └── game.js            XP, niveaux, série de jours, objectifs, aura
+    │   ├── game.js            XP, niveaux, série de jours, objectifs, aura
+    │   └── badges.js          Liste des badges et leurs conditions
     ├── ui/                    Outils d'affichage
     │   ├── character.js       Dessin SVG des persos en calques + animations
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
@@ -196,6 +198,9 @@ revision-ia/
         ├── review.js          Fiches à swiper (Sora)
         ├── quiz-hub.js        Onglet Quiz (Ren)
         ├── quiz-play.js       Duel de quiz + récap Wrapped (Ren)
+        ├── exercise.js        Un exercice : réponse (texte/photo) + correction (Awa)
+        ├── exam.js            Examen blanc : choix, chrono, correction avec barème (Ren)
+        ├── stats.js           Statistiques, badges, récap de la semaine (Binta)
         ├── profile.js         Profil
         ├── settings.js        Réglages
         └── report.js          Fenêtre « Signaler une erreur »
@@ -322,6 +327,11 @@ et mets `signature: 'monnom'` dans le perso.
 | `summaryPrompt` + `SUMMARY_SCHEMA` | résumé partie par partie + blocs « explication » |
 | `cardsPrompt` + `CARDS_SCHEMA` | fiches question/réponse + source |
 | `quizPrompt` + `QUIZ_SCHEMA` | QCM + explications + source |
+| `exercisesPrompt` + `EXERCISES_SCHEMA` | exercices d'application (Awa) |
+| `correctionPrompt` + `CORRECTION_SCHEMA` | correction étape par étape, note /20, conseils |
+| `verify…Prompt` + `VERIFY_SCHEMA` | mode vérification : 2e relecture des fiches, QCM et corrections |
+| `examPrompt` + `EXAM_SCHEMA` | sujet d'examen blanc (barème sur 20) |
+| `examCorrectionPrompt` + `EXAM_CORRECTION_SCHEMA` | correction de la copie avec barème |
 
 - **Changer le texte d'une consigne** : sans risque, modifie librement.
 - **Changer un schéma** (la forme du JSON demandé) : l'IA répond **exactement** dans cette
@@ -358,8 +368,30 @@ Dans `src/views/course.js` : ajoute une ligne dans `TABS` et une fonction dans `
 `src/core/db.js` : `db.put('store', objet)`, `db.get`, `db.getAll`, `db.getByIndex`…
 Pour ajouter un « store », ajoute-le dans `STORES` **et augmente `DB_VERSION`**.
 
-### Gains d'XP, objectifs du jour
+### Gains d'XP, objectifs du jour, badges
 `src/core/game.js` : `XP_RULES` (XP par action), `DAILY_GOALS`, `AURA_STEPS` (paliers de série).
+`src/core/badges.js` : liste `BADGES`. Pour en ajouter un, copie une ligne et change
+`id`, `icon`, `name`, `desc` et la condition `test` (ex. `(c) => c.reviews.length >= 1000`).
+Binta fête automatiquement chaque nouveau badge et chaque niveau gagné.
+
+---
+
+## 10 bis. Fonctions de la phase 2
+
+- **Exercices (Awa)** : onglet ✍️ Exercices d'un cours, ou Quiz → Exercices. Réponds en
+  texte **ou prends ton brouillon en photo** (compressée avant envoi). Awa corrige étape
+  par étape (juste / partiel / faux / manquant), met une note sur 20 et donne des conseils.
+  Ton brouillon de réponse est gardé automatiquement.
+- **Mode vérification** (Réglages → 🔍) : après chaque génération, un 2e appel à l'IA relit
+  les fiches, les QCM et les corrections en les comparant au cours. Il corrige les erreurs
+  (badge « 🔍 corrigée par la vérif ») ou signale les fiches fausses (mises dans « À corriger »)
+  et retire les questions ambiguës. ⚠️ Utilise environ 2× plus de quota gratuit.
+- **Examen blanc (Ren)** : Quiz → Examen blanc. Choisis un ou plusieurs cours et une durée.
+  Le chrono continue même si tu quittes l'écran, et tes réponses sont enregistrées au fur
+  et à mesure (rien n'est perdu si la connexion coupe : bouton « Réessayer » la correction).
+  Les QCM sont notés par l'appli, le reste par l'IA avec le barème.
+- **Statistiques (Binta)** : Profil → Stats. Activité des 14 derniers jours, progression
+  par matière, notions les plus ratées, badges, et **récap de la semaine** façon Wrapped.
 
 ---
 
@@ -417,8 +449,8 @@ La clé API et les photos ne sont pas incluses.
   compagnon, XP/niveaux/série, import photo/PDF, résumé en stories, fiches swipe SM-2,
   quiz contre Ren + récap Wrapped, sources vérifiées, signalement d'erreurs, JSON
   structuré + réessais, erreurs expliquées par Tidiane, hors ligne.
-- ⏳ **Phase 2** : exercices corrigés (Awa), mode vérification, Binta (badges, niveaux,
-  stats, récap de la semaine), examen blanc chronométré (Ren).
+- ✅ **Phase 2** : exercices corrigés (Awa, réponse texte ou photo), mode vérification,
+  Binta (badges, niveaux, stats, récap de la semaine), examen blanc chronométré (Ren).
 - ⏳ **Phase 3** : conseil de correction animé, auras et pouvoirs spéciaux.
 
 Bibliothèques utilisées (incluses dans l'appli, rien à télécharger en plus) :

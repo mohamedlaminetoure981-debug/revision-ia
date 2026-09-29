@@ -173,4 +173,32 @@ export function celebrate(result, fromEl) {
   } else if (result.streakUp && result.streak > 1) {
     setTimeout(() => onomatopoeia(`🔥 ${result.streak} JOURS!`), 300);
   }
+  // Binta fête les niveaux gagnés et les nouveaux badges.
+  if (result.levelUp || result.newBadges?.length) {
+    setTimeout(() => bintaParty(result), result.levelUp ? 1500 : 700);
+  }
+}
+
+/** Fenêtre de fête de Binta : niveau gagné et/ou badges débloqués. */
+async function bintaParty(result) {
+  const [{ modal, line, esc }, { characterHTML, play }] = await Promise.all([import('./ui.js'), import('./character.js')]);
+  const items = [
+    ...(result.levelUp ? [{ icon: '⬆️', name: `Niveau ${result.level}`, desc: 'Nouveau niveau atteint !' }] : []),
+    ...(result.newBadges || []),
+  ];
+  const m = modal(`
+    <div class="center" style="--c:#FF3D9A">
+      ${characterHTML('binta', { expression: 'celebration', size: 150 })}
+      <div class="bubble top" style="margin:8px 0 14px;text-align:left"><span class="who">Binta</span>${esc(line('binta', 'reussite'))}</div>
+      ${items.map((b) => `
+        <div class="tile neon badge-won" style="--c:#FF3D9A;margin-bottom:8px">
+          <div class="row nowrap"><span style="font-size:2.2rem">${b.icon}</span>
+            <div class="grow" style="text-align:left"><strong>${esc(b.name)}</strong><div class="small muted">${esc(b.desc)}</div></div></div>
+        </div>`).join('')}
+      <button class="btn pink block" data-close>Trop bien ! ✨</button>
+    </div>`);
+  confetti(120);
+  sound('level');
+  vibrate([20, 30, 20, 30, 50]);
+  setTimeout(() => play(m.el.querySelector('.ch'), 'signature'), 300);
 }

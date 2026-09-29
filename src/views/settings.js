@@ -14,7 +14,7 @@ const SUGGESTED_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-fl
 
 export async function render(el) {
   const s = {};
-  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration']) s[k] = await db.getSetting(k);
+  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode']) s[k] = await db.getSetting(k);
 
   let usage = '';
   try {
@@ -42,6 +42,7 @@ export async function render(el) {
       <datalist id="models">${SUGGESTED_MODELS.map((m) => `<option value="${m}">`).join('')}</datalist>
       <p class="tiny muted">Quota épuisé ou modèle qui ne marche plus ? Essaie-en un autre (les « lite » ont souvent plus de quota).
         <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Liste des modèles</a></p>
+      ${toggle('verifyMode', '🔍 Mode vérification', s.verifyMode, 'Un 2e appel à l’IA relit les fiches, quiz et corrections en les comparant au cours, et corrige ou signale les erreurs. Plus fiable, mais utilise 2× plus de quota.')}
       <div class="row nowrap" style="margin-top:10px">
         <button class="btn grow" id="save">💾 Enregistrer</button>
         <button class="btn ghost grow" id="test">🧪 Tester</button>
@@ -104,6 +105,10 @@ export async function render(el) {
       el.querySelectorAll('#theme button').forEach((x) => x.classList.toggle('active', x === b));
     };
   });
+  $('#verifyMode').onchange = async (e) => {
+    await db.setSetting('verifyMode', e.target.checked);
+    toast(e.target.checked ? '🔍 Mode vérification activé' : 'Mode vérification désactivé', 'ok');
+  };
   for (const k of ['sounds', 'vibration']) {
     $(`#${k}`).onchange = async (e) => {
       await db.setSetting(k, e.target.checked);

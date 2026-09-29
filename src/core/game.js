@@ -30,6 +30,8 @@ export const XP_RULES = {
   quizPerfect: 40, // bonus 100 %
   summaryDone: 25, // résumé lu jusqu'au bout
   courseAdded: 40, // nouveau cours ajouté
+  exercise: 20, // exercice corrigé (+ 2 XP par point obtenu sur 20)
+  exam: 60, // examen blanc terminé (+ 4 XP par point obtenu sur 20)
 };
 
 /** Objectifs du jour affichés sur l'accueil. */
@@ -37,6 +39,7 @@ export const DAILY_GOALS = [
   { id: 'cards', label: 'Révise 10 fiches', target: 10, icon: '🗂️' },
   { id: 'quizzes', label: 'Fais 1 quiz', target: 1, icon: '🎯' },
   { id: 'summaries', label: 'Lis 1 résumé', target: 1, icon: '📖' },
+  { id: 'exercises', label: 'Fais 1 exercice avec Awa', target: 1, icon: '✍️' },
 ];
 
 /** Paliers de la série qui font évoluer l'aura du compagnon. */
@@ -149,12 +152,20 @@ export async function addXp(amount, counter) {
   p.xp += amount;
   p.daily.xp += amount;
   p.xpByDay[today()] = (p.xpByDay[today()] || 0) + amount;
-  if (counter) p.daily[counter] = (p.daily[counter] || 0) + 1;
+  if (counter) {
+    p.daily[counter] = (p.daily[counter] || 0) + 1;
+    p.totals ||= {};
+    p.totals[counter] = (p.totals[counter] || 0) + 1; // compteurs à vie (badges)
+  }
   await saveProfile(p);
 
   const level = levelFromXp(p.xp);
   const streak = currentStreak(p);
+  // Badges débloqués par cette action (chargé à la demande pour éviter une boucle d'import).
+  const { checkBadges } = await import('./badges.js');
+  const newBadges = await checkBadges();
   return {
+    newBadges,
     gained: amount,
     level,
     levelUp: level > beforeLevel,

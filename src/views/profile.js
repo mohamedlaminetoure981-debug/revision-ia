@@ -43,8 +43,10 @@ export async function render(el) {
       <div class="tile"><div class="label">Fiches</div><div class="big">${cards.length}</div><div class="tiny muted">${reviews.length} révisions</div></div>
       <div class="tile span-2"><div class="label">Quiz</div>
         <div class="row between"><div class="big">${quizzes.length}</div><div class="small muted">moyenne ${avg === null ? '—' : `${avg} %`}</div></div></div>
-      <div class="tile span-2" style="opacity:.8"><div class="label">Badges & stats avancées</div>
-        <div class="small muted">Binta débarque bientôt avec les badges, les stats par matière et ton récap de la semaine ✨</div></div>
+      <a class="tile span-2 neon speedlines" href="#/stats" style="--c:${CHARACTERS.binta.color}">
+        <div class="row nowrap">${characterHTML('binta', { expression: 'joie', size: 64, enter: false })}
+          <div class="grow"><div class="label">Avec Binta</div><h3 style="margin:2px 0">📊 Stats, badges & récap</h3>
+          <div class="tiny muted">${Object.keys(p.badges || {}).length} badge(s) débloqué(s)</div></div></div></a>
     </div>
 
     <div class="stack">

@@ -10,7 +10,7 @@
 // =====================================================================
 
 import * as db from './db.js';
-import { generateJSON } from './gemini.js';
+import { generateJSON, blobToBase64 } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { initialState } from './srs.js';
 
@@ -112,8 +112,8 @@ export async function generateCards(course, onStatus) {
       check: (json) => (json.cards.length ? null : 'aucune fiche'),
     });
     let cards = res.cards;
-    // Phase 2 : relecture par l'IA si le mode vérification est activé.
-    if (hooks.verifyCards) cards = await hooks.verifyCards(course, pages, cards, status);
+    // Mode vérification : un 2e appel relit les fiches avant affichage.
+    if (await db.getSetting('verifyMode')) cards = await verifyCards(course, pages, cards, status);
     const now = new Date().toISOString();
     await db.putMany('cards', cards.map((c) => ({
       id: db.newId(),
@@ -124,7 +124,9 @@ export async function generateCards(course, onStatus) {
       question: c.question,
       answer: c.answer,
       source: c.source,
-      verified: c.verified, // défini seulement en mode vérification
+      check: c.check, // 'ok' | 'corrige' | 'faux' (seulement en mode vérification)
+      checkComment: c.checkComment,
+      flagged: c.check === 'faux', // fiche jugée fausse → à corriger, pas proposée en révision
       createdAt: now,
       ...initialState(),
     })));
@@ -158,7 +160,7 @@ export async function generateQuiz(course, count, onStatus) {
     },
   });
   let questions = res.questions;
-  if (hooks.verifyQuiz) questions = await hooks.verifyQuiz(course, questions, onStatus);
+  if (await db.getSetting('verifyMode')) questions = await verifyQuiz(course, questions, onStatus);
   const quiz = {
     id: db.newId(),
     courseId: course.id,
@@ -169,7 +171,192 @@ export async function generateQuiz(course, count, onStatus) {
   return quiz;
 }
 
+// =====================================================================
+// MODE VÉRIFICATION (phase 2) — un 2e appel à l'IA relit le travail
 // ---------------------------------------------------------------------
-// Points d'extension (utilisés par la phase 2 : mode vérification)
-// ---------------------------------------------------------------------
-export const hooks = { verifyCards: null, verifyQuiz: null };
+// Activé dans Réglages. Coûte un appel de plus (quota), mais réduit les
+// erreurs : les fiches/questions sont corrigées ou signalées AVANT affichage.
+// =====================================================================
+
+/** Relit des fiches : corrige les réponses fausses, signale les fiches absurdes. */
+async function verifyCards(course, pages, cards, onStatus) {
+  onStatus?.('🔍 vérification des fiches…');
+  const res = await generateJSON({
+    parts: [{ text: P.verifyCardsPrompt(P.courseText(pages, unitLabel(course)), cards) }],
+    schema: P.VERIFY_SCHEMA,
+    system: P.SYSTEM,
+    temperature: 0.1,
+  });
+  return cards.map((c, i) => {
+    const v = res.items.find((x) => x.index === i);
+    if (!v) return c;
+    if (v.status === 'corrige' && v.fixed.trim()) return { ...c, answer: v.fixed, check: 'corrige', checkComment: v.comment };
+    return { ...c, check: v.status, checkComment: v.comment };
+  });
+}
+
+/** Relit un QCM : corrige la bonne réponse / l'explication, retire les questions ambiguës. */
+async function verifyQuiz(course, questions, onStatus) {
+  onStatus?.('🔍 vérification des questions…');
+  const res = await generateJSON({
+    parts: [{ text: P.verifyQuizPrompt(P.courseText(course.pages, unitLabel(course)), questions) }],
+    schema: P.VERIFY_SCHEMA,
+    system: P.SYSTEM,
+    temperature: 0.1,
+  });
+  const out = [];
+  questions.forEach((q, i) => {
+    const v = res.items.find((x) => x.index === i);
+    if (v?.status === 'faux') return; // question ambiguë : on la retire
+    if (v?.status === 'corrige') {
+      const idx = v.fixedIndex >= 0 && v.fixedIndex < q.choices.length ? v.fixedIndex : q.correctIndex;
+      out.push({ ...q, correctIndex: idx, explanation: v.fixed.trim() || q.explanation, check: 'corrige' });
+    } else {
+      out.push({ ...q, check: v ? 'ok' : undefined });
+    }
+  });
+  return out.length ? out : questions;
+}
+
+// =====================================================================
+// EXERCICES (phase 2, Awa)
+// =====================================================================
+
+/** Crée `count` exercices d'application sur le cours et les enregistre. */
+export async function generateExercises(course, count, onStatus) {
+  const previous = await db.getByIndex('exercises', 'courseId', course.id);
+  onStatus?.('Awa prépare les exercices…');
+  const res = await generateJSON({
+    parts: [{ text: P.exercisesPrompt(P.courseText(course.pages, unitLabel(course)), count, previous.map((e) => e.title)) }],
+    schema: P.EXERCISES_SCHEMA,
+    system: P.SYSTEM,
+    temperature: 0.7,
+    onStatus,
+    check: (json) => (json.exercises.length ? null : 'aucun exercice'),
+  });
+  const now = new Date().toISOString();
+  const list = res.exercises.map((e) => ({
+    id: db.newId(), courseId: course.id, subject: course.subject, createdAt: now, attempts: [], ...e,
+  }));
+  await db.putMany('exercises', list);
+  return list;
+}
+
+/**
+ * Corrige la réponse de l'élève (texte et/ou photo du brouillon), étape par étape.
+ * @param {Blob} [image] photo compressée de la réponse manuscrite (facultatif)
+ */
+export async function correctExercise(course, exercise, answer, image, onStatus) {
+  const text = P.courseText(course.pages, unitLabel(course));
+  const parts = [{ text: P.correctionPrompt(text, exercise.statement, answer, !!image) }];
+  if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: await blobToBase64(image) } });
+  onStatus?.('Awa corrige ta copie…');
+  let correction = await generateJSON({
+    parts, schema: P.CORRECTION_SCHEMA, system: P.SYSTEM, temperature: 0.2, onStatus,
+    check: (j) => (j.grade < 0 || j.grade > 20 ? 'note hors de 0-20' : null),
+  });
+  // Mode vérification : un 2e appel relit la correction.
+  if (await db.getSetting('verifyMode')) {
+    onStatus?.('🔍 vérification de la correction…');
+    const v = await generateJSON({
+      parts: [{ text: P.verifyCorrectionPrompt(text, exercise.statement, answer, correction) }],
+      schema: P.VERIFY_SCHEMA, system: P.SYSTEM, temperature: 0.1,
+    });
+    const item = v.items[0];
+    if (item?.status === 'corrige' && item.fixed.trim()) {
+      correction = {
+        ...correction,
+        solution: item.fixed,
+        grade: item.fixedIndex >= 0 && item.fixedIndex <= 20 ? item.fixedIndex : correction.grade,
+        check: 'corrige',
+        checkComment: item.comment,
+      };
+    } else if (item) {
+      correction = { ...correction, check: item.status, checkComment: item.comment };
+    }
+  }
+  const attempt = { date: new Date().toISOString(), answer, hasImage: !!image, correction };
+  exercise.attempts = [...(exercise.attempts || []), attempt];
+  await db.put('exercises', exercise);
+  await db.put('results', {
+    id: db.newId(), type: 'exercise', courseId: course.id, subject: course.subject, exerciseId: exercise.id,
+    score: correction.grade, total: 20, date: attempt.date,
+    missed: correction.grade < 10 ? [exercise.title] : [],
+  });
+  return attempt;
+}
+
+// =====================================================================
+// EXAMEN BLANC (phase 2, Ren)
+// =====================================================================
+
+/** Texte de plusieurs cours à la suite (pour un examen multi-cours). */
+function multiCourseText(courses) {
+  return courses.map((c) => `===== ${c.title} (${c.subject}) =====\n${P.courseText(c.pages, unitLabel(c))}`).join('\n\n');
+}
+
+/** Crée un sujet d'examen blanc (barème sur 20) sur un ou plusieurs cours. */
+export async function generateExam(courses, minutes, onStatus) {
+  onStatus?.('Ren rédige le sujet…');
+  const res = await generateJSON({
+    parts: [{ text: P.examPrompt(multiCourseText(courses), minutes) }],
+    schema: P.EXAM_SCHEMA,
+    system: P.SYSTEM,
+    temperature: 0.6,
+    onStatus,
+    check: (j) => {
+      if (!j.questions.length) return 'aucune question';
+      const bad = j.questions.findIndex((q) => q.kind === 'qcm' && (q.choices.length < 2 || q.correctIndex < 0 || q.correctIndex >= q.choices.length));
+      return bad >= 0 ? `QCM ${bad + 1} mal formé` : null;
+    },
+  });
+  // Remet le barème exactement sur 20 si l'IA s'est trompée dans le total.
+  const sum = res.questions.reduce((s, q) => s + q.points, 0);
+  if (sum > 0 && Math.abs(sum - 20) > 0.01) {
+    res.questions.forEach((q) => { q.points = Math.round((q.points * 20 * 2) / sum) / 2; });
+  }
+  const exam = {
+    id: db.newId(), createdAt: new Date().toISOString(), minutes,
+    courseIds: courses.map((c) => c.id), subjects: [...new Set(courses.map((c) => c.subject))],
+    title: res.title, instructions: res.instructions, questions: res.questions, attempts: [],
+  };
+  await db.put('exams', exam);
+  return exam;
+}
+
+/** Corrige une copie d'examen blanc avec le barème. QCM notés automatiquement. */
+export async function correctExam(exam, courses, answers, onStatus) {
+  onStatus?.('Le jury délibère…');
+  const res = await generateJSON({
+    parts: [{ text: P.examCorrectionPrompt(multiCourseText(courses), exam, answers) }],
+    schema: P.EXAM_CORRECTION_SCHEMA,
+    system: P.SYSTEM,
+    temperature: 0.2,
+    onStatus,
+  });
+  // Les QCM sont notés par l'appli (pas par l'IA) : fiable à 100 %.
+  const details = exam.questions.map((q, i) => {
+    const ai = res.questions.find((x) => x.index === i);
+    if (q.kind === 'qcm') {
+      const ok = answers[i] === q.correctIndex;
+      return { points: ok ? q.points : 0, comment: ok ? 'Bonne réponse ✓' : `Mauvaise réponse. ${ai?.comment || ''}`.trim() };
+    }
+    const pts = Math.max(0, Math.min(q.points, Number(ai?.points) || 0));
+    return { points: pts, comment: ai?.comment || 'Pas de commentaire.' };
+  });
+  const total = Math.round(details.reduce((s, d) => s + d.points, 0) * 2) / 2;
+  const attempt = { date: new Date().toISOString(), answers, details, total, verdict: verdictOf(total), advice: res.advice };
+  exam.attempts = [...(exam.attempts || []), attempt];
+  await db.put('exams', exam);
+  await db.put('results', {
+    id: db.newId(), type: 'exam', examId: exam.id, courseId: exam.courseIds[0], subject: exam.subjects.join(', '),
+    score: total, total: 20, date: attempt.date,
+    missed: exam.questions.filter((q, i) => details[i].points < q.points / 2).map((q) => q.statement.slice(0, 160)),
+  });
+  return attempt;
+}
+
+/** Niveau de résultat à partir d'une note sur 20. */
+export function verdictOf(note20) {
+  return note20 >= 16 ? 'excellent' : note20 >= 12 ? 'bon' : note20 >= 8 ? 'moyen' : 'a_retravailler';
+}

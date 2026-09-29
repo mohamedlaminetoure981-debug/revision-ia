@@ -671,6 +671,100 @@ export const CHARACTERS = {
   },
 };
 
+// Binta est ajoutée à l'équipe juste en dessous (phase 2).
+Object.assign(CHARACTERS, {
+  // -------------------------------------------------------------------
+  binta: {
+    name: 'Binta',
+    role: 'La hype',
+    personality: 'Énergique, elle fête chaque victoire : badges, niveaux gagnés, statistiques et récap de la semaine.',
+    color: '#FF3D9A',
+    screens: ['badges', 'niveaux', 'statistiques', 'recap'],
+    signature: 'hype',
+    look: {
+      skin: '#9A6444', hair: 'ponytail', hairColor: '#1E120C',
+      outfit: 'bomber', outfitColor: '#3D0F28', outfitColor2: '#FF3D9A',
+      eyeColor: '#5A3317', accessories: ['hoops'],
+    },
+    images: {},
+    voice: {},
+    lines: {
+      arrivee: [
+        'HEYYY {prenom} ! On regarde tes stats ?',
+        'Binta dans la place ! Prêt(e) à voir tes exploits ?',
+        'Tes chiffres sont chauds aujourd’hui 🔥',
+        'Je t’ai préparé ton récap, il est trop beau !',
+        'Yo ! Tes badges t’attendent !',
+        'On célèbre quoi aujourd’hui ?',
+        'Coucou la star ! Regarde ce que tu as accompli.',
+        'Allez, on check ta progression !',
+        'J’adore les stats. Surtout les tiennes.',
+        'Prêt(e) pour un peu de hype ?',
+      ],
+      reussite: [
+        'LET’S GOOO ! Nouveau badge !',
+        'Incroyable ! Je savais que t’allais le faire !',
+        'Wouhouuu ! T’es une légende !',
+        'Badge débloqué ! Tu collectionnes, hein ?',
+        'NIVEAU SUPÉRIEUR ! Je crie trop fort ?',
+        'Tes stats montent en flèche 📈',
+        'GG ! Toute la team t’applaudit !',
+        'C’est historique ! Je note tout !',
+        'T’es en feu, personne peut t’arrêter !',
+        'Moment légendaire ! Capture d’écran obligatoire !',
+      ],
+      echec: [
+        'Même les champions ont des jours sans. Demain, on repart !',
+        'Pas grave ! Les stats, ça remonte toujours.',
+        'Une petite baisse, c’est rien. Regarde tout ce que t’as déjà fait !',
+        'On s’en fiche de cette note, t’as progressé ailleurs !',
+        'Allez, la remontée va être épique !',
+        'Les plus belles histoires ont des rebondissements.',
+        'T’inquiète, je garde ta place sur le podium.',
+        'Respire, souris, et on y retourne !',
+        'Tes efforts comptent plus que les chiffres.',
+        'Demain, je te prépare une fête !',
+      ],
+      attente: [
+        'Je calcule tes stats… suspense !',
+        'Je compte tes XP un par un…',
+        'Je prépare les confettis…',
+        'Je polis tes badges…',
+        'Récap en préparation… ça va être beau !',
+        'Je range tes trophées…',
+        'Deux secondes, je fais les graphiques !',
+        'Je vérifie ta série de jours…',
+        'Chargement de la hype…',
+        'Presque prêt, je gonfle les ballons !',
+      ],
+      encouragement: [
+        'Encore un effort et tu débloques un badge !',
+        'Ta série de jours est précieuse, protège-la !',
+        'Tu es à quelques XP du niveau suivant !',
+        'Un quiz de plus et ton récap sera incroyable !',
+        'Chaque jour compte pour ta série 🔥',
+        'Vise le badge “7 jours de suite” !',
+        'Les petits pas font les grandes stats.',
+        'Allez, montre-moi une belle courbe !',
+        'Ton futur récap te remercie d’avance.',
+        'Tu vas voir, ta progression va exploser !',
+      ],
+      fin: [
+        'Récap terminé ! T’es une star ✨',
+        'À la semaine prochaine pour un nouveau récap !',
+        'Garde cette énergie, champion(ne) !',
+        'Je range les confettis… pour la prochaine fois !',
+        'Continue comme ça, je veux fêter encore !',
+        'Bye ! Et n’oublie pas ta série !',
+        'C’était ta semaine. Et la prochaine sera meilleure.',
+        'Fin du show ! Applaudissements !',
+        'Tu mérites un repos de star.',
+        'À très vite pour la suite de tes exploits !',
+      ],
+    },
+  },
+});
+
 /** Ordre d'affichage de l'équipe. */
 export const TEAM = Object.keys(CHARACTERS);
 
@@ -684,5 +778,6 @@ export const SCREEN_OWNER = {
   quiz: 'ren',
   exercices: 'awa',
   erreurs: 'tidiane',
+  stats: 'binta',
   profil: 'kai',
 };

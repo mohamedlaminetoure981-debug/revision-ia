@@ -129,3 +129,30 @@ details > summary .rich p { display: inline; margin: 0; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .thumb .n { position: absolute; left: 5px; top: 5px; background: var(--overlay); color: var(--text); font-size: .72rem; font-weight: 800; border-radius: 8px; padding: 0 7px; }
 .thumb button { position: absolute; right: 4px; top: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--overlay); color: var(--text); cursor: pointer; }
+
+/* ---------- Statistiques (Binta) ---------- */
+/* Histogramme XP : barres fines, extrémité arrondie 4px, 2px d'écart, une seule teinte. */
+.xp-chart { display: grid; grid-template-columns: repeat(14, 1fr); gap: 2px; height: 140px; align-items: end; margin-top: 6px; border-bottom: 1px solid var(--border); }
+.xp-col { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; background: none; border: 0; padding: 0 0 18px; cursor: pointer; color: var(--text-dim); font: inherit; }
+.xp-bar { width: 70%; max-width: 18px; border-radius: 4px 4px 0 0; background: var(--neon-violet); transition: height .6s cubic-bezier(.2, .9, .3, 1); }
+.xp-col.today .xp-bar { background: var(--neon-green); }
+.xp-col.sel .xp-bar { outline: 2px solid var(--text); outline-offset: 1px; }
+.xp-day { position: absolute; bottom: 0; font-size: .65rem; }
+.xp-top { font-size: .65rem; font-weight: 800; color: var(--text-soft); margin-bottom: 2px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: 6px; }
+.data-table th, .data-table td { border-bottom: 1px solid var(--border); padding: 4px 6px; text-align: left; }
+.subj-row { margin: 10px 0; }
+.subj-row .bar { margin-top: 4px; }
+.missed { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border); color: var(--text); text-decoration: none; }
+.missed:last-child { border-bottom: 0; }
+.badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.badge { text-align: center; padding: 10px 4px; border-radius: 16px; background: var(--bg-2); border: 1px solid var(--border); opacity: .55; }
+.badge .ico { font-size: 1.8rem; display: block; }
+.badge b { display: block; font-size: .72rem; line-height: 1.2; margin-top: 4px; }
+.badge small { display: block; font-size: .62rem; color: var(--text-dim); line-height: 1.2; margin-top: 2px; }
+.badge.won { opacity: 1; border-color: var(--neon-pink); box-shadow: 0 0 14px color-mix(in srgb, var(--neon-pink) 30%, transparent); }
+.badge-won { animation: a-pop .5s cubic-bezier(.3, 1.8, .5, 1); }
+
+/* ---------- Examen blanc : chrono collant en haut ---------- */
+.exam-timer { position: sticky; top: calc(8px + env(safe-area-inset-top)); z-index: 15; margin-bottom: 12px; padding: 10px 14px; }
+.exam-timer .display { font-size: 1.3rem; font-variant-numeric: tabular-nums; }

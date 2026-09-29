@@ -186,6 +186,8 @@ export function toast(message, type = 'info', ms = 3500) {
   el.className = `toast toast-${type}`;
   el.textContent = message;
   box.appendChild(el);
+  // Au plus 2 messages à la fois (sinon ils cachent l'écran).
+  while (box.children.length > 2) box.firstElementChild.remove();
   setTimeout(() => el.remove(), type === 'error' ? ms * 2 : ms);
 }
 

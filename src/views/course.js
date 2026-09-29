@@ -160,7 +160,8 @@ async function renderCards(el, course) {
   const cardHtml = (c) => `
     <details class="tile" style="margin-bottom:8px;${c.flagged ? 'border-color:var(--bad)' : ''}">
       <summary style="cursor:pointer;font-weight:700"><span class="rich" style="display:inline">${rich(c.question)}</span>
-        ${c.flagged ? ' <span class="chip bad">🚩 fausse</span>' : ''}${c.edited ? ' <span class="chip">✏️ corrigée</span>' : ''}${c.verified === false ? ' <span class="chip warn">⚠ doute IA</span>' : ''}</summary>
+        ${c.flagged ? ' <span class="chip bad">🚩 fausse</span>' : ''}${c.edited ? ' <span class="chip">✏️ corrigée</span>' : ''}${c.check === 'ok' ? ' <span class="chip ok">🔍 vérifiée</span>' : ''}${c.check === 'corrige' ? ' <span class="chip warn">🔍 corrigée par la vérif</span>' : ''}</summary>
+      ${c.checkComment && c.check !== 'ok' ? `<p class="tiny muted">🔍 ${esc(c.checkComment)}</p>` : ''}
       <div class="rich" style="margin-top:8px">${rich(c.answer)}</div>
       ${sourceHtml(course, c.source)}
       <div class="row between tiny dim" style="margin-top:8px">
@@ -245,13 +246,32 @@ async function renderQuizzes(el, course) {
 }
 
 // ---------------------------------------------------------------------
-// Onglet Exercices (Awa) — arrive en phase 2
+// Onglet Exercices (Awa)
 // ---------------------------------------------------------------------
-async function renderExercises(el) {
+async function renderExercises(el, course) {
+  const exos = (await db.getByIndex('exercises', 'courseId', course.id)).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const DIFF = { facile: '🟢', moyen: '🟡', difficile: '🔴' };
   el.innerHTML = `
-    <div class="tile">
-      ${mascot('awa', { text: 'Mes exercices corrigés étape par étape arrivent très bientôt. Échauffe-toi avec les fiches en attendant !', expression: 'concentration' })}
-    </div>`;
+    <div class="tile" style="margin-bottom:12px">
+      ${mascot('awa', { situation: exos.length ? 'encouragement' : 'arrivee', expression: 'concentration' })}
+      <div class="seg" id="count" style="margin-top:14px">
+        <button data-n="3" class="active">3 exercices</button><button data-n="5">5</button>
+      </div>
+      <button class="btn block" id="gen" style="margin-top:10px;background:${CHARACTERS.awa.color};color:var(--on-neon)">✍️ Nouveaux exercices</button>
+    </div>
+    ${exos.map((x) => {
+      const best = x.attempts?.length ? Math.max(...x.attempts.map((a) => a.correction.grade)) : null;
+      return `
+      <a class="tile" href="#/exo/${x.id}" style="display:block;margin-bottom:8px;text-decoration:none;color:inherit">
+        <div class="row nowrap"><span>${DIFF[x.difficulty] || '•'}</span><strong class="grow">${esc(x.title)}</strong>
+          ${best === null ? '<span class="chip">à faire</span>' : `<span class="chip ${best >= 10 ? 'ok' : 'warn'}">${best}/20</span>`}</div>
+      </a>`;
+    }).join('')}`;
+  let count = 3;
+  el.querySelectorAll('#count button').forEach((b) => {
+    b.onclick = () => { count = Number(b.dataset.n); el.querySelectorAll('#count button').forEach((x) => x.classList.toggle('active', x === b)); };
+  });
+  el.querySelector('#gen').onclick = () => runAI('Awa prépare tes exercices', 'awa', (set) => gen.generateExercises(course, count, set));
 }
 
 // ---------------------------------------------------------------------

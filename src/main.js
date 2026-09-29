@@ -29,6 +29,9 @@ import * as quizHub from './views/quiz-hub.js';
 import * as quizPlay from './views/quiz-play.js';
 import * as profile from './views/profile.js';
 import * as settings from './views/settings.js';
+import * as exercise from './views/exercise.js';
+import * as exam from './views/exam.js';
+import * as stats from './views/stats.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -44,6 +47,9 @@ const ROUTES = {
   play: { view: quizPlay, fullscreen: true }, //  #/play/ID_QUIZ
   profil: { view: profile }, //                   #/profil
   reglages: { view: settings }, //                #/reglages
+  exo: { view: exercise }, //                     #/exo/ID_EXERCICE
+  exam: { view: exam }, //                        #/exam[/ID_EXAMEN]
+  stats: { view: stats }, //                      #/stats
 };
 
 const app = document.getElementById('app');
@@ -66,7 +72,7 @@ async function route() {
   }
   const r = ROUTES[name] || ROUTES[''];
   nav.hidden = !!r.fullscreen;
-  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (name === 'reglages' && a.dataset.route === 'profil')));
+  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
   try {
     const box = document.createElement('div');
