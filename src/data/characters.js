@@ -224,7 +224,7 @@ export const CHARACTERS = {
     screens: ['resume', 'stories', 'explications'],
     signature: 'reflexion',
     look: {
-      skin: '#7A4A2E', hair: 'braids', hairColor: '#20140F',
+      style: 'manga', face: 'soft', skin: '#7A4A2E', hair: 'braids', hairColor: '#20140F',
       outfit: 'cardigan', outfitColor: '#3B1F4A', outfitColor2: '#E879F9',
       eyeColor: '#5C3417', accessories: ['earrings'],
     },

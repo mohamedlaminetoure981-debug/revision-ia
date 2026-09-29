@@ -454,6 +454,7 @@ function palette(L) {
 const MY = 103; // hauteur des yeux
 const MX = { l: 87, r: 113 };
 const FACE = 'M71,84 C71,68 83,56 100,56 C117,56 129,68 129,84 L130,102 C130,112 127,120 122,127 L109,144 Q100,151 91,144 L78,127 C73,120 70,112 70,102 Z';
+const FACE_SOFT = 'M71,84 C71,68 83,56 100,56 C117,56 129,68 129,84 L130,101 C130,113 126,122 120,129 L108,142 Q100,148 92,142 L80,129 C74,122 70,113 70,101 Z';
 const FACE_SHADOW = 'M70,102 C70,112 73,120 78,127 L91,144 Q95,147 99,148 L94,138 L83,124 C79,117 77,108 77,99 L76,86 Q72,90 70,102 Z';
 
 /** Œil en amande (coin extérieur pointu). side = -1 (gauche) ou 1 (droite). */
@@ -474,6 +475,10 @@ function mEye(cx, type, side, L, P, id) {
   const withClip = (shape, content) => `<clipPath id="${id}"><path d="${shape}"/></clipPath>
     <path d="${shape}" fill="#fff"/><g clip-path="url(#${id})">${content}</g>`;
 
+  // Cils marqués pour les visages doux
+  const lashes = L.face === 'soft'
+    ? `<path d="M${outer + 3 * side},${cy - 4.8} l${2.6 * side},-2.4 M${outer + 1 * side},${cy - 6} l${1.6 * side},-2.8" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>`
+    : '';
   if (type === 'happy' || (type === 'wink' && side > 0)) { // yeux fermés souriants (^ ^)
     return `<path d="M${inner},${cy + 1} Q${cx},${cy - 6} ${outer + 3 * side},${cy - 1}" fill="none" stroke="${INK}" stroke-width="2.8" stroke-linecap="round"/>
       <path d="M${cx - 2 * side},${cy + 3.5} Q${cx + 3 * side},${cy + 4.5} ${cx + 7 * side},${cy + 2.6}" fill="none" stroke="${INK}" stroke-width="1" opacity=".6"/>`;
@@ -500,11 +505,11 @@ function mEye(cx, type, side, L, P, id) {
   if (type === 'up') { dx = 1.2; dy = -2; }
   if (type === 'soft') { dy = 0.8; shine = 1.25; }
   if (type === 'shiny' || type === 'stars') { shine = 1.5; extra = sparkle(cx + dx - 1.5, cy - 1, 2.6, '#fff', ''); }
-  return `${withClip(almond(), iris(dx, dy, 5.4, shine) + extra)}${lid()}${lower}${crease}`;
+  return `${withClip(almond(), iris(dx, dy, 5.4, shine) + extra)}${lid()}${lower}${crease}${lashes}`;
 }
 
 /** Sourcils épais, effilés vers l'extérieur. */
-function mBrows(type, P) {
+function mBrows(type, P, soft = false) {
   // [yIntérieur, yExtérieur] pour chaque sourcil (gauche, droite)
   const T = {
     neutral: [[92, 90], [92, 90]], raised: [[88, 86], [88, 86]], high: [[85, 84], [85, 84]],
@@ -515,7 +520,8 @@ function mBrows(type, P) {
     const ix = 100 + 6 * side;
     const ox = 100 + 26 * side;
     const mx = (ix + ox) / 2;
-    return `<path d="M${ix},${iy + 3.4} L${ix},${iy - 0.6} Q${mx},${Math.min(iy, oy) - 3} ${ox},${oy} Q${mx},${Math.min(iy, oy) + 0.8} ${ix},${iy + 3.4} Z" fill="${P.hair}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`;
+    const t = soft ? 2.2 : 3.4; // épaisseur (plus fin pour les visages doux)
+    return `<path d="M${ix},${iy + t} L${ix},${iy - 0.6} Q${mx},${Math.min(iy, oy) - 3} ${ox},${oy} Q${mx},${Math.min(iy, oy) + 0.8} ${ix},${iy + t} Z" fill="${P.hair}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`;
   }).join('');
 }
 
@@ -546,6 +552,32 @@ function mMouth(type, P) {
     default: // smile
       return `<path d="M94,130.6 Q100,134.8 106,130" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round"/>${lip}`;
   }
+}
+
+/**
+ * Tresse / box braid manga : corde encrée avec motif en chevrons,
+ * ombre à gauche, reflet à droite, perle au bout (couleur du perso).
+ */
+function mBraid(x0, y0, qx, qy, x1, y1, w, P, L, bead = true) {
+  const d = `M${x0},${y0} Q${qx},${qy} ${x1},${y1}`;
+  let marks = '';
+  const n = Math.max(4, Math.round(Math.hypot(x1 - x0, y1 - y0) / 7));
+  for (let i = 1; i < n; i++) {
+    const t = i / n;
+    const x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * qx + t * t * x1;
+    const y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * qy + t * t * y1;
+    const dx = 2 * (1 - t) * (qx - x0) + 2 * t * (x1 - qx);
+    const dy = 2 * (1 - t) * (qy - y0) + 2 * t * (y1 - qy);
+    const len = Math.hypot(dx, dy) || 1;
+    const tx = dx / len; const ty = dy / len;
+    const nx = -ty; const ny = tx;
+    const h = w / 2 - 0.6;
+    marks += `<path d="M${(x - nx * h).toFixed(1)},${(y - ny * h).toFixed(1)} L${(x + tx * 3).toFixed(1)},${(y + ty * 3).toFixed(1)} L${(x + nx * h).toFixed(1)},${(y + ny * h).toFixed(1)}" fill="none" stroke="${P.hairSh}" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M${(x + nx * h * 0.2 + tx * 2.4).toFixed(1)},${(y + ny * h * 0.2 + ty * 2.4).toFixed(1)} L${(x + nx * h * 0.8 + tx * 0.5).toFixed(1)},${(y + ny * h * 0.8 + ty * 0.5).toFixed(1)}" stroke="${P.hairHi}" stroke-width="1.2" stroke-linecap="round"/>`;
+  }
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 3}" stroke-linecap="round"/>
+    <path d="${d}" fill="none" stroke="${P.hair}" stroke-width="${w}" stroke-linecap="round"/>${marks}
+    ${bead ? `<circle cx="${x1}" cy="${y1 + w / 2 + 2}" r="${w / 2 + 0.6}" fill="${L.color}" stroke="${INK}" stroke-width="1.4"/>` : ''}`;
 }
 
 /** Cheveux style manga : { back, front }. */
@@ -612,6 +644,23 @@ function mHair(L, P) {
           <path d="${fringe}" fill="none" ${o}/>`,
       };
     }
+    case 'braids': { // Nia : longues box braids, raie au milieu
+      const cap = 'M68,100 L68,74 Q72,54 94,50 L100,54 L106,50 Q128,54 132,74 L132,100 Q128,84 120,76 Q110,68 100,60 Q90,68 80,76 Q72,84 68,100 Z';
+      return {
+        back: [
+          mBraid(72, 80, 58, 140, 52, 206, 8, P, L), mBraid(78, 74, 66, 140, 64, 214, 8, P, L),
+          mBraid(86, 68, 78, 140, 76, 208, 7, P, L, false),
+          mBraid(128, 80, 142, 140, 148, 206, 8, P, L), mBraid(122, 74, 134, 140, 136, 214, 8, P, L),
+          mBraid(114, 68, 122, 140, 124, 208, 7, P, L, false),
+        ].join(''),
+        front: `<path d="${cap}" fill="${P.hair}"/>
+          <path d="M68,100 L68,74 Q72,56 90,51 Q78,64 78,80 Q72,86 68,100 Z" fill="${P.hairSh}"/>
+          <path d="M100,60 Q88,66 79,79 M100,60 Q112,66 121,79 M97,53 Q82,56 73,70 M103,53 Q118,56 127,70" fill="none" stroke="${P.hairSh}" stroke-width="1.6"/>
+          <path d="M108,56 Q118,60 124,68 M106,62 Q114,66 118,72" fill="none" stroke="${P.hairHi}" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="${cap}" fill="none" ${o}/>
+          ${mBraid(69, 94, 62, 140, 60, 186, 8, P, L)}${mBraid(131, 94, 138, 140, 140, 186, 8, P, L)}`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -647,6 +696,15 @@ function mOutfit(L, P) {
         <rect x="128" y="204" width="20" height="14" rx="2" fill="${P.mainSh}" stroke="${INK}" stroke-width="1.2"/>
         <rect x="131" y="202" width="6" height="4" rx="1" fill="${P.acc}"/>
         ${outline}`;
+    case 'cardigan': // Nia : cardigan ouvert sur un t-shirt
+      return `${base}
+        <path d="M84,168 Q100,190 116,168 L120,232 L80,232 Z" fill="${P.acc}"/>
+        <path d="M84,168 Q90,180 96,185 L90,232 L80,232 Z" fill="${shade(P.acc, -0.3)}"/>
+        <path d="M84,168 Q100,190 116,168" fill="none" stroke="${INK}" stroke-width="1.6"/>
+        <path d="M84,168 L88,200 L80,232 M116,168 L112,200 L120,232" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M86,172 L90,200 M114,172 L110,200" stroke="${P.mainHi}" stroke-width="1.4" opacity=".7"/>
+        <circle cx="85" cy="208" r="2.4" fill="${P.acc}" stroke="${INK}" stroke-width="1.1"/><circle cx="83" cy="222" r="2.4" fill="${P.acc}" stroke="${INK}" stroke-width="1.1"/>
+        ${outline}`;
     default:
       return `${base}${outline}`;
   }
@@ -656,8 +714,12 @@ function mOutfit(L, P) {
 function mAccessories(L, P) {
   const acc = new Set(L.accessories || []);
   let body = '';
-  const head = '';
+  let head = '';
   let glasses = '';
+  if (acc.has('earrings')) {
+    head += `<circle cx="66" cy="118" r="3.4" fill="none" stroke="#FFD23F" stroke-width="2"/><circle cx="134" cy="118" r="3.4" fill="none" stroke="#FFD23F" stroke-width="2"/>
+      <circle cx="66" cy="121.4" r="1.4" fill="#FFD23F"/><circle cx="134" cy="121.4" r="1.4" fill="#FFD23F"/>`;
+  }
   if (acc.has('visor')) { // Mory : lunettes tech rectangulaires
     const lens = (side) => {
       const x1 = side < 0 ? 73 : 103; const x2 = side < 0 ? 97 : 127;
@@ -712,6 +774,7 @@ function characterSVGManga(id, expression, opts) {
     ? `<g stroke="#ff6b8a" stroke-width="1.3" stroke-linecap="round" opacity=".85">
         <path d="M78,117 l3,-4 M82,118 l3,-4 M86,119 l3,-4"/><path d="M112,119 l3,-4 M116,118 l3,-4 M120,117 l3,-4"/></g>`
     : '';
+  const face = L.face === 'soft' ? FACE_SOFT : FACE;
   const earL = 'M72,96 C65,93 62,101 64,108 C65,114 68,117 72,116 Z';
   const earR = 'M128,96 C135,93 138,101 136,108 C135,114 132,117 128,116 Z';
   return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">
@@ -727,16 +790,16 @@ function characterSVGManga(id, expression, opts) {
     <g class="ch-head">
       <path d="${earL}" fill="${P.skinSh}" stroke="${INK}" stroke-width="2"/><path d="M70,100 Q66,104 69,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
       <path d="${earR}" fill="${P.skin}" stroke="${INK}" stroke-width="2"/><path d="M130,100 Q134,104 131,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
-      <path d="${FACE}" fill="${P.skin}"/>
+      <path d="${face}" fill="${P.skin}"/>
       <path d="${FACE_SHADOW}" fill="${P.skinSh}"/>
       <path d="M72,84 Q100,74 128,84 L128,91 Q100,82 72,91 Z" fill="${P.skinSh}"/>
       <path d="M112,112 Q118,110 123,113" fill="none" stroke="${P.skinHi}" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-      <path d="${FACE}" fill="none" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
+      <path d="${face}" fill="none" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
       ${blush}
       <path d="M101,108 L104,118 L99.5,119.5" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M99.5,119.5 L101,109 L98.2,117.4 Z" fill="${P.skinSh}"/>
       <g class="ch-eyes"><g class="ch-eye">${mEye(MX.l, e.eyes, -1, L, P, `m${n}a`)}</g><g class="ch-eye">${mEye(MX.r, e.eyes, 1, L, P, `m${n}b`)}</g></g>
-      <g class="ch-brows">${mBrows(e.brows, P)}</g>
+      <g class="ch-brows">${mBrows(e.brows, P, L.face === 'soft')}</g>
       <g class="ch-mouth">${mMouth(e.mouth, P)}</g>
       <g class="ch-hair-front">${hr.front}</g>
       ${acc.head}
