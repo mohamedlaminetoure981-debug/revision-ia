@@ -18,6 +18,7 @@ import { schedule, isDue, today } from '../core/srs.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, vibrate, sound, confetti, onomatopoeia, hypeWord } from '../ui/fx.js';
 import { reportCard } from './report.js';
+import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 
 // Direction du swipe → note SM-2, texte du tampon, XP.
 const DIRS = {
@@ -91,6 +92,10 @@ export async function render(el, [courseId]) {
     setExpression(soraEl, expression);
     play(soraEl, anim);
   };
+
+  // Pas de pouvoir pendant qu'on réfléchit aux fiches : on les garde pour la fin.
+  suspendPowers();
+  window.addEventListener('hashchange', resumePowers, { once: true });
 
   let flipped = false;
 
@@ -269,6 +274,9 @@ export async function render(el, [courseId]) {
     confetti();
     onomatopoeia(good >= initial * 0.8 ? 'SUGOI!' : hypeWord());
     sound('level');
+    resumePowers();
+    // Bonne série de fiches (80 % réussies ou plus) : aura légère de Sora.
+    if (good >= initial * 0.8) power('sora', 'light', { target: zone.querySelector('.ch') });
   }
 
   showCard();

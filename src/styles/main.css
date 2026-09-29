@@ -12,6 +12,7 @@
 @import './theme.css';
 @import './characters.css';
 @import './views.css';
+@import './anime.css';
 
 :root {
   --font-display: 'Unbounded Variable', 'Arial Black', 'Segoe UI', sans-serif;

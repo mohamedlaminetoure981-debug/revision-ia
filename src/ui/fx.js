@@ -173,6 +173,15 @@ export function celebrate(result, fromEl) {
   } else if (result.streakUp && result.streak > 1) {
     setTimeout(() => onomatopoeia(`🔥 ${result.streak} JOURS!`), 300);
   }
+  // Pouvoirs (phase 3) : ultimes RARES (séries 7/30/100 j, niveaux 10/25/50), aura forte au niveau gagné.
+  import('./powers.js').then(async ({ power }) => {
+    if (result.streakUp && [7, 30, 100].includes(result.streak)) {
+      const { getProfileSync } = await import('../core/game.js');
+      power(getProfileSync()?.companion || 'kai', 'ultimate', { sub: `${result.streak} jours de suite !`, text: `🔥 ${result.streak} JOURS!` });
+    } else if (result.levelUp && [10, 25, 50].includes(result.level)) {
+      power('binta', 'ultimate', { sub: `Niveau ${result.level} atteint !`, text: `NIVEAU ${result.level}!` });
+    }
+  });
   // Binta fête les niveaux gagnés et les nouveaux badges.
   if (result.levelUp || result.newBadges?.length) {
     setTimeout(() => bintaParty(result), result.levelUp ? 1500 : 700);
@@ -201,4 +210,9 @@ async function bintaParty(result) {
   sound('level');
   vibrate([20, 30, 20, 30, 50]);
   setTimeout(() => play(m.el.querySelector('.ch'), 'signature'), 300);
+  // Nouveau niveau : aura forte de Binta (flammes, particules, cheveux qui s'agitent).
+  if (result.levelUp && ![10, 25, 50].includes(result.level)) {
+    const { power } = await import('./powers.js');
+    setTimeout(() => power('binta', 'strong', { target: m.el.querySelector('.ch') }), 1500);
+  }
 }

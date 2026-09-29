@@ -144,6 +144,9 @@ export const DEFAULT_SETTINGS = {
   sounds: false, // sons courts (désactivés par défaut)
   vibration: true, // vibrations légères sur mobile
   quizTimer: false, // minuteur visuel pendant les quiz
+  // Phase 3 : scène du conseil de correction ET pouvoirs spéciaux.
+  // 'complete' (tout), 'short' (version courte, pas de pouvoir plein écran), 'off' (désactivé)
+  council: 'complete',
   // Profil de jeu : prénom, compagnon, XP, série, badges… (voir core/game.js)
   profile: null,
 };

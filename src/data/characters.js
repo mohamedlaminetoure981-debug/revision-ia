@@ -765,6 +765,96 @@ Object.assign(CHARACTERS, {
   },
 });
 
+// =====================================================================
+// PHASE 3 — CONSEIL DE CORRECTION : répliques de suspense
+// ---------------------------------------------------------------------
+// Pendant la scène du conseil (après un quiz, un exercice ou un examen),
+// 2 à 4 persos parlent. Tant que la note n'est pas connue, ils disent une
+// réplique de `deliberation` ; ensuite une réplique adaptée au résultat :
+//   excellent (≥ 16/20) · bon (≥ 12) · moyen (≥ 8) · a_retravailler (< 8)
+// 👉 Modifie ou ajoute des répliques librement (jamais moqueuses !).
+// =====================================================================
+const COUNCIL_LINES = {
+  kai: {
+    deliberation: ['Bon… on se pose et on regarde ça ensemble.', 'Attendez, laissez-moi relire la copie.', 'Hmm… intéressant, très intéressant.', 'Tout le monde est d’accord ? On vérifie encore.', 'Je sens qu’il y a du bon là-dedans…', 'Silence, on délibère !', 'Pas si vite, je veux être juste.', 'Un dernier coup d’œil…'],
+    excellent: ['Les amis… vous voyez ce que je vois ?', 'Je crois qu’on tient quelque chose d’énorme.', 'J’ai jamais vu une copie aussi propre.', 'Préparez les confettis, sérieux.', 'Là, c’est du niveau champion.', 'Ok… je suis impressionné.', 'Je savais qu’on allait être surpris.', 'On annonce ? Moi je tremble.'],
+    bon: ['C’est du solide, franchement.', 'Il y a de très belles choses ici.', 'Presque parfait… presque.', 'Ça progresse, je le vois clairement.', 'Du bon boulot, on est d’accord ?', 'Quelques détails, mais quelle base !', 'Je suis fier du chemin parcouru.', 'On va annoncer une bonne nouvelle.'],
+    moyen: ['C’est un bon début, on peut construire dessus.', 'Il y a des bases, faut consolider.', 'La moitié du chemin, c’est déjà ça.', 'Je vois l’effort, faut juste affiner.', 'On a des points à retravailler ensemble.', 'Pas mal, mais je sais qu’on peut mieux.', 'On va trouver comment progresser.', 'Le potentiel est là, clairement.'],
+    a_retravailler: ['On annonce avec douceur, d’accord ?', 'Ce n’est qu’une étape, pas une fin.', 'On va aider, c’est notre rôle.', 'Personne ne réussit tout du premier coup.', 'L’important, c’est ce qu’on fait après.', 'Je crois en notre champion(ne), point.', 'On transforme ça en plan d’action.', 'C’est le moment où on progresse le plus.'],
+  },
+  mory: {
+    deliberation: ['Analyse de la copie… 42 %…', 'Je lance un deuxième scan pour être sûr.', 'Mes capteurs détectent… quelque chose.', 'Calcul des probabilités en cours…', 'Attendez, je recoupe les données.', 'Scan des réponses, ligne par ligne…', 'Hmm, les données sont intéressantes.', 'Vérification des calculs… bip bip.'],
+    excellent: ['Mes lunettes surchauffent… c’est énorme !', 'Les données sont… parfaites ?!', 'Erreur système : trop de bonnes réponses.', 'Je relance le scan… non, c’est bien réel !', 'Taux de réussite hors norme détecté.', 'Mes capteurs n’ont jamais vu ça.', 'Résultat classé : légendaire.', 'Je sauvegarde cette copie dans mes archives.'],
+    bon: ['Les données sont très positives.', 'Signal fort détecté, bravo.', 'Peu d’anomalies. Très propre.', 'Le graphique monte, j’aime ça.', 'Performance au-dessus de la moyenne.', 'Quelques bugs mineurs, rien de grave.', 'Analyse : solide et fiable.', 'Mes lunettes approuvent.'],
+    moyen: ['Données mitigées, mais exploitables.', 'Il y a du signal et un peu de bruit.', 'Je détecte des zones à optimiser.', 'La moitié des modules OK, l’autre en chantier.', 'Résultat stable, marge de progression détectée.', 'On peut débugger ça ensemble.', 'Les fondations tiennent.', 'Mise à jour recommandée, pas de panique.'],
+    a_retravailler: ['Pas de crash, juste une mise à jour à faire.', 'Chaque bug corrigé rend le système plus fort.', 'J’ai repéré où ça coince. Bonne nouvelle.', 'On relance : version 2.0 en approche.', 'Les données montrent surtout un gros potentiel.', 'Je prépare un plan de correction.', 'Les meilleurs programmes commencent en bêta.', 'On va tout recompiler proprement.'],
+  },
+  nia: {
+    deliberation: ['Laissez-moi lire jusqu’au bout…', 'Chaque réponse raconte une histoire.', 'Je regarde la façon de raisonner.', 'Prenons le temps de bien comprendre.', 'Hmm, ce passage est intéressant.', 'Je relis la partie la plus délicate.', 'Ne précipitons rien.', 'Je crois que je vois le fil…'],
+    excellent: ['C’est… magnifique. Vraiment.', 'Chaque notion est à sa place.', 'Le cours a été compris en profondeur.', 'Je n’ai presque rien à ajouter.', 'Quelle clarté dans les réponses.', 'C’est le genre de copie qu’on garde.', 'Tout s’emboîte parfaitement.', 'Je suis émue, je l’avoue.'],
+    bon: ['Une belle compréhension d’ensemble.', 'Quelques nuances à préciser, c’est tout.', 'Le raisonnement est bon.', 'On voit que le cours a été bien lu.', 'Une belle histoire, avec quelques ratures.', 'Très encourageant.', 'Les idées principales sont là.', 'Il ne manque que quelques détails.'],
+    moyen: ['Certaines notions sont comprises, d’autres à revoir.', 'Le fil est là, mais il se perd parfois.', 'Relire le résumé aidera beaucoup.', 'Il y a une base sur laquelle bâtir.', 'Quelques passages méritent une explication.', 'C’est normal à ce stade.', 'Je vais proposer une relecture ciblée.', 'Petit à petit, ça va s’éclaircir.'],
+    a_retravailler: ['Chaque grand lecteur a commencé par une page.', 'On reprend l’histoire depuis le début, ensemble.', 'Ce n’est pas un échec, c’est un chapitre.', 'Je vais tout réexpliquer doucement.', 'La compréhension vient avec le temps.', 'Soyons patients et bienveillants.', 'Les 💡 du résumé vont beaucoup aider.', 'Demain, ce sera plus clair.'],
+  },
+  sora: {
+    deliberation: ['Allez allez, on annonce ?!', 'Je tiens plus en place !', 'Suspense de ouf…', 'Qui a la note ? Qui ?!', 'Je devine… non, je dis rien !', 'Tic tac, tic tac…', 'Mon cœur bat trop vite !', 'Laissez-moi voir, laissez-moi voir !'],
+    excellent: ['NON ?! C’est trop fort !', 'Je le savais, je le savais !', 'Speedrun parfait !', 'Même moi j’aurais pas fait mieux… enfin, presque !', 'Mes fiches ont bien bossé !', 'C’est une dinguerie !', 'Trop facile, t’as vu ?!', 'Clin d’œil de fierté ! 😉'],
+    bon: ['Ça, c’est une belle perf !', 'Bim ! Presque parfait !', 'La mémoire a assuré !', 'Je valide à 100 % !', 'Trop bien, on enchaîne ?', 'Quelques fiches à revoir et c’est parfait !', 'Oh, c’est cool ça !', 'Bravo, bravo, bravo !'],
+    moyen: ['Hmm, quelques fiches à rejouer !', 'C’est pas mal, on peut faire mieux !', 'Je te prépare une petite pile de révision !', 'Moitié gagné, moitié à swiper !', 'On repasse les fiches ratées ?', 'Allez, deuxième manche bientôt !', 'Ça va venir, t’inquiète !', 'Petit coup de boost nécessaire !'],
+    a_retravailler: ['Pas grave du tout, on rejoue !', 'Je t’ai gardé des fiches spéciales !', 'Chaque fiche ratée revient pour être gagnée !', 'On repart à zéro, c’est cool aussi !', 'Moi aussi, j’ai raté des trucs au début !', 'La revanche va être énorme !', 'On swipe ensemble demain ?', 'Promis, ça va rentrer !'],
+  },
+  ren: {
+    deliberation: ['Hmm… je m’attendais pas à ça…', 'Laissez-moi recompter…', 'Tch… attendez.', 'C’est moi qui annonce, hein.', 'Intéressant…', 'Je suis pas stressé. Pas du tout.', 'Le résultat est… hmm.', 'Je relis. Par fair-play.'],
+    excellent: ['Pff… ok, c’est incroyable.', 'Je… je suis battu. Respect.', 'Mon record est en danger.', 'Tu m’énerves… tellement t’es fort(e).', 'Je m’incline. Cette fois.', 'C’est officiel : j’ai un vrai rival.', 'Personne ne m’avait fait ça.', 'Je vais devoir m’entraîner deux fois plus.'],
+    bon: ['Pas mal. Vraiment pas mal.', 'Tu t’approches de mon niveau.', 'Ok, je te l’accorde.', 'Bonne perf, rival(e).', 'Hmm, c’est solide.', 'Je dois avouer que c’est bien.', 'Tu progresses trop vite.', 'Presque… mais je reste devant.'],
+    moyen: ['Le match est serré.', 'Il y a de la marge, et du potentiel.', 'La prochaine sera la bonne, je le sens.', 'Je t’attends pour la revanche.', 'Pas encore mon niveau, mais ça vient.', 'C’est une base de rival.', 'Entraîne-toi, je veux un vrai duel.', 'On en reparle au prochain round.'],
+    a_retravailler: ['Hé, même moi j’ai commencé en bas.', 'Je veux une revanche, et je sais que tu vas revenir fort.', 'Les vrais rivaux se relèvent toujours.', 'Ce round est à moi, le suivant sera peut-être à toi.', 'Relève-toi, j’ai besoin d’un adversaire.', 'C’était juste un échauffement.', 'Je crois en ta remontée. Chut, le dis à personne.', 'On repart au combat.'],
+  },
+  awa: {
+    deliberation: ['Attendez, j’ai vérifié deux fois…', 'Je regarde la méthode, pas que le résultat.', 'Chaque étape compte.', 'Barème en main, je note.', 'Hmm, ce calcul mérite un second regard.', 'Je suis exigeante, mais juste.', 'Un instant, je recompte les points.', 'Rigueur avant tout.'],
+    excellent: ['Méthode impeccable, résultat juste. Parfait.', 'Je n’ai rien à redire. Rien.', 'C’est une copie modèle.', 'Voilà le travail que j’attendais !', 'Rigueur, précision, clarté. Tout y est.', 'Je mettrais cette copie au tableau.', 'Excellente maîtrise, bravo.', 'Je suis fière, vraiment.'],
+    bon: ['Très bon travail, quelques détails.', 'La méthode est là, bien joué.', 'Encore un effort sur la rédaction.', 'C’est sérieux, j’aime ça.', 'Quelques points perdus bêtement.', 'Solide, continue comme ça.', 'Tu y es presque.', 'Belle application du cours.'],
+    moyen: ['La moitié est bonne, l’autre est à revoir.', 'Il faut plus de rigueur dans les étapes.', 'Je vois les idées, il faut les structurer.', 'On va retravailler la méthode.', 'Attention aux erreurs d’inattention.', 'C’est une base, pas une fin.', 'Un peu d’entraînement et ça passe.', 'Reprends les exercices ratés.'],
+    a_retravailler: ['On va reprendre pas à pas, ensemble.', 'Chaque erreur est une leçon, je vais te les montrer.', 'Je ne lâche personne. Toi non plus.', 'Commençons par les bases, doucement.', 'C’est le début de l’entraînement.', 'Je suis exigeante parce que je crois en toi.', 'Un exercice par jour, et tu verras la différence.', 'Je t’ai préparé des conseils précis.'],
+  },
+  tidiane: {
+    deliberation: ['Respire, on annonce…', 'Tranquille, tout le monde se calme.', 'On prend notre temps.', 'Pas de pression, hein.', 'Zen… le résultat arrive.', 'Je sens que ça va aller.', 'Doucement, on délibère.', 'Un peu de patience.'],
+    excellent: ['Waouh… même moi je sors de mon calme.', 'Tranquille… mais incroyable.', 'Là, c’est vraiment beau.', 'Je hausse les épaules… d’admiration.', 'Serein et excellent. Parfait.', 'C’est la paix de l’esprit, ça.', 'Rien à dire. Juste bravo.', 'Calme et efficace. Respect.'],
+    bon: ['C’est très bien, relax.', 'Bonne note, profite.', 'Tout roule.', 'Tranquille, c’est du bon travail.', 'Pas de stress, c’est solide.', 'Tu peux être content(e).', 'Ça se passe bien, hein ?', 'Nickel. Zen.'],
+    moyen: ['C’est ok. On améliore doucement.', 'Pas de panique, c’est rattrapable.', 'Tranquille, on garde le cap.', 'Moyen, mais on a le temps.', 'Respire, ça va venir.', 'Rien de grave, vraiment.', 'On ajuste, sans stress.', 'Pas à pas, sereinement.'],
+    a_retravailler: ['T’inquiète, on réessaie tranquille.', 'Une note, c’est juste une info.', 'On respire, et on repart.', 'Rien n’est perdu, tout est enregistré.', 'Demain est un autre jour.', 'Calme. On va y arriver.', 'On progresse à ton rythme.', 'Je reste avec toi. Zen.'],
+  },
+  binta: {
+    deliberation: ['Roulement de tambour…', 'J’ai les confettis prêts, au cas où !', 'Suspense insoutenable !!', 'Qui veut deviner ?', 'J’ai trop hâte !', 'Allez, allez, allez !', 'Je filme pour le récap !', 'Le moment de vérité…'],
+    excellent: ['C’EST LÉGENDAIRE !!', 'BADGE D’OR MÉRITÉ !', 'Je crie, je crie !', 'Top 1 mondial, au moins !', 'Les stats vont exploser !', 'On fête ça tout de suite !', 'Capture d’écran obligatoire !', 'Hype maximum !!'],
+    bon: ['Super perf ! Ça mérite un petit cri !', 'Belle note, j’adore !', 'Ça monte, ça monte !', 'Je note ça dans ton récap !', 'Trop bien, on continue !', 'Bravo, bravo !', 'Belle énergie !', 'Tes stats vont sourire !'],
+    moyen: ['C’est une étape, et j’adore les étapes !', 'La courbe va remonter, je le sens !', 'On prépare le come-back !', 'Pas mal, et le meilleur arrive !', 'Je garde les confettis pour la prochaine !', 'Tu vas voir la progression !', 'On y croit à fond !', 'Chaque essai compte dans tes stats !'],
+    a_retravailler: ['Les plus beaux come-backs commencent comme ça !', 'Je garde ta place sur le podium !', 'Pas de stress, la fête viendra !', 'Chaque effort compte, j’ai tout noté !', 'On va écrire une remontée épique !', 'Je crois en toi à 1000 % !', 'La prochaine fois, je sors les confettis !', 'T’as eu le courage d’essayer, c’est énorme !'],
+  },
+};
+
+// =====================================================================
+// PHASE 3 — POUVOIRS SPÉCIAUX (aura + pouvoir signature, dans sa couleur)
+// L'effet visuel de chaque pouvoir est dans src/ui/powers.js (fonction
+// portant le nom de `effect`) et src/styles/anime.css.
+// =====================================================================
+const POWERS = {
+  kai: { name: 'Flamme du guide', effect: 'flame', desc: 'Une flamme montante entoure tout l’écran.' },
+  mory: { name: 'Scan laser', effect: 'scan', desc: 'Un laser balaie l’écran sur une grille holographique.' },
+  nia: { name: 'Tourbillon de pages', effect: 'pages', desc: 'Des pages lumineuses tourbillonnent autour d’elle.' },
+  sora: { name: 'Tempête de cartes', effect: 'cards', desc: 'Des cartes tournent comme un vortex.' },
+  ren: { name: 'Éclairs du rival', effect: 'lightning', desc: 'Des éclairs crépitent, aura électrique.' },
+  awa: { name: 'Stylo d’énergie', effect: 'check', desc: 'Un stylo d’énergie trace un ✓ géant lumineux.' },
+  tidiane: { name: 'Bouclier zen', effect: 'shield', desc: 'Une onde calme apaise tout l’écran.' },
+  binta: { name: 'Explosion de hype', effect: 'hype', desc: 'Confettis et étoiles dans tous les sens.' },
+};
+
+// On range répliques du conseil et pouvoir dans chaque personnage.
+for (const [id, c] of Object.entries(CHARACTERS)) {
+  c.council = COUNCIL_LINES[id] || COUNCIL_LINES.kai;
+  c.power = POWERS[id];
+}
+
 /** Ordre d'affichage de l'équipe. */
 export const TEAM = Object.keys(CHARACTERS);
 

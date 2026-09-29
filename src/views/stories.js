@@ -15,6 +15,7 @@ import { esc, rich, line } from '../ui/ui.js';
 import { vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { rewardSummary } from './course.js';
 import { unitLabel } from '../core/generate.js';
+import { suspendPowers, resumePowers } from '../ui/powers.js';
 
 const MAX_SLIDE_CHARS = 650; // au-delà, un bloc est découpé en plusieurs écrans
 
@@ -152,7 +153,9 @@ export async function render(el, [courseId]) {
     if (e.key === 'Escape') location.hash = `#/course/${course.id}/resume`;
   };
   document.addEventListener('keydown', onKey);
-  window.addEventListener('hashchange', () => document.removeEventListener('keydown', onKey), { once: true });
+  // Jamais de pouvoir pendant la lecture d'un résumé : ils attendent qu'on quitte l'écran.
+  suspendPowers();
+  window.addEventListener('hashchange', () => { document.removeEventListener('keydown', onKey); resumePowers(); }, { once: true });
   el.querySelector('#close').onclick = () => { location.hash = `#/course/${course.id}/resume`; };
 
   show();

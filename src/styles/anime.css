@@ -1,0 +1,160 @@
+/* =====================================================================
+   anime.css — Phase 3 : conseil de correction + auras et pouvoirs
+   ---------------------------------------------------------------------
+   Performance : seules "transform" et "opacity" sont animées, avec peu
+   d'éléments (particules limitées). Tout est coupé si le téléphone
+   demande de réduire les animations.
+   ===================================================================== */
+
+/* ================= CONSEIL DE CORRECTION ================= */
+.council {
+  position: fixed; inset: 0; z-index: 130; overflow: hidden;
+  background: var(--bg);
+  animation: fade-in .25s ease-out;
+}
+/* trame de points manga + lignes de concentration vers la table */
+.council::before {
+  content: ""; position: absolute; inset: -20%;
+  background:
+    radial-gradient(var(--dots) 1.4px, transparent 1.6px) 0 0 / 12px 12px,
+    repeating-conic-gradient(from 0deg at 50% 60%, color-mix(in srgb, var(--neon-violet) 16%, transparent) 0 2deg, transparent 2deg 9deg);
+  animation: council-lines 6s linear infinite;
+}
+@keyframes council-lines { to { transform: rotate(8deg) scale(1.05); } }
+.council-title { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 0; right: 0; padding: 0 100px 0 16px; text-align: left; font-family: var(--font-display); font-weight: 900; font-size: 1rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text); }
+.council-title small { display: block; font-family: var(--font-body); font-weight: 600; font-size: .75rem; letter-spacing: 0; text-transform: none; color: var(--text-soft); }
+.council-skip { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 5; padding: 8px 14px; border-radius: 99px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-weight: 800; font-size: .85rem; cursor: pointer; }
+.council-status { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); left: 16px; right: 16px; text-align: center; font-size: .8rem; color: var(--text-soft); }
+
+/* la table ronde lumineuse */
+.council-table {
+  position: absolute; left: 50%; top: 62%; width: min(78vw, 440px); aspect-ratio: 2.4;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--neon-violet) 55%, transparent), color-mix(in srgb, var(--neon-violet) 12%, var(--surface)) 70%);
+  border: 2px solid var(--neon-violet);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--neon-violet) 60%, transparent), inset 0 0 30px color-mix(in srgb, var(--neon-cyan) 30%, transparent);
+  animation: table-glow 1.6s ease-in-out infinite alternate;
+}
+@keyframes table-glow { from { opacity: .85; } to { opacity: 1; } }
+
+/* une place autour de la table (position calculée en JS) */
+.seat { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; }
+.seat .ch { --size: 104px; }
+.seat .say { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 46vw; font-size: .78rem; padding: 7px 10px; border-radius: 14px; z-index: 3; }
+.seat .say::before { left: 50%; bottom: -8px; transform: translateX(-50%) rotate(-45deg); }
+.seat.front { z-index: 2; }
+
+/* --- Téléportation style manga --- */
+.tp-in { animation: tp-in .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes tp-in {
+  0% { opacity: 0; transform: translate(-50%, -100%) scaleX(.08) scaleY(2.4); }
+  45% { opacity: 1; transform: translate(-50%, -100%) scaleX(.35) scaleY(1.5); }
+  70% { transform: translate(-50%, -100%) scale(1.12); }
+  100% { opacity: 1; transform: translate(-50%, -100%); }
+}
+/* traînée de lignes de vitesse (juste avant l'apparition) */
+.tp-streak { position: absolute; left: 50%; bottom: 0; width: 70px; height: 160%; transform: translateX(-50%); pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 6px, var(--c) 6px 8px, transparent 8px 14px);
+  -webkit-mask: linear-gradient(to top, #000, transparent); mask: linear-gradient(to top, #000, transparent);
+  animation: tp-streak .45s ease-out forwards; }
+@keyframes tp-streak { from { opacity: .9; transform: translateX(-50%) scaleY(1.4); } to { opacity: 0; transform: translateX(-50%) scaleY(.2); } }
+/* image rémanente (afterimage) */
+.tp-ghost { position: absolute; inset: 0; opacity: 0; pointer-events: none; filter: saturate(0) brightness(1.6); animation: tp-ghost .6s ease-out; }
+@keyframes tp-ghost { 0% { opacity: .5; transform: translateX(-18px); } 100% { opacity: 0; transform: translateX(-40px); } }
+/* flash + particules */
+.tp-flash { position: absolute; left: 50%; top: 55%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fff 0%, var(--c) 35%, transparent 70%); animation: tp-flash .45s ease-out forwards; }
+@keyframes tp-flash { from { opacity: 1; transform: scale(.2); } to { opacity: 0; transform: scale(1.6); } }
+.tp-p { position: absolute; left: 50%; top: 55%; width: 6px; height: 6px; border-radius: 50%; background: var(--c); pointer-events: none; animation: tp-p .6s ease-out forwards; }
+@keyframes tp-p { from { opacity: 1; transform: translate(0, 0); } to { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
+
+/* réactions silencieuses */
+.nod { animation: nod .5s ease-in-out 2; }
+@keyframes nod { 50% { transform: translate(-50%, -100%) translateY(5px); } }
+
+/* --- Révélation de la note --- */
+.reveal { position: absolute; left: 50%; top: 24%; transform: translate(-50%, -50%); z-index: 4; text-align: center; pointer-events: none; width: min(90vw, 420px); }
+.reveal .bubble { margin-top: 10px; text-align: left; font-size: .9rem; }
+.reveal .bubble::before { left: 50%; top: auto; bottom: -9px; transform: translateX(-50%) rotate(-45deg); }
+.reveal .note { font-family: var(--font-display); font-weight: 900; font-size: clamp(3.4rem, 20vw, 6rem); line-height: 1; color: var(--c); text-shadow: 0 0 30px var(--c), 4px 4px 0 var(--bg); animation: a-pop .6s cubic-bezier(.3, 1.8, .5, 1) both; }
+.reveal .lbl { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; color: var(--text); margin-top: 6px; animation: fade-in .4s .2s both; }
+.shockwave { position: absolute; left: 50%; top: 24%; width: 200px; height: 200px; margin: -100px 0 0 -100px; border-radius: 50%; border: 6px solid var(--c); pointer-events: none; animation: shock .8s ease-out forwards; }
+@keyframes shock { from { opacity: 1; transform: scale(.2); } to { opacity: 0; transform: scale(3.2); } }
+.warm-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--neon-yellow) 22%, transparent), transparent 60%); animation: fade-in .6s both; }
+
+/* ================= AURAS ET POUVOIRS ================= */
+/* Aura légère : petite lueur autour du perso */
+.pw-light { animation: pw-glow 1.4s ease-in-out 2 !important; }
+@keyframes pw-glow { 0%, 100% { filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .35)); } 50% { filter: drop-shadow(0 0 18px var(--c)) drop-shadow(0 0 6px var(--c)); } }
+
+/* Aura forte : flammes + particules + cheveux qui s'agitent */
+.pw-strong { animation: pw-strong 1.8s ease-in-out !important; }
+.pw-strong .ch-hair-back, .pw-strong .ch-hair-front { animation: hair-rush .18s ease-in-out infinite alternate !important; transform-origin: 100px 90px; }
+@keyframes pw-strong { 0%, 100% { filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .35)); transform: none; } 20% { transform: scale(1.06); } 30%, 80% { filter: drop-shadow(0 0 26px var(--c)) drop-shadow(0 0 10px var(--c)); } }
+@keyframes hair-rush { from { transform: rotate(-3deg) translateY(-1px); } to { transform: rotate(3deg) translateY(-3px); } }
+.pw-layer { position: fixed; pointer-events: none; z-index: 125; }
+.pw-flame { position: absolute; bottom: 10%; width: 22px; height: 46px; border-radius: 50% 50% 40% 40%; background: radial-gradient(ellipse at 50% 80%, #fff 0%, var(--c) 45%, transparent 75%); opacity: 0; animation: pw-flame 1.1s ease-out forwards; }
+@keyframes pw-flame { 0% { opacity: 0; transform: translateY(10px) scale(.6); } 25% { opacity: .95; } 100% { opacity: 0; transform: translateY(-90px) scale(1.2); } }
+
+/* Pouvoir ultime : plein écran */
+.ultimate { position: fixed; inset: 0; z-index: 140; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 35%, var(--bg)), var(--bg) 70%); animation: fade-in .15s; }
+.ultimate .ch { position: relative; z-index: 3; --size: min(56vw, 260px); }
+.ultimate .ult-name { position: relative; z-index: 4; font-family: var(--font-display); font-weight: 900; font-size: clamp(1.3rem, 7vw, 2.2rem); color: #fff; text-shadow: 0 0 20px var(--c), 3px 3px 0 var(--bg); margin-top: 10px; text-align: center; animation: a-pop .5s .3s both; }
+.ultimate .ult-sub { position: relative; z-index: 4; color: var(--text-soft); font-weight: 700; margin-top: 4px; animation: fade-in .4s .5s both; }
+.ult-flash { position: absolute; inset: 0; z-index: 6; background: #fff; pointer-events: none; animation: ult-flash .35s ease-out forwards; }
+@keyframes ult-flash { from { opacity: .9; } to { opacity: 0; } }
+.ult-skip { position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 7; padding: 8px 14px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, .4); background: rgba(0, 0, 0, .35); color: #fff; font: inherit; font-weight: 800; font-size: .85rem; cursor: pointer; }
+.ult-fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.shake { animation: shake-screen .35s linear 3; }
+@keyframes shake-screen { 25% { transform: translate(4px, -3px); } 50% { transform: translate(-4px, 3px); } 75% { transform: translate(3px, 4px); } }
+
+/* KAÏ — flamme montante qui entoure l'écran */
+.fx-flame-edge { position: absolute; inset: 0; box-shadow: inset 0 0 90px 20px var(--c); animation: flame-pulse .5s ease-in-out infinite alternate; }
+@keyframes flame-pulse { from { opacity: .6; } to { opacity: 1; } }
+.fx-rise { position: absolute; bottom: -60px; width: 34px; height: 80px; border-radius: 50% 50% 40% 40%; background: radial-gradient(ellipse at 50% 80%, #fff 0%, var(--c) 40%, transparent 72%); animation: rise-up 1.4s ease-in infinite; }
+@keyframes rise-up { from { transform: translateY(0) scale(1); opacity: .95; } to { transform: translateY(-110vh) scale(.4); opacity: 0; } }
+
+/* MORY — grille holographique + laser */
+.fx-grid { position: absolute; inset: 0; opacity: .5; background-image: linear-gradient(color-mix(in srgb, var(--c) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--c) 45%, transparent) 1px, transparent 1px); background-size: 28px 28px; animation: fade-in .4s both; }
+.fx-laser { position: absolute; left: 0; right: 0; top: 0; height: 4px; background: #fff; box-shadow: 0 0 18px 6px var(--c); animation: laser 1.1s ease-in-out 2 alternate; }
+@keyframes laser { from { transform: translateY(0); } to { transform: translateY(100vh); } }
+
+/* NIA — pages lumineuses en tourbillon ; SORA — tempête de cartes */
+.fx-orbit { position: absolute; left: 50%; top: 45%; width: 0; height: 0; animation: fx-spin 2.4s linear infinite; }
+.fx-orbit.fast { animation-duration: 1.2s; }
+.fx-orbit > i { position: absolute; left: -18px; top: -24px; width: 36px; height: 48px; border-radius: 6px; background: #fff; border: 2px solid var(--c); box-shadow: 0 0 14px var(--c);
+  transform: rotate(var(--a)) translateX(var(--r)) rotate(90deg); }
+.fx-orbit > i::before { content: ""; position: absolute; left: 6px; right: 6px; top: 10px; height: 2px; background: var(--c); box-shadow: 0 8px 0 var(--c), 0 16px 0 var(--c); opacity: .7; }
+.fx-orbit.cards > i { background: var(--c); border-color: #fff; }
+.fx-orbit.cards > i::before { display: none; }
+.fx-orbit.cards { animation: fx-spin 1.1s linear infinite, vortex 2.4s ease-in forwards; }
+@keyframes vortex { from { transform: scale(1.3); } to { transform: scale(.35) rotate(720deg); } }
+
+/* REN — éclairs */
+.fx-bolt { position: absolute; width: 60px; height: 45vh; opacity: 0; animation: bolt .5s steps(2) infinite; }
+.fx-bolt polyline { fill: none; stroke: #fff; stroke-width: 4; filter: drop-shadow(0 0 8px var(--c)); }
+@keyframes bolt { 0%, 40% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* AWA — ✓ géant tracé par un stylo d'énergie */
+.fx-check { position: absolute; left: 50%; top: 45%; width: 70vmin; height: 70vmin; transform: translate(-50%, -50%); }
+.fx-check path { fill: none; stroke: var(--c); stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 14px var(--c));
+  stroke-dasharray: 400; stroke-dashoffset: 400; animation: draw-check .9s .25s ease-out forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+
+/* TIDIANE — bouclier zen, ondes calmes */
+.fx-wave { position: absolute; left: 50%; top: 45%; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; border: 3px solid var(--c); opacity: 0; animation: zen-wave 2.4s ease-out infinite; }
+@keyframes zen-wave { from { opacity: .8; transform: scale(.3); } to { opacity: 0; transform: scale(4); } }
+.fx-shield { position: absolute; left: 50%; top: 45%; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%;
+  background: radial-gradient(circle, transparent 55%, color-mix(in srgb, var(--c) 40%, transparent) 70%, transparent 72%); animation: fx-pulse 1.6s ease-in-out infinite; }
+
+/* BINTA — explosion de hype (étoiles) */
+.fx-star { position: absolute; left: 50%; top: 45%; font-size: 1.6rem; animation: star-burst 1.3s ease-out forwards; }
+@keyframes star-burst { from { opacity: 1; transform: translate(0, 0) scale(.4); } to { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(160deg); } }
+
+/* Accessibilité : animations réduites */
+@media (prefers-reduced-motion: reduce) {
+  .council::before, .council *, .ultimate * { animation: none !important; }
+}
+:root[data-motion="off"] .council::before, :root[data-motion="off"] .council *, :root[data-motion="off"] .ultimate * { animation: none !important; }

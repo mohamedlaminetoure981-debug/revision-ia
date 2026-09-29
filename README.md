@@ -174,7 +174,8 @@ revision-ia/
     ├── styles/
     │   ├── theme.css          ⭐ TOUTES LES COULEURS (mode sombre + mode clair)
     │   ├── main.css           Styles généraux (blocs bento, boutons, navigation…)
-    │   ├── views.css          Stories, swipe, quiz, récap « Wrapped »
+    │   ├── views.css          Stories, swipe, quiz, récap « Wrapped », stats
+    │   ├── anime.css          Phase 3 : conseil de correction, téléportation, pouvoirs
     │   └── characters.css     Animations des personnages
     ├── core/                  « Moteur » (pas d'affichage)
     │   ├── db.js              Base de données locale (IndexedDB), réglages, sauvegarde
@@ -187,7 +188,9 @@ revision-ia/
     ├── ui/                    Outils d'affichage
     │   ├── character.js       Dessin SVG des persos en calques + animations
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
-    │   └── fx.js              Confettis, onomatopées, vibrations, sons
+    │   ├── fx.js              Confettis, onomatopées, vibrations, sons, fête de Binta
+    │   ├── council.js         Phase 3 : scène du conseil de correction
+    │   └── powers.js          Phase 3 : auras et pouvoirs spéciaux (+ règles de rareté)
     └── views/                 Un fichier par écran
         ├── welcome.js         Première ouverture (Kaï, équipe, choix du compagnon)
         ├── home.js            Accueil
@@ -395,6 +398,67 @@ Binta fête automatiquement chaque nouveau badge et chaque niveau gagné.
 
 ---
 
+## 10 ter. Phase 3 : le conseil de correction, les auras et les pouvoirs
+
+### Le conseil de correction (`src/ui/council.js`)
+Quand tu finis un quiz, un exercice ou un examen blanc, **avant la note** :
+1. 3 à 5 persos arrivent un par un en **se téléportant** (traînée de lignes de vitesse,
+   image rémanente, flash et particules) autour d'une **table ronde lumineuse**
+   (trame de points, lignes de concentration) ;
+2. **2 à 4 persos parlent** (tirés au hasard, jamais toute l'équipe, jamais la même
+   combinaison deux fois de suite), les autres réagissent en silence (hochements de tête,
+   bras croisés, yeux étoilés, goutte de sueur) ;
+3. un perso **révèle la note** : explosion d'énergie si excellent, encouragement
+   chaleureux si c'est à retravailler (jamais moqueur).
+
+Durée : environ **4 s** (1,5 à 2,5 s en version courte). La correction par l'IA se fait
+**pendant** la scène : si elle est plus longue, les persos continuent de délibérer.
+Bouton **« Passer »** toujours visible.
+
+**Réglage** : Profil → Réglages → **Scène de correction et pouvoirs** :
+*Complète* / *Courte* / *Désactivée* (désactivée = simple chargement, aucun pouvoir).
+
+**Répliques** : dans `src/data/characters.js`, objet `COUNCIL_LINES` : pour chaque perso,
+`deliberation` (pendant que l'IA corrige) puis `excellent`, `bon`, `moyen`,
+`a_retravailler` (8 répliques minimum chacune). Niveaux : ≥ 16/20 excellent, ≥ 12 bon,
+≥ 8 moyen, sinon à retravailler (fonction `verdictOf` de `src/core/generate.js`).
+
+### Auras et pouvoirs (`src/ui/powers.js`)
+Chaque perso a un pouvoir signature dans sa couleur (objet `POWERS` de `characters.js`) :
+
+| Perso | Pouvoir |
+|---|---|
+| Kaï | Flamme du guide (flamme montante autour de l'écran) |
+| Mory | Scan laser (laser + grille holographique) |
+| Nia | Tourbillon de pages lumineuses |
+| Sora | Tempête de cartes en vortex |
+| Ren | Éclairs du rival (aura électrique) |
+| Awa | Stylo d'énergie qui trace un ✓ géant |
+| Tidiane | Bouclier zen (onde calme) |
+| Binta | Explosion de hype (étoiles, confettis) |
+
+Trois niveaux, **volontairement rares** :
+- **Aura légère** (petite lueur) : bonne série de fiches (≥ 80 %), quiz ≥ 70 %, exercice ≥ 10/20.
+- **Aura forte** (flammes, particules, cheveux qui s'agitent) : 100 % à un quiz, examen
+  blanc réussi (≥ 10/20), exercice à 20/20, nouveau niveau.
+- **Pouvoir ultime** (plein écran, flash, vibration, onomatopée géante) : série de
+  **7 / 30 / 100 jours** (pouvoir de ton compagnon), **premier examen blanc à 20/20**,
+  niveaux **10 / 25 / 50**. **Un seul par session** (sinon il devient une aura forte).
+
+Jamais de pouvoir pendant la lecture d'un résumé ni pendant une question (les écrans
+appellent `suspendPowers()` / `resumePowers()` ; un pouvoir demandé est joué à la fin).
+Tout respecte « réduire les animations » du téléphone et le réglage ci-dessus.
+
+Pour changer une règle : cherche `power(` dans `src/` (ex. `src/views/quiz-play.js`).
+Pour changer un effet : `ULTIMATE_FX` dans `powers.js` + styles dans `anime.css`.
+Pour tester tous les pouvoirs : lance `npm run dev`, ouvre l'appli, puis dans la console
+du navigateur (F12) :
+```js
+const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('ren', 'ultimate');
+```
+
+---
+
 ## 11. Changer de modèle Gemini
 
 Par défaut : **`gemini-3.8-flash`** (meilleur modèle Flash gratuit d'après la doc Google,
@@ -451,7 +515,9 @@ La clé API et les photos ne sont pas incluses.
   structuré + réessais, erreurs expliquées par Tidiane, hors ligne.
 - ✅ **Phase 2** : exercices corrigés (Awa, réponse texte ou photo), mode vérification,
   Binta (badges, niveaux, stats, récap de la semaine), examen blanc chronométré (Ren).
-- ⏳ **Phase 3** : conseil de correction animé, auras et pouvoirs spéciaux.
+- ✅ **Phase 3** : conseil de correction animé (téléportation, table, délibération,
+  révélation), auras et pouvoirs spéciaux des 8 persos, règles de rareté, réglage
+  complète / courte / désactivée.
 
 Bibliothèques utilisées (incluses dans l'appli, rien à télécharger en plus) :
 [Vite](https://vite.dev), [KaTeX](https://katex.org) (formules),

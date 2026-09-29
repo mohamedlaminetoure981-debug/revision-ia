@@ -14,6 +14,9 @@ import { esc, rich, sourceHtml, line } from '../ui/ui.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { reportQuestion } from './report.js';
+import { runWithCouncil } from '../ui/council.js';
+import { power, suspendPowers, resumePowers } from '../ui/powers.js';
+import { verdictOf } from '../core/generate.js';
 
 const SECONDS_PER_QUESTION = 30; // durée du minuteur
 
@@ -50,7 +53,11 @@ export async function render(el, [quizId]) {
       </div>`;
     const renEl = el.querySelector('.ch');
     setTimeout(() => play(renEl, 'signature'), 500);
-    el.querySelector('#go').onclick = () => { vibrate(20); sound('tap'); answers = []; times = []; i = 0; question(); };
+    el.querySelector('#go').onclick = () => {
+      vibrate(20); sound('tap'); answers = []; times = []; i = 0;
+      suspendPowers(); // pas de pouvoir pendant les questions
+      question();
+    };
   }
 
   // --- Une question ---
@@ -148,6 +155,11 @@ export async function render(el, [quizId]) {
       score, total, date: new Date().toISOString(), avgTime: avg,
       missed: missed.map((q) => q.question), // notions ratées (statistiques)
     });
+    // Le conseil de correction délibère avant d'annoncer la note.
+    await runWithCouncil({
+      owner: 'ren', title: 'Résultat du quiz', task: async () => null,
+      toResult: () => ({ level: verdictOf((20 * score) / total), label: `${score}/${total}` }),
+    });
     const xp = score * XP_RULES.quizGood + XP_RULES.quizDone + (score === total ? XP_RULES.quizPerfect : 0);
     const xpResult = await addXp(xp, 'quizzes');
     wrapped({ score, total, bestRun, avg, missed, xp, xpResult, beatRecord: record !== null && score > record });
@@ -187,8 +199,12 @@ export async function render(el, [quizId]) {
       if (s < slides.length - 1) {
         w.onclick = () => { s++; vibrate(8); draw(); };
       } else {
-        celebrate(r.xpResult, w.querySelector('.display'));
         play(w.querySelector('.ch'), 'signature');
+        resumePowers();
+        celebrate(r.xpResult, w.querySelector('.display'));
+        // Aura : forte si 100 %, légère si 70 % ou plus.
+        if (pct === 100) power('ren', 'strong', { target: w.querySelector('.ch') });
+        else if (pct >= 70) power('ren', 'light', { target: w.querySelector('.ch') });
         w.querySelector('#corr').onclick = correction;
         w.querySelector('#again').onclick = intro;
       }
@@ -228,7 +244,7 @@ export async function render(el, [quizId]) {
     });
   }
 
-  // Arrête le minuteur si on quitte l'écran.
-  window.addEventListener('hashchange', () => clearInterval(timerId), { once: true });
+  // Arrête le minuteur si on quitte l'écran (et relâche la pause des pouvoirs).
+  window.addEventListener('hashchange', () => { clearInterval(timerId); resumePowers(); }, { once: true });
   intro();
 }

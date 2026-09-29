@@ -14,7 +14,7 @@ const SUGGESTED_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-fl
 
 export async function render(el) {
   const s = {};
-  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode']) s[k] = await db.getSetting(k);
+  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode', 'council']) s[k] = await db.getSetting(k);
 
   let usage = '';
   try {
@@ -55,6 +55,13 @@ export async function render(el) {
         <button data-t="dark" class="${s.theme !== 'light' ? 'active' : ''}">🌙 Sombre</button>
         <button data-t="light" class="${s.theme === 'light' ? 'active' : ''}">☀️ Clair</button>
       </div>
+      <label class="field">🎬 Scène de correction et pouvoirs</label>
+      <div class="seg" id="council">
+        <button data-v="complete" class="${s.council === 'complete' ? 'active' : ''}">Complète</button>
+        <button data-v="short" class="${s.council === 'short' ? 'active' : ''}">Courte</button>
+        <button data-v="off" class="${s.council === 'off' ? 'active' : ''}">Désactivée</button>
+      </div>
+      <p class="tiny muted">Le conseil des persos avant chaque note, et les auras / pouvoirs spéciaux. « Courte » : scène rapide, pas de pouvoir plein écran.</p>
       ${toggle('sounds', '🔊 Sons', s.sounds, 'Petits sons sur les actions (désactivés par défaut)')}
       ${toggle('vibration', '📳 Vibrations', s.vibration, 'Légères vibrations sur les actions clés')}
     </div>
@@ -103,6 +110,13 @@ export async function render(el) {
       await db.setSetting('theme', b.dataset.t);
       applyTheme(b.dataset.t);
       el.querySelectorAll('#theme button').forEach((x) => x.classList.toggle('active', x === b));
+    };
+  });
+  el.querySelectorAll('#council button').forEach((b) => {
+    b.onclick = async () => {
+      await db.setSetting('council', b.dataset.v);
+      el.querySelectorAll('#council button').forEach((x) => x.classList.toggle('active', x === b));
+      vibrate();
     };
   });
   $('#verifyMode').onchange = async (e) => {

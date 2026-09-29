@@ -17,6 +17,9 @@ import { generateExam, correctExam } from '../core/generate.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, confetti, onomatopoeia, vibrate, sound } from '../ui/fx.js';
 import { refresh } from '../main.js';
+import { runWithCouncil } from '../ui/council.js';
+import { power, suspendPowers, resumePowers } from '../ui/powers.js';
+import { verdictOf } from '../core/generate.js';
 
 const KIND = { qcm: 'QCM', question: 'Question de cours', calcul: 'Calcul', exercice: 'Exercice' };
 const VERDICT = { excellent: '🏆 Excellent', bon: '👍 Bon travail', moyen: '💪 Peut mieux faire', a_retravailler: '📚 À retravailler' };
@@ -164,23 +167,32 @@ function renderSession(el, exam, courses) {
   };
   const timer = setInterval(tick, 1000);
   tick();
-  window.addEventListener('hashchange', () => clearInterval(timer), { once: true });
+  suspendPowers(); // pas de pouvoir pendant l'examen
+  window.addEventListener('hashchange', () => { clearInterval(timer); resumePowers(); }, { once: true });
 
   async function submit() {
     clearInterval(timer);
     await save();
     const answers = exam.questions.map((_, i) => s.answers[i] ?? null);
-    const pg = progress('Ren et le jury corrigent ta copie', 'ren');
+    // Était-ce le tout premier 20/20 à un examen blanc ? (pouvoir ultime)
+    const allExams = await db.getAll('exams');
+    const hadPerfect = allExams.some((x) => (x.attempts || []).some((a) => a.total >= 20));
     try {
-      const attempt = await correctExam(exam, courses, answers, pg.set);
+      // La correction par l'IA se fait PENDANT la scène du conseil.
+      const attempt = await runWithCouncil({
+        owner: 'ren', title: 'Correction de ta copie',
+        task: (onStatus) => correctExam(exam, courses, answers, onStatus),
+        toResult: (a) => ({ level: verdictOf(a.total), label: `${a.total}/20` }),
+      });
       exam.session = null;
       await db.put('exams', exam);
-      pg.done();
+      resumePowers();
       // Récompense + résultat
       const res = await addXp(XP_RULES.exam + Math.round(attempt.total * 4));
       renderResult(el, exam, courses, attempt, res);
+      if (attempt.total >= 20 && !hadPerfect) power('ren', 'ultimate', { sub: 'Premier examen blanc à 20/20 !', text: 'MAJOR!' });
+      else if (attempt.total >= 10) power('ren', 'strong', { target: el.querySelector('.ch') });
     } catch (e) {
-      pg.done();
       // La copie reste enregistrée : on peut réessayer la correction.
       showError(new Error(`${e.message}\n\nTa copie est bien enregistrée : touche « Réessayer ».`), submit);
     }

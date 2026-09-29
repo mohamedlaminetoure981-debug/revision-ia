@@ -12,6 +12,8 @@ import { compressImage } from '../core/importer.js';
 import { correctExercise, verdictOf } from '../core/generate.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, confetti, onomatopoeia, vibrate, sound } from '../ui/fx.js';
+import { runWithCouncil } from '../ui/council.js';
+import { power } from '../ui/powers.js';
 
 const STATUS = {
   juste: { icon: '✅', cls: 'ok', label: 'Juste' },
@@ -111,13 +113,15 @@ export async function render(el, [exoId]) {
       el.querySelector('.mascot .say').textContent = 'Il me faut ta réponse (texte ou photo) pour corriger !';
       return;
     }
-    const pg = progress('Awa corrige ta copie', 'awa');
     let attempt;
     try {
-      attempt = await correctExercise(course, exo, answer, photo, pg.set);
-      pg.done();
+      // La correction par l'IA se fait PENDANT la scène du conseil.
+      attempt = await runWithCouncil({
+        owner: 'awa', title: 'Correction de ton exercice',
+        task: (onStatus) => correctExercise(course, exo, answer, photo, onStatus),
+        toResult: (a) => ({ level: a.correction.verdict || verdictOf(a.correction.grade), label: `${Math.round(a.correction.grade * 2) / 2}/20` }),
+      });
     } catch (e) {
-      pg.done();
       showError(e, () => $('#submit').click());
       return;
     }
@@ -133,6 +137,9 @@ export async function render(el, [exoId]) {
       if (grade >= 16) { confetti(); onomatopoeia('YOSH!'); sound('level'); } else { sound(grade >= 10 ? 'good' : 'bad'); }
       vibrate(grade >= 10 ? [20, 30, 20] : 30);
       celebrate(await addXp(XP_RULES.exercise + Math.round(grade * 2), 'exercises'), $('#result'));
+      // Aura d'Awa : forte pour 20/20, légère pour une réussite.
+      if (grade >= 20) power('awa', 'strong', { target: awa.querySelector('.ch') });
+      else if (grade >= 10) power('awa', 'light', { target: awa.querySelector('.ch') });
     };
     await reveal();
   };
