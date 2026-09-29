@@ -582,6 +582,36 @@ function mHair(L, P) {
           <path d="${block}" fill="none" ${o}/>`,
       };
     }
+    case 'afro': { // Mory : afro volumineux, grosses masses découpées
+      const cx = 100; const cy = 72; const R = 50;
+      const pt = (a, r) => [cx + r * Math.cos(a), cy + r * Math.sin(a)].map((v) => v.toFixed(1));
+      let d = '';
+      const N = 13;
+      const a0 = Math.PI * 0.86; const a1 = Math.PI * 2.14; // du bas-gauche au bas-droite en passant par le haut
+      for (let k = 0; k <= N; k++) {
+        const a = a0 + ((a1 - a0) * k) / N;
+        const [x, y] = pt(a, R);
+        if (k === 0) { d = `M${x},${y}`; continue; }
+        const [qx, qy] = pt(a - (a1 - a0) / N / 2, R + 10);
+        d += ` Q${qx},${qy} ${x},${y}`;
+      }
+      d += ' L126,122 L74,122 Z';
+      let shine = '';
+      for (const [x, y, r] of [[118, 30, 7], [132, 44, 6], [106, 26, 6], [140, 62, 5]]) {
+        shine += `<path d="M${x - r},${y} Q${x},${y - r * 1.1} ${x + r},${y} Q${x},${y - r * 0.4} ${x - r},${y} Z" fill="${P.hairHi}"/>`;
+      }
+      const fringe = 'M69,98 L68,76 Q72,56 88,52 Q100,49 112,52 Q128,56 132,76 L131,98 L127,88 Q126,80 121,79 q-3,-5 -7,-2 q-3,-5 -7,-1 q-3,-5 -7,-1 q-3,-5 -7,0 q-3,-5 -7,-1 q-3,-5 -7,2 Q74,80 73,88 Z';
+      return {
+        back: `<path d="${d}" fill="${P.hair}"/>
+          <path d="M54,112 Q44,86 56,58 Q58,40 72,30 Q62,60 70,88 Q72,102 78,114 Z" fill="${P.hairSh}"/>
+          ${shine}
+          <path d="${d}" fill="none" ${o}/>`,
+        front: `<path d="${fringe}" fill="${P.hair}"/>
+          <path d="M69,98 L68,76 Q70,64 78,58 Q76,72 78,82 L73,88 Z" fill="${P.hairSh}"/>
+          <path d="M104,58 q5,-3 9,1 M116,62 q5,-3 9,2" fill="none" stroke="${P.hairHi}" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="${fringe}" fill="none" ${o}/>`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -604,6 +634,19 @@ function mOutfit(L, P) {
         <rect x="88.4" y="205" width="3.4" height="6" rx="1" fill="${INK}"/><rect x="108.4" y="205" width="3.4" height="6" rx="1" fill="${INK}"/>
         ${sparkle(136, 212, 7, P.acc, '')}
         ${outline}`;
+    case 'jacket': // Mory : veste tech à col montant, liserés lumineux
+      return `${base}
+        <path d="M100,184 L95,232 L105,232 Z" fill="${shade(P.acc, -0.65)}"/>
+        <path d="M86,168 L100,196 L114,168 Z" fill="${shade(P.acc, -0.65)}"/>
+        <path d="M86,168 L79,149 L90,153 L100,184 Z" fill="${P.main}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M86,168 L79,149 L84,151 L94,176 Z" fill="${P.mainSh}"/>
+        <path d="M114,168 L121,149 L110,153 L100,184 Z" fill="${P.main}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M100,184 L95,232 M100,184 L105,232" stroke="${INK}" stroke-width="1.6"/>
+        <path d="M34,194 Q58,180 82,172 M166,194 Q142,180 118,172" fill="none" stroke="${P.acc}" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M121,149 L110,153" stroke="${P.acc}" stroke-width="1.6"/>
+        <rect x="128" y="204" width="20" height="14" rx="2" fill="${P.mainSh}" stroke="${INK}" stroke-width="1.2"/>
+        <rect x="131" y="202" width="6" height="4" rx="1" fill="${P.acc}"/>
+        ${outline}`;
     default:
       return `${base}${outline}`;
   }
@@ -614,7 +657,19 @@ function mAccessories(L, P) {
   const acc = new Set(L.accessories || []);
   let body = '';
   const head = '';
-  const glasses = '';
+  let glasses = '';
+  if (acc.has('visor')) { // Mory : lunettes tech rectangulaires
+    const lens = (side) => {
+      const x1 = side < 0 ? 73 : 103; const x2 = side < 0 ? 97 : 127;
+      return `<path d="M${x1},95 L${x2},95 L${x2 - 1},109 Q${(x1 + x2) / 2},112 ${x1 + 1},109 Z" fill="${L.color}" fill-opacity=".2" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M${x1},95 L${x2},95" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M${x1 + 4},107 L${x1 + 11},97" stroke="#fff" stroke-width="1.6" opacity=".55" stroke-linecap="round"/>`;
+    };
+    glasses = `<g class="ch-glasses">${lens(-1)}${lens(1)}
+      <path d="M97,99 Q100,97 103,99" fill="none" stroke="${INK}" stroke-width="2"/>
+      <path d="M73,98 L66,99 M127,98 L134,99" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="124" cy="97.6" r="1.3" fill="${L.color}" class="fx-blink"/></g>`;
+  }
   if (acc.has('headphones')) {
     body += `<path d="M78,170 C80,187 120,187 122,170" fill="none" stroke="${INK}" stroke-width="6.5" stroke-linecap="round"/>
       <path d="M78,170 C80,187 120,187 122,170" fill="none" stroke="#2b2a33" stroke-width="3.6" stroke-linecap="round"/>

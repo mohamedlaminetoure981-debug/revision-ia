@@ -133,7 +133,7 @@ export const CHARACTERS = {
     screens: ['ajouter', 'photo', 'pdf', 'analyse'],
     signature: 'lunettes',
     look: {
-      skin: '#5A3825', hair: 'afro', hairColor: '#1C1310',
+      style: 'manga', skin: '#5A3825', hair: 'afro', hairColor: '#1C1310',
       outfit: 'jacket', outfitColor: '#1E2A3F', outfitColor2: '#22D3EE',
       eyeColor: '#3B2616', accessories: ['visor'],
     },
