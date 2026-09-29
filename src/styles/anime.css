@@ -41,8 +41,16 @@
 /* une place autour de la table (position calculée en JS) */
 .seat { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; }
 .seat .ch { --size: 104px; }
-.seat .say { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 46vw; font-size: .78rem; padding: 7px 10px; border-radius: 14px; z-index: 3; }
-.seat .say::before { left: 50%; bottom: -8px; transform: translateX(-50%) rotate(-45deg); }
+/* Bulle des scènes de groupe (une seule à la fois, placée par src/ui/bubble.js
+   pour rester entièrement dans l'écran ; --tail = position de la pointe). */
+.bubble.group-say {
+  position: absolute; z-index: 6; width: max-content; max-width: min(300px, calc(100vw - 24px));
+  font-size: .84rem; line-height: 1.32; padding: 8px 12px; border-radius: 16px;
+  white-space: normal; overflow-wrap: break-word; hyphens: auto;
+}
+.bubble.group-say::before { left: var(--tail, 50%); bottom: -9px; transform: translateX(-50%) rotate(-45deg); }
+.bubble.group-say.below::before { top: -9px; bottom: auto; transform: translateX(-50%) rotate(135deg); }
+@media (max-width: 380px) { .bubble.group-say { font-size: .8rem; padding: 7px 10px; } }
 .seat.front { z-index: 2; }
 
 /* --- Téléportation style manga --- */

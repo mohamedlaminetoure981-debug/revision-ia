@@ -12,6 +12,7 @@ import { characterHTML, play, setExpression } from './character.js';
 import { esc } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
 import { creatorName } from '../core/creator.js';
+import { groupBubble, clearBubbles } from './bubble.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // Positions : deux rangées autour de la table (en % de l'écran).
@@ -53,12 +54,8 @@ export function creatorWelcome() {
       // 2. Chacun réagit à tour de rôle (bulle + animation signature).
       for (const { id, seat } of seats) {
         if (done) return;
-        el.querySelectorAll('.seat .say').forEach((b) => b.remove());
-        const b = document.createElement('div');
-        b.className = 'bubble say';
-        b.style.setProperty('--c', CHARACTERS[id].color);
-        b.innerHTML = `<span class="who">${esc(CHARACTERS[id].name)}</span>${esc(CHARACTERS[id].createur?.accueil?.[0] || '…')}`;
-        seat.appendChild(b);
+        // Une seule bulle à la fois, recalée pour rester dans l'écran.
+        groupBubble(el, seat, id, CHARACTERS[id].createur?.accueil?.[0] || '…', 80);
         const chEl = seat.querySelector('.ch');
         setExpression(chEl, 'joie');
         play(chEl, 'signature');
@@ -66,7 +63,7 @@ export function creatorWelcome() {
       }
       if (done) return;
       // 3. Tout le monde fête l'arrivée du créateur.
-      el.querySelectorAll('.seat .say').forEach((b) => b.remove());
+      clearBubbles(el);
       seats.forEach(({ seat }) => setExpression(seat.querySelector('.ch'), 'celebration'));
       confetti(160);
       onomatopoeia('👑 CRÉATEUR!');

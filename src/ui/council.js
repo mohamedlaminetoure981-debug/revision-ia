@@ -23,6 +23,7 @@ import { characterHTML, play, setExpression } from './character.js';
 import { esc, progress } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
 import { isCreator, creatorName } from '../core/creator.js';
+import { groupBubble, clearBubbles } from './bubble.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -122,14 +123,8 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
   // 2. Délibération : bulles, réactions muettes, suspense.
   let turn = 0;
   let spokeAfterResult = 0;
-  const say = (id, text) => {
-    el.querySelectorAll('.seat .say').forEach((b) => b.remove());
-    const b = document.createElement('div');
-    b.className = 'bubble say';
-    b.style.setProperty('--c', CHARACTERS[id].color);
-    b.innerHTML = `<span class="who">${esc(CHARACTERS[id].name)}</span>${esc(text)}`;
-    seats[id]?.appendChild(b);
-  };
+  // Une seule bulle à la fois, toujours entièrement dans l'écran (voir bubble.js).
+  const say = (id, text) => { if (seats[id]) groupBubble(el, seats[id], id, text); };
   const react = (level) => { // les muets réagissent
     for (const id of silent) {
       const chEl = seats[id]?.querySelector('.ch');
@@ -166,7 +161,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
 
   // 3. Révélation de la note.
   if (!skipped) {
-    el.querySelectorAll('.seat .say').forEach((b) => b.remove());
+    clearBubbles(el);
     const color = LEVEL_COLOR[res.level] || 'var(--neon-violet)';
     const revealSeat = seats[revealer];
     if (revealSeat) {
