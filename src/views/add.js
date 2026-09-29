@@ -160,7 +160,9 @@ export async function render(el) {
       sound('good');
       toast('✅ Mory : cours scanné et rangé !', 'ok');
       celebrate(await addXp(XP_RULES.courseAdded));
-      location.hash = `#/course/${course.id}/resume`;
+      // Direction les stories : le résumé s'écrit en direct (streaming),
+      // puis fiches et quiz se préparent en arrière-plan.
+      location.hash = `#/stories/${course.id}`;
     } catch (e) {
       pg.done();
       if (course) {

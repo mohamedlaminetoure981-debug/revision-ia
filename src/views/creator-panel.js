@@ -18,6 +18,7 @@ import { confetti, onomatopoeia } from '../ui/fx.js';
 import { openInstall } from '../ui/install.js';
 import { creatorWelcome } from '../ui/creator-scene.js';
 import { creatorName } from '../core/creator.js';
+import { speedSection, bindSpeed } from './creator-speed.js';
 
 const LEVELS = [
   { level: 'excellent', label: '19/20', name: '🏆 Excellent' },
@@ -33,6 +34,7 @@ export async function render(el) {
   el.innerHTML = `
     <div class="screen-head"><a class="back-btn" href="#/profil">←</a><h1>👑 Panneau créateur</h1></div>
     <div class="tile" style="margin-bottom:12px">${mascot('mory', { situation: 'arrivee', expression: 'joie', size: 80 })}</div>
+    ${await speedSection()}
 
     <div class="tile" style="margin-bottom:12px">
       <h2 style="margin-top:0">🎨 Galerie des personnages</h2>
@@ -88,6 +90,7 @@ export async function render(el) {
   `;
 
   const $ = (s) => el.querySelector(s);
+  bindSpeed(el);
 
   // --- Galerie ---
   const drawGallery = () => {

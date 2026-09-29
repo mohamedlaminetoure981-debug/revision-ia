@@ -18,15 +18,11 @@
 // ---------------------------------------------------------------------
 // Rôle général de l'IA (envoyé avec chaque demande)
 // ---------------------------------------------------------------------
-export const SYSTEM = `Tu es un professeur particulier expert et bienveillant qui aide un lycéen ou
-un étudiant (15-25 ans, en Guinée / Afrique francophone) à réviser ses cours.
-Règles absolues :
-- Réponds toujours en français clair et simple, en tutoyant. Phrases courtes.
-- Sérieux sur le fond : exactitude avant tout.
-- Base-toi UNIQUEMENT sur le cours fourni. N'invente jamais un fait qui contredit le cours.
-- Écris toutes les formules mathématiques en LaTeX entre $...$ (en ligne) ou $$...$$ (bloc).
-- Tu peux utiliser du Markdown simple : **gras**, *italique*, listes "- ", titres "### ", \`code\`.
-- Les citations ("quote") doivent être copiées MOT POUR MOT depuis le cours (10 à 30 mots maximum).`;
+// ⚡ Consignes volontairement COURTES : moins de texte envoyé = réponse plus rapide.
+export const SYSTEM = `Prof particulier pour lycéen/étudiant francophone (Guinée). Français simple, tutoiement.
+Exactitude avant tout ; uniquement d'après le cours fourni.
+Formules en LaTeX $...$ ou $$...$$. Markdown simple autorisé.
+"quote" = citation copiée mot pour mot du cours (10 à 25 mots).`;
 
 // Morceau de schéma réutilisé : le passage source dans le cours.
 const SOURCE = {
@@ -43,7 +39,9 @@ const SOURCE = {
  * Chaque page est précédée d'un repère : [[Page 3]] ou [[Photo 3]].
  */
 export function courseText(pages, unitLabel) {
-  return pages.map((p) => `[[${unitLabel} ${p.n}]]\n${p.text}`).join('\n\n');
+  // Espaces et lignes vides en trop supprimés : moins de texte à envoyer.
+  const compact = (t) => String(t).replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return pages.map((p) => `[[${unitLabel} ${p.n}]]\n${compact(p.text)}`).join('\n');
 }
 
 // =====================================================================
@@ -110,13 +108,10 @@ export const SUMMARY_SCHEMA = {
 };
 
 export function summaryPrompt(text, unitLabel) {
-  return `Fais un résumé structuré de ce morceau de cours, partie par partie, dans l'ordre du cours.
-- N'oublie AUCUNE notion, définition, formule, propriété, exemple important ou méthode.
-- Une "section" par partie du cours, avec son titre et les numéros de ${unitLabel.toLowerCase()} concernés.
-- Blocs de type "cours" : le contenu du cours, résumé fidèlement.
-- Quand un passage du cours est peu expliqué (définition sèche, étape de calcul sautée,
-  notion supposée connue), ajoute juste après un bloc de type "explication" qui le développe
-  simplement, avec un exemple si utile. Ces blocs seront marqués "💡 Explication ajoutée".
+  return `Résume ce cours partie par partie, dans l'ordre, sans oublier aucune notion, formule ou méthode.
+Une section par partie (titre + n° de ${unitLabel.toLowerCase()}). Commence par la 1re partie, courte.
+Blocs "cours" = contenu fidèle et concis. Si un passage est peu expliqué, ajoute juste après un bloc
+"explication" simple (avec un exemple si utile).
 
 COURS :
 ${text}`;
@@ -146,11 +141,8 @@ export const CARDS_SCHEMA = {
 };
 
 export function cardsPrompt(text) {
-  return `Crée des fiches de révision question/réponse sur ce morceau de cours.
-- Couvre TOUTES les parties et TOUTES les notions importantes (définitions, formules,
-  propriétés, méthodes, exemples, pièges). Mieux vaut trop de fiches que pas assez.
-- Une question = une seule notion. Réponse courte et précise (1 à 4 phrases ou une formule).
-- Pour chaque fiche, donne la source : numéro de page/photo et une citation mot pour mot.
+  return `Fiches question/réponse couvrant TOUTES les notions de ce cours (définitions, formules, méthodes, pièges).
+Une notion par fiche ; réponse courte (1-3 phrases ou une formule) ; source (page + citation).
 
 COURS :
 ${text}`;
@@ -181,13 +173,10 @@ export const QUIZ_SCHEMA = {
 };
 
 export function quizPrompt(text, count, avoid = []) {
-  return `Crée un QCM de ${count} questions sur ce cours.
-- Répartis les questions sur TOUTES les parties du cours.
-- 4 choix par question, UNE seule bonne réponse ; les mauvais choix doivent être plausibles.
-- Mélange compréhension, application (petits calculs si le cours s'y prête) et définitions.
-- "explanation" : explique pourquoi la bonne réponse est juste ET pourquoi les autres sont fausses.
-- Donne la source (page/photo + citation mot pour mot).
-${avoid.length ? `\nÉvite de reposer ces questions déjà posées :\n- ${avoid.slice(0, 60).join('\n- ')}\n` : ''}
+  return `QCM de ${count} questions réparties sur tout le cours. 4 choix plausibles, 1 seule bonne réponse.
+Mélange définitions, compréhension et petits calculs. "explanation" : pourquoi c'est juste (2 phrases max).
+Source : page + citation.${avoid.length ? `\nNe repose pas : ${avoid.slice(0, 20).map((q) => q.slice(0, 70)).join(' | ')}` : ''}
+
 COURS :
 ${text}`;
 }

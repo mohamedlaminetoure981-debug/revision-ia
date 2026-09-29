@@ -14,6 +14,7 @@ import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate } from '../ui/fx.js';
 import { reportCard } from './report.js';
 import { refresh } from '../main.js';
+import { isRunning, onJob, getJob } from '../core/jobs.js';
 
 // Onglets : identifiant (dans l'adresse) → titre + personnage responsable.
 // ➕ Pour ajouter un onglet : ajoute une ligne ici ET une fonction dans TAB_RENDERERS.
@@ -97,7 +98,8 @@ async function renderSummary(el, course) {
         ${mascot('nia', { text: partial ? 'Mon résumé a été interrompu. On le termine ?' : 'Je te prépare le résumé en stories, partie par partie, sans rien oublier ?', expression: 'reflexion' })}
         <button class="btn block" id="gen" style="margin-top:14px">✨ ${partial ? 'Continuer le résumé' : 'Créer le résumé'}</button>
       </div>`;
-    el.querySelector('#gen').onclick = () => runAI('Nia écrit ton résumé', 'nia', (set) => gen.generateSummary(course, set));
+    // Les stories s'affichent au fur et à mesure (streaming) : pas d'attente.
+    el.querySelector('#gen').onclick = () => { location.hash = `#/stories/${course.id}`; };
     return;
   }
   const label = gen.unitLabel(course);
@@ -125,8 +127,28 @@ async function renderSummary(el, course) {
   el.querySelector('#regen').onclick = async () => {
     if (!(await confirmBox('Remplacer le résumé actuel par un nouveau ?', 'Refaire'))) return;
     await gen.resetSummary(course);
-    runAI('Nia écrit ton résumé', 'nia', (set) => gen.generateSummary(course, set));
+    location.hash = `#/stories/${course.id}`;
   };
+}
+
+/**
+ * Bandeau "préparation en arrière-plan" (fiches ou quiz en cours de création).
+ * L'écran se met à jour tout seul quand la tâche avance ou se termine.
+ */
+function backgroundBanner(el, course, kind, charId, text) {
+  if (!isRunning(course.id, kind)) return '';
+  const tab = location.hash;
+  const stop = onJob(course.id, kind, (j) => {
+    if (location.hash !== tab) { stop(); return; } // on a quitté l'écran
+    const st = el.querySelector(`#bg-${kind}`);
+    if (st && j.data.status) st.textContent = j.data.status;
+    if (j.status !== 'running') { stop(); refresh(); }
+  });
+  return `<div class="tile neon" style="--c:${CHARACTERS[charId].color};margin-bottom:12px">
+    ${mascot(charId, { text, expression: 'concentration', size: 70 })}
+    <div class="dots-loader" style="margin-left:82px"><i></i><i></i><i></i></div>
+    <p class="tiny muted" id="bg-${kind}" style="margin:6px 0 0">${esc(getJob(course.id, kind)?.data?.status || 'En cours…')}</p>
+  </div>`;
 }
 
 // ---------------------------------------------------------------------
@@ -138,6 +160,10 @@ async function renderCards(el, course) {
   const partial = gen.isPartial(course, 'cards');
   const due = cards.filter((c) => isDue(c)).length;
   const flagged = cards.filter((c) => c.flagged);
+
+  // Fiches en préparation automatique (après le résumé) ?
+  const bg = backgroundBanner(el, course, 'cards', 'sora', 'Je prépare tes fiches en arrière-plan. Elles arrivent !');
+  if (bg && !cards.length) { el.innerHTML = bg; return; }
 
   if (!cards.length && !partial) {
     el.innerHTML = `
@@ -171,7 +197,8 @@ async function renderCards(el, course) {
     </details>`;
 
   el.innerHTML = `
-    ${partial ? `<div class="tile neon" style="--c:var(--neon-yellow);margin-bottom:12px">⚠️ Création des fiches interrompue.
+    ${bg}
+    ${partial && !bg ? `<div class="tile neon" style="--c:var(--neon-yellow);margin-bottom:12px">⚠️ Création des fiches interrompue.
       <button class="btn small" id="continue" style="margin-top:8px">▶️ Continuer</button></div>` : ''}
     <div class="bento" style="margin-bottom:12px">
       <div class="tile"><div class="label">Fiches</div><div class="big">${cards.length}</div></div>
@@ -206,6 +233,7 @@ async function renderQuizzes(el, course) {
   const results = (await db.getByIndex('results', 'courseId', course.id)).filter((r) => r.type === 'quiz');
 
   el.innerHTML = `
+    ${backgroundBanner(el, course, 'quiz', 'ren', 'Je te prépare un quiz en arrière-plan. Échauffe-toi…')}
     <div class="tile" style="margin-bottom:12px">
       ${mascot('ren', { situation: 'arrivee', expression: 'joie' })}
       <div class="seg" id="count" style="margin-top:14px">

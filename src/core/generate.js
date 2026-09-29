@@ -13,6 +13,7 @@ import * as db from './db.js';
 import { generateJSON, blobToBase64 } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { initialState } from './srs.js';
+import { startJob } from './jobs.js';
 
 const CHUNK_CHARS = 12000; // taille maximale d'un morceau (en caractères)
 
@@ -69,17 +70,56 @@ async function runChunked(course, kind, label, onStatus, fn) {
   }
 }
 
+/** Comme runChunked, mais traite 2 morceaux EN MÊME TEMPS (plus rapide). */
+async function runChunkedParallel(course, kind, label, onStatus, fn, limit = 2) {
+  const parts = chunks(course);
+  const p = prog(course, kind);
+  const todo = parts.map((_, i) => i).filter((i) => !p.done.includes(i));
+  let finished = parts.length - todo.length;
+  const worker = async () => {
+    while (todo.length) {
+      const i = todo.shift();
+      const status = (t) => onStatus?.(`${label} — ${finished}/${parts.length} parties prêtes${t ? ' · ' + t : ''}`);
+      status();
+      await fn(parts[i], i, status);
+      p.done.push(i);
+      finished++;
+      status();
+      await db.put('courses', course);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, todo.length) }, worker));
+}
+
 // ---------------------------------------------------------------------
-// Résumé
+// Résumé — en STREAMING : chaque partie arrive dès qu'elle est prête
 // ---------------------------------------------------------------------
-export async function generateSummary(course, onStatus) {
+/**
+ * @param {Function} [onSection] (section, indexGlobal) appelé à chaque nouvelle partie reçue
+ */
+export async function generateSummary(course, onStatus, onSection) {
   course.summaryParts ||= {};
+  const parts = chunks(course);
+  // Nombre de parties déjà prêtes avant chaque morceau (pour l'index global).
+  const before = (i) => Object.keys(course.summaryParts).filter((k) => Number(k) < i).reduce((s, k) => s + course.summaryParts[k].length, 0);
+  // Les parties déjà reçues (reprise après coupure) sont renvoyées tout de suite.
+  Object.keys(course.summaryParts).sort((a, b) => a - b).forEach((k) => {
+    course.summaryParts[k].forEach((sec, j) => onSection?.(sec, before(Number(k)) + j));
+  });
   await runChunked(course, 'summary', 'Résumé', onStatus, async (pages, i, status) => {
     const res = await generateJSON({
       parts: [{ text: P.summaryPrompt(P.courseText(pages, unitLabel(course)), unitLabel(course)) }],
       schema: P.SUMMARY_SCHEMA,
       system: P.SYSTEM,
       onStatus: status,
+      label: `résumé ${i + 1}/${parts.length}`,
+      streamKey: 'sections',
+      // idx = position dans ce morceau : si un autre modèle reprend la réponse,
+      // les parties déjà affichées sont simplement remplacées (pas de doublon).
+      onItem: (sec, idx) => {
+        if (!sec?.title || !Array.isArray(sec.blocks)) return;
+        onSection?.(sec, before(i) + idx);
+      },
     });
     course.summaryParts[i] = res.sections;
   });
@@ -103,12 +143,13 @@ export async function resetSummary(course) {
 // Fiches
 // ---------------------------------------------------------------------
 export async function generateCards(course, onStatus) {
-  await runChunked(course, 'cards', 'Fiches', onStatus, async (pages, i, status) => {
+  await runChunkedParallel(course, 'cards', 'Fiches', onStatus, async (pages, i, status) => {
     const res = await generateJSON({
       parts: [{ text: P.cardsPrompt(P.courseText(pages, unitLabel(course))) }],
       schema: P.CARDS_SCHEMA,
       system: P.SYSTEM,
       onStatus: status,
+      label: `fiches ${i + 1}`,
       check: (json) => (json.cards.length ? null : 'aucune fiche'),
     });
     let cards = res.cards;
@@ -153,6 +194,7 @@ export async function generateQuiz(course, count, onStatus) {
     system: P.SYSTEM,
     temperature: 0.7,
     onStatus,
+    label: 'quiz',
     // Vérifie que chaque question a des choix et une bonne réponse valide.
     check: (json) => {
       const bad = json.questions.findIndex((q) => q.choices.length < 2 || q.correctIndex < 0 || q.correctIndex >= q.choices.length);
@@ -253,6 +295,8 @@ export async function correctExercise(course, exercise, answer, image, onStatus)
   onStatus?.('Awa corrige ta copie…');
   let correction = await generateJSON({
     parts, schema: P.CORRECTION_SCHEMA, system: P.SYSTEM, temperature: 0.2, onStatus,
+    thinking: 'low', // un peu de réflexion pour vérifier les calculs
+    label: 'correction exercice',
     check: (j) => (j.grade < 0 || j.grade > 20 ? 'note hors de 0-20' : null),
   });
   // Mode vérification : un 2e appel relit la correction.
@@ -330,6 +374,8 @@ export async function correctExam(exam, courses, answers, onStatus) {
   const res = await generateJSON({
     parts: [{ text: P.examCorrectionPrompt(multiCourseText(courses), exam, answers) }],
     schema: P.EXAM_CORRECTION_SCHEMA,
+    thinking: 'low', // un peu de réflexion pour vérifier les calculs
+    label: 'correction examen',
     system: P.SYSTEM,
     temperature: 0.2,
     onStatus,
@@ -359,4 +405,38 @@ export async function correctExam(exam, courses, answers, onStatus) {
 /** Niveau de résultat à partir d'une note sur 20. */
 export function verdictOf(note20) {
   return note20 >= 16 ? 'excellent' : note20 >= 12 ? 'bon' : note20 >= 8 ? 'moyen' : 'a_retravailler';
+}
+
+// =====================================================================
+// PRÉPARATION AUTOMATIQUE D'UN COURS (en arrière-plan)
+// ---------------------------------------------------------------------
+//  1. résumé en STREAMING (les stories s'affichent au fur et à mesure) ;
+//  2. puis fiches, puis quiz de 10 questions, pendant que tu lis.
+// Les écrans suivent l'avancement grâce à core/jobs.js.
+// =====================================================================
+
+/** Lance (ou rejoint) la préparation d'un cours. Renvoie la tâche "résumé". */
+export function prepareCourse(course) {
+  const sections = [];
+  const job = startJob(course.id, 'summary', async (update) => {
+    await generateSummary(course, (s) => update({ status: s }), (sec, idx) => {
+      sections[idx] = sec;
+      update({ sections: sections.slice() });
+    });
+    return course.summary;
+  });
+  job.promise.then(() => { if (job.status === 'done') prepareExtras(course); });
+  return job;
+}
+
+/** Fiches puis quiz, l'un après l'autre (pour ne pas saturer le quota gratuit). */
+export async function prepareExtras(course) {
+  const cards = await db.getByIndex('cards', 'courseId', course.id);
+  if (!cards.length || isPartial(course, 'cards')) {
+    await startJob(course.id, 'cards', (update) => generateCards(course, (s) => update({ status: s }))).promise;
+  }
+  const quizzes = await db.getByIndex('quizzes', 'courseId', course.id);
+  if (!quizzes.length) {
+    await startJob(course.id, 'quiz', (update) => generateQuiz(course, 10, (s) => update({ status: s }))).promise;
+  }
 }

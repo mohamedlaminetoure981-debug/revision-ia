@@ -14,7 +14,7 @@ import { creatorWelcome } from '../ui/creator-scene.js';
 import { refresh } from '../main.js';
 
 // Modèles proposés dans la liste (tu peux en taper un autre).
-const SUGGESTED_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
+const SUGGESTED_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash-lite'];
 
 export async function render(el) {
   const s = {};
@@ -44,7 +44,7 @@ export async function render(el) {
       <label class="field" for="model">Modèle Gemini</label>
       <input id="model" type="text" list="models" value="${esc(s.model)}" autocomplete="off">
       <datalist id="models">${SUGGESTED_MODELS.map((m) => `<option value="${m}">`).join('')}</datalist>
-      <p class="tiny muted">Quota épuisé ou modèle qui ne marche plus ? Essaie-en un autre (les « lite » ont souvent plus de quota).
+      <p class="tiny muted">Par défaut : le modèle « lite », le plus rapide. Si un modèle est surchargé ou à court de quota, l'appli bascule toute seule sur un autre.
         <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Liste des modèles</a></p>
       ${toggle('verifyMode', '🔍 Mode vérification', s.verifyMode, 'Un 2e appel à l’IA relit les fiches, quiz et corrections en les comparant au cours, et corrige ou signale les erreurs. Plus fiable, mais utilise 2× plus de quota.')}
       <div class="row nowrap" style="margin-top:10px">

@@ -157,6 +157,11 @@ initInstall();
 (async () => {
   applyTheme(await db.getSetting('theme'));
   await loadCreator();
+  // Ancien modèle par défaut (plus lent) → nouveau modèle rapide, une seule fois.
+  if (!(await db.getSetting('modelMigrated'))) {
+    if ((await db.getSetting('model')) === 'gemini-3.8-flash') await db.setSetting('model', db.DEFAULT_SETTINGS.model);
+    await db.setSetting('modelMigrated', true);
+  }
   await loadFxPrefs();
   window.addEventListener('online', updateNet);
   window.addEventListener('offline', updateNet);

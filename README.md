@@ -509,14 +509,30 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 
 ---
 
-## 11. Changer de modèle Gemini
+## 11. Changer de modèle Gemini (et vitesse de l'IA)
 
-Par défaut : **`gemini-3.8-flash`** (meilleur modèle Flash gratuit d'après la doc Google,
-septembre 2026). Pour en changer **sans toucher au code** : Profil → Réglages → Modèle.
-Liste à jour : https://ai.google.dev/gemini-api/docs/models
+Par défaut : **`gemini-3.5-flash-lite`**, le modèle gratuit le plus **rapide** et le moins
+surchargé (doc Google, septembre 2026). Pour en changer **sans toucher au code** :
+Profil → Réglages → Modèle. Liste à jour : https://ai.google.dev/gemini-api/docs/models
 
 Pour changer la valeur par défaut : `DEFAULT_SETTINGS.model` dans `src/core/db.js`.
-Les modèles « lite » sont plus rapides et ont souvent plus de quota gratuit.
+
+### Comment l'appli va vite (`src/core/gemini.js`)
+- **Streaming** (`streamGenerateContent`) : le résumé arrive partie par partie ; la 1re
+  story s'affiche dès que la 1re partie est prête, les suivantes pendant que tu lis.
+- **Réflexion minimale** : `thinkingLevel: "minimal"` (Flash-Lite) ou `"low"` (Flash),
+  `thinkingBudget: 0` (Gemini 2.5). Un peu plus (`"low"`) seulement pour corriger les
+  exercices et examens (calculs).
+- **Bascule automatique** : si un modèle est surchargé (503) ou à court de quota (429),
+  l'appli passe tout de suite au suivant de `MODEL_CHAIN` (attente 1 s puis 3 s max),
+  puis revient au modèle principal pour la requête suivante. Le modèle utilisé s'affiche
+  discrètement pendant le chargement.
+- **En arrière-plan** : après l'import, résumé d'abord (streaming), puis fiches (2 morceaux
+  à la fois) et quiz se préparent pendant que tu lis (`prepareCourse` dans
+  `src/core/generate.js`, suivi par `src/core/jobs.js`).
+- **Consignes courtes** et texte du cours compacté avant l'envoi.
+- **Mesures** : Panneau créateur → ⏱️ Vitesse de l'IA (temps du 1er texte, temps total,
+  modèle, réessais) + **banc d'essai avant / après** sur un de tes cours.
 
 ---
 

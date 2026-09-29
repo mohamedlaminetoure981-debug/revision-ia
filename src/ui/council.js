@@ -94,7 +94,10 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
 
   const seats = {};
   const start = performance.now();
-  const minDuration = short ? 1300 : 2500; // scène complète : ~4 s au total (5 s max si l'IA a fini)
+  // Durées : version courte (par défaut) ≈ 1,3 s en tout si la correction est
+  // instantanée ; version complète ≈ 4 s. Si l'IA est plus lente, la scène
+  // continue jusqu'à ce que la note soit prête (jamais d'attente en plus).
+  const minDuration = short ? 500 : 2500;
 
   // 1. Arrivées en téléportation, une par une.
   for (let i = 0; i < cast.length; i++) {
@@ -189,7 +192,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'encouragement'));
       vibrate(20);
     }
-    await Promise.race([sleep(short ? 900 : 1300), new Promise((r) => { el.onclick = r; })]);
+    await Promise.race([sleep(short ? 700 : 1300), new Promise((r) => { el.onclick = r; })]);
   }
   el.remove();
   return value;

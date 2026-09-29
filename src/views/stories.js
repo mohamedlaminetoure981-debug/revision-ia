@@ -5,27 +5,34 @@
 // taper à gauche = précédent. Barre de progression en haut.
 // Les explications ajoutées par l'IA ont leur propre écran, marqué
 // "💡 Explication ajoutée".
+//
+// ⚡ MODE DIRECT : si le résumé n'existe pas encore, il est créé EN STREAMING.
+// La 1re story s'affiche dès que la 1re partie arrive (quelques secondes) ;
+// les suivantes se remplissent pendant que tu lis. Ensuite, les fiches et
+// le quiz se préparent tout seuls en arrière-plan (core/generate.js → prepareCourse).
 // Adresse : #/stories/ID_COURS
 // =====================================================================
 
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, rich, line } from '../ui/ui.js';
+import { esc, rich, line, showError } from '../ui/ui.js';
 import { vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { rewardSummary } from './course.js';
-import { unitLabel } from '../core/generate.js';
+import { unitLabel, prepareCourse } from '../core/generate.js';
+import { getJob, onJob } from '../core/jobs.js';
 import { suspendPowers, resumePowers } from '../ui/powers.js';
 
 const MAX_SLIDE_CHARS = 650; // au-delà, un bloc est découpé en plusieurs écrans
 
-/** Transforme le résumé en liste d'écrans (slides). */
-function buildSlides(course) {
+/** Transforme les parties du résumé en liste d'écrans (slides). */
+function buildSlides(sections) {
   const slides = [];
-  for (const s of course.summary) {
-    for (const b of s.blocks) {
+  for (const s of sections) {
+    if (!s) continue;
+    for (const b of s.blocks || []) {
       // On découpe les longs blocs par paragraphes pour garder "une notion par écran".
-      const paras = b.text.split(/\n{2,}/);
+      const paras = String(b.text || '').split(/\n{2,}/);
       let buf = '';
       const flush = () => { if (buf.trim()) slides.push({ section: s.title, pages: s.pages, kind: b.kind, text: buf.trim() }); buf = ''; };
       for (const p of paras) {
@@ -39,10 +46,20 @@ function buildSlides(course) {
 }
 
 export async function render(el, [courseId]) {
-  const course = await db.get('courses', courseId);
-  if (!course?.summary) { location.hash = `#/course/${courseId}/resume`; return; }
-  const slides = buildSlides(course);
+  let course = await db.get('courses', courseId);
+  if (!course) { location.hash = '#/cours'; return; }
   const nia = CHARACTERS.nia;
+
+  // Résumé déjà prêt → lecture normale. Sinon → génération en direct.
+  let live = !course.summary;
+  let job = null;
+  let sections = course.summary || [];
+  if (live) {
+    job = getJob(courseId, 'summary');
+    if (!job || job.status === 'error' || job.status === 'idle') job = prepareCourse(course);
+    sections = job.data.sections || [];
+  }
+  let slides = buildSlides(sections);
   let i = 0;
   let rewarded = false;
 
@@ -50,9 +67,7 @@ export async function render(el, [courseId]) {
     <div class="fs" style="--c:${nia.color}">
       <div class="fs-top">
         <button class="fs-close" id="close" aria-label="Fermer">✕</button>
-        ${slides.length <= 30
-          ? `<div class="story-bars">${slides.map(() => '<i></i>').join('')}</div>`
-          : '<div class="story-bar-cont"><div></div></div>'}
+        <div class="story-bar-cont"><div></div></div>
         <span class="tiny dim" id="cnt"></span>
       </div>
       <div class="fs-body">
@@ -69,14 +84,15 @@ export async function render(el, [courseId]) {
   const bubble = el.querySelector('.story-foot .say');
   const label = unitLabel(course);
 
-  function show(dir = 1) {
-    // Barre de progression
-    el.querySelectorAll('.story-bars i').forEach((b, k) => { b.className = k < i ? 'done' : k === i ? 'now' : ''; });
-    const cont = el.querySelector('.story-bar-cont > div');
-    if (cont) cont.style.width = `${(100 * (i + 1)) / (slides.length + 1)}%`;
-    el.querySelector('#cnt').textContent = i < slides.length ? `${i + 1}/${slides.length}` : '🏁';
+  function bar() {
+    const total = slides.length + (live ? 1 : 0);
+    el.querySelector('.story-bar-cont > div').style.width = `${total ? (100 * Math.min(i + 1, total)) / (total + (live ? 0 : 1)) : 0}%`;
+    el.querySelector('#cnt').textContent = i < slides.length ? `${i + 1}/${slides.length}${live ? '…' : ''}` : live ? '…' : '🏁';
+  }
 
-    if (i >= slides.length) return showEnd();
+  function show(dir = 1) {
+    bar();
+    if (i >= slides.length) return live ? showWaiting() : showEnd();
     const s = slides[i];
     const isExplain = s.kind === 'explication';
     stage.innerHTML = `
@@ -100,6 +116,19 @@ export async function render(el, [courseId]) {
     } else {
       setExpression(niaEl, 'neutre');
     }
+  }
+
+  /** Écran d'attente (la suite est en train d'arriver). */
+  function showWaiting() {
+    stage.innerHTML = `
+      <div class="story-card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px">
+        ${characterHTML('nia', { expression: 'concentration', size: 120, enter: false })}
+        <h2>${slides.length ? 'Nia écrit la suite…' : 'Nia lit ton cours…'}</h2>
+        <div class="dots-loader"><i></i><i></i><i></i></div>
+        <p class="tiny muted" id="live-status">${esc(job?.data?.status || 'Connexion à l’IA…')}</p>
+      </div>
+      <button class="story-nav prev" aria-label="Précédent"></button>`;
+    stage.querySelector('.prev').onclick = prev;
   }
 
   async function showEnd() {
@@ -138,6 +167,33 @@ export async function render(el, [courseId]) {
     show(-1);
   }
 
+  // --- Mode direct : on écoute la génération en streaming ---
+  let stop = null;
+  if (live) {
+    stop = onJob(courseId, 'summary', async (j) => {
+      const waiting = i >= slides.length; // l'élève attend la suite
+      if (j.data.sections) slides = buildSlides(j.data.sections);
+      if (j.status === 'done') {
+        course = await db.get('courses', courseId);
+        slides = buildSlides(course.summary || []);
+        live = false;
+        if (waiting) show(); else bar();
+      } else if (j.status === 'error') {
+        live = false;
+        bar();
+        showError(j.error, () => { location.reload(); });
+        if (waiting) show();
+      } else if (waiting && i < slides.length) {
+        show(); // la story attendue vient d'arriver
+      } else if (waiting) {
+        const st = el.querySelector('#live-status');
+        if (st && j.data.status) st.textContent = j.data.status;
+      } else {
+        bar();
+      }
+    });
+  }
+
   // Swipe horizontal (doigt) + flèches du clavier.
   let x0 = null;
   stage.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
@@ -155,7 +211,7 @@ export async function render(el, [courseId]) {
   document.addEventListener('keydown', onKey);
   // Jamais de pouvoir pendant la lecture d'un résumé : ils attendent qu'on quitte l'écran.
   suspendPowers();
-  window.addEventListener('hashchange', () => { document.removeEventListener('keydown', onKey); resumePowers(); }, { once: true });
+  window.addEventListener('hashchange', () => { document.removeEventListener('keydown', onKey); resumePowers(); stop?.(); }, { once: true });
   el.querySelector('#close').onclick = () => { location.hash = `#/course/${course.id}/resume`; };
 
   show();

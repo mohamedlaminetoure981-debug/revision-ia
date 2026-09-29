@@ -136,9 +136,11 @@ export async function clear(name) {
 /** Valeurs par défaut des réglages. */
 export const DEFAULT_SETTINGS = {
   apiKey: '',
-  // Modèle Gemini par défaut : meilleur Flash gratuit (doc Google, sept. 2026).
+  // Modèle Gemini par défaut : le Flash-Lite gratuit, le plus RAPIDE et le moins
+  // surchargé (doc Google, sept. 2026). En cas de surcharge, l'appli bascule
+  // toute seule sur les modèles de secours (MODEL_CHAIN dans core/gemini.js).
   // Modifiable dans Profil → Réglages, sans toucher au code.
-  model: 'gemini-3.8-flash',
+  model: 'gemini-3.5-flash-lite',
   verifyMode: false, // Phase 2 : 2e appel IA de vérification
   theme: 'dark', // 'dark' ou 'light'
   sounds: false, // sons courts (désactivés par défaut)
@@ -146,7 +148,7 @@ export const DEFAULT_SETTINGS = {
   quizTimer: false, // minuteur visuel pendant les quiz
   // Phase 3 : scène du conseil de correction ET pouvoirs spéciaux.
   // 'complete' (tout), 'short' (version courte, pas de pouvoir plein écran), 'off' (désactivé)
-  council: 'complete',
+  council: 'short', // version courte par défaut : la note arrive vite
   // Profil de jeu : prénom, compagnon, XP, série, badges… (voir core/game.js)
   profile: null,
 };
