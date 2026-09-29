@@ -44,7 +44,8 @@ export function creatorWelcome() {
       return { id, seat };
     });
     vibrate([30, 30, 60]);
-    sound('level');
+    sound('teleport');
+    setTimeout(() => sound('teleport'), 90);
 
     (async () => {
       await sleep(900);

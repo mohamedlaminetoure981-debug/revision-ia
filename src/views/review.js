@@ -235,7 +235,7 @@ export async function render(el, [courseId]) {
       combo = 0;
       talk('echec', 'encouragement', 'shake');
       vibrate([25, 30, 25]);
-      sound('bad');
+      sound('swipe', dir);
     } else {
       done++;
       combo++;
@@ -250,7 +250,7 @@ export async function render(el, [courseId]) {
         talk('reussite', 'joie', 'bounce');
       }
       vibrate(12);
-      sound('swipe');
+      sound('swipe', dir);
     }
     setTimeout(showCard, 280);
   }

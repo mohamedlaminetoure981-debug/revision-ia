@@ -11,6 +11,7 @@
 
 import { CHARACTERS } from '../data/characters.js';
 import { esc } from './ui.js';
+import { playSfx, voice } from './sfx.js';
 
 const MARGIN = 10; // marge minimale avec les bords de l'écran (px)
 
@@ -30,6 +31,8 @@ export function groupBubble(scene, seat, id, text, minTop = 70) {
   b.innerHTML = `<span class="who">${esc(CHARACTERS[id]?.name || '')}</span>${esc(text)}`;
   scene.appendChild(b);
   place(scene, seat, b, minTop);
+  playSfx('bubble');
+  setTimeout(() => voice(id), 60);
   return b;
 }
 

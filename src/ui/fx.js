@@ -2,19 +2,22 @@
 // fx.js — Sensations : confettis, onomatopées anime, vibrations, sons
 // ---------------------------------------------------------------------
 // Tout est léger (pas de bibliothèque) pour rester fluide sur un
-// téléphone d'entrée de gamme. Les sons sont DÉSACTIVÉS par défaut
-// (Profil → Réglages). Les vibrations peuvent aussi être coupées.
+// téléphone d'entrée de gamme. Les sons (style anime, générés par le code
+// dans ui/sfx.js) sont ACTIVÉS par défaut, volume modéré : bouton 🔊/🔇
+// en haut de l'écran et curseur de volume dans Réglages.
 // =====================================================================
 
 import * as db from '../core/db.js';
+import { playSfx, setSfxPrefs } from './sfx.js';
 
-const prefs = { sounds: false, vibration: true, motion: true };
+const prefs = { sounds: true, vibration: true, motion: true };
 
 /** Charge les préférences (appelé au démarrage et après un changement). */
 export async function loadFxPrefs() {
   prefs.sounds = await db.getSetting('sounds');
   prefs.vibration = await db.getSetting('vibration');
   prefs.motion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setSfxPrefs({ on: prefs.sounds, vol: await db.getSetting('volume') });
 }
 
 /** Vibration légère (si le téléphone le permet et si c'est activé). */
@@ -25,37 +28,11 @@ export function vibrate(pattern = 15) {
 }
 
 // ---------------------------------------------------------------------
-// Sons (générés par le navigateur, aucun fichier à télécharger)
+// Sons : délégués au moteur ui/sfx.js (générés par le code)
 // ---------------------------------------------------------------------
-let audioCtx = null;
-const SOUNDS = {
-  tap: [[660, 0.05]],
-  good: [[660, 0.08], [990, 0.12]],
-  bad: [[300, 0.12], [220, 0.16]],
-  flip: [[520, 0.05]],
-  level: [[523, 0.1], [659, 0.1], [784, 0.1], [1046, 0.25]],
-  swipe: [[440, 0.04], [700, 0.05]],
-};
-
-/** Joue un petit son ('tap', 'good', 'bad', 'flip', 'level', 'swipe'). */
-export function sound(name) {
-  if (!prefs.sounds || !SOUNDS[name]) return;
-  try {
-    audioCtx ||= new (window.AudioContext || window.webkitAudioContext)();
-    let t = audioCtx.currentTime;
-    for (const [freq, dur] of SOUNDS[name]) {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.12, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start(t);
-      osc.stop(t + dur);
-      t += dur * 0.9;
-    }
-  } catch { /* son non disponible */ }
+/** Joue un son : 'tap', 'good', 'bad', 'flip', 'level', 'swipe', 'sparkle', 'badge'… */
+export function sound(name, arg) {
+  playSfx(name, arg);
 }
 
 /** Joue un fichier audio (voix des persos, quand elles existeront). */
@@ -71,6 +48,7 @@ const CONFETTI_COLORS = ['#8B5CF6', '#C6FF3D', '#FF3D9A', '#22D3EE', '#FFD23F'];
 
 /** Lance des confettis pendant ~2,2 s. */
 export function confetti(count = 110) {
+  playSfx('sparkle');
   if (!prefs.motion) return;
   const canvas = document.createElement('canvas');
   canvas.className = 'confetti';
@@ -207,7 +185,7 @@ async function bintaParty(result) {
       <button class="btn pink block" data-close>Trop bien ! ✨</button>
     </div>`);
   confetti(120);
-  sound('level');
+  sound(result.newBadges?.length ? 'badge' : 'level');
   vibrate([20, 30, 20, 30, 50]);
   setTimeout(() => play(m.el.querySelector('.ch'), 'signature'), 300);
   // Nouveau niveau : aura forte de Binta (flammes, particules, cheveux qui s'agitent).

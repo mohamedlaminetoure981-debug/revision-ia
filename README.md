@@ -194,7 +194,9 @@ revision-ia/
     ├── ui/                    Outils d'affichage
     │   ├── character.js       Dessin SVG des persos en calques + animations
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
-    │   ├── fx.js              Confettis, onomatopées, vibrations, sons, fête de Binta
+    │   ├── fx.js              Confettis, onomatopées, vibrations, fête de Binta
+    │   ├── sfx.js             Effets sonores style anime générés par le code + voix des persos
+    │   ├── bubble.js          Bulle unique des scènes de groupe (toujours dans l'écran)
     │   ├── install.js         Bandeau « Installe l'appli » (Android + guide iPhone)
     │   ├── creator-scene.js   Scène d'accueil du créateur (1re activation)
     │   ├── council.js         Phase 3 : scène du conseil de correction
@@ -428,7 +430,8 @@ Durée : environ **4 s** (1,5 à 2,5 s en version courte). La correction par l'I
 Bouton **« Passer »** toujours visible.
 
 **Réglage** : Profil → Réglages → **Scène de correction et pouvoirs** :
-*Complète* / *Courte* / *Désactivée* (désactivée = simple chargement, aucun pouvoir).
+*Complète* / *Courte* (par défaut : la note arrive en 1 à 2 s, pouvoirs plus brefs) /
+*Désactivée* (simple chargement, aucun pouvoir).
 
 **Répliques** : dans `src/data/characters.js`, objet `COUNCIL_LINES` : pour chaque perso,
 `deliberation` (pendant que l'IA corrige) puis `excellent`, `bon`, `moyen`,
@@ -506,6 +509,23 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
   excellent/bon/moyen/faible, confettis, installation, scène d'accueil), infos techniques
   (version, modèle, nombre de cours et fiches) et « Réinitialiser l'appli ».
 - **Désactiver** : Réglages → 👑 Mode Créateur → Désactiver (réactivable avec le code).
+
+---
+
+## 10 cinquies. Sons style anime (`src/ui/sfx.js`)
+
+- **Aucun fichier audio** : chaque son est fabriqué par le code (Web Audio API), donc rien
+  à télécharger. Les sons démarrent après ton premier toucher (règle des navigateurs).
+- **Activés par défaut**, volume modéré. Bouton **🔊/🔇** en bas à droite (au-dessus de la
+  barre de navigation) et **curseur de volume** dans Réglages → Ambiance.
+- Sons disponibles (objet `SOUNDS`) : clic, whoosh de téléportation, scintillement,
+  montée d'énergie (3 niveaux, de plus en plus puissante), bonne / mauvaise réponse,
+  swipe (différent selon la direction), retournement de fiche, niveau gagné, badge,
+  apparition d'une bulle, révélation de la note.
+- **Voix signature** de chaque perso (objet `VOICES` : hauteur, timbre, petite mélodie),
+  jouée quand il parle dans une bulle.
+- Pour modifier un son : change les fréquences (Hz) et durées (secondes) de sa fonction.
+- Tous les sons se testent dans **Panneau créateur → 🔊 Sons**.
 
 ---
 

@@ -17,6 +17,7 @@ import * as db from './core/db.js';
 import { loadProfile } from './core/game.js';
 import { loadCreator, isCreator } from './core/creator.js';
 import { loadFxPrefs } from './ui/fx.js';
+import { playSfx } from './ui/sfx.js';
 import { esc, showError } from './ui/ui.js';
 import { initInstall, onRoute } from './ui/install.js';
 
@@ -77,6 +78,7 @@ async function route() {
   if (name === 'createur' && !isCreator()) name = 'profil'; // panneau réservé au créateur
   const r = ROUTES[name] || ROUTES[''];
   nav.hidden = !!r.fullscreen;
+  document.getElementById('sound-toggle')?.toggleAttribute('hidden', !!r.fullscreen);
   onRoute(ROUTES[name] ? name : ''); // bandeau d'installation (caché sur certains écrans)
   nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats', 'createur'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
@@ -98,6 +100,27 @@ async function route() {
 /** Permet aux écrans de se redessiner eux-mêmes (après une modification). */
 export function refresh() {
   return route();
+}
+
+/** Bouton 🔊/🔇 toujours accessible (au-dessus de la barre du bas). */
+async function soundToggle() {
+  const b = document.createElement('button');
+  b.id = 'sound-toggle';
+  b.className = 'sound-toggle';
+  const draw = async () => {
+    const on = await db.getSetting('sounds');
+    b.textContent = on ? '🔊' : '🔇';
+    b.setAttribute('aria-label', on ? 'Couper le son' : 'Activer le son');
+  };
+  b.onclick = async () => {
+    const on = !(await db.getSetting('sounds'));
+    await db.setSetting('sounds', on);
+    await loadFxPrefs();
+    await draw();
+    if (on) playSfx('sparkle');
+  };
+  await draw();
+  document.body.appendChild(b);
 }
 
 /** Applique le thème sombre/clair. */
@@ -163,6 +186,7 @@ initInstall();
     await db.setSetting('modelMigrated', true);
   }
   await loadFxPrefs();
+  await soundToggle();
   window.addEventListener('online', updateNet);
   window.addEventListener('offline', updateNet);
   updateNet();

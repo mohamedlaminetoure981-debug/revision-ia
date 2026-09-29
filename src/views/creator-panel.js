@@ -19,6 +19,7 @@ import { openInstall } from '../ui/install.js';
 import { creatorWelcome } from '../ui/creator-scene.js';
 import { creatorName } from '../core/creator.js';
 import { speedSection, bindSpeed } from './creator-speed.js';
+import { playSfx, voice, VOICE_LIST } from '../ui/sfx.js';
 
 const LEVELS = [
   { level: 'excellent', label: '19/20', name: '🏆 Excellent' },
@@ -60,6 +61,19 @@ export async function render(el) {
           <button class="btn ghost small" data-pw="${id}" data-l="strong">Forte</button>
           <button class="btn small" data-pw="${id}" data-l="ultimate">Ultime</button>
         </div>`).join('')}
+    </div>
+
+    <div class="tile" style="margin-bottom:12px">
+      <h2 style="margin-top:0">🔊 Sons</h2>
+      <div class="panel-grid">
+        ${[['click', 'Clic'], ['teleport', 'Téléport'], ['sparkle', 'Étoiles'], ['bubble', 'Bulle'],
+          ['good', 'Juste'], ['bad', 'Faux'], ['flip', 'Retourner'], ['level', 'Niveau'],
+          ['badge', 'Badge'], ['reveal', 'Note']].map(([n, l]) => `<button class="btn ghost" data-sfx="${n}">${l}</button>`).join('')}
+        ${[1, 2, 3].map((l) => `<button class="btn ghost" data-sfx="energy" data-arg="${l}">Énergie ${l}</button>`).join('')}
+        ${['right', 'left', 'up', 'down'].map((d) => `<button class="btn ghost" data-sfx="swipe" data-arg="${d}">Swipe ${{ right: '→', left: '←', up: '↑', down: '↓' }[d]}</button>`).join('')}
+      </div>
+      <h3>Voix des persos</h3>
+      <div class="panel-grid">${VOICE_LIST.map((id) => `<button class="btn ghost" data-voice="${id}" style="color:${CHARACTERS[id].color}">${esc(CHARACTERS[id].name)}</button>`).join('')}</div>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
@@ -142,6 +156,10 @@ export async function render(el) {
     };
   });
 
+  el.querySelectorAll('[data-sfx]').forEach((b) => {
+    b.onclick = () => { const a = b.dataset.arg; playSfx(b.dataset.sfx, a && /^\d$/.test(a) ? Number(a) : a); };
+  });
+  el.querySelectorAll('[data-voice]').forEach((b) => { b.onclick = () => voice(b.dataset.voice); });
   $('#t-confetti').onclick = () => confetti(160);
   $('#t-ono').onclick = () => onomatopoeia('YOSH!');
   $('#t-install').onclick = () => openInstall();

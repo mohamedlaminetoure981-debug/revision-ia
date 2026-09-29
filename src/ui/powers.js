@@ -14,8 +14,8 @@
 //  - jamais pendant la lecture d'un résumé ni pendant une question :
 //    les écrans concernés appellent suspendPowers() / resumePowers() ;
 //    un pouvoir demandé pendant ce temps est joué plus tard ;
-//  - le réglage "Scène de correction" s'applique aussi : 'short' remplace
-//    l'ultime par une aura forte, 'off' désactive tout ;
+//  - le réglage "Scène de correction" s'applique aussi : 'short' (par défaut)
+//    raccourcit l'ultime (1,7 s au lieu de 2,6 s), 'off' désactive tout ;
 //  - bouton "Passer" (ou toucher l'écran) ; animations réduites respectées.
 //
 // L'effet visuel de chaque ultime dépend de `power.effect` du perso
@@ -64,12 +64,12 @@ export function resumePowers() {
 export async function power(charId, level, opts = {}) {
   const mode = await db.getSetting('council');
   if (mode === 'off' || !CHARACTERS[charId]) return;
-  if (level === 'ultimate' && (mode === 'short' || ultimateUsed())) level = 'strong';
+  if (level === 'ultimate' && ultimateUsed()) level = 'strong'; // 1 seul ultime par session
   if (suspended) {
     if (!queued || RANK[level] > RANK[queued.level]) queued = { charId, level, opts: { ...opts, target: null } };
     return;
   }
-  if (level === 'ultimate') { markUltimate(); return ultimate(charId, opts); }
+  if (level === 'ultimate') { markUltimate(); return ultimate(charId, { ...opts, short: mode === 'short' }); }
   const target = opts.target || document.querySelector(`#app .ch[data-ch="${charId}"]`);
   if (level === 'light') return light(target);
   return strong(charId, target);
@@ -79,6 +79,7 @@ export async function power(charId, level, opts = {}) {
 // Aura légère
 // ---------------------------------------------------------------------
 function light(target) {
+  sound('energy', 1);
   if (!target) return;
   target.classList.remove('pw-light');
   void target.offsetWidth;
@@ -91,6 +92,7 @@ function light(target) {
 // ---------------------------------------------------------------------
 function strong(charId, target) {
   const color = CHARACTERS[charId].color;
+  sound('energy', 2);
   vibrate([20, 30, 40]);
   if (!target) { // pas de perso à l'écran : petite apparition au centre
     const box = document.createElement('div');
@@ -144,7 +146,7 @@ const ULTIMATE_FX = {
   }).join(''),
 };
 
-function ultimate(charId, { text, sub } = {}) {
+function ultimate(charId, { text, sub, short = false } = {}) {
   const ch = CHARACTERS[charId];
   const fx = ULTIMATE_FX[ch.power?.effect] || ULTIMATE_FX.hype;
   return new Promise((resolve) => {
@@ -165,7 +167,7 @@ function ultimate(charId, { text, sub } = {}) {
       if (ch.power?.effect === 'hype') confetti(140);
     }
     vibrate([40, 30, 60, 30, 90]);
-    sound('level');
+    sound('energy', 3);
     play(el.querySelector('.ch'), 'signature', { duration: 2000 });
     let done = false;
     const close = () => {
@@ -175,6 +177,7 @@ function ultimate(charId, { text, sub } = {}) {
       resolve();
     };
     el.onclick = close; // toucher l'écran ou "Passer"
-    setTimeout(close, reduced() ? 1200 : 2600);
+    // Réglage "court" : le pouvoir ultime reste, mais plus bref.
+    setTimeout(close, reduced() ? 1200 : short ? 1700 : 2600);
   });
 }

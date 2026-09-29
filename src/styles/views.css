@@ -173,3 +173,14 @@ details > summary .rich p { display: inline; margin: 0; }
 .install-steps .step small { color: var(--text-dim); font-size: .72rem; }
 .install-steps .num { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c, var(--neon-violet)); color: #fff; font-weight: 800; font-size: .75rem; flex: none; }
 .install-steps .ico { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-2); color: var(--neon-cyan); flex: none; }
+
+/* ---------- Bouton son 🔊/🔇 (au-dessus de la barre du bas, à droite) ---------- */
+.sound-toggle {
+  position: fixed; right: 14px; bottom: calc(var(--nav-h) + 22px + env(safe-area-inset-bottom)); z-index: 24;
+  width: 42px; height: 42px; border-radius: 14px; font-size: 1.15rem; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--border-strong); color: var(--text);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: var(--shadow);
+}
+.sound-toggle[hidden] { display: none; }
+.volume-row { display: flex; align-items: center; gap: 10px; margin: 6px 0 4px; }
+.volume-row input[type=range] { flex: 1; accent-color: var(--neon-violet); }

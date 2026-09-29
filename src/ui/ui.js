@@ -19,6 +19,7 @@ import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from './character.js';
 import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
+import { voice, playSfx } from './sfx.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
 export function esc(s) {
@@ -168,6 +169,8 @@ export function say(container, situation, { expression, anim = 'bounce', text } 
   const id = chEl?.dataset.ch;
   if (bubble && id) {
     bubble.querySelector('.say').textContent = text ?? line(id, situation);
+    playSfx('bubble');
+    voice(id);
     bubble.style.animation = 'none';
     void bubble.offsetWidth;
     bubble.style.animation = '';

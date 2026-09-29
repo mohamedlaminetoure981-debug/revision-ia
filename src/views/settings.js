@@ -18,7 +18,7 @@ const SUGGESTED_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gem
 
 export async function render(el) {
   const s = {};
-  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode', 'council']) s[k] = await db.getSetting(k);
+  for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode', 'council', 'volume']) s[k] = await db.getSetting(k);
 
   let usage = '';
   try {
@@ -71,8 +71,11 @@ export async function render(el) {
         <button data-v="short" class="${s.council === 'short' ? 'active' : ''}">Courte</button>
         <button data-v="off" class="${s.council === 'off' ? 'active' : ''}">Désactivée</button>
       </div>
-      <p class="tiny muted">Le conseil des persos avant chaque note, et les auras / pouvoirs spéciaux. « Courte » : scène rapide, pas de pouvoir plein écran.</p>
-      ${toggle('sounds', '🔊 Sons', s.sounds, 'Petits sons sur les actions (désactivés par défaut)')}
+      <p class="tiny muted">Le conseil des persos avant chaque note, et les auras / pouvoirs spéciaux. « Courte » (par défaut) : la note arrive en 1 à 2 s, pouvoirs plus brefs.</p>
+      ${toggle('sounds', '🔊 Sons', s.sounds, 'Effets sonores style anime (générés par l’appli, rien à télécharger)')}
+      <div class="volume-row"><span class="small">🔈</span>
+        <input id="volume" type="range" min="0" max="100" step="5" value="${Math.round((s.volume ?? 0.55) * 100)}" aria-label="Volume">
+        <span class="small">🔊</span><button class="btn ghost small" id="vol-test">Tester</button></div>
       ${toggle('vibration', '📳 Vibrations', s.vibration, 'Légères vibrations sur les actions clés')}
     </div>
 
@@ -182,6 +185,12 @@ export async function render(el) {
     await db.setSetting('verifyMode', e.target.checked);
     toast(e.target.checked ? '🔍 Mode vérification activé' : 'Mode vérification désactivé', 'ok');
   };
+  $('#volume').onchange = async (e) => {
+    await db.setSetting('volume', Number(e.target.value) / 100);
+    await loadFxPrefs();
+    sound('good');
+  };
+  $('#vol-test').onclick = () => sound('level');
   for (const k of ['sounds', 'vibration']) {
     $(`#${k}`).onchange = async (e) => {
       await db.setSetting(k, e.target.checked);

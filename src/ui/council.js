@@ -115,6 +115,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
       ${Array.from({ length: 6 }, (_, k) => { const a = (k / 6) * Math.PI * 2; return `<span class="tp-p" style="--dx:${Math.round(Math.cos(a) * 50)}px;--dy:${Math.round(Math.sin(a) * 50)}px"></span>`; }).join('')}`}`;
     el.appendChild(seat);
     seats[id] = seat;
+    sound('teleport');
     if (!short) { vibrate(8); await sleep(240); }
   }
   // nettoyage des effets d'arrivée
@@ -171,6 +172,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     }
     // La réplique du perso qui annonce s'affiche sous la note (pas de chevauchement).
     const rc = CHARACTERS[revealer];
+    sound('reveal');
     const rv = document.createElement('div');
     rv.innerHTML = `
       ${res.level === 'excellent' ? `<div class="shockwave" style="--c:${color}"></div><div class="burst"></div>` : ''}
@@ -180,7 +182,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     el.appendChild(rv);
     if (res.level === 'excellent') { // explosion d'énergie
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'celebration'));
-      confetti(140); onomatopoeia("LET'S GO!"); sound('level'); vibrate([30, 40, 60]);
+      setTimeout(() => { confetti(140); onomatopoeia("LET'S GO!"); sound('level'); }, 450); vibrate([30, 40, 60]);
     } else if (res.level === 'bon') {
       sound('good'); vibrate([20, 30]);
     } else { // encouragement chaleureux, jamais moqueur

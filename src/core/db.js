@@ -143,7 +143,8 @@ export const DEFAULT_SETTINGS = {
   model: 'gemini-3.5-flash-lite',
   verifyMode: false, // Phase 2 : 2e appel IA de vérification
   theme: 'dark', // 'dark' ou 'light'
-  sounds: false, // sons courts (désactivés par défaut)
+  sounds: true, // effets sonores style anime (activés par défaut)
+  volume: 0.55, // volume des sons (0 à 1)
   vibration: true, // vibrations légères sur mobile
   quizTimer: false, // minuteur visuel pendant les quiz
   // Phase 3 : scène du conseil de correction ET pouvoirs spéciaux.
