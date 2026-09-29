@@ -588,7 +588,7 @@ export const CHARACTERS = {
     screens: ['erreurs', 'reseau', 'quota', 'chargements'],
     signature: 'haussement',
     look: {
-      skin: '#3E2418', hair: 'waves', hairColor: '#120C09',
+      style: 'manga', skin: '#3E2418', hair: 'waves', hairColor: '#120C09',
       outfit: 'hoodie', outfitColor: '#1B2A44', outfitColor2: '#60A5FA',
       eyeColor: '#2F1B10', accessories: ['earbuds', 'beard'],
     },

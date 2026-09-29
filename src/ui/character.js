@@ -442,8 +442,13 @@ function mix(a, b, t) {
 
 /** Palette cel-shading d'un perso : 2-3 tons par couleur. */
 function palette(L) {
+  // Clarté de la peau (0 = noir, 1 = blanc) : sur une peau très foncée, on
+  // adoucit l'ombre et on renforce la lumière pour garder les traits lisibles.
+  const n = parseInt(L.skin.slice(1), 16);
+  const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  const dark = lum < 0.2;
   return {
-    skin: L.skin, skinSh: shade(L.skin, -0.32), skinHi: shade(L.skin, 0.16),
+    skin: L.skin, skinSh: shade(L.skin, dark ? -0.2 : -0.32), skinHi: shade(L.skin, dark ? 0.32 : 0.16),
     hair: L.hairColor, hairSh: shade(L.hairColor, -0.55), hairHi: shade(mix(L.hairColor, L.color, 0.45), 0.12),
     main: L.outfitColor, mainSh: shade(L.outfitColor, -0.35), mainHi: shade(L.outfitColor, 0.18),
     acc: L.outfitColor2,
@@ -748,6 +753,21 @@ function mHair(L, P) {
           <path d="${cap}" fill="none" ${o}/>`,
       };
     }
+    case 'waves': { // Tidiane : coupe courte à waves, contour net
+      const cap = 'M69,94 L68,74 Q72,55 100,53 Q128,55 132,74 L131,94 L127,82 L124,78 Q100,73 76,78 L73,82 Z';
+      const clip = `wv${++uid}`;
+      let waves = '';
+      for (let r = 10; r <= 42; r += 8) {
+        waves += `<path d="M${100 - r},${56 + r * 0.45} Q${100 - r / 2},${50 + r * 0.1} 100,${52 + r * 0.25} Q${100 + r / 2},${50 + r * 0.1} ${100 + r},${56 + r * 0.45}" fill="none" stroke="${P.hairHi}" stroke-width="1.5" opacity=".75"/>`;
+      }
+      return {
+        back: '',
+        front: `<path d="${cap}" fill="${P.hair}"/>
+          <path d="M69,94 L68,74 Q72,57 88,54 Q80,64 80,77 L76,78 L73,82 Z" fill="${P.hairSh}"/>
+          <clipPath id="${clip}"><path d="${cap}"/></clipPath><g clip-path="url(#${clip})">${waves}</g>
+          <path d="${cap}" fill="none" ${o}/>`,
+      };
+    }
     default:
       return { back: '', front: '' };
   }
@@ -821,6 +841,17 @@ function mAccessories(L, P) {
   let body = '';
   let head = '';
   let glasses = '';
+  if (acc.has('beard')) { // barbe courte le long de la mâchoire + moustache
+    head += `<path d="M71,108 C71,114 74,121 78,127 L91,144 Q100,151 109,144 L122,127 C126,121 129,114 129,108 L126,111 C125,117 122,122 118,127 L107,139 Q100,144 93,139 L82,127 C78,122 75,117 74,111 Z" fill="${P.hair}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M92,126 Q100,121.5 108,126 Q100,124.6 92,126 Z" fill="${P.hair}" stroke="${INK}" stroke-width="1"/>
+      <path d="M110,138 L118,128" stroke="${P.hairHi}" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>`;
+  }
+  if (acc.has('earbuds')) { // écouteurs sans fil
+    head += `<path d="M64,104 q-3,1 -3,5 l1,6" fill="none" stroke="${INK}" stroke-width="4.6" stroke-linecap="round"/>
+      <path d="M64,104 q-3,1 -3,5 l1,6" fill="none" stroke="#f4f4f8" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M136,104 q3,1 3,5 l-1,6" fill="none" stroke="${INK}" stroke-width="4.6" stroke-linecap="round"/>
+      <path d="M136,104 q3,1 3,5 l-1,6" fill="none" stroke="#f4f4f8" stroke-width="2.6" stroke-linecap="round"/>`;
+  }
   if (acc.has('clips')) {
     head += `${sparkle(74, 64, 6.5, L.color, '')}${sparkle(126, 64, 6.5, L.color, '')}
       <path d="M74,57.5 L75.8,64 L74,70.5 L72.2,64 Z" fill="none" stroke="${INK}" stroke-width=".8"/>`;
