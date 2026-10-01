@@ -19,7 +19,9 @@ import { openInstall } from '../ui/install.js';
 import { creatorWelcome } from '../ui/creator-scene.js';
 import { creatorName } from '../core/creator.js';
 import { speedSection, bindSpeed } from './creator-speed.js';
-import { playSfx, voice, VOICE_LIST } from '../ui/sfx.js';
+import { playSfx, voice, VOICE_LIST, AMBIENT_LIST, startAmbient, stopAmbient } from '../ui/sfx.js';
+import { cardHTML } from '../ui/card.js';
+import { RARITIES } from '../core/collection.js';
 import { stripSVG, stripToPng } from '../ui/manga.js';
 import { shareImage } from '../ui/share.js';
 import { DEMO_STRIP } from '../core/manga.js';
@@ -112,6 +114,15 @@ export async function render(el) {
         <button class="btn ghost" id="t-duel-link">Longueur d'un lien (10 q.)</button>
         <button class="btn ghost" id="t-status">Statut démo</button>
         <button class="btn ghost" id="t-status-lv">Statut niveau</button>
+      </div>
+      <h3>🃏 Cartes & 🥋 Focus</h3>
+      <div class="panel-grid">
+        <a class="btn ghost" href="#/collection">Classeur</a>
+        <button class="btn ghost" id="t-pack">Rouvrir toutes les cartes</button>
+        <button class="btn ghost" id="t-legend">Carte légendaire démo</button>
+        <a class="btn ghost" href="#/dojo/test">Dojo : session d'1 min</a>
+        ${AMBIENT_LIST.map((a) => `<button class="btn ghost" data-amb="${a}">Ambiance ${a}</button>`).join('')}
+        <button class="btn ghost" id="t-amb-stop">Couper l'ambiance</button>
       </div>
     </div>
 
@@ -213,6 +224,17 @@ export async function render(el) {
   $('#t-duel-link').onclick = () => toast(`Lien de duel avec 10 questions : ${duelLink(demoDuel(10)).length} caractères (WhatsApp accepte très largement).`, 'ok', 6000);
   $('#t-status').onclick = () => offerStatus({ kicker: 'Examen blanc', big: '17/20', sub: 'Test du créateur', lines: ['Excellent !'] });
   $('#t-status-lv').onclick = () => offerStatus({ kicker: 'Nouveau niveau', big: 'NIV. 9', sub: 'Level up !' });
+  // --- Cartes & focus ---
+  $('#t-pack').onclick = async () => { await db.setSetting('collection', {}); location.hash = '#/collection/ouvrir'; };
+  $('#t-legend').onclick = () => {
+    const it = { card: { id: 'demo-legende', question: 'Théorème de Pythagore', answer: 'Dans un triangle rectangle : a² + b² = c² (c = hypoténuse).' },
+      course: { subject: 'Maths', title: 'Démo' }, rarity: RARITIES[3], char: 'binta', num: 99 };
+    modal(`<div class="center"><div class="card-big">${cardHTML(it, 'big')}</div><button class="btn block" data-close style="margin-top:12px">Fermer</button></div>`);
+    playSfx('badge');
+  };
+  el.querySelectorAll('[data-amb]').forEach((b) => { b.onclick = () => startAmbient(b.dataset.amb); });
+  $('#t-amb-stop').onclick = () => stopAmbient();
+  window.addEventListener('hashchange', stopAmbient, { once: true });
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);
     toast('Histoire remise à zéro (chapitres lus, boss vaincus).');

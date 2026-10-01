@@ -177,6 +177,14 @@ const SOUNDS = {
     tone({ type: 'sine', f: 98, to: 49, dur: 0.8, vol: 0.4, at: 0.5 });
     setTimeout(() => SOUNDS.sparkle(), 600);
   },
+  // --- Cartes & dojo ---
+  // Gong du dojo (début / fin de session)
+  gong: () => {
+    [110, 220.5, 331, 445].forEach((f, i) => tone({ type: 'sine', f, to: f * 0.99, dur: 3 - i * 0.5, vol: 0.3 / (i + 1), attack: 0.01 }));
+    noise({ dur: 0.15, vol: 0.2, type: 'lowpass', f: 800 });
+  },
+  // Retour dans l'appli après l'avoir quittée (petit "hmm" déçu)
+  oops: () => { tone({ type: 'triangle', f: 440, to: 330, dur: 0.18, vol: 0.2 }); tone({ type: 'triangle', f: 330, to: 247, dur: 0.3, vol: 0.2, at: 0.18 }); },
   // Compatibilité (anciens noms)
   level_up: () => SOUNDS.level(),
 };
@@ -210,6 +218,81 @@ export function voice(id) {
 export function playSfx(name, arg) {
   if (!enabled || !ctx || !SOUNDS[name]) return;
   try { SOUNDS[name](arg); } catch { /* son non disponible */ }
+}
+
+// ---------------------------------------------------------------------
+// AMBIANCES EN BOUCLE (mode Focus) — pluie, nuit, dojo. Rien à télécharger.
+// ---------------------------------------------------------------------
+let ambient = null; // { nodes, timers, gain }
+
+/** Bruit continu filtré (pluie, vent…) branché sur `out`. */
+function loopNoise(out, { type = 'lowpass', f = 1000, q = 0.7, vol = 0.2 }) {
+  const src = ctx.createBufferSource();
+  src.buffer = noiseBuf;
+  src.loop = true;
+  const fl = ctx.createBiquadFilter();
+  fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+  const g = ctx.createGain();
+  g.gain.value = vol;
+  src.connect(fl).connect(g).connect(out);
+  src.start();
+  return src;
+}
+
+const AMBIENTS = {
+  // Pluie : souffle doux + gouttes aléatoires
+  pluie: (out, timers) => {
+    const n = [loopNoise(out, { f: 1400, vol: 0.22 }), loopNoise(out, { type: 'highpass', f: 5000, vol: 0.05 })];
+    timers.push(setInterval(() => {
+      if (Math.random() < 0.7) tone({ type: 'sine', f: 1800 + Math.random() * 2400, to: 900, dur: 0.04, vol: 0.03 + Math.random() * 0.04 });
+    }, 120));
+    return n;
+  },
+  // Nuit : grondement très grave + grillons
+  nuit: (out, timers) => {
+    const n = [loopNoise(out, { f: 220, vol: 0.18 })];
+    timers.push(setInterval(() => {
+      const f = 4200 + Math.random() * 600;
+      for (let i = 0; i < 3; i++) tone({ type: 'sine', f, dur: 0.035, vol: 0.025, at: i * 0.06 });
+    }, 900 + Math.random() * 600));
+    return n;
+  },
+  // Dojo : vent léger + bambou qui claque + cloche rare
+  dojo: (out, timers) => {
+    const n = [loopNoise(out, { type: 'bandpass', f: 600, q: 0.5, vol: 0.12 })];
+    timers.push(setInterval(() => {
+      const r = Math.random();
+      if (r < 0.25) { tone({ type: 'triangle', f: 320, to: 260, dur: 0.12, vol: 0.12 }); tone({ type: 'triangle', f: 480, to: 400, dur: 0.1, vol: 0.06, at: 0.01 }); }
+      else if (r < 0.32) [523, 1046, 1568].forEach((f, i) => tone({ type: 'sine', f, dur: 2.4 - i * 0.6, vol: 0.05 / (i + 1) }));
+    }, 2600));
+    return n;
+  },
+};
+export const AMBIENT_LIST = Object.keys(AMBIENTS);
+
+/** Lance une ambiance (arrête la précédente). Renvoie false si le son n'est pas encore disponible. */
+export function startAmbient(name) {
+  stopAmbient();
+  unlock();
+  if (!ctx || !AMBIENTS[name]) return false;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 1.5); // fondu d'entrée
+  gain.connect(master);
+  const timers = [];
+  const nodes = AMBIENTS[name](gain, timers);
+  ambient = { nodes, timers, gain };
+  return true;
+}
+
+/** Arrête l'ambiance en cours (fondu de sortie). */
+export function stopAmbient() {
+  if (!ambient || !ctx) return;
+  const a = ambient;
+  ambient = null;
+  a.timers.forEach(clearInterval);
+  a.gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.3);
+  setTimeout(() => { a.nodes.forEach((n) => { try { n.stop(); } catch { /* déjà arrêté */ } }); a.gain.disconnect(); }, 1500);
 }
 
 /** Liste des sons (Panneau créateur). */

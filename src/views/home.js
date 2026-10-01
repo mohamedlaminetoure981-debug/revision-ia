@@ -6,6 +6,7 @@
 
 import * as db from '../core/db.js';
 import { storyOverview } from '../core/story.js';
+import { pendingCount } from '../core/collection.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
 import { esc, mascot, say, line, subjectColor, subjectEmoji, displayName } from '../ui/ui.js';
@@ -30,6 +31,7 @@ export async function render(el) {
   const unlocked = story.chapters.filter((c) => c.unlocked);
   const unread = unlocked.filter((c) => !c.read).length;
   const bossReady = story.arcs.some((a) => a.ready && !a.defeated);
+  const pending = await pendingCount();
   const due = cards.filter((c) => isDue(c)).length;
   const streak = currentStreak(p);
   const lv = levelInfo(p.xp);
@@ -95,6 +97,12 @@ export async function render(el) {
       </div>
 
       <a class="btn block span-2 pulse" href="${next.href}">${next.label}</a>
+
+      <a class="tile dojo-tile" href="#/dojo" style="--c:${CHARACTERS.awa.color}">
+        <div class="label">Mode Focus</div><div class="big">🥋</div><div class="tiny">Dojo d'Awa</div></a>
+      <a class="tile" href="#/collection" style="--c:${CHARACTERS.sora.color};position:relative">
+        <div class="label">Collection</div><div class="big">🃏</div><div class="tiny">${pending ? `🎁 ${pending} à ouvrir` : 'Mes cartes'}</div>
+        ${pending ? '<span class="dot-new" style="position:absolute;top:10px;right:10px"></span>' : ''}</a>
 
       <a class="tile span-2 story-tile" href="#/histoire">
         <div class="row nowrap">${characterHTML('kai', { expression: unread ? 'celebration' : 'clin', size: 60, enter: false })}

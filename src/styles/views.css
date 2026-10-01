@@ -275,3 +275,66 @@ details > summary .rich p { display: inline; margin: 0; }
 @keyframes vs-pop { from { opacity: 0; transform: scale(3) rotate(-8deg); } }
 .status-preview svg { display: block; width: min(62vw, 240px); height: auto; margin: 12px auto; border-radius: 14px; border: 3px solid #111; box-shadow: 0 10px 30px color-mix(in srgb, var(--c) 40%, transparent); }
 @media (prefers-reduced-motion: reduce) { .duel-face .ch, .duel-face .vs { animation: none; } }
+
+/* =====================================================================
+   CARTES À COLLECTIONNER
+   ===================================================================== */
+.binder { margin-bottom: 18px; }
+.binder-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.binder-slot { padding: 0; border: 0; background: none; cursor: pointer; }
+.tcg { position: relative; border-radius: 7%/5%; overflow: hidden; aspect-ratio: 300 / 420; transition: transform .2s; }
+.tcg svg { display: block; width: 100%; height: 100%; }
+.tcg-shine, .tcg-holo { position: absolute; inset: 0; pointer-events: none; }
+.tcg.locked { background: var(--surface-2); border: 2px dashed var(--border-strong); }
+.tcg-back { position: absolute; inset: 0; display: grid; place-items: center; border-radius: inherit; background: repeating-linear-gradient(45deg, #1a1030 0 10px, #120c22 10px 20px); }
+.tcg-back span { font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: var(--border-strong); }
+.tcg-back.big { background: radial-gradient(circle, #8B5CF6 0%, #1a1030 60%), #120c22; border: 4px solid #fff; border-radius: 20px; }
+.tcg-back.big span { color: #fff; font-size: 4rem; text-shadow: 0 0 20px #fff; }
+/* Rare : reflet qui passe */
+.rar-rare .tcg-shine, .rar-epique .tcg-shine, .rar-legendaire .tcg-shine { background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .55) 48%, transparent 60%); background-size: 250% 100%; animation: tcg-shine 3.2s ease-in-out infinite; mix-blend-mode: overlay; }
+/* Épique : holographique */
+.rar-epique .tcg-holo, .rar-legendaire .tcg-holo { background: linear-gradient(125deg, #ff3d9a55, #22d3ee55, #c6ff3d55, #a855f755, #ff3d9a55); background-size: 300% 300%; background-position: var(--hx, 50%) 50%; animation: tcg-holo 6s linear infinite; mix-blend-mode: color-dodge; opacity: .55; }
+/* Légendaire : aura animée */
+.tcg.rar-legendaire { overflow: visible; }
+.tcg.rar-legendaire::before { content: ""; position: absolute; inset: -6px; z-index: -1; border-radius: inherit; background: conic-gradient(from var(--ang, 0deg), #FFD23F, #FF3D9A, #22D3EE, #C6FF3D, #FFD23F); filter: blur(8px); animation: tcg-aura 2.5s linear infinite; }
+.tcg.rar-epique { box-shadow: 0 0 14px color-mix(in srgb, var(--rc) 60%, transparent); }
+.binder-slot .tcg.rar-legendaire::before { inset: -3px; filter: blur(4px); }
+.card-big { width: min(78vw, 300px); margin: 6px auto 0; }
+.card-big .tcg { touch-action: none; }
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes tcg-shine { 0% { background-position: 150% 0; } 60%, 100% { background-position: -100% 0; } }
+@keyframes tcg-holo { to { background-position: 300% 50%; } }
+@keyframes tcg-aura { to { --ang: 360deg; } }
+/* Ouverture du paquet */
+.pack-screen { background-image: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c) 30%, transparent), transparent 60%), radial-gradient(var(--dots) 1px, transparent 1.2px); background-size: auto, 14px 14px; }
+.pack-stage { width: min(70vw, 280px); margin: 0 auto; }
+.flip-card { perspective: 1000px; cursor: pointer; aspect-ratio: 300 / 420; animation: pack-float 2s ease-in-out infinite; }
+.flip-inner { position: relative; width: 100%; height: 100%; transition: transform .7s cubic-bezier(.3, 1.4, .5, 1); transform-style: preserve-3d; }
+.flip-card.flipped { animation: none; }
+.flip-card.flipped .flip-inner { transform: rotateY(180deg) scale(1.04); }
+.flip-front, .flip-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip-back { transform: rotateY(180deg); }
+.flip-front .tcg-back { box-shadow: 0 0 30px var(--rc); }
+.pack-flash { position: fixed; inset: 0; z-index: 90; pointer-events: none; background: radial-gradient(circle, #fff 0%, var(--rc) 40%, transparent 75%); animation: pack-flash .9s ease-out forwards; }
+.pack-btn { animation: boss-glow 1.2s ease-in-out infinite alternate; }
+@keyframes pack-float { 50% { transform: translateY(-10px) rotate(1.5deg); } }
+@keyframes pack-flash { from { opacity: .95; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tcg-shine, .tcg-holo, .tcg.rar-legendaire::before, .flip-card, .pack-btn { animation: none !important; } }
+
+/* =====================================================================
+   MODE FOCUS (dojo)
+   ===================================================================== */
+.dojo { background-image: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%), repeating-linear-gradient(90deg, transparent 0 60px, rgba(255, 255, 255, .02) 60px 62px); }
+.stepper { gap: 6px; align-items: center; }
+.dojo-ring { position: relative; width: min(72vw, 280px); aspect-ratio: 1; margin: 0 auto; }
+.dojo-ring > svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--surface-2); stroke-width: 10; }
+.ring-fg { fill: none; stroke: var(--c); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 8px var(--c)); }
+.dojo-char { position: absolute; inset: 0; display: grid; place-items: center; }
+.dojo-train .ch { animation: dojo-train 1.6s ease-in-out infinite; }
+.dojo-rest .ch { animation: dojo-breathe 4s ease-in-out infinite; }
+.dojo-time { font-family: var(--font-display); font-weight: 900; font-size: 3rem; letter-spacing: .04em; margin-top: 8px; font-variant-numeric: tabular-nums; text-shadow: 0 0 20px color-mix(in srgb, var(--c) 60%, transparent); }
+@keyframes dojo-train { 0%, 100% { transform: translateY(0) rotate(0); } 20% { transform: translateY(-6px) rotate(-3deg); } 40% { transform: translateX(6px) rotate(4deg); } 60% { transform: translateY(-4px) rotate(-2deg); } 80% { transform: translateX(-5px) rotate(2deg); } }
+@keyframes dojo-breathe { 50% { transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .dojo-train .ch, .dojo-rest .ch { animation: none; } }
+#amb { flex-wrap: wrap; } #amb button { min-width: 45%; }

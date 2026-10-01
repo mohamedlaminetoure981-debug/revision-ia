@@ -19,6 +19,7 @@ import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, vibrate, sound, confetti, onomatopoeia, hypeWord } from '../ui/fx.js';
 import { reportCard } from './report.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
+import { pendingCount } from '../core/collection.js';
 
 // Direction du swipe → note SM-2, texte du tampon, XP.
 const DIRS = {
@@ -270,6 +271,12 @@ export async function render(el, [courseId]) {
         <div class="display" style="font-size:1.4rem;color:var(--neon-green)">+${xpTotal} XP</div>
       </div>`;
     actions.innerHTML = `<a class="btn block" href="${back}">Terminer</a>`;
+    // Nouvelles cartes à collectionner gagnées pendant cette pile ?
+    pendingCount().then((n) => {
+      if (!n) return;
+      actions.insertAdjacentHTML('afterbegin', `<a class="btn pink block pack-btn" href="#/collection/ouvrir" style="margin-bottom:8px">🎁 ${n} carte${n > 1 ? 's' : ''} à ouvrir !</a>`);
+      sound('sparkle');
+    });
     talk('fin', 'joie', 'signature');
     confetti();
     onomatopoeia(good >= initial * 0.8 ? 'SUGOI!' : hypeWord());

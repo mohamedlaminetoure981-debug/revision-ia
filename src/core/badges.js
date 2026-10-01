@@ -54,16 +54,23 @@ export const BADGES = [
   { id: 'story_all', icon: '🎬', name: 'Fin de saison', desc: 'Lire les 12 chapitres de la saison 1', test: (c) => (c.profile.totals?.chapters || 0) >= 12 },
   { id: 'boss_first', icon: '👊', name: 'Tueur de boss', desc: 'Vaincre un boss de fin d’arc', test: (c) => c.results.some((r) => r.type === 'boss' && r.won) },
   { id: 'boss_flawless', icon: '🛡️', name: 'Intouchable', desc: 'Vaincre un boss sans perdre de cœur', test: (c) => c.results.some((r) => r.type === 'boss' && r.won && r.hearts === 3) },
+  // --- Cartes & Focus ---
+  { id: 'card_epic', icon: '💜', name: 'Holo !', desc: 'Obtenir une carte Épique', test: (c) => c.cards.some((x) => !x.flagged && x.interval >= 15) },
+  { id: 'card_legend', icon: '🌟', name: 'Légendaire', desc: 'Obtenir une carte Légendaire', test: (c) => c.cards.some((x) => !x.flagged && x.interval >= 35) },
+  { id: 'collector_50', icon: '🃏', name: 'Collectionneur', desc: 'Posséder 50 cartes', test: (c) => c.cards.filter((x) => !x.flagged && x.reps >= 1).length >= 50 },
+  { id: 'focus_first', icon: '🥋', name: 'Premier entraînement', desc: 'Terminer une session au dojo', test: (c) => c.focus.some((f) => f.completed) },
+  { id: 'focus_pure', icon: '🧘', name: 'Esprit d’acier', desc: 'Session complète sans quitter l’appli', test: (c) => c.focus.some((f) => f.completed && !f.leaves && f.minutes >= 20) },
+  { id: 'focus_10h', icon: '⏳', name: 'Maître du dojo', desc: '10 heures de focus au total', test: (c) => c.focus.reduce((s, f) => s + (f.minutes || 0), 0) >= 600 },
   { id: 'bug_hunter', icon: '🕵️', name: 'Chasseur d’erreurs', desc: 'Signaler ou corriger une fiche', test: (c) => c.cards.some((x) => x.flagged || x.edited) },
 ];
 
 /** Lit tout ce qu'il faut pour tester les badges. */
 export async function badgeContext() {
   const profile = getProfileSync();
-  const [courses, cards, reviews, results] = await Promise.all([
-    db.getAll('courses'), db.getAll('cards'), db.getAll('reviews'), db.getAll('results'),
+  const [courses, cards, reviews, results, focus] = await Promise.all([
+    db.getAll('courses'), db.getAll('cards'), db.getAll('reviews'), db.getAll('results'), db.getAll('focus'),
   ]);
-  return { profile, level: levelFromXp(profile.xp), courses, cards, reviews, results };
+  return { profile, level: levelFromXp(profile.xp), courses, cards, reviews, results, focus };
 }
 
 /**

@@ -11,12 +11,15 @@ import { vibrate } from '../ui/fx.js';
 import { refresh } from '../main.js';
 import { isCreator } from '../core/creator.js';
 import { displayName } from '../ui/ui.js';
+import { loadCollection } from '../core/collection.js';
+import { focusStats } from './dojo.js';
 
 export async function render(el) {
   const p = getProfileSync();
   const [courses, cards, reviews, results] = await Promise.all([
     db.getAll('courses'), db.getAll('cards'), db.getAll('reviews'), db.getAll('results'),
   ]);
+  const [col, fstats] = await Promise.all([loadCollection(), focusStats()]);
   const comp = CHARACTERS[p.companion] || CHARACTERS.kai;
   const streak = currentStreak(p);
   const aura = auraLevel(streak);
@@ -45,6 +48,15 @@ export async function render(el) {
       <div class="tile"><div class="label">Fiches</div><div class="big">${cards.length}</div><div class="tiny muted">${reviews.length} révisions</div></div>
       <div class="tile span-2"><div class="label">Quiz</div>
         <div class="row between"><div class="big">${quizzes.length}</div><div class="small muted">moyenne ${avg === null ? '—' : `${avg} %`}</div></div></div>
+      <a class="tile span-2 neon" href="#/collection" style="--c:${CHARACTERS.sora.color}">
+        <div class="row nowrap">${characterHTML('sora', { expression: col.pending.length ? 'celebration' : 'clin', size: 64, enter: false })}
+          <div class="grow"><div class="label">Avec Sora</div><h3 style="margin:2px 0">🃏 Ma collection · ${col.owned}/${col.total}</h3>
+          <div class="tiny muted">${col.pending.length ? `🎁 ${col.pending.length} carte(s) à ouvrir !` : 'Réussis tes fiches pour gagner des cartes'}</div></div>
+          ${col.pending.length ? '<span class="dot-new"></span>' : ''}</div></a>
+      <a class="tile span-2 neon" href="#/dojo" style="--c:${CHARACTERS.awa.color}">
+        <div class="row nowrap">${characterHTML('awa', { expression: 'concentration', size: 64, enter: false })}
+          <div class="grow"><div class="label">Avec Awa · Mode Focus</div><h3 style="margin:2px 0">🥋 Dojo : ${fstats.today} min aujourd'hui</h3>
+          <div class="tiny muted">${fstats.week} min sur 7 jours · ${Math.round(fstats.total / 60 * 10) / 10} h au total · ${fstats.pure} session(s) parfaite(s)</div></div></div></a>
       <a class="tile span-2 neon speedlines" href="#/stats" style="--c:${CHARACTERS.binta.color}">
         <div class="row nowrap">${characterHTML('binta', { expression: 'joie', size: 64, enter: false })}
           <div class="grow"><div class="label">Avec Binta</div><h3 style="margin:2px 0">📊 Stats, badges & récap</h3>

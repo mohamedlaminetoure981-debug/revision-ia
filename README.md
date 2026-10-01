@@ -574,6 +574,28 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 - Proposée après : examen blanc réussi (≥ 10/20), boss vaincu, niveau gagné (fenêtre de Binta),
   et dans le récap de la semaine (écran Stats).
 
+### 🃏 Cartes à collectionner (Sora) — `src/core/collection.js`, `src/ui/card.js`, `src/views/collection.js`
+- Chaque fiche devient une carte (aucun appel à l'IA) : titre, idée clé, perso attribué,
+  couleur de la matière.
+- Rareté selon ta maîtrise (répétition espacée, intervalle de la fiche) :
+  Commune (réussie 1 fois) → Rare (≥ 6 j) → Épique (≥ 15 j) → Légendaire (≥ 35 j).
+  Effets qui grandissent : reflet qui passe, holographique, aura animée.
+- Nouvelles cartes et montées de rareté arrivent dans un **paquet** à ouvrir
+  (retournement + flash, confettis pour les plus rares). Proposé à la fin d'une pile de fiches.
+- **Classeur** par matière avec progression : Profil → 🃏 Ma collection (ou tuile Collection sur l'accueil).
+- Chaque carte se partage en image (PNG 600 × 840).
+- Seuils de rareté : `RARITIES` dans `src/core/collection.js`.
+
+### 🥋 Mode Focus : le dojo d'Awa — `src/views/dojo.js`
+- Minuteur travail / pause (25 / 5 par défaut, réglable), 100 % hors ligne.
+- Ton compagnon s'entraîne (animation légère en boucle) ; son aura grandit à 25 %, 50 %, 80 % du temps.
+- Si tu quittes l'appli pendant le travail : Awa réagit à ton retour et la session rapporte
+  25 % d'XP en moins par sortie (un coup d'œil de moins de 3 s est pardonné).
+- Ambiances générées (pluie, nuit, dojo), sans aucun fichier : `AMBIENTS` dans `src/ui/sfx.js`.
+- Sessions enregistrées (store `focus`) : minutes du jour / 7 jours / total dans Profil.
+- Badges : Premier entraînement, Esprit d'acier (session sans sortie), Maître du dojo (10 h).
+- Nouveaux sons : `gong`, `oops`.
+
 ### Répliques, sons, tests
 - Répliques des nouvelles fonctions (et taquineries du Mode Créateur) : section
   `FEATURE_LINES` de `src/data/characters.js`.
