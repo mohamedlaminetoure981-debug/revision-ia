@@ -614,8 +614,16 @@ const MANGA_FX = { sweat: [134, 78], vein: [124, 70] };
  * @param {object} [opts]     { aura: 0..3 }
  */
 export function characterSVG(id, expression = 'neutre', opts = {}) {
-  const h = characterParts(id, expression);
-  return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">
+  return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">${characterBust(id, expression, opts)}</svg>`;
+}
+
+/**
+ * Contenu du portrait en buste (sans la balise <svg>), repère 200 × 232.
+ * Utilisé par la BD pour les gros plans et plans poitrine (opts.turn : trois-quarts).
+ */
+export function characterBust(id, expression = 'neutre', opts = {}) {
+  const h = characterParts(id, expression, { turn: opts.turn || 0 });
+  return `
     <g class="ch-aura">${aura(opts.aura || 0, h.L, h.n)}</g>
     <g class="ch-fx-back">${h.fxBack}</g>
     <g class="ch-hair-back">${h.back}</g>
@@ -626,8 +634,7 @@ export function characterSVG(id, expression = 'neutre', opts = {}) {
       ${h.accBody}
     </g>
     ${h.head}
-    <g class="ch-fx">${h.fx}</g>
-  </svg>`;
+    <g class="ch-fx">${h.fx}</g>`;
 }
 
 /**
@@ -636,7 +643,11 @@ export function characterSVG(id, expression = 'neutre', opts = {}) {
  * exactement le même visage, la même coiffure et les mêmes couleurs.
  * @returns {{ L, P, n, fxBack, back, head, fx, accBody }}
  */
-export function characterParts(id, expression = 'neutre') {
+export function characterParts(id, expression = 'neutre', opts = {}) {
+  // opts.turn : tête de TROIS-QUARTS (BD). 0 = de face, 1 = tournée vers la droite
+  // (-1 = vers la gauche). Les traits glissent vers le côté regardé, l'œil
+  // éloigné rétrécit et l'oreille cachée disparaît.
+  const turn = Math.max(-1, Math.min(1, opts.turn || 0));
   const ch = CHARACTERS[id];
   const L = { ...ch.look, color: ch.color };
   const P = palette(L);
@@ -666,26 +677,32 @@ export function characterParts(id, expression = 'neutre') {
   const face = L.face === 'soft' ? FACE_SOFT : FACE;
   const earL = 'M72,96 C65,93 62,101 64,108 C65,114 68,117 72,116 Z';
   const earR = 'M128,96 C135,93 138,101 136,108 C135,114 132,117 128,116 Z';
+  const farR = turn > 0.25; const farL = turn < -0.25;
+  const fShift = turn * 11; // décalage des traits (yeux, nez, bouche)
+  const eyeScale = (side) => ((side > 0 && turn > 0) || (side < 0 && turn < 0) ? 1 - Math.abs(turn) * 0.32 : 1);
+  const eyeT = (cx, side) => `translate(${cx} ${MY}) scale(${eyeScale(side)} 1) translate(${-cx} ${-MY})`;
   const head = `<g class="ch-head">
-      <path d="${earL}" fill="${P.skinSh}" stroke="${INK}" stroke-width="2"/><path d="M70,100 Q66,104 69,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
-      <path d="${earR}" fill="${P.skin}" stroke="${INK}" stroke-width="2"/><path d="M130,100 Q134,104 131,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
+      ${farL ? '' : `<path d="${earL}" fill="${P.skinSh}" stroke="${INK}" stroke-width="2"/><path d="M70,100 Q66,104 69,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>`}
+      ${farR ? '' : `<path d="${earR}" fill="${P.skin}" stroke="${INK}" stroke-width="2"/><path d="M130,100 Q134,104 131,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>`}
       <path d="${face}" fill="${P.skin}"/>
       <path d="${FACE_SHADOW}" fill="${P.skinSh}"/>
       <path d="M72,84 Q100,74 128,84 L128,91 Q100,82 72,91 Z" fill="${P.skinSh}"/>
       <path d="M112,112 Q118,110 123,113" fill="none" stroke="${P.skinHi}" stroke-width="2" stroke-linecap="round" opacity=".7"/>
       <path d="M127.4,98 L127.8,104 C127.6,112 124.6,120 119.6,126 L108,140" fill="none" stroke="${P.skinHi}" stroke-width="2" stroke-linecap="round" opacity=".75"/>
       <path d="${face}" fill="none" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
+      <g class="ch-feat"${turn ? ` transform="translate(${fShift.toFixed(1)} 0)"` : ''}>
       ${blush}
       <path d="M101,108 L104,118 L99.5,119.5" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M99.5,119.5 L101,109 L98.2,117.4 Z" fill="${P.skinSh}"/>
-      <g class="ch-eyes"><g class="ch-eye">${eye(MX.l, e.eyes, -1, L, P, `m${n}a`)}</g><g class="ch-eye">${eye(MX.r, e.eyes, 1, L, P, `m${n}b`)}</g></g>
+      <g class="ch-eyes"><g class="ch-eye"${turn ? ` transform="${eyeT(MX.l, -1)}"` : ''}>${eye(MX.l, e.eyes, -1, L, P, `m${n}a`)}</g><g class="ch-eye"${turn ? ` transform="${eyeT(MX.r, 1)}"` : ''}>${eye(MX.r, e.eyes, 1, L, P, `m${n}b`)}</g></g>
       <g class="ch-brows">${brows(e.brows, P, L.face === 'soft')}</g>
       <g class="ch-mouth">${mouth(e.mouth, P)}</g>
-      <g class="ch-hair-front">${hr.front}</g>
+      </g>
+      <g class="ch-hair-front"${turn ? ` transform="translate(${(turn * 4).toFixed(1)} 0)"` : ''}>${hr.front}</g>
       ${acc.head}
-      ${acc.glasses}
+      ${turn ? `<g transform="translate(${fShift.toFixed(1)} 0)">${acc.glasses}</g>` : acc.glasses}
     </g>`;
-  return { L, P, n, fxBack: fx.back, back: hr.back, head, fx: fxFront, accBody: acc.body };
+  return { L, P, n, fxBack: fx.back, back: hr.back, head, fx: fxFront, accBody: acc.body, hairFront: hr.front };
 }
 
 /** Chemin complet d'une image (tient compte du chemin de base GitHub Pages). */

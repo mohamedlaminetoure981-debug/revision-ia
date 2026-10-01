@@ -8,6 +8,8 @@
 // =====================================================================
 
 import { INK, mixHex } from './body.js';
+import { CHARACTERS as TEAM_CH } from '../data/characters.js';
+import { BODY_LOOKS as BL } from '../data/comic/looks.js';
 
 const f = (n) => Math.round(n * 10) / 10;
 
@@ -145,3 +147,80 @@ export function extraSVG(kind, pose = 'debout', o = {}) {
 }
 
 export const EXTRA_KINDS = Object.keys(EXTRAS);
+
+// ---------------------------------------------------------------------
+// GROS PLANS PARTIELS (mise en scène manga : suggérer l'action)
+// ---------------------------------------------------------------------
+
+const shadeHex = (hex, a) => mixHex(hex, a < 0 ? '#000000' : '#ffffff', Math.abs(a));
+function lookOf(id) {
+  const ch = TEAM_CH[id] || TEAM_CH.kai;
+  const B = BL[id] || BL.kai;
+  return { skin: ch.look.skin, main: ch.look.outfitColor, acc: ch.look.outfitColor2, pants: B.pants, shoes: B.shoes, sole: B.sole, color: ch.color, skirt: B.skirt };
+}
+
+/**
+ * POING en premier plan, lancé vers le lecteur (vu de face, en raccourci).
+ * Phalanges repliées (2 rangées de 4 doigts), pouce en travers, poignet et
+ * manche qui fuient vers l'arrière. Repère : poing centré en (0,0).
+ * @param {string} of  personnage à qui appartient le poing
+ */
+export function poingSVG(of = 'kai') {
+  const L = lookOf(of);
+  const o = `stroke="${INK}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"`;
+  const sk = L.skin; const skSh = shadeHex(L.skin, -0.32); const skHi = shadeHex(L.skin, 0.22);
+  const sleeve = L.main; const sleeveSh = shadeHex(L.main, -0.42);
+  // Manche + poignet (en perspective, vers le bas à gauche)
+  let s = `<path d="M-620,640 L-330,330 C-300,300 -250,290 -210,300 L-120,360 C-90,390 -90,440 -120,470 L-420,780 Z" fill="${sleeve}" ${o}/>
+    <path d="M-620,640 L-330,330 C-320,320 -300,312 -280,308 L-520,700 Z" fill="${sleeveSh}"/>
+    <path d="M-330,330 C-300,300 -250,290 -210,300 L-120,360 C-90,390 -90,440 -120,470 C-170,420 -260,380 -330,330 Z" fill="${L.acc}" ${o}/>
+    <path d="M-220,300 C-160,250 -120,230 -60,230 L-20,330 C-60,380 -110,400 -150,400 Z" fill="${sk}" ${o}/>`;
+  // Dos de la main (masse principale)
+  s += `<path d="M-200,-60 C-200,-150 -120,-190 0,-190 C120,-190 210,-150 210,-50 L200,150 C190,230 120,270 20,270 C-90,270 -190,230 -200,140 Z" fill="${sk}" ${o}/>`;
+  // 4 doigts repliés : 1re rangée (phalanges du haut)
+  const fingers = [-150, -50, 50, 150];
+  fingers.forEach((x, i) => {
+    const h = i === 0 || i === 3 ? 108 : 118;
+    s += `<path d="M${x - 48},-150 C${x - 50},-200 ${x + 50},-200 ${x + 48},-150 L${x + 46},${-150 + h} C${x + 30},${-150 + h + 22} ${x - 30},${-150 + h + 22} ${x - 46},${-150 + h} Z" fill="${sk}" ${o}/>
+      <path d="M${x - 30},-170 C${x - 10},-184 ${x + 10},-184 ${x + 30},-170" stroke="${skHi}" stroke-width="10" fill="none" opacity=".75"/>
+      <path d="M${x - 40},${-150 + h - 12} C${x - 20},${-150 + h + 4} ${x + 20},${-150 + h + 4} ${x + 40},${-150 + h - 12}" stroke="${skSh}" stroke-width="12" fill="none" opacity=".7"/>`;
+  });
+  // 2e rangée (phalanges repliées dans la paume)
+  fingers.forEach((x) => {
+    s += `<path d="M${x - 44},-10 C${x - 44},-30 ${x + 44},-30 ${x + 44},-10 L${x + 42},60 C${x + 28},80 ${x - 28},80 ${x - 42},60 Z" fill="${sk}" ${o}/>
+      <path d="M${x - 34},50 C${x - 16},64 ${x + 16},64 ${x + 34},50" stroke="${skSh}" stroke-width="10" fill="none" opacity=".7"/>`;
+  });
+  // Pouce replié en travers, devant
+  s += `<path d="M-215,40 C-230,110 -160,160 -60,150 C30,140 80,120 96,96 C110,70 90,52 60,58 C10,68 -60,74 -110,60 C-150,48 -190,20 -215,40 Z" fill="${sk}" ${o}/>
+    <path d="M-200,70 C-170,120 -100,138 -40,132" stroke="${skSh}" stroke-width="14" fill="none" opacity=".6"/>
+    <path d="M30,74 C50,70 70,72 84,84" stroke="${INK}" stroke-width="5" fill="none"/>
+    <path d="M150,-140 C190,-100 200,-20 196,60" stroke="${skHi}" stroke-width="12" fill="none" opacity=".55"/>`;
+  return { svg: `<g>${s}</g>`, head: [0, -200], top: -200 };
+}
+
+/**
+ * PIEDS qui courent (gros plan sur les baskets, poussière, mouvement).
+ * Repère : le sol est en y = 0.
+ */
+export function piedsSVG(of = 'kai') {
+  const L = lookOf(of);
+  const o = `stroke="${INK}" stroke-width="5" stroke-linejoin="round"`;
+  const leg = L.skirt ? L.skin : L.pants;
+  const legSh = shadeHex(leg, -0.4);
+  const shoe = (x, y, rot, lifted) => `<g transform="translate(${x},${y}) rotate(${rot})">
+    <path d="M-120,-60 Q-60,-110 10,-80 L170,-20 Q220,0 210,50 L-120,50 Z" fill="${L.shoes}" ${o}/>
+    <path d="M-120,38 L210,38" stroke="${L.sole}" stroke-width="22"/>
+    <path d="M-30,-70 L10,-30 M10,-84 L50,-40 M50,-70 L84,-30" stroke="${INK}" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+    <path d="M-110,-40 Q-60,-70 0,-60" stroke="#fff" stroke-width="8" fill="none" opacity=".5"/>
+    ${lifted ? '' : '<ellipse cx="40" cy="60" rx="180" ry="18" fill="#000" opacity=".25"/>'}</g>`;
+  const svg = `<g>
+    <path d="M-330,-700 C-320,-500 -300,-300 -260,-120 L-90,-120 C-120,-300 -150,-500 -160,-700 Z" fill="${leg}" ${o}/>
+    <path d="M-330,-700 C-320,-500 -300,-300 -260,-120 L-210,-120 C-240,-300 -260,-500 -270,-700 Z" fill="${legSh}"/>
+    ${shoe(-180, -60, 0, false)}
+    <path d="M120,-760 C150,-600 200,-470 250,-360 L400,-430 C340,-540 300,-650 290,-760 Z" fill="${leg}" ${o}/>
+    ${shoe(330, -390, -28, true)}
+    <path d="M60,-300 l-200,0 M80,-250 l-260,0 M40,-200 l-160,0" stroke="${INK}" stroke-width="6" stroke-linecap="round" opacity=".55"/>
+    <g fill="#c9b79a" opacity=".8"><circle cx="-420" cy="-20" r="40"/><circle cx="-500" cy="-60" r="28"/><circle cx="-560" cy="-10" r="22"/><circle cx="-360" cy="-50" r="24"/></g>
+  </g>`;
+  return { svg, head: [0, -700], top: -760 };
+}

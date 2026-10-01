@@ -158,67 +158,71 @@ function foot(A, side, C, mode, flipX) {
 }
 
 // ---------------------------------------------------------------------
-// Buste (dessiné dans son repère : bassin en 0,0, cou en 0,-TORSO)
+// Buste (repère : bassin en 0,0, cou en 0,-TORSO).
+// Renvoie le CONTOUR (pour l'encrage commun de la silhouette) et le remplissage.
 // ---------------------------------------------------------------------
-function torsoShape(C, sw, back) {
+function torsoShape(C, sw, back, opt = {}) {
   const f2 = C.build === 'f';
-  const W = sw + 15; // épaule extérieure
-  const ww = f2 ? 42 : 52; // taille
+  const nk = f2 ? 20 : 24; // demi-largeur du cou
+  const ww = f2 ? 40 : 50; // taille
   const hw = f2 ? 54 : 54; // bas de la veste
   const top = -TORSO;
-  const path = `M${-W},${top + 22} Q${-W + 2},${top + 6} ${-sw + 2},${top + 2} L${sw - 2},${top + 2} Q${W - 2},${top + 6} ${W},${top + 22}
-    L${W - 6},${top + 70} Q${ww + 6},${-80} ${ww},${-40} L${hw},${16} Q0,${24} ${-hw},${16} L${-ww},${-40} Q${-ww - 6},${-80} ${-W + 6},${top + 70} Z`;
-  const shadowP = `M${-W},${top + 22} Q${-W + 2},${top + 6} ${-sw + 2},${top + 2} L${-sw + 26},${top + 4} Q${-ww + 18},${-90} ${-hw + 22},${16} L${-hw},${16} L${-ww},${-40} Q${-ww - 6},${-80} ${-W + 6},${top + 70} Z`;
+  const b = opt.bend || 0; // courbe d'action (le ventre avance ou recule)
+  const sh = opt.shift || 0; // décalage des détails (trois-quarts)
+  const L = opt.left ?? sw; const R = opt.right ?? sw; // épaules (trois-quarts : asymétrique)
+  const path = `M${-nk},${top} Q${f(-L * 0.6)},${top + 4} ${f(-L - 10)},${top + 28} Q${f(-L - 20)},${top + 54} ${f(-L - 4)},${top + 80}
+    Q${f(-ww - 10 + b * 0.5)},-100 ${f(-ww + b)},-40 L${f(-hw + b * 0.3)},16 Q${f(b * 0.3)},26 ${f(hw + b * 0.3)},16 L${f(ww + b)},-40
+    Q${f(ww + 10 + b * 0.5)},-100 ${f(R + 4)},${top + 80} Q${f(R + 20)},${top + 54} ${f(R + 10)},${top + 28} Q${f(R * 0.6)},${top + 4} ${nk},${top} Z`;
+  const shadowP = `M${f(-L - 10)},${top + 28} Q${f(-L - 20)},${top + 54} ${f(-L - 4)},${top + 80} Q${f(-ww - 10 + b * 0.5)},-100 ${f(-ww + b)},-40 L${f(-hw + b * 0.3)},16 L${f(-hw + 26 + b * 0.3)},18 Q${f(-ww + 22 + b)},-80 ${f(-L + 20)},${top + 34} Z`;
   let det = '';
   const o = `stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"`;
+  // Plis du tissu (taille, aisselles) : la veste "tombe" au lieu d'être rigide
+  const folds = `<path d="M${f(-L + 6)},${top + 70} q14,10 22,4 M${f(R - 6)},${top + 70} q-14,10 -22,4 M${f(-ww + 10 + b)},-30 q10,-8 18,0 M${f(ww - 12 + b)},-24 q-10,-8 -16,2" ${o} opacity=".45"/>`;
   if (!back) {
     if (C.outfit === 'hoodie') {
-      det += `<path d="M-38,${top + 6} Q0,${top + 40} 38,${top + 6} Q30,${top + 26} 0,${top + 34} Q-30,${top + 26} -38,${top + 6} Z" fill="${C.mainSh}" stroke="${INK}" stroke-width="2.2"/>
-        <path d="M-9,${top + 28} L-12,${top + 72} M9,${top + 28} L12,${top + 72}" stroke="${C.acc}" stroke-width="3" stroke-linecap="round"/>
-        <path d="M-34,-58 L34,-58 L40,-6 L-40,-6 Z" fill="${C.mainSh}" opacity=".55" stroke="${INK}" stroke-width="2"/>
-        <path d="M-26,-58 L-30,-20 M26,-58 L30,-20" ${o} opacity=".5"/>`;
+      det += `<path d="M-38,${top + 2} Q0,${top + 38} 38,${top + 2} Q30,${top + 26} 0,${top + 32} Q-30,${top + 26} -38,${top + 2} Z" fill="${C.mainSh}" stroke="${INK}" stroke-width="2.2"/>
+        <path d="M-9,${top + 26} L-12,${top + 70} M9,${top + 26} L12,${top + 70}" stroke="${C.acc}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M-34,-56 Q0,-62 34,-56 L40,-6 L-40,-6 Z" fill="${C.mainSh}" opacity=".55" stroke="${INK}" stroke-width="2"/>`;
     } else if (C.outfit === 'jacket') {
       det += `<path d="M-22,${top} L-26,${top - 18} L0,${top + 6} L26,${top - 18} L22,${top}" fill="${C.main}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>
         <path d="M0,${top + 6} L0,14" stroke="${INK}" stroke-width="2.4"/><path d="M3,${top + 6} L3,14" stroke="${C.acc}" stroke-width="1.6" opacity=".9"/>
-        <path d="M${-sw},${top + 18} Q-20,${top + 60} -14,10 M${sw},${top + 18} Q20,${top + 60} 14,10" stroke="${C.acc}" stroke-width="2.4" fill="none"/>
+        <path d="M${-L + 6},${top + 26} Q-20,${top + 60} -14,10 M${R - 6},${top + 26} Q20,${top + 60} 14,10" stroke="${C.acc}" stroke-width="2.4" fill="none"/>
         <rect x="16" y="${top + 50}" width="22" height="16" rx="2" fill="${C.mainSh}" stroke="${INK}" stroke-width="1.6"/>`;
     } else if (C.outfit === 'cardigan') {
       det += `<path d="M-20,${top + 2} Q0,${top + 30} 20,${top + 2} L26,14 Q0,20 -26,14 Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>
-        <path d="M-20,${top + 2} L-24,14 M20,${top + 2} L24,14" stroke="${C.mainHi}" stroke-width="2" opacity=".7"/>
         <path d="M-20,${top + 2} Q0,${top + 30} 20,${top + 2}" ${o}/>
         <circle cx="-30" cy="${top + 80}" r="3" fill="${C.acc}" stroke="${INK}" stroke-width="1.2"/><circle cx="-32" cy="${top + 120}" r="3" fill="${C.acc}" stroke="${INK}" stroke-width="1.2"/>`;
     } else if (C.outfit === 'bomber') {
       det += `<path d="M-30,${top + 2} Q0,${top + 26} 30,${top + 2} L28,${top + 12} Q0,${top + 36} -28,${top + 12} Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>
         <path d="M0,${top + 26} L0,4" stroke="${INK}" stroke-width="2.4"/>
-        <path d="M${-hw},2 Q0,12 ${hw},2 L${hw},16 Q0,26 ${-hw},16 Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>
-        <path d="M${-hw + 6},8 Q0,18 ${hw - 6},8" stroke="${C.accSh}" stroke-width="1.5" fill="none"/>
-        <path d="M-26,${top + 40} Q-30,${top + 90} -24,-10 M26,${top + 40} Q30,${top + 90} 24,-10" ${o} opacity=".45"/>`;
+        <path d="M${-hw},2 Q0,12 ${hw},2 L${hw},16 Q0,26 ${-hw},16 Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>`;
     } else if (C.outfit === 'track') {
       det += `<path d="M-18,${top - 14} L18,${top - 14} L20,${top + 14} L-20,${top + 14} Z" fill="${C.main}" stroke="${INK}" stroke-width="2.2"/>
         <path d="M0,${top - 14} L0,14" stroke="${INK}" stroke-width="2.4"/>
-        <path d="M${-sw - 4},${top + 10} Q-30,${top + 14} -20,${top + 4} M${sw + 4},${top + 10} Q30,${top + 14} 20,${top + 4}" stroke="${C.acc}" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <rect x="-4" y="${top + 12}" width="8" height="12" rx="2" fill="#d9d9e3" stroke="${INK}" stroke-width="1.2"/>`;
+        <path d="M${-L - 4},${top + 22} Q-30,${top + 14} -20,${top + 4} M${R + 4},${top + 22} Q30,${top + 14} 20,${top + 4}" stroke="${C.acc}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    } else if (C.outfit === 'tee') {
+      det += `<path d="M-22,${top + 2} Q0,${top + 22} 22,${top + 2}" ${o}/>`;
     }
-    // Accessoires portés au cou
     if (C.accs.has('headphones')) det += `<path d="M-30,${top - 4} Q0,${top + 26} 30,${top - 4}" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M-30,${top - 4} Q0,${top + 26} 30,${top - 4}" stroke="#2b2a33" stroke-width="5" fill="none" stroke-linecap="round"/>
       <rect x="-44" y="${top - 12}" width="18" height="26" rx="7" fill="#1d1c24" stroke="${INK}" stroke-width="2.2"/><rect x="26" y="${top - 12}" width="18" height="26" rx="7" fill="#1d1c24" stroke="${INK}" stroke-width="2.2"/>
       <rect x="-40" y="${top - 8}" width="9" height="17" rx="3" fill="${C.color}"/><rect x="31" y="${top - 8}" width="9" height="17" rx="3" fill="${C.color}"/>`;
     if (C.accs.has('chain')) det += `<path d="M-20,${top + 8} Q0,${top + 50} 20,${top + 8}" stroke="${INK}" stroke-width="4.4" fill="none"/><path d="M-20,${top + 8} Q0,${top + 50} 20,${top + 8}" stroke="#dcdce6" stroke-width="2.4" stroke-dasharray="4 2" fill="none"/>`;
     if (C.accs.has('whistle')) det += `<path d="M-14,${top + 8} L4,${top + 52} M14,${top + 8} L6,${top + 52}" stroke="${C.color}" stroke-width="2" fill="none"/><rect x="-2" y="${top + 50}" width="20" height="12" rx="5" fill="#d9d9e3" stroke="${INK}" stroke-width="2"/>`;
-  } else if (C.outfit === 'hoodie') {
-    det += `<path d="M-40,${top + 4} Q-44,${top + 70} 0,${top + 84} Q44,${top + 70} 40,${top + 4} Z" fill="${C.mainSh}" stroke="${INK}" stroke-width="2.2"/>`;
-  } else if (C.outfit === 'bomber') {
-    det += `<path d="M${-hw},2 Q0,12 ${hw},2 L${hw},16 Q0,26 ${-hw},16 Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>`;
+  } else {
+    // De dos : couture centrale, capuche éventuelle
+    det += `<path d="M0,${top + 10} Q${b * 0.3},-80 ${b * 0.3},10" ${o} opacity=".4"/>`;
+    if (C.outfit === 'hoodie') det += `<path d="M-40,${top + 4} Q-44,${top + 70} 0,${top + 84} Q44,${top + 70} 40,${top + 4} Z" fill="${C.mainSh}" stroke="${INK}" stroke-width="2.2"/>`;
+    if (C.outfit === 'bomber') det += `<path d="M${-hw},2 Q0,12 ${hw},2 L${hw},16 Q0,26 ${-hw},16 Z" fill="${C.acc}" stroke="${INK}" stroke-width="2"/>`;
   }
-  return `<path d="${path}" fill="${C.main}"/><path d="${shadowP}" fill="${C.mainSh}"/>
-    <path d="M${W - 10},${top + 30} Q${ww + 4},${-90} ${ww - 6},${-30}" stroke="${C.mainHi}" stroke-width="4" fill="none" opacity=".5" stroke-linecap="round"/>
-    ${det}<path d="${path}" fill="none" stroke="${INK}" stroke-width="${LW}" stroke-linejoin="round"/>`;
+  const fill = `<path d="${path}" fill="${C.main}"/><path d="${shadowP}" fill="${C.mainSh}"/>
+    <path d="M${f(R - 8)},${top + 36} Q${f(ww + 4 + b)},-90 ${f(ww - 6 + b)},-30" stroke="${C.mainHi}" stroke-width="4" fill="none" opacity=".45" stroke-linecap="round"/>
+    ${folds}<g transform="translate(${f(sh)},0)">${det}</g>`;
+  return { d: path, fill };
 }
 
 let skirtId = 0;
-/** Jupe longue façon pagne (motif wax simple). */
+/** Jupe longue façon pagne (motif wax simple). Renvoie contour + remplissage. */
 function skirt(Hl, Hr, Kl, Kr, Sl, Sr, C) {
-  // Ourlet à mi-mollet, mais le tissu ne s'écarte pas plus que ~90 de chaque côté.
   const clampX = (x, side) => (side < 0 ? Math.max(x, Hl[0] - 90) : Math.min(x, Hr[0] + 90));
   const hemL = [clampX(Kl[0] + (Sl[0] - Kl[0]) * 0.55 - 16, -1), Kl[1] + (Sl[1] - Kl[1]) * 0.55];
   const hemR = [clampX(Kr[0] + (Sr[0] - Kr[0]) * 0.55 + 16, 1), Kr[1] + (Sr[1] - Kr[1]) * 0.55];
@@ -230,9 +234,61 @@ function skirt(Hl, Hr, Kl, Kr, Sl, Sr, C) {
     const y = top + 30 + i * ((Math.max(hemL[1], hemR[1]) - top - 30) / 4);
     motif += `<path d="M${f(hemL[0] + 6)},${f(y)} L${f(hemR[0] - 6)},${f(y)}" stroke="${C.skirt2}" stroke-width="3" stroke-dasharray="10 8" opacity=".9"/>`;
   }
-  return `<path d="${d}" fill="${C.skirt}" stroke="${INK}" stroke-width="${LW}" stroke-linejoin="round"/>
-    <clipPath id="${cid}"><path d="${d}"/></clipPath><g clip-path="url(#${cid})">${motif}</g>
-    <path d="M${f(Hl[0] - 10)},${f(top + 10)} Q${f(hemL[0] + 10)},${f(hemL[1] - 60)} ${f(hemL[0] + 20)},${f(hemL[1])}" stroke="${C.skirtSh}" stroke-width="10" fill="none" opacity=".6"/>`;
+  // Plis verticaux du tissu
+  const pl = `<path d="M${f(Hl[0] + 4)},${f(top + 20)} Q${f(hemL[0] + 30)},${f(hemL[1] - 80)} ${f(hemL[0] + 36)},${f(hemL[1] - 4)} M${f(Hr[0] - 4)},${f(top + 20)} Q${f(hemR[0] - 30)},${f(hemR[1] - 80)} ${f(hemR[0] - 36)},${f(hemR[1] - 4)}" stroke="${INK}" stroke-width="1.6" fill="none" opacity=".45"/>`;
+  return {
+    d,
+    fill: `<path d="${d}" fill="${C.skirt}"/><clipPath id="${cid}"><path d="${d}"/></clipPath><g clip-path="url(#${cid})">${motif}
+      <path d="M${f(Hl[0] - 10)},${f(top + 10)} Q${f(hemL[0] + 10)},${f(hemL[1] - 60)} ${f(hemL[0] + 20)},${f(hemL[1])}" stroke="${C.skirtSh}" stroke-width="16" fill="none" opacity=".55"/></g>${pl}`,
+  };
+}
+
+/** Plis de vêtement au creux d'une articulation (coude, genou). */
+function jointFolds(A, J, B, r) {
+  // côté intérieur du pli = vers le point milieu entre A et B
+  const mx = (A[0] + B[0]) / 2 - J[0]; const my = (A[1] + B[1]) / 2 - J[1];
+  const L = Math.hypot(mx, my);
+  if (L < 8) return ''; // membre presque droit : pas de pli marqué
+  const ux = mx / L; const uy = my / L;
+  const c = [J[0] + ux * r * 0.55, J[1] + uy * r * 0.55];
+  const n = [-uy, ux];
+  const a1 = [c[0] + n[0] * r * 0.6, c[1] + n[1] * r * 0.6]; const a2 = [c[0] - n[0] * r * 0.6, c[1] - n[1] * r * 0.6];
+  const k = [c[0] + ux * r * 0.5, c[1] + uy * r * 0.5];
+  return `<path d="M${pt(a1)} Q${pt(k)} ${pt(a2)}" stroke="${INK}" stroke-width="1.8" fill="none" opacity=".55" stroke-linecap="round"/>
+    <path d="M${pt([a1[0] + ux * 7, a1[1] + uy * 7])} Q${pt([k[0] + ux * 6, k[1] + uy * 6])} ${pt([c[0] + ux * 7, c[1] + uy * 7])}" stroke="${INK}" stroke-width="1.4" fill="none" opacity=".4" stroke-linecap="round"/>`;
+}
+
+// ---------------------------------------------------------------------
+// ORIENTATIONS et VÉRIFICATION AUTOMATIQUE
+// ---------------------------------------------------------------------
+// Chaque pose a UNE orientation, appliquée à tout le corps (tête comprise) :
+//   'face'       : de face (léger contrapposto autorisé)
+//   'tq'         : trois-quarts, regard vers la droite (flip: true = vers la gauche)
+//   'dos'        : de dos (on voit l'arrière de la tête)
+//   'silhouette' : poses d'action de profil → dessinées en ombre chinoise
+//                  (contre-jour), jamais avec un visage dessiné de face.
+export const ORIENTATIONS = ['face', 'tq', 'dos', 'silhouette'];
+
+/** Liste des incohérences d'une pose (vide = pose correcte). */
+export function checkPose(pose, name = '?') {
+  const err = [];
+  const o = pose.o;
+  if (!ORIENTATIONS.includes(o)) err.push(`${name} : orientation manquante ou inconnue (${o})`);
+  const k = pose.k || 0;
+  const ht = pose.ht || 0;
+  if (o === 'face') {
+    if (k > 0.25) err.push(`${name} : de face mais le corps est tourné (k=${k})`);
+    if (Math.abs(ht) > 0.25) err.push(`${name} : de face mais la tête est trop tournée (${ht})`);
+    if (pose.feet && pose.feet !== 'front') err.push(`${name} : de face mais pieds de profil`);
+  }
+  if (o === 'tq') {
+    if (k < 0.3 || k > 0.75) err.push(`${name} : trois-quarts mais rotation du corps incohérente (k=${k})`);
+    if (ht < 0 || ht > 0.35) err.push(`${name} : la tête doit suivre le corps de trois-quarts (rotation du cou ±0,35)`);
+    if (pose.feet !== 'side') err.push(`${name} : trois-quarts mais pieds de face`);
+  }
+  if (o === 'dos' && pose.turnHead) err.push(`${name} : de dos avec un visage de face (interdit)`);
+  if (Math.abs(pose.h || 0) > 25) err.push(`${name} : cou trop tordu (${pose.h}°)`);
+  return err;
 }
 
 // ---------------------------------------------------------------------
@@ -240,28 +296,41 @@ function skirt(Hl, Hr, Kl, Kr, Sl, Sr, C) {
 // ---------------------------------------------------------------------
 /**
  * SVG (contenu de <g>) d'un personnage en pied, pieds au sol en (0,0).
- * @param {string} id     kai, mory, nia, sora, ren, awa, tidiane, binta
+ * @param {string} id     kai, mory, nia, sora, ren, awa, tidiane, binta (ou un figurant)
  * @param {string|object} poseName  nom de pose (data/comic/poses.js) ou objet pose
- * @param {object} [o]    { expr, grade (fonction couleur), aura }
- * @returns {{ svg, head: [x,y], top }}  head = centre de la tête (pour les bulles)
+ * @param {object} [o]    { expr, grade (fonction couleur), silhouette, rim }
+ * @returns {{ svg, head: [x,y], top, issues }}  head = yeux (bulles, cadrage)
  */
 export function bodySVG(id, poseName = 'debout', o = {}) {
   const pose = typeof poseName === 'string' ? (POSES[poseName] || POSES.debout) : poseName;
+  const issues = checkPose(pose, typeof poseName === 'string' ? poseName : 'pose');
+  // Silhouette (ombre chinoise) : toutes les couleurs → une seule teinte sombre,
+  // + un liseré de lumière décalé (contre-jour). Pas de traits du visage.
+  const silhouette = o.silhouette || pose.o === 'silhouette' || issues.length > 0;
+  if (silhouette && !o._inner) {
+    const dark = o.dark || '#0e0a16';
+    const rim = o.rim || '#ffcf8a';
+    const base = bodySVG(id, pose, { ...o, _inner: true, grade: () => dark, silhouetteHead: true });
+    const glow = bodySVG(id, pose, { ...o, _inner: true, grade: () => rim, silhouetteHead: true });
+    return { ...base, issues, svg: `<g transform="translate(-6,-5)">${glow.svg.replaceAll(INK, rim)}</g>${base.svg.replaceAll(INK, dark)}` };
+  }
   const C = colors(id, o.grade);
   const fem = C.build === 'f';
+  const orient = pose.o;
   const k = pose.k || 0;
-  const wf = 1 - 0.42 * k;
-  const SW = (fem ? 58 : 72) * wf;
-  const HW = (fem ? 30 : 26) * wf;
   const t = pose.t || 0;
-  const back = pose.view === 'back';
+  const back = orient === 'dos';
+  const tq = orient === 'tq' || (orient === 'silhouette' && k > 0.3);
+  // Trois-quarts : épaule proche large, épaule lointaine resserrée
+  const SWb = fem ? 58 : 72;
+  const SL = SWb * (tq ? 1 - 0.12 * k : 1 - 0.3 * k);
+  const SR = SWb * (tq ? 1 - 0.62 * k : 1 - 0.3 * k);
+  const HW = (fem ? 30 : 26) * (1 - 0.35 * k);
 
   // --- Articulations (repère : bassin en 0,0) ---
-  const P = [0, 0];
   const up = rot([0, -1], t);
-  const N = add(P, up, TORSO);
-  // Contrapposto : épaules et bassin s'inclinent en sens opposé (pose plus vivante).
-  const shoulder = (s) => add(N, rot([s * SW, 26], t + (pose.s || 0)));
+  const N = add([0, 0], up, TORSO);
+  const shoulder = (s) => add(N, rot([s * (s < 0 ? SL : SR), 26], t + (pose.s || 0)));
   const hip = (s) => rot([s * HW, 8], t * 0.35 + (pose.p || 0));
   const Sl = shoulder(-1); const Sr = shoulder(1);
   const Hl = hip(-1); const Hr = hip(1);
@@ -276,103 +345,114 @@ export function bodySVG(id, poseName = 'debout', o = {}) {
   const [, Kr, Ar] = chain(Hr, pose.lr || [0, 0], LEG);
   const neckTop = add(N, rot([0, -1], t + (pose.h || 0) * 0.5), NECK);
 
-  // --- Rayons des membres (silhouette homme / femme) ---
-  const r = fem
+  // En silhouette, membres plus épais : une ombre chinoise pleine, pas des tiges.
+  const th = o.silhouetteHead ? 1.32 : 1;
+  const rr = fem
     ? { ua: [19, 14], fa: [15, 10], th: [31, 18], sh: [19, 11] }
-    : { ua: [24, 17], fa: [19, 12], th: [33, 21], sh: [22, 13] };
+    : { ua: [23, 17], fa: [19, 12], th: [33, 21], sh: [22, 13] };
+  const r = Object.fromEntries(Object.entries(rr).map(([k2, v]) => [k2, v.map((x) => x * th)]));
 
-  const armParts = (S, E, W, a) => C.outfit === 'tee' ? [
-    // T-shirt : manche courte, bras nus
-    { A: S, B: E, ra: r.ua[0] - 2, rb: r.ua[1], fill: C.skin, shadow: C.skinSh, light: C.skinHi, bulge: 1.1,
-      extra: `<path d="${segPath(S, add(S, [E[0] - S[0], E[1] - S[1]], 0.55), r.ua[0] + 2, r.ua[1] + 4, 1)}" fill="${C.main}" stroke="${INK}" stroke-width="2.2"/>` },
-    { A: E, B: W, ra: r.fa[0], rb: r.fa[1], fill: C.skin, shadow: C.skinSh, light: C.skinHi },
-  ] : [
-    { A: S, B: E, ra: r.ua[0], rb: r.ua[1] + 2, fill: C.main, shadow: C.mainSh, light: C.mainHi, bulge: 1.1 },
-    { A: E, B: W, ra: r.fa[0] + 2, rb: r.fa[1] + 2, fill: C.main, shadow: C.mainSh, light: C.mainHi,
-      extra: `<path d="${segPath(add(E, [W[0] - E[0], W[1] - E[1]], 0.82), W, r.fa[1] + 3, r.fa[1] + 3, 1)}" fill="${C.outfit === 'cardigan' || C.outfit === 'hoodie' ? C.mainSh : C.acc}" stroke="${INK}" stroke-width="2"/>`
-        + (C.outfit === 'track' || C.outfit === 'jacket' ? `<path d="M${pt(S)} L${pt(E)} L${pt(add(E, [W[0] - E[0], W[1] - E[1]], 0.8))}" stroke="${C.acc}" stroke-width="3.4" fill="none" stroke-linejoin="round" opacity=".95"/>` : '') },
-  ];
-  const legParts = (H, K, A) => [
-    { A: H, B: K, ra: r.th[0], rb: r.th[1] + 1, fill: C.pants, shadow: C.pantsSh, light: C.pantsHi, bulge: 1.08,
-      extra: C.stripe ? `<path d="M${pt(H)} L${pt(K)}" stroke="${C.stripe}" stroke-width="4"/>` : '' },
-    { A: K, B: A, ra: r.sh[0] + 2, rb: r.sh[1] + 4, fill: C.pants, shadow: C.pantsSh, light: C.pantsHi, bulge: 1.02,
-      extra: (C.stripe ? `<path d="M${pt(K)} L${pt(A)}" stroke="${C.stripe}" stroke-width="4"/>` : '')
-        + `<path d="M${pt(add(K, [A[0] - K[0], A[1] - K[1]], -0.08))} q6,10 0,18" stroke="${INK}" stroke-width="1.6" fill="none" opacity=".6"/>` },
-  ];
-
-  const footMode = pose.feet || 'front';
-  const drawArm = (side) => {
+  // --- Les formes (contour + remplissage), regroupées par calque ---
+  const shapes = { back: [], core: [], front: [] };
+  const layerOfArm = (side) => {
+    const key = side < 0 ? 'al' : 'ar';
+    if ((pose.back || []).includes(key) || (tq && side > 0 && !(pose.front === key))) return 'back';
+    if (pose.front === key || (pose.fronts || []).includes(key)) return 'front';
+    return 'core';
+  };
+  const seg = (A, B, ra, rb, fill, shadow, light, bulge) => ({ d: segPath(A, B, ra, rb, bulge), A, B, ra, rb, fill, shadow, light });
+  const addArm = (side) => {
     const S = side < 0 ? Sl : Sr; const E = side < 0 ? El : Er; const W = side < 0 ? Wl : Wr;
+    const layer = shapes[layerOfArm(side)];
+    const tee = C.outfit === 'tee';
+    const up1 = tee ? seg(S, E, r.ua[0] - 2, r.ua[1], C.skin, C.skinSh, C.skinHi, 1.1) : seg(S, E, r.ua[0], r.ua[1] + 3, C.main, C.mainSh, C.mainHi, 1.1);
+    const lo1 = tee ? seg(E, W, r.fa[0], r.fa[1], C.skin, C.skinSh, C.skinHi, 1.03) : seg(E, W, r.fa[0] + 3, r.fa[1] + 3, C.main, C.mainSh, C.mainHi, 1.04);
     const ang = (side < 0 ? pose.al : pose.ar)?.[1] ?? 0;
-    const ht = side < 0 ? pose.hl : pose.hr;
-    return `<g class="arm">${limb(armParts(S, E, W, ang))}${hand(W, ang, ht || 'open', C, side > 0 ? pose.prop : null)}</g>`;
-  };
-  const drawLeg = (side) => {
-    const H = side < 0 ? Hl : Hr; const K = side < 0 ? Kl : Kr; const A = side < 0 ? Al : Ar;
-    if (C.skirt) { // jupe : tibias nus sous l'ourlet
-      return `<g class="leg">${limb([{ A: K, B: A, ra: r.sh[0], rb: r.sh[1], fill: C.skin, shadow: C.skinSh, light: C.skinHi }])}${foot(A, side, C, footMode)}</g>`;
+    let extra = '';
+    if (tee) extra += `<path d="${segPath(S, add(S, [E[0] - S[0], E[1] - S[1]], 0.5), r.ua[0] + 3, r.ua[1] + 5, 1)}" fill="${C.main}" stroke="${INK}" stroke-width="2.2"/>`;
+    else {
+      extra += `<path d="${segPath(add(E, [W[0] - E[0], W[1] - E[1]], 0.84), W, r.fa[1] + 4, r.fa[1] + 4, 1)}" fill="${C.outfit === 'cardigan' || C.outfit === 'hoodie' ? C.mainSh : C.acc}" stroke="${INK}" stroke-width="2"/>`;
+      if (C.outfit === 'track' || C.outfit === 'jacket') extra += `<path d="M${pt(S)} L${pt(E)} L${pt(add(E, [W[0] - E[0], W[1] - E[1]], 0.82))}" stroke="${C.acc}" stroke-width="3.4" fill="none" stroke-linejoin="round" opacity=".95"/>`;
+      extra += jointFolds(S, E, W, r.ua[1] + 3);
     }
-    return `<g class="leg">${limb(legParts(H, K, A))}${foot(A, side, C, footMode)}</g>`;
+    layer.push(up1, { ...lo1, extra: extra + hand(W, ang, (side < 0 ? pose.hl : pose.hr) || 'open', C, side > 0 ? pose.prop : null), contour: layer !== shapes.back });
   };
-  const behind = new Set(pose.back || []);
+  const footMode = pose.feet || 'front';
+  const addLeg = (side) => {
+    const H = side < 0 ? Hl : Hr; const K = side < 0 ? Kl : Kr; const A = side < 0 ? Al : Ar;
+    const layer = (pose.back || []).includes(side < 0 ? 'll' : 'lr') ? shapes.back : shapes.core;
+    const ft = foot(A, side, C, footMode);
+    if (C.skirt) { layer.push({ ...seg(K, A, r.sh[0], r.sh[1], C.skin, C.skinSh, C.skinHi, 1.02), extra: ft }); return; }
+    layer.push(seg(H, K, r.th[0], r.th[1] + 2, C.pants, C.pantsSh, C.pantsHi, 1.08));
+    layer.push({ ...seg(K, A, r.sh[0] + 3, r.sh[1] + 5, C.pants, C.pantsSh, C.pantsHi, 1.02),
+      extra: (C.stripe ? `<path d="M${pt(H)} L${pt(K)} L${pt(A)}" stroke="${C.stripe}" stroke-width="4" fill="none"/>` : '')
+        + jointFolds(H, K, A, r.th[1] + 2)
+        + `<path d="M${pt(add(A, [-10, -14]))} l8,6 l8,-6 l8,6" stroke="${INK}" stroke-width="1.6" fill="none" opacity=".5"/>` + ft });
+  };
+  // Ordre : jambe lointaine, puis proche (trois-quarts : la jambe de droite est derrière)
+  if (tq) { addLeg(1); addLeg(-1); } else { addLeg(-1); addLeg(1); }
+  // Bassin / jupe
+  if (C.skirt) {
+    const sk = skirt(Hl, Hr, Kl, Kr, Al, Ar, C);
+    shapes.core.push({ d: sk.d, fillSvg: sk.fill });
+  } else {
+    const pd = `M${f(Hl[0] - 24)},${f(Hl[1] - 34)} L${f(Hr[0] + 24)},${f(Hr[1] - 34)} L${f(Hr[0] + 22)},${f(Hr[1] + 12)} Q0,50 ${f(Hl[0] - 22)},${f(Hl[1] + 12)} Z`;
+    shapes.core.push({ d: pd, fill: C.pants });
+  }
+  // Cou + buste (le buste est dessiné tourné/penché, son contour rejoint la silhouette)
+  shapes.core.push(seg(N, neckTop, fem ? 15 : 18, fem ? 14 : 17, C.skin, C.skinSh, null, 1));
+  const torso = torsoShape(C, SWb, back, { bend: pose.bend || 0, shift: tq ? 18 * k : 0, left: SL, right: SR });
+  const tTr = `rotate(${f(t)})`;
+  shapes.core.push({ d: torso.d, transform: tTr, fillSvg: `<g transform="${tTr}">${torso.fill}</g>` });
+  // Bras
+  addArm(-1); addArm(1);
 
-  // --- Tête (portrait de l'équipe, ou tête simple pour les figurants) ---
-  const parts = EXTRA_LOOKS[id] ? extraHead(EXTRA_LOOKS[id], o.expr) : characterParts(id, o.expr || 'neutre');
+  // --- Rendu d'un calque : encrage commun (silhouette continue), puis couleurs ---
+  const renderLayer = (list) => {
+    let ink = ''; let fill = ''; let shade2 = ''; let extra = ''; let contour = '';
+    for (const s of list) {
+      const tr = s.transform ? ` transform="${s.transform}"` : '';
+      ink += `<path d="${s.d}"${tr} fill="${INK}" stroke="${INK}" stroke-width="${LW * 2}" stroke-linejoin="round"/>`;
+      fill += s.fillSvg || `<path d="${s.d}"${tr} fill="${s.fill}"/>`;
+      if (s.A && s.shadow) shade2 += segShade(s.A, s.B, s.ra, s.rb, s.shadow, s.light);
+      if (s.extra) extra += s.extra;
+      // Contour fin d'un bras posé devant le buste : il reste lisible sans "couture"
+      if (s.contour) contour += `<path d="${s.d}" fill="none" stroke="${INK}" stroke-width="1.8" opacity=".75"/>`;
+    }
+    return ink + fill + shade2 + contour + extra;
+  };
+
+  // --- Tête : portrait (face / trois-quarts) ou arrière de la tête (dos) ---
+  const parts = EXTRA_LOOKS[id] ? extraHead(EXTRA_LOOKS[id], o.expr) : characterParts(id, o.expr || 'neutre', { turn: tq ? 0.55 + (pose.ht || 0) : (pose.ht || 0) });
   const g = o.grade || ((c) => c);
   const recolor = (s) => (o.grade ? s.replace(/#[0-9a-fA-F]{6}\b/g, (c) => (c.toLowerCase() === INK ? c : g(c))) : s);
   const headAngle = t + (pose.h || 0);
   const headT = `translate(${pt(neckTop)}) rotate(${f(headAngle)}) scale(${HEAD_SCALE}) translate(${-HEAD_ANCHOR[0]},${-HEAD_ANCHOR[1]})`;
   let head;
-  if (back && !pose.turnHead) {
-    // Vu de dos : arrière de la tête (cheveux) + nuque
-    head = `<g transform="${headT}">${recolor(parts.back)}<path d="M70,90 C70,58 86,46 100,46 C114,46 130,58 130,90 L128,120 Q100,140 72,120 Z" fill="${C.hair}" stroke="${INK}" stroke-width="2.8"/><path d="M78,70 Q100,58 122,70" stroke="${shade(C.hairRaw || '#222222', 0.25)}" stroke-width="3" fill="none" opacity=".6"/></g>`;
+  if (back || o.silhouetteHead) {
+    const hairBack = `<path d="M70,90 C70,58 86,46 100,46 C114,46 130,58 130,90 L128,120 Q100,140 72,120 Z" fill="${C.hair}" stroke="${INK}" stroke-width="2.8"/>`;
+    head = back
+      ? `<g transform="${headT}">${recolor(parts.back)}${hairBack}<path d="M78,70 Q100,58 122,70" stroke="${g(shade(C.hairRaw || '#222222', 0.25))}" stroke-width="3" fill="none" opacity=".6"/></g>`
+      : `<g transform="${headT}">${recolor(parts.back)}${recolor(parts.head)}</g>`;
   } else {
     head = `<g transform="${headT}">${recolor(parts.back)}${recolor(parts.head)}${recolor(parts.fx)}</g>`;
   }
-  const neck = limb([{ A: N, B: neckTop, ra: fem ? 14 : 17, rb: fem ? 13 : 16, fill: C.skin, shadow: C.skinSh }]);
 
-  // --- Assemblage (ordre des calques) ---
-  const torso = `<g transform="rotate(${f(t)}) scale(${f(wf)},1)">${torsoShape(C, SW / wf, back)}</g>`;
-  const pelvis = C.skirt
-    ? skirt(Hl, Hr, Kl, Kr, Al, Ar, C)
-    : `<path d="M${f(Hl[0] - 22)},${f(Hl[1] - 30)} L${f(Hr[0] + 22)},${f(Hr[1] - 30)} L${f(Hr[0] + 20)},${f(Hr[1] + 10)} Q0,46 ${f(Hl[0] - 20)},${f(Hl[1] + 10)} Z" fill="${C.pants}" stroke="${INK}" stroke-width="${LW}" stroke-linejoin="round"/>`;
-  const legsBack = ['ll', 'lr'].filter((x) => behind.has(x));
-  const legsFront = ['ll', 'lr'].filter((x) => !behind.has(x));
-  const armsBack = ['al', 'ar'].filter((x) => behind.has(x));
-  const armsFront = ['al', 'ar'].filter((x) => !behind.has(x));
-  const side = (x) => (x.endsWith('l') ? -1 : 1);
-  // Bras croisés : on dessine en dernier le bras indiqué par `front`.
-  armsFront.sort((a) => (pose.front === a ? 1 : -1));
+  const body = back
+    ? renderLayer([...shapes.back, ...shapes.core, ...shapes.front]) + head
+    : renderLayer(shapes.back) + renderLayer(shapes.core) + head + renderLayer(shapes.front);
 
-  let body = '';
-  if (back) {
-    // De dos : les bras et la tête passent derrière… sauf la tête, au-dessus du buste.
-    body = [...['ll', 'lr'].map((x) => drawLeg(side(x))), pelvis, ...['al', 'ar'].map((x) => drawArm(side(x))), neck, torso, head].join('');
-  } else {
-    body = [
-      ...armsBack.map((x) => drawArm(side(x))),
-      ...legsBack.map((x) => drawLeg(side(x))),
-      C.skirt ? '' : pelvis,
-      ...legsFront.map((x) => drawLeg(side(x))),
-      C.skirt ? pelvis : '',
-      neck, torso, head,
-      ...armsFront.map((x) => drawArm(side(x))),
-    ].join('');
-  }
-
-  // --- Mise au sol : le pied le plus bas touche y = 0 (ou bassin posé si assis) ---
+  // --- Mise au sol ---
   const lowest = Math.max(Al[1], Ar[1]) + ANKLE;
   let dy = pose.seat ? -Math.max(Hl[1], Hr[1]) - 30 : -lowest;
   dy -= pose.air || 0;
   const rotAll = pose.rot || 0;
   const scale = BODY_LOOKS[id]?.height || 1;
   const svg = `<g transform="scale(${scale}) translate(0,${f(dy)}) rotate(${rotAll})">${body}</g>`;
-  // Centre de la tête (pour pointer les bulles)
-  // Repères pour le cadrage et les bulles : yeux et sommet de la tête.
   const eyes = rot(add(neckTop, rot([0, -1], headAngle), 43), rotAll);
   const crown = rot(add(neckTop, rot([0, -1], headAngle), 136), rotAll);
   const P2 = (q) => [q[0] * scale, (q[1] + dy) * scale];
-  return { svg, head: P2(eyes), top: P2(crown)[1], crown: P2(crown) };
+  return { svg, head: P2(eyes), top: P2(crown)[1], crown: P2(crown), issues };
 }
 
 /** Hauteur de référence d'un perso debout (pour le cadrage). */
@@ -382,7 +462,7 @@ export const FIGURE_HEIGHT = 720;
 // ---------------------------------------------------------------------
 // Tête simple des figurants (même repère que les portraits 200 × 232)
 // ---------------------------------------------------------------------
-function extraHead(X, expr = 'neutre') {
+export function extraHead(X, expr = 'neutre') {
   const sk = X.skin; const skSh = shade(sk, -0.3); const hair = X.hair;
   const face = 'M72,86 C72,66 84,56 100,56 C116,56 128,66 128,86 L129,104 C129,116 124,126 117,133 L106,144 Q100,148 94,144 L83,133 C76,126 71,116 71,104 Z';
   const o = `stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"`;

@@ -30,7 +30,7 @@ export default {
         },
         { // Mory s'assoit à côté
           bg: { id: 'classe', time: 'jour', horizon: 0.5, vp: 0.15 },
-          chars: [{ id: 'mory', pose: 'decontracte', expr: 'clin', shot: 'taille', x: 0.55, y: 0.18, fill: 0.85, flip: true }],
+          chars: [{ id: 'mory', pose: 'bras_croises', expr: 'clin', shot: 'taille', x: 0.55, y: 0.18, fill: 0.85, flip: true }],
           fx: [{ type: 'lueur', x: 0.5, y: 0.36, color: '#22d3ee', size: 0.2, opacity: 0.55 }],
           bubbles: [{ type: 'parole', text: 'Toi. Le gars de Madina. T’as frappé l’Oubli à mains nues.', x: 0.5, y: 0.12, w: 0.85, who: 0 }],
         },

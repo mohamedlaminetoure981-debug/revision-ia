@@ -16,8 +16,8 @@ export default {
         { // Nia explique, des étudiants l'écoutent
           bg: { id: 'bibliotheque', time: 'pluie', horizon: 0.42, vp: 0.55 },
           chars: [
-            { id: 'etudiant', pose: 'assis', shot: 'pied', x: 0.22, y: 0.98, fill: 0.42 },
-            { id: 'etudiante', pose: 'assis', shot: 'pied', x: 0.38, y: 0.98, fill: 0.42 },
+            { id: 'etudiant', pose: 'assis_bureau', shot: 'pied', x: 0.22, y: 0.98, fill: 0.42 },
+            { id: 'etudiante', pose: 'assis_bureau', shot: 'pied', x: 0.38, y: 0.98, fill: 0.42 },
             { id: 'nia', pose: 'lire', expr: 'joie', shot: 'pied', x: 0.66, y: 0.97, fill: 0.7, flip: true },
           ],
           captions: [{ text: 'Bibliothèque. 9 h 58. Il pleut.', x: 0.03, y: 0.8, style: 'noir', w: 0.45 }],

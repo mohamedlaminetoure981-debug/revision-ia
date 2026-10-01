@@ -13,8 +13,10 @@
 // =====================================================================
 
 import { bodySVG, INK } from './body.js';
-import { decorSVG, gradeFor, rng } from './decors.js';
-import { oubliSVG } from './entities.js';
+import { decorSVG, gradeFor, rng, TIMES } from './decors.js';
+import { oubliSVG, poingSVG, piedsSVG } from './entities.js';
+import { figureSVG, FIGURES } from './figures.js';
+import { characterBust } from '../ui/character.js';
 import { EXTRA_LOOKS } from '../data/comic/looks.js';
 import { CHARACTERS } from '../data/characters.js';
 
@@ -107,17 +109,42 @@ const polyD = (poly) => `M${poly.map((p) => `${f(p[0])},${f(p[1])}`).join(' L')}
  *   blur  : flou de mouvement (décalage, ex. -80)   aura : couleur d'aura
  *   break : true = le perso DÉBORDE du cadre (grands moments)
  */
-const SPANS = { americain: 470, taille: 360, buste: 255, gros: 175, yeux: 70 };
+const SPANS = { americain: 470, taille: 360, buste: 230, gros: 170, yeux: 70 };
 function figure(c, w, h, time) {
   let grade = gradeFor(time);
   if (c.light === 'contre') grade = gradeFor(time, ['#0d0718', 0.72]);
   else if (c.light && c.light.startsWith?.('#')) grade = gradeFor(time, [c.light, 0.13]); // léger : la peau garde sa couleur
   let r;
+  const portrait = ['gros', 'buste', 'yeux'].includes(c.shot) && CHARACTERS[c.id];
   if (c.id === 'oubli') r = oubliSVG(c.pose, { seed: c.seed });
-  else if (CHARACTERS[c.id] || EXTRA_LOOKS[c.id]) r = bodySVG(c.id, c.pose || 'debout', { expr: c.expr, grade });
-  else return { svg: '', back: '', head: [0, 0] };
+  else if (c.id === 'poing') r = poingSVG(c.of);
+  else if (c.id === 'pieds') r = piedsSVG(c.of);
+  else if (portrait) {
+    // Gros plans et plans poitrine : le PORTRAIT original (le plus réussi).
+    // Rotation du cou limitée (±0,35) : la tête reste cohérente avec le buste.
+    const turn = Math.max(-0.35, Math.min(0.35, c.turn || 0));
+    const g = grade;
+    let bust = characterBust(c.id, c.expr || 'neutre', { turn });
+    if (g) bust = bust.replace(/#[0-9a-fA-F]{6}/g, (col) => (col.toLowerCase() === INK ? col : g(col)));
+    r = { svg: `<g transform="scale(1.16) translate(-100,-103)">${bust}</g>`, head: [0, 0], top: -90 };
+  } else if (CHARACTERS[c.id] || EXTRA_LOOKS[c.id]) {
+    // Corps entier : une POSE DESSINÉE d'un bloc si elle existe ; sinon (action)
+    // une silhouette en contre-jour. Toute incohérence est signalée.
+    if (FIGURES[c.pose || 'debout']) r = figureSVG(c.id, c.pose || 'debout', { expr: c.expr, grade });
+    else {
+      r = bodySVG(c.id, c.pose, { expr: c.expr, silhouette: true, rim: c.rim || (TIMES[time] || TIMES.jour).light });
+    }
+    if (r.issues?.length && typeof window !== 'undefined') (window.__poseIssues ||= []).push(...r.issues);
+  } else return { svg: '', back: '', head: [0, 0] };
   const flip = c.flip ? -1 : 1;
   let sc; let tx = (c.x ?? 0.5) * w; let ty;
+  if (c.id === 'poing' || c.id === 'pieds') {
+    // Gros plans partiels : `size` = taille relative dans la case
+    sc = ((c.size ?? 0.5) * h) / (c.id === 'poing' ? 400 : 760);
+    ty = (c.y ?? (c.id === 'poing' ? 0.5 : 0.98)) * h;
+    const tr0 = `translate(${f(tx)},${f(ty)}) scale(${f(sc * flip * 1000) / 1000},${f(sc * 1000) / 1000})${c.rot ? ` rotate(${c.rot})` : ''}`;
+    return { svg: `<g class="fig" transform="${tr0}">${r.svg}</g>`, back: '', head: [tx, ty] };
+  }
   const top = r.top; // sommet de la tête (valeur négative)
   const fill = c.fill ?? 0.92;
   if (c.shot === 'pied' || (!c.shot && c.anchor !== 'head' && !c.h)) {
@@ -153,7 +180,7 @@ function figure(c, w, h, time) {
   }
   svg += `<g transform="${tr}">${r.svg}</g>`;
   const head = [tx + r.head[0] * sx, ty + r.head[1] * sc];
-  return { svg, back, head };
+  return { svg: `<g class="fig">${svg}</g>`, back, head };
 }
 
 // ---------------------------------------------------------------------

@@ -18,6 +18,7 @@
 // =====================================================================
 
 import { mixHex, INK } from './body.js';
+import { rue, marche, corniche, toit } from './ville.js';
 
 // ---------------------------------------------------------------------
 // Ambiances selon l'heure
@@ -48,10 +49,10 @@ export function rng(seed = 1) {
 }
 const f = (n) => Math.round(n * 10) / 10;
 let gid = 0;
-const uid = (p) => `${p}${++gid}`;
+export const uid = (p) => `${p}${++gid}`;
 
 /** Perspective : convertit (X, hauteur Y, profondeur z) → point écran. */
-function cam(w, h, o) {
+export function cam(w, h, o) {
   const hz = h * (o.horizon ?? 0.55);
   const vx = w * (o.vp ?? 0.5);
   const k = Math.max(h - hz, h * 0.25) * (o.zoom || 1);
@@ -64,7 +65,7 @@ function cam(w, h, o) {
 }
 
 /** Ciel : dégradé, soleil ou lune, nuages, étoiles. */
-function sky(w, h, T, o, r, hz) {
+export function sky(w, h, T, o, r, hz) {
   const id = uid('sk');
   let s = `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${T.top}"/><stop offset=".55" stop-color="${T.mid}"/><stop offset="1" stop-color="${T.low}"/></linearGradient></defs>
@@ -98,10 +99,10 @@ function sky(w, h, T, o, r, hz) {
 }
 
 /** Brume : rapproche une couleur de la couleur de l'horizon selon la distance. */
-const haze = (c, T, z) => mixHex(c, T.haze, Math.min(0.78, z / 30));
+export const haze = (c, T, z) => mixHex(c, T.haze, Math.min(0.78, z / 30));
 
 /** Façade d'immeuble vue en fuite, entre les profondeurs z1 et z2, côté X. */
-function facade(c, T, X, z1, z2, H, color, r, opts = {}) {
+export function facade(c, T, X, z1, z2, H, color, r, opts = {}) {
   const near = Math.min(z1, z2);
   const col = haze(color, T, near);
   const sh = mixHex(col, '#000000', 0.18);
@@ -135,7 +136,7 @@ function facade(c, T, X, z1, z2, H, color, r, opts = {}) {
 }
 
 /** Palmier (cocotier) à la position (X, z). */
-function palm(c, T, X, z, H = 2.6, r) {
+export function palm(c, T, X, z, H = 2.6, r) {
   const x0 = c.x(X, z); const y0 = c.y(0, z); const s = c.s(z);
   const lean = (r() - 0.5) * 0.5 * s;
   const tx = x0 + lean; const ty = y0 - H * s;
@@ -152,7 +153,7 @@ function palm(c, T, X, z, H = 2.6, r) {
 }
 
 /** Lampadaire (allumé la nuit et à l'aube). */
-function lamp(c, T, X, z, side = 1) {
+export function lamp(c, T, X, z, side = 1) {
   const x = c.x(X, z); const y = c.y(0, z); const s = c.s(z);
   const top = y - s * 2.1; const hx = x - side * s * 0.35;
   const col = haze('#2b2f3a', T, z);
@@ -168,7 +169,7 @@ function lamp(c, T, X, z, side = 1) {
 }
 
 /** Taxi jaune de Conakry, vu de l'arrière ou de l'avant, sur la route. */
-function taxi(c, T, X, z, front = false) {
+export function taxi(c, T, X, z, front = false) {
   const x = c.x(X, z); const y = c.y(0, z); const s = c.s(z);
   const W = s * 1.15; const H = s * 0.95;
   const body = haze('#f5c518', T, z); const dark = haze('#b88a00', T, z); const glass = haze(T.night ? '#0c1226' : '#7fb3d6', T, z);
@@ -190,7 +191,7 @@ function taxi(c, T, X, z, front = false) {
 }
 
 /** Moto avec conducteur (silhouette). */
-function moto(c, T, X, z, color = '#e8442e') {
+export function moto(c, T, X, z, color = '#e8442e') {
   const x = c.x(X, z); const y = c.y(0, z); const s = c.s(z);
   const ink = haze(INK, T, z); const col = haze(color, T, z); const lw = f(Math.max(0.6, s * 0.012));
   return `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(s * 0.45)}" ry="${f(s * 0.04)}" fill="#000" opacity=".25"/>
@@ -202,7 +203,7 @@ function moto(c, T, X, z, color = '#e8442e') {
 }
 
 /** Silhouette de passant (foule en arrière-plan). */
-function walker(c, T, X, z, r) {
+export function walker(c, T, X, z, r) {
   const x = c.x(X, z); const y = c.y(0, z); const s = c.s(z) * (0.85 + r() * 0.2);
   const cols = ['#e8442e', '#2f86d6', '#f5c518', '#8b5cf6', '#1f9d55', '#f2f0fa', '#ff3d9a', '#ff8a3d'];
   const shirt = haze(cols[Math.floor(r() * cols.length)], T, z * 1.4);
@@ -217,149 +218,6 @@ function walker(c, T, X, z, r) {
 // ---------------------------------------------------------------------
 // LES DÉCORS
 // ---------------------------------------------------------------------
-
-/** La corniche au bord de la mer : promenade, muret, mer, îles au loin. */
-function corniche(w, h, o) {
-  const T = TIMES[o.time] || TIMES.couchant; const r = rng(o.seed || 7); const c = cam(w, h, o);
-  let s = sky(w, h, T, { ...o, sunX: o.sunX ?? 0.78 }, r, c.hz);
-  // Mer
-  const sea = uid('sea');
-  s += `<defs><linearGradient id="${sea}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mixHex(T.low, T.mid, 0.4)}"/><stop offset="1" stop-color="${mixHex(T.top, '#0b3b5c', 0.4)}"/></linearGradient></defs>
-    <rect y="${f(c.hz)}" width="${w}" height="${f(h - c.hz)}" fill="url(#${sea})"/>`;
-  // Îles de Loos au loin (collines basses dans la brume)
-  s += `<path d="M${f(w * 0.48)},${f(c.hz)} Q${f(w * 0.56)},${f(c.hz - h * 0.035)} ${f(w * 0.64)},${f(c.hz - h * 0.02)} Q${f(w * 0.7)},${f(c.hz - h * 0.045)} ${f(w * 0.8)},${f(c.hz)} Z" fill="${mixHex(T.mid, T.top, 0.35)}" opacity=".8"/>
-    <path d="M${f(w * 0.86)},${f(c.hz)} Q${f(w * 0.92)},${f(c.hz - h * 0.025)} ${f(w * 1.02)},${f(c.hz)} Z" fill="${mixHex(T.mid, T.top, 0.35)}" opacity=".7"/>`;
-  // Reflet du soleil/lune
-  if (o.time !== 'pluie') {
-    const sx = w * (o.sunX ?? 0.78);
-    for (let i = 0; i < 14; i++) {
-      const yy = c.hz + 4 + i * i * (h - c.hz) * 0.004;
-      const ww = 8 + i * 5;
-      s += `<rect x="${f(sx - ww / 2 + (r() - 0.5) * ww)}" y="${f(yy)}" width="${f(ww)}" height="${f(1.5 + i * 0.25)}" fill="${T.sun}" opacity="${f(0.75 - i * 0.04)}"/>`;
-    }
-  }
-  for (let i = 0; i < 18; i++) {
-    const yy = c.hz + (h - c.hz) * Math.pow(r(), 1.6);
-    s += `<path d="M${f(r() * w)},${f(yy)} h${f(10 + (yy - c.hz) * 0.25)}" stroke="#fff" stroke-width="1.2" opacity=".25"/>`;
-  }
-  // Sol à gauche du muret (promenade + route), muret en fuite à droite
-  const WALL = 1.1;
-  const zN = 0.35; const zF = 80;
-  const ground = `M0,${f(h)} L0,${f(c.hz)} L${f(c.x(WALL, zF))},${f(c.y(0, zF))} L${f(c.x(WALL, zN))},${f(c.y(0, zN))} Z`;
-  s += `<path d="${ground}" fill="${mixHex(T.ground, '#c8b9a2', 0.35)}"/>`;
-  // Route (à gauche) et sa ligne centrale
-  s += `<path d="M0,${f(h)} L0,${f(c.hz)} L${f(c.x(-0.2, zF))},${f(c.y(0, zF))} L${f(c.x(-0.2, zN))},${f(c.y(0, zN))} Z" fill="${mixHex(T.ground, '#2e2e36', 0.55)}"/>`;
-  for (let z = 1; z < 40; z *= 1.45) s += `<path d="M${f(c.x(-1.6, z))},${f(c.y(0, z))} L${f(c.x(-1.6, z * 1.18))},${f(c.y(0, z * 1.18))}" stroke="${haze('#f2f0e6', T, z)}" stroke-width="${f(Math.max(0.6, c.s(z) * 0.05))}"/>`;
-  // Immeubles bas de l'autre côté de la route
-  const pastels = ['#e9d8b4', '#f2e6d0', '#c9dceb', '#efc9b8', '#d8e2c4'];
-  let z = 3.2;
-  while (z < 45) {
-    const z2 = z * (1.25 + r() * 0.2);
-    s += facade(c, T, -4.2, z2, z, 1.6 + r() * 2.2, pastels[Math.floor(r() * pastels.length)], r, { shop: true });
-    z = z2 * 1.02;
-  }
-  // Palmiers et lampadaires le long de la promenade (du plus loin au plus près)
-  const items = [];
-  for (let zz = 1.2; zz < 40; zz *= 1.55) items.push({ z: zz, kind: 'palm' });
-  for (let zz = 1.6; zz < 40; zz *= 1.55) items.push({ z: zz, kind: 'lamp' });
-  items.sort((a, b) => b.z - a.z);
-  // Muret (face visible + dessus)
-  const top = (zz) => [c.x(WALL, zz), c.y(0.42, zz)];
-  const base = (zz) => [c.x(WALL, zz), c.y(0, zz)];
-  const wallCol = mixHex('#d9cdb6', T.ground, 0.3);
-  s += `<path d="M${f(base(zN)[0])},${f(base(zN)[1])} L${f(base(zF)[0])},${f(base(zF)[1])} L${f(top(zF)[0])},${f(top(zF)[1])} L${f(top(zN)[0])},${f(top(zN)[1])} Z" fill="${mixHex(wallCol, '#000', 0.22)}" stroke="${INK}" stroke-width="2"/>
-    <path d="M${f(top(zN)[0])},${f(top(zN)[1])} L${f(top(zF)[0])},${f(top(zF)[1])} L${f(c.x(WALL + 0.25, zF))},${f(c.y(0.42, zF))} L${f(c.x(WALL + 0.25, zN))},${f(c.y(0.42, zN))} Z" fill="${wallCol}" stroke="${INK}" stroke-width="2"/>`;
-  for (let zz = 0.6; zz < 50; zz *= 1.22) s += `<path d="M${f(base(zz)[0])},${f(base(zz)[1])} L${f(top(zz)[0])},${f(top(zz)[1])}" stroke="${haze(INK, T, zz + 3)}" stroke-width="${f(Math.max(0.4, c.s(zz) * 0.01))}" opacity=".6"/>`;
-  for (const it of items) s += it.kind === 'palm' ? palm(c, T, 0.75, it.z, 2.8, r) : lamp(c, T, 0.9, it.z, 1);
-  // Promeneurs au loin
-  for (let i = 0; i < 6; i++) s += walker(c, T, -0.1 + r() * 0.8, 6 + r() * 25, r);
-  if (o.cars !== false) s += taxi(c, T, -1.0, 9, false) + moto(c, T, -2.4, 6.5, '#2f86d6');
-  return s;
-}
-
-/** Rue animée : immeubles, boutiques, taxis jaunes, motos, câbles électriques. */
-function rue(w, h, o) {
-  const T = TIMES[o.time] || TIMES.jour; const r = rng(o.seed || 3); const c = cam(w, h, o);
-  let s = sky(w, h, T, o, r, c.hz);
-  const zN = 0.35; const zF = 90;
-  s += `<rect y="${f(c.hz)}" width="${w}" height="${f(h - c.hz)}" fill="${mixHex(T.ground, '#3a3a42', 0.5)}"/>`;
-  // Trottoirs
-  for (const X of [-2.0, 2.0]) {
-    const X2 = X < 0 ? -3 : 3;
-    s += `<path d="M${f(c.x(X2, zN))},${f(c.y(0, zN))} L${f(c.x(X2, zF))},${f(c.y(0, zF))} L${f(c.x(X, zF))},${f(c.y(0, zF))} L${f(c.x(X, zN))},${f(c.y(0, zN))} Z" fill="${mixHex(T.ground, '#c8b9a2', 0.3)}" stroke="${INK}" stroke-width="1.4"/>`;
-  }
-  // Ligne de terre rouge sur le bord (latérite) — détail très local
-  s += `<path d="M${f(c.x(-2.0, zN))},${f(c.y(0, zN))} L${f(c.x(-2.0, zF))},${f(c.y(0, zF))} L${f(c.x(-1.7, zF))},${f(c.y(0, zF))} L${f(c.x(-1.7, zN))},${f(c.y(0, zN))} Z" fill="${haze('#a4502c', T, 4)}" opacity=".55"/>`;
-  if (o.time === 'pluie') { // flaques avec reflets
-    for (let i = 0; i < 6; i++) { const zz = 1.5 + r() * 12; const X = -1.2 + r() * 2.4; s += `<ellipse cx="${f(c.x(X, zz))}" cy="${f(c.y(0, zz))}" rx="${f(c.s(zz) * 0.5)}" ry="${f(c.s(zz) * 0.06)}" fill="${T.low}" opacity=".45"/>`; }
-  }
-  // Façades des deux côtés (du plus loin au plus près)
-  const colors = ['#e9d8b4', '#f2e6d0', '#c9dceb', '#efc9b8', '#d8e2c4', '#f0d27a', '#b9d6c9'];
-  const blocks = [];
-  for (const X of [-3, 3]) {
-    let z = 1.2;
-    while (z < 60) { const z2 = z * (1.3 + r() * 0.3); blocks.push({ X, z1: z2, z2: z, H: 1.8 + r() * 2.6, col: colors[Math.floor(r() * colors.length)] }); z = z2; }
-  }
-  blocks.sort((a, b) => b.z2 - a.z2);
-  for (const b of blocks) s += facade(c, T, b.X, b.z1, b.z2, b.H, b.col, r, { shop: true });
-  // Câbles électriques
-  for (let i = 0; i < 4; i++) {
-    const za = 2 + i * 3; const zb = za + 8;
-    s += `<path d="M${f(c.x(-3, za))},${f(c.y(3.2, za))} Q${f((c.x(-3, za) + c.x(3, zb)) / 2)},${f(c.y(2.4, (za + zb) / 2))} ${f(c.x(3, zb))},${f(c.y(3.3, zb))}" stroke="${INK}" stroke-width="1.2" fill="none" opacity=".7"/>`;
-  }
-  // Circulation
-  const traffic = [
-    { z: 26, k: 'w' }, { z: 22, k: 'w' }, { z: 14, k: 'taxi', X: 0.6, front: true }, { z: 18, k: 'moto', X: -0.6 }, { z: 9, k: 'taxi', X: -0.7 },
-    { z: 7, k: 'moto', X: 0.9, col: '#8b5cf6' }, { z: 11, k: 'w' }, { z: 5, k: 'w' },
-  ];
-  // Véhicules imposés par la case (ex. un taxi qui fonce vers nous)
-  for (const v of o.vehicles || []) traffic.push({ z: v.z, k: v.k || 'taxi', X: v.X ?? 0, front: v.front, col: v.col });
-  traffic.sort((a, b) => b.z - a.z);
-  for (const t of traffic) {
-    if (o.cars === false && t.k !== 'w') continue;
-    if (t.k === 'taxi') s += taxi(c, T, t.X, t.z, t.front);
-    else if (t.k === 'moto') s += moto(c, T, t.X, t.z, t.col);
-    else s += walker(c, T, (r() < 0.5 ? -1 : 1) * (2.2 + r() * 0.6), t.z, r);
-  }
-  return s;
-}
-
-/** Marché coloré : bâches, étals de fruits, tissus wax, foule. */
-function marche(w, h, o) {
-  const T = TIMES[o.time] || TIMES.jour; const r = rng(o.seed || 11); const c = cam(w, h, o);
-  let s = rue(w, h, { ...o, cars: false });
-  const tarps = ['#e8442e', '#2f86d6', '#f5c518', '#1f9d55', '#ff8a3d', '#8b5cf6', '#ff3d9a'];
-  const stalls = [];
-  for (const X of [-1.9, 1.9]) for (let z = 1.1; z < 30; z *= 1.4) stalls.push({ X, z });
-  stalls.sort((a, b) => b.z - a.z);
-  for (const st of stalls) {
-    const side = st.X < 0 ? -1 : 1;
-    const sz = c.s(st.z);
-    const x = c.x(st.X, st.z); const y = c.y(0, st.z);
-    const col = haze(tarps[Math.floor(r() * tarps.length)], T, st.z);
-    const lw = f(Math.max(0.5, sz * 0.012));
-    // Table
-    s += `<rect x="${f(x - sz * 0.45)}" y="${f(y - sz * 0.42)}" width="${f(sz * 0.9)}" height="${f(sz * 0.42)}" fill="${haze('#7a5536', T, st.z)}" stroke="${INK}" stroke-width="${lw}"/>`;
-    // Fruits (mangues, oranges, piments)
-    const fr = [['#ff9f1c', '#3a8f3a'], ['#ff8a00', '#ffb347'], ['#e8442e', '#b81d13']][Math.floor(r() * 3)];
-    for (let i = 0; i < 9; i++) s += `<circle cx="${f(x - sz * 0.38 + (i % 5) * sz * 0.18 + (i > 4 ? sz * 0.09 : 0))}" cy="${f(y - sz * 0.46 - (i > 4 ? sz * 0.07 : 0))}" r="${f(sz * 0.07)}" fill="${haze(fr[i % 2], T, st.z)}" stroke="${INK}" stroke-width="${lw}"/>`;
-    // Bâche inclinée
-    s += `<path d="M${f(x - sz * 0.6)},${f(y - sz * 1.45)} L${f(x + sz * 0.6)},${f(y - sz * 1.45)} L${f(x + sz * 0.68)},${f(y - sz * 1.15)} Q${f(x)},${f(y - sz * 1.05)} ${f(x - sz * 0.68)},${f(y - sz * 1.15)} Z" fill="${col}" stroke="${INK}" stroke-width="${lw}"/>
-      <path d="M${f(x - sz * 0.55)},${f(y - sz * 1.15)} L${f(x - sz * 0.55)},${f(y)} M${f(x + sz * 0.55)},${f(y - sz * 1.15)} L${f(x + sz * 0.55)},${f(y)}" stroke="${haze('#4a3a2a', T, st.z)}" stroke-width="${f(sz * 0.03)}"/>`;
-    // Tissu wax suspendu
-    if (r() < 0.6) {
-      const wx = x + side * sz * 0.2;
-      s += `<rect x="${f(wx - sz * 0.15)}" y="${f(y - sz * 1.12)}" width="${f(sz * 0.3)}" height="${f(sz * 0.55)}" fill="${haze(tarps[Math.floor(r() * tarps.length)], T, st.z)}" stroke="${INK}" stroke-width="${lw}"/>
-        <path d="M${f(wx - sz * 0.12)},${f(y - sz * 1.0)} h${f(sz * 0.24)} M${f(wx - sz * 0.12)},${f(y - sz * 0.85)} h${f(sz * 0.24)}" stroke="${haze('#ffd23f', T, st.z)}" stroke-width="${f(sz * 0.03)}" stroke-dasharray="${f(sz * 0.04)} ${f(sz * 0.03)}"/>`;
-    }
-  }
-  // Foule
-  const crowd = [];
-  for (let i = 0; i < 16; i++) crowd.push({ X: -1.3 + r() * 2.6, z: 3 + r() * 30 });
-  crowd.sort((a, b) => b.z - a.z);
-  for (const p of crowd) s += walker(c, T, p.X, p.z, r);
-  return s;
-}
 
 /** Intérieur générique en perspective (pièce : mur du fond, sol, plafond, murs latéraux). */
 function room(w, h, o, colors) {
@@ -476,57 +334,6 @@ function bibliotheque(w, h, o) {
     <circle cx="${f(lx)}" cy="${f(ly - ls * 0.3)}" r="${f(ls * 0.9)}" fill="url(#${lg})"/>
     <path d="M${f(lx)},${f(ly)} L${f(lx)},${f(ly - ls * 0.35)}" stroke="${INK}" stroke-width="3"/>
     <path d="M${f(lx - ls * 0.15)},${f(ly - ls * 0.3)} L${f(lx + ls * 0.15)},${f(ly - ls * 0.3)} L${f(lx + ls * 0.08)},${f(ly - ls * 0.45)} L${f(lx - ls * 0.08)},${f(ly - ls * 0.45)} Z" fill="#2f7d4a" stroke="${INK}" stroke-width="2"/>`;
-  return s;
-}
-
-/** Toit-terrasse la nuit : muret, cuve d'eau, antenne, ville illuminée. */
-function toit(w, h, o) {
-  const T = TIMES[o.time] || TIMES.nuit; const r = rng(o.seed || 13); const c = cam(w, h, { ...o, horizon: o.horizon ?? 0.5 });
-  let s = sky(w, h, T, { ...o, sunX: o.sunX ?? 0.2 }, r, c.hz);
-  // Mer au loin
-  s += `<rect y="${f(c.hz)}" width="${w}" height="${f(h - c.hz)}" fill="${mixHex(T.mid, T.top, 0.5)}"/>`;
-  // Ville : plusieurs plans d'immeubles (du plus loin au plus près)
-  const layers = [[0.02, 0.06, 0.75], [0.06, 0.14, 0.5], [0.14, 0.26, 0.25]];
-  layers.forEach(([hMin, hMax, fade], li) => {
-    const base = c.hz + (h - c.hz) * (0.15 + li * 0.25);
-    let x = -10;
-    while (x < w) {
-      const bw = w * (0.04 + r() * 0.07); const bh = h * (hMin + r() * (hMax - hMin));
-      const col = mixHex(T.night ? '#0b1022' : '#7d8794', T.haze, fade);
-      s += `<rect x="${f(x)}" y="${f(base - bh)}" width="${f(bw + 1)}" height="${f(h - base + bh)}" fill="${col}"/>`;
-      // Fenêtres allumées
-      const win = T.night ? '#ffcf6b' : mixHex('#2a3550', T.haze, fade);
-      for (let yy = base - bh + 4; yy < base - 3; yy += 7 + li * 3) {
-        for (let xx = x + 3; xx < x + bw - 3; xx += 6 + li * 3) if (r() < (T.night ? 0.35 : 0.5)) s += `<rect x="${f(xx)}" y="${f(yy)}" width="${f(2 + li)}" height="${f(2 + li * 1.4)}" fill="${win}" opacity="${f(1 - fade * 0.6)}"/>`;
-      }
-      x += bw;
-    }
-    // Minaret au loin (silhouette)
-    if (li === 1) {
-      const mx = w * 0.32;
-      s += `<path d="M${f(mx - 6)},${f(base)} L${f(mx - 5)},${f(base - h * 0.22)} L${f(mx)},${f(base - h * 0.27)} L${f(mx + 5)},${f(base - h * 0.22)} L${f(mx + 6)},${f(base)} Z" fill="${mixHex(T.night ? '#0b1022' : '#7d8794', T.haze, 0.45)}"/>
-        <rect x="${f(mx - 8)}" y="${f(base - h * 0.17)}" width="16" height="4" fill="${mixHex(T.night ? '#0b1022' : '#7d8794', T.haze, 0.45)}"/>`;
-    }
-  });
-  // Halos de lumière de la ville (bokeh)
-  if (T.night) for (let i = 0; i < 26; i++) s += `<circle cx="${f(r() * w)}" cy="${f(c.hz + (h - c.hz) * (0.3 + r() * 0.6))}" r="${f(2 + r() * 7)}" fill="${['#ffcf6b', '#ff8a3d', '#fff3cf', '#8be9ff'][Math.floor(r() * 4)]}" opacity="${f(0.15 + r() * 0.3)}"/>`;
-  // Toit : sol + muret au premier plan
-  const roofY = h * (o.roofY ?? 0.86);
-  s += `<rect y="${f(roofY)}" width="${w}" height="${f(h - roofY)}" fill="${mixHex('#8a8278', T.top, T.night ? 0.6 : 0.2)}"/>
-    <rect y="${f(roofY - h * 0.07)}" width="${w}" height="${f(h * 0.07)}" fill="${mixHex('#b4a99a', T.top, T.night ? 0.55 : 0.15)}" stroke="${INK}" stroke-width="3"/>
-    <rect y="${f(roofY - h * 0.075)}" width="${w}" height="${f(h * 0.012)}" fill="${mixHex('#d6ccbc', T.top, T.night ? 0.5 : 0.1)}"/>`;
-  // Cuve d'eau noire (polytank) + antenne parabolique
-  if (o.props !== false) {
-    const tx = w * (o.tankX ?? 0.85); const tw = w * 0.13; const th = h * 0.2;
-    s += `<rect x="${f(tx - tw / 2)}" y="${f(roofY - th - h * 0.07)}" width="${f(tw)}" height="${f(th)}" rx="${f(tw * 0.12)}" fill="#14141a" stroke="${INK}" stroke-width="3"/>
-      <ellipse cx="${f(tx)}" cy="${f(roofY - th - h * 0.07)}" rx="${f(tw / 2)}" ry="${f(tw * 0.12)}" fill="#24242c" stroke="${INK}" stroke-width="3"/>
-      <path d="M${f(tx - tw * 0.4)},${f(roofY - th * 0.8 - h * 0.07)} h${f(tw * 0.8)} M${f(tx - tw * 0.4)},${f(roofY - th * 0.45 - h * 0.07)} h${f(tw * 0.8)}" stroke="#2c2c36" stroke-width="2"/>
-      <path d="M${f(w * 0.08)},${f(roofY - h * 0.07)} L${f(w * 0.08)},${f(roofY - h * 0.2)}" stroke="${INK}" stroke-width="3"/>
-      <ellipse cx="${f(w * 0.08)}" cy="${f(roofY - h * 0.22)}" rx="${f(w * 0.035)}" ry="${f(w * 0.05)}" transform="rotate(-25 ${f(w * 0.08)} ${f(roofY - h * 0.22)})" fill="#c9c9d4" stroke="${INK}" stroke-width="2.4"/>`;
-    // Fil à linge avec un pagne qui sèche
-    s += `<path d="M${f(w * 0.12)},${f(roofY - h * 0.19)} Q${f(w * 0.45)},${f(roofY - h * 0.15)} ${f(w * 0.78)},${f(roofY - h * 0.2)}" stroke="${INK}" stroke-width="1.4" fill="none"/>
-      <path d="M${f(w * 0.5)},${f(roofY - h * 0.165)} l${f(w * 0.06)},0 l${f(w * 0.01)},${f(h * 0.08)} l${f(-w * 0.08)},0 Z" fill="${mixHex('#e8442e', T.top, T.night ? 0.5 : 0)}" stroke="${INK}" stroke-width="1.6"/>`;
-  }
   return s;
 }
 
