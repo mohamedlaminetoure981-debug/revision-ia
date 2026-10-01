@@ -123,8 +123,8 @@ export function stripSVG(strip, o = {}) {
   </svg>`;
 }
 
-/** Convertit un SVG (texte) en image PNG (Blob), largeur `width` px. */
-export async function svgToPng(svg, width = 1080) {
+/** Convertit un SVG (texte) en image (Blob PNG, ou JPEG plus léger), largeur `width` px. */
+export async function svgToPng(svg, width = 1080, type = 'image/png', quality = 0.9) {
   const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   try {
@@ -137,7 +137,7 @@ export async function svgToPng(svg, width = 1080) {
     canvas.height = Math.round(width * ratio);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return await new Promise((res) => canvas.toBlob(res, 'image/png'));
+    return await new Promise((res) => canvas.toBlob(res, type, quality));
   } finally {
     URL.revokeObjectURL(url);
   }

@@ -182,8 +182,14 @@ async function bintaParty(result) {
           <div class="row nowrap"><span style="font-size:2.2rem">${b.icon}</span>
             <div class="grow" style="text-align:left"><strong>${esc(b.name)}</strong><div class="small muted">${esc(b.desc)}</div></div></div>
         </div>`).join('')}
+      ${result.levelUp ? '<button class="btn block" id="lv-status" style="margin-bottom:8px">📸 Statut WhatsApp</button>' : ''}
       <button class="btn pink block" data-close>Trop bien ! ✨</button>
     </div>`);
+  m.el.querySelector('#lv-status')?.addEventListener('click', async () => {
+    m.close();
+    const { offerStatus } = await import('./status.js');
+    offerStatus({ kicker: 'Nouveau niveau', big: `NIV. ${result.level}`, sub: 'Level up !', lines: [] });
+  });
   confetti(120);
   sound(result.newBadges?.length ? 'badge' : 'level');
   vibrate([20, 30, 20, 30, 50]);

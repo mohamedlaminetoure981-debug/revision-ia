@@ -14,7 +14,7 @@ import { confetti, onomatopoeia, vibrate, sound } from '../ui/fx.js';
 
 export async function render(el) {
   const existing = getProfileSync();
-  let name = existing?.name || '';
+  let name = existing?.name || (() => { try { return localStorage.getItem('duelName') || ''; } catch { return ''; } })();
   let step = 0; // 0 = prénom, 1..n = équipe, n+1 = choix du compagnon
   let chosen = existing?.companion || null;
   const others = TEAM; // toute l'équipe, Kaï compris

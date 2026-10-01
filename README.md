@@ -557,6 +557,23 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 - Bonne réponse = coup + réplique d'un allié + aura ; 3 d'affilée = aura forte.
 - Victoire : K.O., pouvoir ultime, confettis, XP, badges « Tueur de boss » / « Intouchable ».
 
+### ⚔️ Duels entre amis, SANS serveur (Ren) — `src/core/duel.js`, `src/views/duel.js`
+- Après un quiz : **🤝 Défier un ami**. Tout le quiz (questions, réponses, explications,
+  ton score, ton pseudo, ton perso) est **compressé dans le lien** (après le `#`, avec lz-string).
+- Partage par le menu du téléphone (WhatsApp…), sinon `wa.me`. Message accrocheur
+  (« Je t'ai mis 8/10 sur « Les suites » 😏 Fais mieux. »).
+- L'ami joue **sans clé Gemini** ni compte. S'il n'a jamais ouvert l'appli : petit accueil,
+  pseudo, duel, puis proposition d'installer l'appli et de créer son profil.
+- Écran de duel : les deux persos face à face, les deux scores, le gagnant.
+  **↩️ Renvoyer le défi** : quand tu ouvres sa réponse, tu vois directement le résultat.
+- Longueur : environ 2 000 caractères pour 10 questions (aucun souci pour WhatsApp).
+
+### 📸 Image de statut WhatsApp (Binta) — `src/ui/status.js`
+- Image 1080 × 1920 (JPEG ~300 Ko) : perso en pose de pouvoir, score ou récap, série 🔥,
+  niveau, style néon/manga, nom de l'appli discret.
+- Proposée après : examen blanc réussi (≥ 10/20), boss vaincu, niveau gagné (fenêtre de Binta),
+  et dans le récap de la semaine (écran Stats).
+
 ### Répliques, sons, tests
 - Répliques des nouvelles fonctions (et taquineries du Mode Créateur) : section
   `FEATURE_LINES` de `src/data/characters.js`.

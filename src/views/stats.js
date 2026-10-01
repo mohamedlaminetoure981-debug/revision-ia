@@ -18,6 +18,7 @@ import { getProfileSync, currentStreak, levelInfo } from '../core/game.js';
 import { today, addDays } from '../core/srs.js';
 import { BADGES } from '../core/badges.js';
 import { confetti, onomatopoeia, vibrate } from '../ui/fx.js';
+import { offerStatus } from '../ui/status.js';
 
 const DAY_NAMES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 
@@ -174,7 +175,8 @@ function weeklyWrapped(el, { p, cards, reviews, results }) {
     { cls: 'w5', html: `${characterHTML('binta', { expression: 'celebration', size: 160 })}
         <div class="bubble top" style="max-width:340px;margin:10px auto;text-align:left;--c:${CHARACTERS.binta.color}"><span class="who">Binta</span>${esc(line('binta', 'fin'))}</div>
         <div class="mid">${badgesWeek.length ? `${badgesWeek.map((b) => b.icon).join(' ')} ${badgesWeek.length} badge(s) cette semaine` : 'Prochain badge : la semaine prochaine ?'}</div>
-        <button class="btn block" id="wclose" style="max-width:320px;margin:10px auto 0">Fermer</button>` },
+        <button class="btn pink block" id="wstatus" style="max-width:320px;margin:10px auto 0">📸 Mon récap en statut WhatsApp</button>
+        <button class="btn block" id="wclose" style="max-width:320px;margin:8px auto 0">Fermer</button>` },
   ];
   let s = 0;
   const layer = document.createElement('div');
@@ -191,6 +193,12 @@ function weeklyWrapped(el, { p, cards, reviews, results }) {
       onomatopoeia('WRAPPED!');
       play(w.querySelector('.ch'), 'signature');
       w.querySelector('#wclose').onclick = () => layer.remove();
+      w.querySelector('#wstatus').onclick = (e) => {
+        e.stopPropagation();
+        layer.remove();
+        offerStatus({ charId: 'binta', kicker: 'Ma semaine', big: `${xp} XP`, sub: `${activeDays}/7 jours actifs`,
+          lines: [`${rev.length} fiches révisées`, topSubject ? `Matière star : ${topSubject[0]}` : ''] });
+      };
     }
   };
   draw();

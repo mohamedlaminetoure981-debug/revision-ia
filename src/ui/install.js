@@ -20,7 +20,7 @@ import { vibrate, confetti } from './fx.js';
 const SNOOZE_DAYS = 3;
 const SNOOZE_KEY = 'installSnoozeUntil';
 // Écrans où le bandeau ne doit jamais apparaître.
-const BLOCKED_ROUTES = ['bienvenue', 'play', 'exam', 'review', 'stories', 'exo'];
+const BLOCKED_ROUTES = ['bienvenue', 'play', 'exam', 'review', 'stories', 'exo', 'duel', 'boss', 'manga'];
 
 let deferredPrompt = null; // événement "beforeinstallprompt" gardé de côté
 let banner = null;

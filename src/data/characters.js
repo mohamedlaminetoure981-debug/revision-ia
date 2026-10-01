@@ -1167,6 +1167,117 @@ const FEATURE_LINES = {
   },
 };
 
+// Partie 2 : duels entre amis (Ren) et statut WhatsApp (Binta).
+const FEATURE_LINES_2 = {
+  ren: {
+    normal: {
+      duel_intro: [
+        'Un duel ? J’adore. Montre-lui qui est le patron.',
+        'Même quiz, même règles. Le meilleur gagne.',
+        'Pas d’IA, pas d’excuse : juste toi et tes neurones.',
+        'Ton ami t’a lancé le gant. Tu le ramasses ?',
+        'Je serai l’arbitre. Et je suis impitoyable.',
+        'Concentre-toi : chaque question compte double.',
+        'Lis bien chaque réponse. Les pièges, c’est mon truc.',
+        'Le score à battre est affiché. Pas de pression… 😏',
+        'Un vrai rival te rend plus fort. Go !',
+        'Duel lancé. Que le meilleur cerveau gagne.',
+      ],
+      duel_gagne: [
+        'Victoire ! Ton ami va devoir réviser.',
+        'Tu l’as battu à la loyale. Respect.',
+        'Envoie-lui le résultat, qu’il souffre un peu 😏',
+        'Le titre est à toi. Pour l’instant.',
+        'Propre. Net. Sans bavure.',
+        'Je l’avoue, t’as été impressionnant(e).',
+        'Il voulait un duel ? Il a eu une leçon.',
+        'Score supérieur. Fin de la discussion.',
+        'Ça, c’est un comportement de champion(ne).',
+        'Renvoie-lui le défi, qu’il tente sa chance.',
+      ],
+      duel_perdu: [
+        'Défaite… Mais la revanche est à un clic.',
+        'Il t’a eu cette fois. Révise et renvoie le défi.',
+        'Pas grave. Les rivaux, ça sert à progresser.',
+        'Regarde la correction, et reviens plus fort(e).',
+        'Tch. Je déteste perdre. Toi aussi, j’espère.',
+        'Un point d’écart, c’est rien. Revanche !',
+        'Il a gagné une bataille, pas la guerre.',
+        'Note tes erreurs. Elles seront ta force.',
+        'La prochaine fois, c’est toi qui envoies le 😏.',
+        'Respire, relis, reviens.',
+      ],
+      duel_egalite: [
+        'Égalité parfaite ! Il faut un match retour.',
+        'Même score. Vous êtes faits pour être rivaux.',
+        'Ni vainqueur ni vaincu. Revanche obligatoire.',
+        'Égalité… je déteste ça. Rejouez !',
+        'Deux cerveaux, un seul score. Intéressant.',
+        'Personne ne lâche rien. J’aime ça.',
+        'Ex aequo. Le prochain duel tranchera.',
+        'Pile pareil ! Vous avez triché ensemble ? 😏',
+        'Match nul. Mais pas des joueurs nuls.',
+        'Égalité. On remet ça ?',
+      ],
+      duel_envoi: [
+        'Défi envoyé ! On attend sa réponse.',
+        'Le gant est lancé. 😏',
+        'Ton ami a un défi qui l’attend.',
+        'C’est parti ! Qu’il fasse mieux, s’il peut.',
+        'Défi en route vers WhatsApp.',
+        'Il va transpirer, crois-moi.',
+        'Lien envoyé. Le duel a commencé.',
+        'Envoyé ! Moi, je prépare le pop-corn.',
+        'Défi lancé. Pas de retour en arrière.',
+        'C’est envoyé. Que le meilleur gagne.',
+      ],
+    },
+    createur: {
+      duel_intro: ['Le créateur en duel ? Si tu perds, je le dis à toute l’équipe.', 'Défie quelqu’un, patron. Prouve que t’as pas juste codé les réponses.'],
+      duel_gagne: ['Le créateur gagne. Il a lu le code source, j’en suis sûr.', 'GG sensei. Ton ami ne sait pas que t’as créé l’arbitre.'],
+      duel_perdu: ['Battu dans ta propre appli. Légendaire, baka.', 'Le créateur perd. Je fais une capture pour l’histoire.'],
+      duel_egalite: ['Égalité avec le créateur. Ton ami mérite un badge.'],
+      duel_envoi: ['Défi envoyé, patron. Prépare-toi à l’humiliation… la sienne, j’espère.'],
+    },
+  },
+  binta: {
+    normal: {
+      statut_offre: [
+        'Ça mérite un statut WhatsApp, non ?! 📸',
+        'Montre au monde entier ce que tu viens de faire !',
+        'J’ai préparé ton image de statut, trop stylée !',
+        'Statut WhatsApp ? Tes contacts doivent voir ça !',
+        'Une perf pareille, ça se partage !',
+        'J’ai fait le montage, t’as plus qu’à publier 😎',
+        'Ton image de champion(ne) est prête !',
+        'Allez, un petit statut pour motiver la classe !',
+        'Ça va faire des jaloux… dans le bon sens !',
+        'Publie, et regarde les vues monter 📈',
+      ],
+      statut_partage: [
+        'Publié ! T’es une star 🌟',
+        'Statut envoyé ! Tes potes vont halluciner.',
+        'Et voilà, le monde sait que tu bosses !',
+        'Partagé ! Prochain statut : encore mieux.',
+        'Trop stylé sur ton statut !',
+        'Les vues vont exploser, crois-moi.',
+        'Publié ! La motivation est contagieuse.',
+        'Image partagée. Ton aura brille jusqu’à WhatsApp.',
+        'Envoyé ! Je suis fière de toi.',
+        'Statut posté. Hype maximale !',
+      ],
+    },
+    createur: {
+      statut_offre: ['Le créateur fait un statut ? Mets « codé par moi » en légende, frimeur.', 'Patron, publie ça. Que tes contacts voient que tu révises AUSSI.'],
+      statut_partage: ['Publié ! Tes contacts croient enfin que tu dors parfois… non ?', 'Statut posté, boss. La fanbase grandit.'],
+    },
+  },
+};
+for (const [id, f] of Object.entries(FEATURE_LINES_2)) {
+  Object.assign(CHARACTERS[id].lines, f.normal);
+  CREATOR_LINES[id] = { ...(CREATOR_LINES[id] || {}), ...f.createur };
+}
+
 // Soutien de l'équipe pendant le combat (une phrase quand tu touches le boss).
 const BOSS_SUPPORT = {
   kai: ['Vas-y {prenom}, on est avec toi !', 'Garde le rythme !', 'C’est ça, l’esprit de la team !'],

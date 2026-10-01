@@ -24,6 +24,8 @@ import { stripSVG, stripToPng } from '../ui/manga.js';
 import { shareImage } from '../ui/share.js';
 import { DEMO_STRIP } from '../core/manga.js';
 import { storyState, saveStory } from '../core/story.js';
+import { makeDuel, encodeDuel, duelLink } from '../core/duel.js';
+import { offerStatus } from '../ui/status.js';
 
 const LEVELS = [
   { level: 'excellent', label: '19/20', name: '🏆 Excellent' },
@@ -104,6 +106,13 @@ export async function render(el) {
         <button class="btn ghost" id="t-story-reset">Remettre l'histoire à zéro</button>
       </div>
       <p class="tiny muted">Planches enregistrées : ${mangaCount}. Le boss démo n'enregistre rien.</p>
+      <h3>⚔️ Duels & statut WhatsApp</h3>
+      <div class="panel-grid">
+        <button class="btn ghost" id="t-duel">Ouvrir un duel démo</button>
+        <button class="btn ghost" id="t-duel-link">Longueur d'un lien (10 q.)</button>
+        <button class="btn ghost" id="t-status">Statut démo</button>
+        <button class="btn ghost" id="t-status-lv">Statut niveau</button>
+      </div>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
@@ -195,6 +204,15 @@ export async function render(el) {
     toast(story.unlockAll ? 'Chapitres : déblocage normal.' : 'Tous les chapitres et boss sont ouverts (Mode Créateur).', 'ok');
     render(el);
   };
+  // --- Duels & statut ---
+  const demoDuel = (n) => makeDuel({
+    questions: Array.from({ length: n }, (_, k) => ({ question: `Question démo ${k + 1} : combien font ${k + 2} × 3 ?`, choices: [String((k + 2) * 3), String((k + 2) * 3 + 1), String(k + 5), '0'], correctIndex: 0, explanation: `${k + 2} × 3 = ${(k + 2) * 3}. On multiplie simplement, rien de plus (explication de démonstration un peu longue pour tester le lien).` })),
+    title: 'Tables de multiplication', subject: 'Maths', score: 7, name: 'Ren (démo)', charId: 'ren',
+  });
+  $('#t-duel').onclick = () => { location.hash = `#/duel/${encodeDuel(demoDuel(5))}`; };
+  $('#t-duel-link').onclick = () => toast(`Lien de duel avec 10 questions : ${duelLink(demoDuel(10)).length} caractères (WhatsApp accepte très largement).`, 'ok', 6000);
+  $('#t-status').onclick = () => offerStatus({ kicker: 'Examen blanc', big: '17/20', sub: 'Test du créateur', lines: ['Excellent !'] });
+  $('#t-status-lv').onclick = () => offerStatus({ kicker: 'Nouveau niveau', big: 'NIV. 9', sub: 'Level up !' });
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);
     toast('Histoire remise à zéro (chapitres lus, boss vaincus).');

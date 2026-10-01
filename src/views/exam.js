@@ -20,6 +20,7 @@ import { refresh } from '../main.js';
 import { runWithCouncil } from '../ui/council.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { verdictOf } from '../core/generate.js';
+import { offerStatus } from '../ui/status.js';
 
 const KIND = { qcm: 'QCM', question: 'Question de cours', calcul: 'Calcul', exercice: 'Exercice' };
 const VERDICT = { excellent: '🏆 Excellent', bon: '👍 Bon travail', moyen: '💪 Peut mieux faire', a_retravailler: '📚 À retravailler' };
@@ -220,6 +221,7 @@ function renderResult(el, exam, courses, attempt, xpResult) {
       <div class="big" style="font-size:3.6rem;color:${color}">${total}<span style="font-size:1.4rem">/20</span></div>
       <div class="display" style="margin:4px 0">${VERDICT[attempt.verdict] || ''}</div>
       <div class="bubble top" style="text-align:left;margin-top:10px;--c:${CHARACTERS.ren.color}"><span class="who">Ren</span>${esc(line('ren', total >= 10 ? 'reussite' : 'encouragement'))}</div>
+      ${total >= 10 ? '<button class="btn pink block" id="status" style="margin-top:12px">📸 Partager en statut WhatsApp</button>' : ''}
     </div>
     <div class="tile neon" style="--c:${CHARACTERS.awa.color};margin-bottom:12px">
       <h3 style="margin-top:0">💡 Tes 3 priorités</h3>
@@ -239,6 +241,9 @@ function renderResult(el, exam, courses, attempt, xpResult) {
         <details><summary class="small" style="cursor:pointer">📋 Corrigé type</summary><div class="rich small">${rich(q.kind === 'qcm' ? `${'ABCD'[q.correctIndex]}. ${q.choices[q.correctIndex]}\n\n${q.expected}` : q.expected)}</div></details>
         ${courseOf(q) ? sourceHtml(courseOf(q), q.source) : ''}
       </div>`;
+  el.querySelector('#status')?.addEventListener('click', () => offerStatus({
+    kicker: 'Examen blanc', big: `${total}/20`, sub: exam.title.slice(0, 40), lines: [VERDICT[attempt.verdict] || 'Réussi !'],
+  }));
     }).join('')}
     <button class="btn pink block" id="again" style="margin-bottom:20px">🔁 Repasser cet examen</button>`;
   el.querySelector('#again').onclick = async () => {

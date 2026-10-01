@@ -19,6 +19,7 @@ import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { generateQuiz } from '../core/generate.js';
 import { markBossDefeated } from '../core/story.js';
+import { offerStatus } from '../ui/status.js';
 import { addXp, XP_RULES, getProfileSync } from '../core/game.js';
 
 const MAX_QUESTIONS = 10;
@@ -229,8 +230,13 @@ export async function render(el, [subjectRaw]) {
           <a class="btn ${won ? 'green' : 'pink'}" href="#/histoire">📚 Retour à l'histoire</a>
           <button class="btn ghost" id="again">↺ ${won ? 'Rejouer' : 'Revanche'}</button>
         </div>
+        ${won ? '<button class="btn block" id="status" style="max-width:360px;margin:10px auto 0">📸 Statut WhatsApp</button>' : ''}
       </div>`;
     el.querySelector('#again').onclick = () => render(el, [subjectRaw]);
+    el.querySelector('#status')?.addEventListener('click', () => offerStatus({
+      charId: companion, kicker: 'Boss vaincu', big: 'K.O. !', sub: `Arc ${subject}`.slice(0, 40),
+      lines: [`${good} coups portés · ${'❤️'.repeat(Math.max(0, hearts))}`],
+    }));
     if (won) {
       if (!demo) await markBossDefeated(subject);
       sound('victory');

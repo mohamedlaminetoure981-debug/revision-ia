@@ -38,7 +38,7 @@ export async function shareImage(blob, filename, text = '') {
 }
 
 /** Nom de fichier propre à partir d'un titre. */
-export function fileName(prefix, title) {
+export function fileName(prefix, title, ext = 'png') {
   const slug = String(title || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
-  return `${prefix}${slug ? '-' + slug : ''}.png`;
+  return `${prefix}${slug ? '-' + slug : ''}.${ext}`;
 }

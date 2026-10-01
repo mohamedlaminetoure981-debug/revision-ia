@@ -10,8 +10,10 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, rich, sourceHtml, line } from '../ui/ui.js';
-import { addXp, XP_RULES } from '../core/game.js';
+import { esc, rich, sourceHtml, line, toast } from '../ui/ui.js';
+import { addXp, XP_RULES, getProfileSync } from '../core/game.js';
+import { makeDuel, shareDuel } from '../core/duel.js';
+import { isCreator, creatorName } from '../core/creator.js';
 import { celebrate, vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { reportQuestion } from './report.js';
 import { runWithCouncil } from '../ui/council.js';
@@ -182,6 +184,7 @@ export async function render(el, [quizId]) {
             <button class="btn ghost" id="corr">📋 Correction</button>
             <button class="btn pink" id="again">⚔️ Revanche</button>
           </div>
+          <button class="btn block" id="duel" style="max-width:340px;margin:10px auto 0">🤝 Défier un ami</button>
           <a class="linkbtn" href="${back}" style="display:inline-block;margin-top:10px">Retour au cours</a>` },
     ];
     let s = 0;
@@ -207,6 +210,15 @@ export async function render(el, [quizId]) {
         else if (pct >= 70) power('ren', 'light', { target: w.querySelector('.ch') });
         w.querySelector('#corr').onclick = correction;
         w.querySelector('#again').onclick = intro;
+        // Duel : tout le quiz voyage dans le lien (aucun serveur).
+        w.querySelector('#duel').onclick = async (e) => {
+          e.stopPropagation();
+          const p = getProfileSync();
+          const duel = makeDuel({ questions: quiz.questions, title: course.title, subject: course.subject, score: r.score,
+            name: isCreator() ? creatorName() : p?.name, charId: p?.companion || 'kai' });
+          const res = await shareDuel(duel);
+          if (res !== 'cancelled') toast(line('ren', 'duel_envoi'), 'ok');
+        };
       }
     };
     draw();

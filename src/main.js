@@ -40,6 +40,7 @@ import * as creatorPanel from './views/creator-panel.js';
 import * as manga from './views/manga.js';
 import * as story from './views/story.js';
 import * as boss from './views/boss.js';
+import * as duel from './views/duel.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -62,6 +63,7 @@ const ROUTES = {
   manga: { view: manga, fullscreen: true }, //    #/manga/ID_COURS/N°_NOTION
   histoire: { view: story, fullscreen: (args) => !!args[0] }, // #/histoire[/N°_CHAPITRE]
   boss: { view: boss, fullscreen: true }, //      #/boss/MATIÈRE
+  duel: { view: duel, fullscreen: true }, //      #/duel/QUIZ_COMPRESSÉ (marche même sans profil)
 };
 
 const app = document.getElementById('app');
@@ -78,7 +80,8 @@ async function route() {
   let { name, args } = parseHash();
   // Première ouverture : écran de bienvenue obligatoire.
   const profile = await loadProfile();
-  if (!profile && name !== 'bienvenue') {
+  // Exception : un ami qui ouvre un lien de duel peut jouer tout de suite.
+  if (!profile && name !== 'bienvenue' && name !== 'duel') {
     location.replace('#/bienvenue');
     return;
   }
