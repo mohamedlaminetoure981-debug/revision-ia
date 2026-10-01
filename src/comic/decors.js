@@ -453,10 +453,14 @@ function bibliotheque(w, h, o) {
   // Étagères sur les deux murs
   const spines = ['#8b2f2f', '#2f5d8b', '#c9a227', '#2f7d4a', '#6b3f8b', '#d9d2c0', '#a8552b', '#1d1d24'];
   for (const X of [-2.6, 2.6]) {
-    for (let zz = 0.6; zz < 9; zz += 0.5) {
-      for (let lv = 0; lv < 6; lv++) {
-        const y1 = 0.2 + lv * 0.52; const y2 = y1 + 0.42;
-        s += `<path d="${sideQuad(c, X, zz, zz + 0.48, y1, y2)}" fill="${spines[Math.floor(r() * spines.length)]}" stroke="#1a120c" stroke-width="${f(Math.max(0.4, 2 / zz))}"/>`;
+    // Dos de livres fins, de hauteurs variées (plus serrés au loin)
+    for (let lv = 0; lv < 6; lv++) {
+      let zz = 0.6;
+      while (zz < 9) {
+        const step = 0.05 + zz * 0.035;
+        const y1 = 0.2 + lv * 0.52; const y2 = y1 + 0.3 + r() * 0.14;
+        s += `<path d="${sideQuad(c, X, zz, zz + step * 0.92, y1, y2)}" fill="${spines[Math.floor(r() * spines.length)]}" stroke="#1a120c" stroke-width="${f(Math.max(0.3, 1.6 / zz))}"/>`;
+        zz += step;
       }
     }
     for (let lv = 0; lv <= 6; lv++) {

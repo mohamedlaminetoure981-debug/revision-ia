@@ -58,8 +58,8 @@ export const CHAPTERS = [
     ],
   },
   {
-    id: 3, emoji: '🌙', title: 'La poète des métaphores',
-    teaser: 'Une voix douce parle aux livres.',
+    id: 3, emoji: '📚', title: 'La voix de la bibliothèque',
+    teaser: 'Un matin de pluie, une voix explique les cours avec des images.',
     strips: [
       { title: 'Ch. 3 — Nia', panels: [
         c('nia', 'reflexion', 'Une dérivée, c’est la vitesse d’une pirogue à un instant précis…', 'Bibliothèque infinie'),
