@@ -112,6 +112,7 @@ export async function render(el) {
         <select id="t-bd-char">${TEAM.map((id) => `<option value="${id}">${esc(CHARACTERS[id].name)}</option>`).join('')}<option value="etudiant">Figurant : étudiant</option><option value="vendeuse">Figurant : vendeuse</option><option value="oubli">L'Oubli</option></select>
         <button class="btn ghost" id="t-bd-poses">Galerie des poses</button>
         <button class="btn ghost" id="t-bd-decors">Galerie des décors</button>
+        <button class="btn ghost" id="t-bd-images">🖼️ Illustrations des cases</button>
       </div>
       <p class="tiny muted">Planches enregistrées : ${mangaCount}. Le boss démo n'enregistre rien.</p>
       <h3>⚔️ Duels & statut WhatsApp</h3>
@@ -278,6 +279,31 @@ export async function render(el) {
       cells += `<figure class="bd-cell wide"><svg viewBox="0 0 600 400">${decorSVG(d, 600, 400, { time: t, seed: i + 1, text: 'Message de test', from: 'TEST' })}</svg><figcaption>${d} · ${t}</figcaption></figure>`;
     });
     modal(`<h3>Décors</h3><div class="bd-gallery">${cells}</div><button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
+  // --- BD : quelles cases ont leur illustration (public/story/…) ---
+  $('#t-bd-images').onclick = async () => {
+    const [{ hasComic, loadComic }, { storyImage, storyFileName }] = await Promise.all([import('../data/comic/index.js'), import('../comic/story-images.js')]);
+    let html = '';
+    let done = 0;
+    let total = 0;
+    for (let id = 1; id <= 12; id++) {
+      if (!hasComic(id)) continue;
+      const ch = await loadComic(id);
+      let rows = '';
+      let n = 0;
+      ch.pages.forEach((page, p) => (page.panels || []).forEach((panel, c) => {
+        const ok = !!storyImage(id, p, c);
+        total++; if (ok) { done++; n++; }
+        rows += `<li style="margin:6px 0">${ok ? '✅ illustrée' : '⬜ dessin SVG'} · <b>page ${p + 1}, case ${c + 1}</b><br>
+          <code style="user-select:all;font-size:12px">${esc(storyFileName(id, p, c))}</code>
+          ${panel.action ? `<div class="tiny dim">${esc(panel.action)}</div>` : ''}</li>`;
+      }));
+      const count = ch.pages.reduce((s, pg) => s + (pg.panels || []).length, 0);
+      html += `<details style="margin:8px 0"><summary><b>Chapitre ${id} — ${esc(ch.title)}</b> · ${n}/${count} illustrées</summary><ul style="list-style:none;padding:0">${rows}</ul></details>`;
+    }
+    modal(`<h3>🖼️ Illustrations des cases (${done}/${total})</h3>
+      <p class="tiny muted">Dépose l'image sur github.com dans le dossier indiqué (.webp, .png ou .jpg), avec ce nom exact. Elle remplace le dessin au prochain déploiement. Voir le README.</p>
+      ${html}<button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);

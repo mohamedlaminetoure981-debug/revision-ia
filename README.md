@@ -33,7 +33,8 @@ qui **marche hors ligne** pour réviser. Tu importes un cours (photos ou PDF), e
 7. [Modifier les couleurs](#7-modifier-les-couleurs)
 8. [Modifier les personnages, leurs répliques, les remplacer par des images](#8-modifier-les-personnages)
 9. [Modifier les consignes (prompts) de l'IA](#9-modifier-les-consignes-prompts-de-lia)
-10. [Ajouter une fonctionnalité](#10-ajouter-une-fonctionnalité)
+10. [Ajouter une fonctionnalité](#10-ajouter-une-fonctionnalité) ·
+    [🖼️ Remplacer les cases de la BD par des illustrations](#10-septies-remplacer-les-cases-de-la-bd-par-des-illustrations)
 11. [Changer de modèle Gemini](#11-changer-de-modèle-gemini)
 12. [Sauvegarde de tes données](#12-sauvegarde-de-tes-données)
 13. [Dépannage](#13-dépannage)
@@ -630,6 +631,49 @@ dojo d'1 minute, ambiances, veille (tout cocher sauf l'examen final, effacer).
 - Nouveaux sons générés (aucun fichier) : `page`, `ink`, `unlock`, `hit`, `boss`, `victory`.
 - Panneau créateur → **🆕 Nouvelles fonctions** : planche démo, image, ouvrir tous les
   chapitres, lire un chapitre, boss démo (n'enregistre rien), remettre l'histoire à zéro.
+
+## 10 septies. Remplacer les cases de la BD par des illustrations
+
+**Aucun code à toucher.** Il suffit de déposer une image avec le **bon nom** dans le
+**bon dossier** : elle remplace automatiquement le dessin de la case. S'il n'y a pas
+d'image, le dessin reste affiché.
+
+### Le nom du fichier
+```
+public/story/chapitre-1/page-2-case-3.webp
+              │          │      └── 3e case de la page (dans l'ordre de lecture)
+              │          └── page 2 du chapitre
+              └── chapitre 1
+```
+- Formats acceptés : **.webp**, **.png** ou **.jpg** (n'importe quelle taille).
+- Pour connaître le nom exact de chaque case : appli → **Panneau créateur** →
+  **🖼️ Illustrations des cases**. Chaque case y est listée avec ✅ (illustrée) ou
+  ⬜ (dessin), son nom de fichier et la description de la scène.
+
+### Déposer une image depuis github.com (téléphone ou PC)
+1. Ouvre ton dépôt sur **github.com**, puis les dossiers `public` → `story` →
+   `chapitre-1` (le chapitre voulu).
+2. Bouton **Add file** → **Upload files**.
+3. Choisis ton image. ⚠️ Renomme-la **avant** (ex. `page-1-case-1.png`) :
+   GitHub garde le nom du fichier tel quel.
+4. En bas, clique sur **Commit changes**.
+5. Attends 2 à 3 minutes (onglet **Actions** : la pastille devient verte ✅), puis
+   recharge l'appli. C'est en ligne !
+
+Pour **changer** une image : dépose la nouvelle avec le même nom (elle écrase
+l'ancienne). Pour **revenir au dessin** : ouvre l'image sur github.com → menu **⋯** →
+**Delete file** → **Commit changes**.
+
+### Ce que l'appli fait toute seule
+- L'image est **recadrée au centre** pour remplir la case (garde le sujet au milieu
+  de l'image ; les bords peuvent être coupés selon la forme de la case).
+- Bulles, cartouches, onomatopées, effets (vitesse, impact…), sons et zooms du
+  lecteur restent **par-dessus** l'image : les textes se modifient toujours dans
+  `src/data/comic/chapitres/chNN.js`.
+- Au déploiement, chaque image est **optimisée** : WebP, 1200 px maximum, moins de
+  200 Ko (outil `sharp`, voir `vite.config.js`). Tu peux donc déposer de gros PNG.
+- Les images ne sont pas pré-téléchargées à l'installation : elles se chargent (puis
+  restent hors ligne) quand on lit le chapitre.
 
 ## 11. Changer de modèle Gemini (et vitesse de l'IA)
 

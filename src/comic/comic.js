@@ -7,12 +7,15 @@
 //            + bulles + cartouches + onomatopées.
 // Tout est décrit dans les fichiers de chapitres (src/data/comic/chapitres/).
 //
-// Une case peut être REMPLACÉE par une illustration dessinée plus tard :
-// mets `image: 'bd/ch01/p1-c1.webp'` (fichier dans public/bd/…). Les bulles
-// et cartouches restent dessinées par-dessus (le texte reste modifiable).
+// Une case peut être REMPLACÉE par une illustration : dépose simplement
+// public/story/chapitre-1/page-2-case-3.webp (ou .png / .jpg), voir
+// story-images.js. L'image est recadrée au centre pour remplir la case ;
+// bulles, cartouches, onomatopées, effets et sons restent par-dessus.
+// (Ancienne méthode, toujours valable : `image: 'chemin/dans/public.webp'`.)
 // =====================================================================
 
 import { bodySVG, INK } from './body.js';
+import { storyImage } from './story-images.js';
 import { decorSVG, gradeFor, rng, TIMES } from './decors.js';
 import { oubliSVG, poingSVG, piedsSVG } from './entities.js';
 import { figureSVG, FIGURES } from './figures.js';
@@ -395,7 +398,7 @@ function assetUrl(p) {
   return /^(https?:|data:)/.test(p) ? p : import.meta.env.BASE_URL + String(p).replace(/^\//, '');
 }
 
-function renderPanel(panel, poly, idx, pageIdx) {
+function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   const box = bboxOf(poly);
   const { w, h } = box;
   const clip = uid('pc');
@@ -405,12 +408,17 @@ function renderPanel(panel, poly, idx, pageIdx) {
   let inner = '';
   const heads = [];
   const overflow = [];
-  if (panel.image) {
-    inner = `<image href="${esc(assetUrl(panel.image))}" x="0" y="0" width="${f(w)}" height="${f(h)}" preserveAspectRatio="xMidYMid slice"/>`;
+  const image = storyImage(chapterId, pageIdx, idx) || panel.image;
+  if (image) {
+    // Illustration recadrée au centre pour remplir la case. Les persos ne sont
+    // pas dessinés, mais leur position sert encore à orienter les bulles.
+    inner = `<image href="${esc(assetUrl(image))}" x="0" y="0" width="${f(w)}" height="${f(h)}" preserveAspectRatio="xMidYMid slice"/>`;
     (panel.chars || []).forEach((c) => {
       const fig = figure(c, w, h, time);
       heads.push(fig.head);
     });
+    // Effets par-dessus l'image (sauf les lueurs "de fond", prévues derrière les persos)
+    for (const fx of (panel.fx || []).filter((x) => x.layer !== 'back')) inner += effect(fx, w, h, r);
   } else {
     inner = decorSVG(bg.id, w, h, { ...bg, seed: bg.seed ?? (idx + 3) * (pageIdx + 2) });
     for (const fx of (panel.fx || []).filter((x) => x.layer === 'back' || ['concentration', 'vitesse'].includes(x.type) && x.layer !== 'front')) inner += effect(fx, w, h, r);
@@ -437,14 +445,15 @@ function renderPanel(panel, poly, idx, pageIdx) {
   for (const s of panel.sfx || []) text += sfx(s, box);
   for (const c of panel.captions || []) text += caption(c, box);
   for (const b of panel.bubbles || []) text += bubble(b, box, heads);
-  return { svg: out, text, box };
+  return { svg: out, text, box, illustrated: !!image };
 }
 
 /**
  * Dessine une page complète.
+ * @param chapterId numéro du chapitre (pour trouver les illustrations public/story/…)
  * @returns {{ svg: string, panels: Array<{box, poly, sound}> }}
  */
-export function renderPage(page, pageIdx = 0) {
+export function renderPage(page, pageIdx = 0, chapterId = 0) {
   const grid = layoutPage(page);
   const list = page.panels || [];
   const panels = [];
@@ -454,7 +463,7 @@ export function renderPage(page, pageIdx = 0) {
     let poly = grid[i];
     if (p.r) { const [x, y, w, h] = p.r; poly = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]; }
     if (!poly) return;
-    const r = renderPanel(p, poly, i, pageIdx);
+    const r = renderPanel(p, poly, i, pageIdx, chapterId);
     body += r.svg;
     texts += r.text;
     panels.push({ box: r.box, poly, sound: p.sound, sfxSound: p.sfxSound });

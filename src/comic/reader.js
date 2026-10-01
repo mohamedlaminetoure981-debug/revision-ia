@@ -56,7 +56,7 @@ export async function openReader(el, chapter, meta, onEnd) {
 
   function drawPage(dir = 1) {
     const page = chapter.pages[pageIdx];
-    current = renderPage(page, pageIdx);
+    current = renderPage(page, pageIdx, chapter.id ?? meta.id);
     holder.innerHTML = current.svg;
     const svg = holder.querySelector('svg');
     // Voile qui assombrit tout sauf la case en cours (mode case par case)
