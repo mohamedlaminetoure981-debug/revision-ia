@@ -76,8 +76,8 @@ export const CHAPTERS = [
     ],
   },
   {
-    id: 4, emoji: '⚡', title: 'Sora, 0,3 seconde',
-    teaser: 'Un éclair traverse la salle des fiches.',
+    id: 4, emoji: '⚡', title: 'Éclair sur la corniche',
+    teaser: '5 h 40, sur la corniche : quelqu’un court plus vite que l’Oubli.',
     strips: [
       { title: 'Ch. 4 — Sora', panels: [
         c('sora', 'celebration', 'Question ! Réponse ! Suivante ! Trop lents, tout le monde !', 'Dans un éclair…', 'ZIP!'),

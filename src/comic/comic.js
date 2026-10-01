@@ -314,9 +314,9 @@ function bubble(b, box, heads) {
 function caption(cp, box) {
   const size = cp.size || 27;
   const maxW = (cp.w ?? 0.6) * box.w;
-  const lines = wrap(cp.text, Math.max(10, Math.floor((maxW - 30) / (size * 0.5))));
+  const lines = wrap(cp.text, Math.max(8, Math.floor((maxW - 34) / (size * 0.56))));
   const lh = size * 1.22;
-  const w = Math.min(maxW, Math.max(...lines.map((l) => l.length)) * size * 0.5 + 34);
+  const w = Math.min(maxW, Math.max(...lines.map((l) => l.length)) * size * 0.56 + 36);
   const h = lines.length * lh + 24;
   let x = box.x + (cp.x ?? 0.03) * box.w; let y = box.y + (cp.y ?? 0.03) * box.h;
   if (cp.right) x = box.x + box.w - w - (cp.x ?? 0.03) * box.w;
