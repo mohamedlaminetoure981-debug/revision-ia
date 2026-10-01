@@ -734,10 +734,46 @@ function carte(w, h, o) {
 }
 const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
+/** Arène du tournoi de quiz : amphi sombre, scène, projecteurs, écran géant, public. */
+function arene(w, h, o) {
+  const r = rng(o.seed || 61);
+  const hz = h * (o.horizon ?? 0.5);
+  let s = aplat(w, h, { color: '#151027', color2: '#05030a' });
+  // Écran géant
+  const sw = w * 0.56; const sh = h * 0.24; const sx = (w - sw) / 2; const sy = hz - h * 0.36;
+  const g = uid('scr');
+  s += `<defs><radialGradient id="${g}"><stop offset="0" stop-color="#22d3ee" stop-opacity=".35"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="${f(w / 2)}" cy="${f(sy + sh / 2)}" r="${f(sw * 0.75)}" fill="url(#${g})"/>
+    <rect x="${f(sx)}" y="${f(sy)}" width="${f(sw)}" height="${f(sh)}" fill="#071a2a" stroke="#2b3a4a" stroke-width="6"/>
+    <text x="${f(w / 2)}" y="${f(sy + sh * 0.42)}" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-weight="900" font-size="${f(sh * 0.24)}" fill="#8be9ff">${esc(o.text || 'TOURNOI DE QUIZ')}</text>
+    <text x="${f(w / 2)}" y="${f(sy + sh * 0.8)}" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-weight="900" font-size="${f(sh * 0.22)}" fill="#ff5a3d">${esc(o.score || '')}</text>`;
+  // Scène
+  s += `<path d="M0,${f(hz)} L${w},${f(hz)} L${w},${h} L0,${h} Z" fill="#2a1d18"/>
+    <path d="M0,${f(hz)} L${w},${f(hz)}" stroke="#ff5a3d" stroke-width="4" opacity=".8"/>`;
+  for (let i = 0; i < 12; i++) s += `<path d="M${f(w / 2)},${f(hz)} L${f((i / 11) * w * 2.4 - w * 0.7)},${h}" stroke="#1c120e" stroke-width="2" opacity=".6"/>`;
+  // Projecteurs (cônes de lumière)
+  for (const [x, col] of [[0.18, '#ff5a3d'], [0.5, '#fff3cf'], [0.82, '#8b5cf6']]) {
+    s += `<path d="M${f(w * x - 6)},0 L${f(w * x + 6)},0 L${f(w * x + w * 0.16)},${f(h)} L${f(w * x - w * 0.16)},${f(h)} Z" fill="${col}" opacity=".1"/>`;
+  }
+  // Public : rangées de têtes en silhouette au premier plan
+  if (o.crowd !== false) {
+    for (let row = 0; row < 3; row++) {
+      const y = h - row * h * 0.07; const rr = h * (0.07 - row * 0.012);
+      for (let x = -rr; x < w + rr; x += rr * 1.7) {
+        const hx = x + (r() - 0.5) * rr * 0.6;
+        const up = o.cheer && r() < 0.4;
+        s += `<circle cx="${f(hx)}" cy="${f(y - rr * 0.6)}" r="${f(rr * 0.75)}" fill="#0a0710"/><path d="M${f(hx - rr)},${f(y + rr)} Q${f(hx)},${f(y - rr * 0.2)} ${f(hx + rr)},${f(y + rr)} Z" fill="#0a0710"/>`;
+        if (up) s += `<path d="M${f(hx + rr * 0.4)},${f(y - rr * 0.2)} L${f(hx + rr * 0.9)},${f(y - rr * 2.2)}" stroke="#0a0710" stroke-width="${f(rr * 0.4)}" stroke-linecap="round"/>`;
+      }
+    }
+  }
+  return s;
+}
+
 // ---------------------------------------------------------------------
 // Catalogue des décors (nom utilisé dans les chapitres → fonction)
 // ---------------------------------------------------------------------
-export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte };
+export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene };
 
 /** Dessine un décor (inconnu → aplat). */
 export function decorSVG(name, w, h, o = {}) {

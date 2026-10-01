@@ -205,6 +205,17 @@ function effect(fx, w, h, r) {
       const cx = w * (fx.x ?? 0.5); const cy = h * (fx.y ?? 0.5);
       return `<defs><radialGradient id="${id}"><stop offset="0" stop-color="${fx.color || '#fff'}" stop-opacity="${fx.opacity ?? 0.7}"/><stop offset="1" stop-color="${fx.color || '#fff'}" stop-opacity="0"/></radialGradient></defs><circle cx="${f(cx)}" cy="${f(cy)}" r="${f((fx.size ?? 0.5) * Math.max(w, h))}" fill="url(#${id})"/>`;
     }
+    case 'fissure': { // fissures violettes lumineuses (marque de l'Oubli)
+      const cx = w * (fx.x ?? 0.5); const cy = h * (fx.y ?? 0.5); const R = (fx.size ?? 0.15) * Math.min(w, h);
+      let s = `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R * 0.9)}" fill="#7c3aed" opacity=".25"/>`;
+      for (let i = 0; i < 7; i++) {
+        let x = cx; let y = cy; let d = `M${f(x)},${f(y)}`;
+        const a0 = r() * Math.PI * 2;
+        for (let k = 0; k < 4; k++) { const a = a0 + (r() - 0.5) * 0.9; x += Math.cos(a) * R * 0.3; y += Math.sin(a) * R * 0.3; d += ` L${f(x)},${f(y)}`; }
+        s += `<path d="${d}" stroke="#7c3aed" stroke-width="5" fill="none" opacity=".8"/><path d="${d}" stroke="#e9d5ff" stroke-width="1.6" fill="none"/>`;
+      }
+      return s;
+    }
     case 'teinte': return `<rect width="${w}" height="${h}" fill="${fx.color || '#000'}" opacity="${fx.opacity ?? 0.3}"/>`;
     case 'glitch': { // l'Oubli efface : rectangles et bandes décalées
       let s = '';
