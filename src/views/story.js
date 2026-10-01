@@ -139,6 +139,8 @@ async function comicReader(el, ch, o) {
   el.innerHTML = '<div class="bd"><div class="spinner" style="margin:40vh auto"></div></div>';
   // Le moteur de BD et le chapitre ne sont téléchargés qu'à l'ouverture.
   const [{ openReader }, data] = await Promise.all([import('../comic/reader.js'), loadComic(ch.id)]);
+  const { setComicVars } = await import('../comic/comic.js');
+  setComicVars({ prenom: displayName() });
   const next = o.chapters.find((c) => c.id === ch.id + 1);
   await openReader(el, data, ch, async () => {
     const box = document.createElement('div');

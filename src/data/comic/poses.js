@@ -30,7 +30,7 @@ export const POSES = {
   decontracte: { t: -3, h: 5, k: 0.25, al: [-6, -2], ar: [26, -48], ll: [6, 2], lr: [-7, -3], hl: 'open', hr: 'fist', feet: 'front' },
   mains_poches: { t: 2, h: -3, k: 0.2, al: [-12, 12], ar: [12, -12], ll: [4, 0], lr: [-5, -2], hl: 'none', hr: 'none', feet: 'front' },
   bras_croises: { t: -2, h: 4, k: 0.1, al: [-14, 78], ar: [14, -78], ll: [5, 1], lr: [-5, -1], hl: 'fist', hr: 'none', feet: 'front', front: 'ar' },
-  penseur: { t: 0, h: -6, k: 0.2, al: [-10, 70], ar: [18, 172], ll: [3, 0], lr: [-3, 0], hl: 'fist', hr: 'fist', feet: 'front' },
+  penseur: { t: 0, h: -6, k: 0.2, al: [-10, 70], ar: [-62, 150], ll: [3, 0], lr: [-3, 0], hl: 'fist', hr: 'fist', feet: 'front' },
   pointer: { t: 4, h: 2, k: 0.45, al: [-10, -4], ar: [92, 94], ll: [-6, -2], lr: [10, 3], hl: 'open', hr: 'point', feet: 'side' },
   poing_leve: { t: -4, h: -8, k: 0.15, al: [-14, -6], ar: [168, 178], ll: [8, 2], lr: [-8, -2], hl: 'fist', hr: 'fist', feet: 'front' },
   victoire: { t: 0, h: -10, k: 0, al: [-148, -168], ar: [148, 168], ll: [10, 3], lr: [-10, -3], hl: 'fist', hr: 'fist', feet: 'front' },
@@ -54,6 +54,13 @@ export const POSES = {
   accroupi: { t: 22, h: -6, k: 0.6, al: [20, 60], ar: [30, 70], ll: [120, -6], lr: [135, 8], hl: 'open', hr: 'fist', feet: 'side', back: ['al', 'll'] },
   // --- Relations ---
   accolade: { t: 6, h: 6, k: 0.2, al: [-8, -3], ar: [110, 92], ll: [4, 1], lr: [-4, -1], hl: 'open', hr: 'open', feet: 'front' },
+  // --- Émotions / divers ---
+  tete_mains: { t: 6, h: 14, k: 0.1, al: [-149, 116], ar: [149, -116], ll: [4, 1], lr: [-4, -1], hl: 'open', hr: 'open', feet: 'front' },
+  genou: { t: 10, h: 12, k: 0.5, al: [-10, 20], ar: [30, 60], ll: [-20, -95], lr: [80, 5], hl: 'open', hr: 'fist', feet: 'side', back: ['al', 'll'] },
+  lire: { t: 4, h: 16, k: 0.3, al: [-5, 120], ar: [12, 140], ll: [4, 1], lr: [-4, -1], hl: 'open', hr: 'open', feet: 'front', prop: 'book', front: 'ar' },
+  sifflet: { t: -2, h: -4, k: 0.3, al: [-6, -2], ar: [-70, 152], ll: [6, 2], lr: [-6, -2], hl: 'open', hr: 'fist', feet: 'front' },
+  coup_de_pied: { t: -18, h: 6, k: 0.8, al: [-60, -100], ar: [40, 150], ll: [-6, 4], lr: [96, 92], hl: 'fist', hr: 'fist', feet: 'side', back: ['al', 'll'] },
+  tendre_bas: { t: 30, h: 20, k: 0.6, al: [-10, 10], ar: [70, 40], ll: [-10, -4], lr: [18, 4], hl: 'open', hr: 'open', feet: 'side', back: ['al', 'll'] },
   // --- Vus de dos ---
   dos: { t: 0, h: 0, k: 0, al: [-6, -2], ar: [6, 2], ll: [3, 1], lr: [-3, -1], hl: 'open', hr: 'open', feet: 'front', view: 'back' },
   epaule: { t: 0, h: 18, k: 0.2, al: [-6, -2], ar: [10, 4], ll: [3, 1], lr: [-3, -1], hl: 'open', hr: 'open', feet: 'front', view: 'back', turnHead: true },

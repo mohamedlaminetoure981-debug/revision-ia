@@ -40,8 +40,8 @@ export const CHAPTERS = [
     ],
   },
   {
-    id: 2, emoji: '📡', title: 'Le geek à 1 % de batterie',
-    teaser: 'Quelqu’un télécharge tout le savoir du monde… en 3G.',
+    id: 2, emoji: '📡', title: 'Le signal',
+    teaser: 'Un geek de Kaloum traque l’Oubli avec une antenne bricolée.',
     strips: [
       { title: 'Ch. 2 — Mory', panels: [
         c('mory', 'concentration', 'Encore 3 Mo… allez… cette connexion ne m’arrêtera pas !', 'Salle des serveurs', 'BIP BIP'),

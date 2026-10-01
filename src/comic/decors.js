@@ -393,6 +393,19 @@ function box(c, X1, X2, z1, z2, H, top, front, side) {
     ${side ? `<path d="M${P(X1 < 0 ? X2 : X1, 0, z1)} L${P(X1 < 0 ? X2 : X1, 0, z2)} L${P(X1 < 0 ? X2 : X1, H, z2)} L${P(X1 < 0 ? X2 : X1, H, z1)} Z" fill="${side}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>` : ''}`;
 }
 
+/** Table : plateau fin sur pieds (plus léger qu'une boîte pleine). */
+function desk(c, X1, X2, z1, z2, H, top, edge) {
+  const P = (X, Y, z) => `${f(c.x(X, z))},${f(c.y(Y, z))}`;
+  const lw = f(Math.max(0.8, 3.2 / z1));
+  let s = '';
+  for (const X of [X1 + 0.08, X2 - 0.08]) s += `<path d="M${P(X, 0, z1 + 0.05)} L${P(X, H - 0.06, z1 + 0.05)}" stroke="#2a2018" stroke-width="${f(Math.max(1, c.s(z1) * 0.025))}"/>`;
+  s += `<path d="M${P(X1, H, z1)} L${P(X2, H, z1)} L${P(X2, H, z2)} L${P(X1, H, z2)} Z" fill="${top}" stroke="${INK}" stroke-width="${lw}" stroke-linejoin="round"/>
+    <path d="M${P(X1, H - 0.07, z1)} L${P(X2, H - 0.07, z1)} L${P(X2, H, z1)} L${P(X1, H, z1)} Z" fill="${edge}" stroke="${INK}" stroke-width="${lw}"/>`;
+  // Chaise (dossier) derrière la table
+  s += `<path d="M${P(X1 + 0.3, 0.45, z2 + 0.25)} L${P(X1 + 0.3, 1.05, z2 + 0.25)} L${P(X1 + 0.9, 1.05, z2 + 0.25)} L${P(X1 + 0.9, 0.45, z2 + 0.25)}" fill="none" stroke="#3a3a46" stroke-width="${f(Math.max(1, c.s(z2) * 0.03))}"/>`;
+  return s;
+}
+
 /** Salle de classe d'université : tableau, rangées de tables, fenêtres lumineuses. */
 function classe(w, h, o) {
   const T = TIMES[o.time] || TIMES.jour; const r = rng(o.seed || 5);
@@ -419,7 +432,7 @@ function classe(w, h, o) {
   for (let i = 0; i < 3; i++) { const z = 1.5 + i * 2; s += `<rect x="${f(c.x(-0.6, z))}" y="${f(c.y(2.68, z))}" width="${f(c.x(0.6, z) - c.x(-0.6, z))}" height="${f(c.s(z) * 0.05)}" fill="#fffbe6" stroke="${INK}" stroke-width="1"/>`; }
   // Rangées de tables (du fond vers l'avant)
   for (let z = 6; z >= 1.2; z -= 1.1) {
-    for (const [X1, X2] of [[-2.8, -0.4], [0.4, 2.8]]) s += box(c, X1, X2, z, z + 0.45, 0.75, T.night ? '#5a4632' : '#c08a52', T.night ? '#3e3022' : '#8f6236', null);
+    for (const [X1, X2] of [[-2.8, -0.4], [0.4, 2.8]]) s += desk(c, X1, X2, z, z + 0.45, 0.75, T.night ? '#5a4632' : '#c08a52', T.night ? '#3e3022' : '#8f6236');
   }
   return s;
 }
@@ -680,10 +693,47 @@ function ecran(w, h, o) {
     ${lines.map((l, i) => `<text x="${f(px + pw * 0.15)}" y="${f(py + pw * 0.63 + i * pw * 0.085)}" font-family="Arial" font-size="${f(pw * 0.06)}" fill="#e8ecff">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`).join('')}`;
 }
 
+/** Écran d'ordinateur de Mory : carte de la presqu'île de Conakry et points d'attaque. */
+function carte(w, h, o) {
+  const r = rng(o.seed || 51);
+  const id = uid('cg');
+  let s = `${aplat(w, h, { color: '#0b1022', color2: '#000' })}
+    <defs><radialGradient id="${id}" cx="50%" cy="50%"><stop offset="0" stop-color="#22d3ee" stop-opacity=".25"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient></defs>
+    <rect x="${f(w * 0.06)}" y="${f(h * 0.08)}" width="${f(w * 0.88)}" height="${f(h * 0.8)}" rx="10" fill="#07121f" stroke="#2b3a4a" stroke-width="6"/>
+    <rect x="${f(w * 0.06)}" y="${f(h * 0.08)}" width="${f(w * 0.88)}" height="${f(h * 0.8)}" fill="url(#${id})"/>`;
+  // Grille
+  for (let i = 1; i < 12; i++) s += `<path d="M${f(w * 0.06 + (w * 0.88 * i) / 12)},${f(h * 0.08)} V${f(h * 0.88)}" stroke="#22d3ee" stroke-width="1" opacity=".12"/>`;
+  for (let i = 1; i < 8; i++) s += `<path d="M${f(w * 0.06)},${f(h * 0.08 + (h * 0.8 * i) / 8)} H${f(w * 0.94)}" stroke="#22d3ee" stroke-width="1" opacity=".12"/>`;
+  // Presqu'île (longue bande vers le sud-ouest) + continent
+  const P = (x, y) => `${f(w * x)},${f(h * y)}`;
+  s += `<path d="M${P(0.94, 0.2)} L${P(0.62, 0.22)} Q${P(0.5, 0.3)} ${P(0.42, 0.42)} L${P(0.22, 0.7)} Q${P(0.16, 0.78)} ${P(0.2, 0.82)} Q${P(0.27, 0.8)} ${P(0.34, 0.68)} L${P(0.52, 0.48)} Q${P(0.62, 0.4)} ${P(0.94, 0.42)} Z" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2.5"/>
+    <path d="M${P(0.3, 0.62)} L${P(0.6, 0.32)} M${P(0.45, 0.6)} L${P(0.8, 0.3)}" stroke="#22d3ee" stroke-width="1.4" opacity=".4"/>
+    <text x="${f(w * 0.2)}" y="${f(h * 0.9 - 8)}" font-family="monospace" font-size="${f(h * 0.045)}" fill="#22d3ee">KALOUM</text>
+    <text x="${f(w * 0.09)}" y="${f(h * 0.14)}" font-family="monospace" font-size="${f(h * 0.05)}" fill="#8be9ff">${esc(o.text || 'OUBLI · ATTAQUES · 7 JOURS')}</text>`;
+  // Points d'attaque (violet) + cible principale (pulsation)
+  for (let i = 0; i < (o.spots ?? 7); i++) {
+    const t = r(); const x = 0.24 + t * 0.6; const y = 0.72 - t * 0.42 + (r() - 0.5) * 0.08;
+    s += `<circle cx="${P(x, y).split(',')[0]}" cy="${P(x, y).split(',')[1]}" r="${f(h * 0.018)}" fill="#c084fc"/><circle cx="${P(x, y).split(',')[0]}" cy="${P(x, y).split(',')[1]}" r="${f(h * 0.04)}" fill="none" stroke="#c084fc" stroke-width="2" opacity=".5"/>`;
+  }
+  if (o.target) {
+    const [x, y] = o.target;
+    s += `<circle cx="${f(w * x)}" cy="${f(h * y)}" r="${f(h * 0.03)}" fill="#ff3d5a"/><circle cx="${f(w * x)}" cy="${f(h * y)}" r="${f(h * 0.08)}" fill="none" stroke="#ff3d5a" stroke-width="3"/>
+      <circle cx="${f(w * x)}" cy="${f(h * y)}" r="${f(h * 0.13)}" fill="none" stroke="#ff3d5a" stroke-width="2" opacity=".5"/>
+      <text x="${f(w * x + h * 0.1)}" y="${f(h * y - h * 0.06)}" font-family="monospace" font-size="${f(h * 0.045)}" font-weight="700" fill="#ff8a9a">${esc(o.label || 'CIBLE')}</text>`;
+  }
+  // Barre de chargement (humour : connexion lente)
+  if (o.loading !== undefined) {
+    s += `<rect x="${f(w * 0.56)}" y="${f(h * 0.8)}" width="${f(w * 0.34)}" height="${f(h * 0.035)}" fill="#0b1022" stroke="#22d3ee" stroke-width="1.5"/>
+      <rect x="${f(w * 0.56)}" y="${f(h * 0.8)}" width="${f(w * 0.34 * o.loading)}" height="${f(h * 0.035)}" fill="#22d3ee"/>`;
+  }
+  return s;
+}
+const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
 // ---------------------------------------------------------------------
 // Catalogue des décors (nom utilisé dans les chapitres → fonction)
 // ---------------------------------------------------------------------
-export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran };
+export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte };
 
 /** Dessine un décor (inconnu → aplat). */
 export function decorSVG(name, w, h, o = {}) {

@@ -221,7 +221,13 @@ function effect(fx, w, h, r) {
 // ---------------------------------------------------------------------
 // BULLES, CARTOUCHES, ONOMATOPÉES (au niveau de la page)
 // ---------------------------------------------------------------------
+// Variables remplacées dans les textes : {prenom} → prénom du lecteur.
+let VARS = { prenom: 'toi' };
+export function setComicVars(v) { VARS = { ...VARS, ...v }; }
+const fillVars = (t) => String(t ?? '').replace(/\{(\w+)\}/g, (m, k) => VARS[k] ?? m);
+
 function wrap(text, maxChars) {
+  text = fillVars(text);
   // Espace insécable devant ! ? : ; » (le signe reste collé au mot).
   const words = String(text).replace(/ ([!?:;»])/g, '\u00a0$1').replace(/« /g, '«\u00a0').split(/[ \t\n]+/).filter(Boolean);
   const lines = [];
@@ -242,14 +248,14 @@ function bubble(b, box, heads) {
   const type = b.type || 'parole';
   const size = b.size || (type === 'cri' ? 36 : 31);
   const maxW = (b.w ?? 0.5) * box.w;
-  const perChar = size * 0.52;
+  const perChar = size * 0.55;
   const lines = wrap(b.text, Math.max(8, Math.floor(maxW / perChar)));
   const tw = Math.max(...lines.map((l) => l.length)) * perChar;
   const lh = size * 1.18;
   const th = lines.length * lh;
   const cx = box.x + (b.x ?? 0.5) * box.w; const cy = box.y + (b.y ?? 0.2) * box.h;
   const big = type === 'cri' ? 1.18 : 1;
-  const rx = (tw / 2 + size * 0.95) * big; const ry = (th / 2 + size * 0.75) * big;
+  const rx = (tw / 2 + size * 1.1) * big; const ry = (th / 2 + size * 0.75) * big;
   const fill = b.fill || '#fff';
   const ink = b.ink || INK;
   let s = '';
