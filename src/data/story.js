@@ -22,8 +22,8 @@ export const STORY_TITLE = 'Saison 1 — La Jeunesse contre l’Oubli';
 
 export const CHAPTERS = [
   {
-    id: 1, emoji: '🌌', title: 'Réveil au QG',
-    teaser: 'Kaï se réveille dans un monde de néons…',
+    id: 1, emoji: '🌇', title: '3 h 12',
+    teaser: 'Conakry, veille de la rentrée. Un message arrive à 3 h 12…',
     strips: [
       { title: 'Ch. 1 — Réveil au QG', panels: [
         c('kai', 'surprise', 'Hein ?! Où je suis ? Pourquoi tout est violet et néon ?!', 'Quelque part dans un téléphone…', '?!'),

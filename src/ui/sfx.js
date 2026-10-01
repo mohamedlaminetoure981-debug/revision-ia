@@ -240,6 +240,40 @@ function loopNoise(out, { type = 'lowpass', f = 1000, q = 0.7, vol = 0.2 }) {
 }
 
 const AMBIENTS = {
+  // --- Ambiances de la BD (mode Histoire) ---
+  // Mer : ressac lent (le volume du bruit monte et descend comme des vagues)
+  mer: (out, timers) => {
+    const swell = ctx.createGain();
+    swell.gain.value = 0.05;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.12;
+    const depth = ctx.createGain();
+    depth.gain.value = 0.12;
+    lfo.connect(depth).connect(swell.gain);
+    const n2 = ctx.createBufferSource();
+    n2.buffer = noiseBuf; n2.loop = true;
+    const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 900;
+    n2.connect(fl).connect(swell).connect(out);
+    n2.start(); lfo.start();
+    timers.push(setInterval(() => { if (Math.random() < 0.3) tone({ type: 'sine', f: 1400 + Math.random() * 600, to: 1100, dur: 0.12, vol: 0.02 }); }, 1800)); // mouettes lointaines
+    return [n2, lfo];
+  },
+  // Ville : rumeur + motos qui passent + klaxons au loin
+  ville: (out, timers) => {
+    const n = [loopNoise(out, { f: 350, vol: 0.1 })];
+    timers.push(setInterval(() => {
+      const r = Math.random();
+      if (r < 0.35) tone({ type: 'sawtooth', f: 90 + Math.random() * 40, to: 140, dur: 1.4, vol: 0.025 }); // moto
+      else if (r < 0.5) { const f0 = 380 + Math.random() * 120; tone({ type: 'square', f: f0, dur: 0.18, vol: 0.02 }); tone({ type: 'square', f: f0 * 1.26, dur: 0.18, vol: 0.016 }); } // klaxon
+    }, 1500));
+    return n;
+  },
+  // Marché : brouhaha (bruit "voix") + quelques appels
+  marche: (out, timers) => {
+    const n = [loopNoise(out, { type: 'bandpass', f: 900, q: 0.6, vol: 0.12 })];
+    timers.push(setInterval(() => { if (Math.random() < 0.5) tone({ type: 'triangle', f: 260 + Math.random() * 200, to: 200 + Math.random() * 200, dur: 0.35, vol: 0.025 }); }, 900));
+    return n;
+  },
   // Pluie : souffle doux + gouttes aléatoires
   pluie: (out, timers) => {
     const n = [loopNoise(out, { f: 1400, vol: 0.22 }), loopNoise(out, { type: 'highpass', f: 5000, vol: 0.05 })];

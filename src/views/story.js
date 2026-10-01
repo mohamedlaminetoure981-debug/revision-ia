@@ -14,6 +14,7 @@ import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { stripSVG } from '../ui/manga.js';
 import { storyOverview, newChaptersSinceLastVisit, markRead, BOSS_POINTS } from '../core/story.js';
 import { addXp, XP_RULES } from '../core/game.js';
+import { hasComic, loadComic } from '../data/comic/index.js';
 
 /** Remplace {prenom} dans les répliques d'une planche. */
 function personal(strip) {
@@ -80,6 +81,8 @@ async function reader(el, id) {
   const o = await storyOverview();
   const ch = o.chapters.find((c) => c.id === id);
   if (!ch || !ch.unlocked) { location.hash = '#/histoire'; return; }
+  // Chapitre disponible en BD (nouveau format) → lecteur de BD.
+  if (hasComic(id)) return comicReader(el, ch, o);
   let page = 0;
 
   el.innerHTML = `
@@ -128,3 +131,34 @@ async function reader(el, id) {
   show();
 }
 
+
+// ---------------------------------------------------------------------
+// Lecture d'un chapitre en BANDE DESSINÉE (src/comic/)
+// ---------------------------------------------------------------------
+async function comicReader(el, ch, o) {
+  el.innerHTML = '<div class="bd"><div class="spinner" style="margin:40vh auto"></div></div>';
+  // Le moteur de BD et le chapitre ne sont téléchargés qu'à l'ouverture.
+  const [{ openReader }, data] = await Promise.all([import('../comic/reader.js'), loadComic(ch.id)]);
+  const next = o.chapters.find((c) => c.id === ch.id + 1);
+  await openReader(el, data, ch, async () => {
+    const box = document.createElement('div');
+    box.className = 'bd-end';
+    box.innerHTML = `<div class="bd-end-card">
+        <div class="tiny dim">Chapitre ${ch.id}</div>
+        <h2 class="grad-text" style="margin:4px 0 10px">${esc(ch.title)} — fin</h2>
+        <div class="row" style="gap:8px;justify-content:center">
+          <button class="btn ghost" id="again">↺ Relire</button>
+          ${next?.unlocked ? `<a class="btn" href="#/histoire/${next.id}">Chapitre ${next.id} →</a>` : '<a class="btn" href="#/histoire">📚 Chapitres</a>'}
+        </div>
+        ${next && !next.unlocked ? `<p class="tiny muted" style="margin-top:10px">${esc(line('kai', 'histoire_verrou'))}</p>` : ''}
+      </div>`;
+    el.querySelector('.bd').appendChild(box);
+    box.querySelector('#again').onclick = () => comicReader(el, ch, o);
+    if (await markRead(ch.id)) {
+      confetti(60);
+      onomatopoeia(ch.id === 12 ? 'FIN DE SAISON!' : `CHAPITRE ${ch.id}!`);
+      if (ch.id === 12) sound('victory');
+      celebrate(await addXp(XP_RULES.chapter, 'chapters'), box);
+    } else sound('page');
+  });
+}

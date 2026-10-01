@@ -64,7 +64,7 @@ export async function render(el, [mode]) {
             ${stepper('work', '⏱️ Travail', prefs.work, 5, 90, 5)}
             ${stepper('rest', '☕ Pause', prefs.rest, 1, 30, 1)}
             <div class="label" style="margin-top:12px">Ambiance (générée, rien à télécharger)</div>
-            <div class="seg" id="amb">${['aucun', ...AMBIENT_LIST].map((a) => `<button data-a="${a}" class="${prefs.ambient === a ? 'active' : ''}">${AMBIENT_LABEL[a]}</button>`).join('')}</div>
+            <div class="seg" id="amb">${['aucun', ...AMBIENT_LIST.filter((a) => AMBIENT_LABEL[a])].map((a) => `<button data-a="${a}" class="${prefs.ambient === a ? 'active' : ''}">${AMBIENT_LABEL[a]}</button>`).join('')}</div>
           </div>
           <button class="btn pink block" id="start" style="margin:14px 0">🔔 Commencer l'entraînement</button>
           <div class="bento">

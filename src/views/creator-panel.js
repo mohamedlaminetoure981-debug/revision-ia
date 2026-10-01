@@ -107,6 +107,12 @@ export async function render(el) {
         <a class="btn ghost" href="#/boss/__demo">Boss démo</a>
         <button class="btn ghost" id="t-story-reset">Remettre l'histoire à zéro</button>
       </div>
+      <h3>🎞️ Bande dessinée (Mode Histoire)</h3>
+      <div class="panel-grid">
+        <select id="t-bd-char">${TEAM.map((id) => `<option value="${id}">${esc(CHARACTERS[id].name)}</option>`).join('')}<option value="etudiant">Figurant : étudiant</option><option value="vendeuse">Figurant : vendeuse</option><option value="oubli">L'Oubli</option></select>
+        <button class="btn ghost" id="t-bd-poses">Galerie des poses</button>
+        <button class="btn ghost" id="t-bd-decors">Galerie des décors</button>
+      </div>
       <p class="tiny muted">Planches enregistrées : ${mangaCount}. Le boss démo n'enregistre rien.</p>
       <h3>⚔️ Duels & statut WhatsApp</h3>
       <div class="panel-grid">
@@ -252,6 +258,27 @@ export async function render(el) {
     location.hash = '#/veille';
   };
   $('#t-veille-reset').onclick = async () => { await db.setSetting('veille', null); toast('Veille effacée.'); };
+  // --- BD : galeries pour vérifier poses et décors ---
+  $('#t-bd-poses').onclick = async () => {
+    const id = $('#t-bd-char').value;
+    const [{ bodySVG }, { POSE_NAMES }, { oubliSVG }] = await Promise.all([import('../comic/body.js'), import('../data/comic/poses.js'), import('../comic/entities.js')]);
+    const list = id === 'oubli' ? ['flotte', 'attaque', 'recul', 'cri'] : POSE_NAMES;
+    const cells = list.map((p) => {
+      const r = id === 'oubli' ? oubliSVG(p) : bodySVG(id, p, { expr: 'neutre' });
+      return `<figure class="bd-cell"><svg viewBox="-420 ${id === 'oubli' ? -1000 : -800} 840 ${id === 'oubli' ? 1060 : 860}">${r.svg}</svg><figcaption>${p}</figcaption></figure>`;
+    }).join('');
+    modal(`<h3>Poses · ${esc(id)}</h3><div class="bd-gallery">${cells}</div><button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
+  $('#t-bd-decors').onclick = async () => {
+    const { decorSVG, DECORS } = await import('../comic/decors.js');
+    const times = ['aube', 'jour', 'couchant', 'nuit', 'pluie'];
+    let cells = '';
+    Object.keys(DECORS).forEach((d, i) => {
+      const t = times[i % times.length];
+      cells += `<figure class="bd-cell wide"><svg viewBox="0 0 600 400">${decorSVG(d, 600, 400, { time: t, seed: i + 1, text: 'Message de test', from: 'TEST' })}</svg><figcaption>${d} · ${t}</figcaption></figure>`;
+    });
+    modal(`<h3>Décors</h3><div class="bd-gallery">${cells}</div><button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);
     toast('Histoire remise à zéro (chapitres lus, boss vaincus).');

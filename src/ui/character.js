@@ -614,6 +614,29 @@ const MANGA_FX = { sweat: [134, 78], vein: [124, 70] };
  * @param {object} [opts]     { aura: 0..3 }
  */
 export function characterSVG(id, expression = 'neutre', opts = {}) {
+  const h = characterParts(id, expression);
+  return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">
+    <g class="ch-aura">${aura(opts.aura || 0, h.L, h.n)}</g>
+    <g class="ch-fx-back">${h.fxBack}</g>
+    <g class="ch-hair-back">${h.back}</g>
+    <g class="ch-body">
+      <path d="M89,128 L111,128 L113,172 L87,172 Z" fill="${h.P.skin}" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
+      <path d="M88,134 L112,134 L112,152 Q100,160 88,150 Z" fill="${h.P.skinSh}"/>
+      ${outfit(h.L, h.P)}
+      ${h.accBody}
+    </g>
+    ${h.head}
+    <g class="ch-fx">${h.fx}</g>
+  </svg>`;
+}
+
+/**
+ * Morceaux d'un portrait (coordonnées 0-200 × 0-232) : utilisé par characterSVG
+ * ET par la bande dessinée (corps entiers, src/comic/body.js) pour garder
+ * exactement le même visage, la même coiffure et les mêmes couleurs.
+ * @returns {{ L, P, n, fxBack, back, head, fx, accBody }}
+ */
+export function characterParts(id, expression = 'neutre') {
   const ch = CHARACTERS[id];
   const L = { ...ch.look, color: ch.color };
   const P = palette(L);
@@ -643,17 +666,7 @@ export function characterSVG(id, expression = 'neutre', opts = {}) {
   const face = L.face === 'soft' ? FACE_SOFT : FACE;
   const earL = 'M72,96 C65,93 62,101 64,108 C65,114 68,117 72,116 Z';
   const earR = 'M128,96 C135,93 138,101 136,108 C135,114 132,117 128,116 Z';
-  return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">
-    <g class="ch-aura">${aura(opts.aura || 0, L, n)}</g>
-    <g class="ch-fx-back">${fx.back}</g>
-    <g class="ch-hair-back">${hr.back}</g>
-    <g class="ch-body">
-      <path d="M89,128 L111,128 L113,172 L87,172 Z" fill="${P.skin}" stroke="${INK}" stroke-width="${OUT}" stroke-linejoin="round"/>
-      <path d="M88,134 L112,134 L112,152 Q100,160 88,150 Z" fill="${P.skinSh}"/>
-      ${outfit(L, P)}
-      ${acc.body}
-    </g>
-    <g class="ch-head">
+  const head = `<g class="ch-head">
       <path d="${earL}" fill="${P.skinSh}" stroke="${INK}" stroke-width="2"/><path d="M70,100 Q66,104 69,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
       <path d="${earR}" fill="${P.skin}" stroke="${INK}" stroke-width="2"/><path d="M130,100 Q134,104 131,111" fill="none" stroke="${INK}" stroke-width="${INN}"/>
       <path d="${face}" fill="${P.skin}"/>
@@ -671,9 +684,8 @@ export function characterSVG(id, expression = 'neutre', opts = {}) {
       <g class="ch-hair-front">${hr.front}</g>
       ${acc.head}
       ${acc.glasses}
-    </g>
-    <g class="ch-fx">${fxFront}</g>
-  </svg>`;
+    </g>`;
+  return { L, P, n, fxBack: fx.back, back: hr.back, head, fx: fxFront, accBody: acc.body };
 }
 
 /** Chemin complet d'une image (tient compte du chemin de base GitHub Pages). */
