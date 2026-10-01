@@ -112,8 +112,8 @@ export const CHAPTERS = [
     ],
   },
   {
-    id: 6, emoji: '🥋', title: 'Le dojo d’Awa',
-    teaser: 'Un coup de sifflet résonne dans le dojo.',
+    id: 6, emoji: '🥋', title: 'Le dojo de Kaloum',
+    teaser: 'Un coup de sifflet, une cour, des tapis usés. Et un combat.',
     strips: [
       { title: 'Ch. 6 — Awa', panels: [
         c('awa', 'concentration', 'Exercice 4 ! On pose les étapes ! Pas de résultat sans méthode !', 'Dojo des exercices', 'PRRT!'),
