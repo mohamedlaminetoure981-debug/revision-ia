@@ -17,8 +17,14 @@ export function hasComic(id) {
   return !!FILES[fileOf(id)];
 }
 
-/** Charge un chapitre BD (ou null s'il n'existe pas encore). */
+/**
+ * Charge un chapitre BD (ou null s'il n'existe pas encore), avec les positions
+ * de bulles de public/story/chapitre-N/bulles-chapitre-N.json si ce fichier existe.
+ * Renvoie une COPIE : on peut la modifier sans toucher à l'original.
+ */
 export async function loadComic(id) {
   const load = FILES[fileOf(id)];
-  return load ? (await load()).default : null;
+  if (!load) return null;
+  const [mod, { applyLayout }] = await Promise.all([load(), import('../../comic/story-images.js')]);
+  return applyLayout(JSON.parse(JSON.stringify(mod.default)));
 }

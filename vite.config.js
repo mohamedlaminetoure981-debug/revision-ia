@@ -67,7 +67,9 @@ function serviceWorker() {
 //   - cherche ces fichiers et donne leur liste à l'appli (module
 //     "virtual:story-images", lu par src/comic/story-images.js) ;
 //   - au build, les optimise : WebP, 1200 px maximum, moins de 200 Ko
-//     (avec "sharp" ; s'il manque, l'image est publiée telle quelle).
+//     (avec "sharp" ; s'il manque, l'image est publiée telle quelle) ;
+//   - lit aussi public/story/chapitre-N/bulles-chapitre-N.json (positions
+//     des bulles enregistrées avec l'éditeur du Panneau créateur).
 // ---------------------------------------------------------------------
 const STORY_DIR = 'public/story';
 const STORY_FILE = /^page-(\d+)-case-(\d+)\.(webp|png|jpe?g)$/i;
@@ -90,6 +92,25 @@ function scanStory() {
     }
   }
   return found;
+}
+
+/** { 1: { "page-1-case-4": { bubbles: [...], captions: [...], sfx: [...] } }, … } */
+function scanLayouts(ctx) {
+  const out = {};
+  if (!existsSync(STORY_DIR)) return out;
+  for (const dir of readdirSync(STORY_DIR)) {
+    const m = dir.match(/^chapitre-(\d+)$/i);
+    if (!m) continue;
+    const file = join(STORY_DIR, dir, `bulles-chapitre-${+m[1]}.json`);
+    if (!existsSync(file)) continue;
+    try {
+      const data = JSON.parse(readFileSync(file, 'utf8'));
+      out[+m[1]] = data.cases || {};
+    } catch (e) {
+      ctx.warn(`${file} ignoré (JSON invalide) : ${e.message}`);
+    }
+  }
+  return out;
 }
 
 async function loadSharp() {
@@ -124,11 +145,22 @@ function storyImages() {
       if (isBuild) sharp = await loadSharp();
     },
     resolveId(id) { return id === STORY_ID ? vid : null; },
-    load(id) {
+    async load(id) {
       if (id !== vid) return null;
-      const map = {};
-      for (const [key, file] of Object.entries(scanStory())) map[key] = `story/${isBuild && sharp ? `${key}.webp` : file}`;
-      return `export default ${JSON.stringify(map)};`;
+      sharp ||= await loadSharp();
+      // { clé: { src, w, h } } : les dimensions servent au recadrage (point focal).
+      const images = {};
+      for (const [key, file] of Object.entries(scanStory())) {
+        const meta = sharp ? await sharp(join(STORY_DIR, file)).metadata().catch(() => ({})) : {};
+        const turned = (meta.orientation || 1) >= 5; // photo pivotée (EXIF)
+        images[key] = {
+          src: `story/${isBuild && sharp ? `${key}.webp` : file}`,
+          w: (turned ? meta.height : meta.width) || 0,
+          h: (turned ? meta.width : meta.height) || 0,
+        };
+      }
+      return `export const IMAGES = ${JSON.stringify(images)};
+export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
     },
     // En local (npm run dev) : une image ajoutée ou supprimée recharge la page.
     configureServer(server) {
@@ -141,6 +173,7 @@ function storyImages() {
       };
       server.watcher.on('add', refresh);
       server.watcher.on('unlink', refresh);
+      server.watcher.on('change', (file) => { if (file.endsWith('.json')) refresh(file); });
     },
     async closeBundle() {
       if (!isBuild) return;

@@ -665,15 +665,56 @@ l'ancienne). Pour **revenir au dessin** : ouvre l'image sur github.com → menu 
 **Delete file** → **Commit changes**.
 
 ### Ce que l'appli fait toute seule
-- L'image est **recadrée au centre** pour remplir la case (garde le sujet au milieu
-  de l'image ; les bords peuvent être coupés selon la forme de la case).
-- Bulles, cartouches, onomatopées, effets (vitesse, impact…), sons et zooms du
+- L'image est **recadrée** pour remplir la case, en gardant au centre son **point
+  focal** (`illus.focus` dans le chapitre ; sinon le milieu de l'image). La page de BD
+  a toujours le même format : le recadrage est **identique sur téléphone et sur
+  ordinateur** (seul le zoom change), donc une bulle bien placée l'est partout.
+- Bulles, cartouches, onomatopées, effets (vitesse, glitch…), sons et zooms du
   lecteur restent **par-dessus** l'image : les textes se modifient toujours dans
-  `src/data/comic/chapitres/chNN.js`.
+  `src/data/comic/chapitres/chNN.js`. Les effets ne recouvrent jamais les zones
+  protégées (visages…) ; les éclats et halos qui les toucheraient sont retirés.
+- **Taille du texte automatique** selon la taille de la case (lisible sur un
+  téléphone de 360 px), et une bulle ne couvre jamais plus de **25 %** de la case.
 - Au déploiement, chaque image est **optimisée** : WebP, 1200 px maximum, moins de
   200 Ko (outil `sharp`, voir `vite.config.js`). Tu peux donc déposer de gros PNG.
 - Les images ne sont pas pré-téléchargées à l'installation : elles se chargent (puis
   restent hors ligne) quand on lit le chapitre.
+
+### ✏️ Déplacer les bulles (sans toucher au code)
+1. Dans l'appli : **Panneau créateur** → **✏️ Éditer les bulles**.
+2. Choisis le **chapitre** et la **case** en haut de l'écran.
+3. **Touche** une bulle, un cartouche ou une onomatopée, puis :
+   - **glisse-la** pour la déplacer ;
+   - tire la **poignée carrée bleue** pour l'élargir ou la rétrécir ;
+   - tire la **poignée ronde rose** pour orienter la **pointe** (vers la bouche de
+     celui qui parle) ;
+   - **A− / A+** : taille du texte (**Taille auto** pour revenir au réglage
+     automatique) ; ↺ ↻ : angle d'une onomatopée ; **Pointe** : auto / aucune.
+   Tes modifications sont gardées sur l'appareil (brouillon), même si tu fermes.
+4. Appuie sur **💾 Enregistrer** : le fichier **`bulles-chapitre-1.json`** est
+   téléchargé (dossier Téléchargements).
+5. Sur **github.com** : dossiers `public` → `story` → `chapitre-1` → **Add file** →
+   **Upload files** → choisis ce fichier → **Commit changes**. Garde exactement ce
+   nom ; s'il en existe déjà un, il est remplacé.
+6. Attends 2 à 3 minutes (onglet **Actions** ✅) : les nouvelles positions sont en
+   ligne. Pour revenir aux positions d'origine, supprime le fichier sur GitHub.
+
+Seules les **positions et tailles** sont dans ce fichier : les textes restent dans le
+code. Si tu ajoutes ou retires une bulle dans le code, refais un passage dans
+l'éditeur puis ré-enregistre.
+
+### Pour les prochains chapitres illustrés (développeur)
+Dans chaque case de `chNN.js`, le bloc `illus` décrit l'image (en fractions de
+l'image, 0 → 1) : `focus` (point focal), `keep` (zones à ne jamais couvrir : visages,
+personnage, action, objet clé), `free` (zones libres pour les textes) et `mouths`
+(bouche de chaque perso de `chars`, que vise la pointe des bulles). Ensuite :
+```
+npm run verifier-bulles        # chapitre 1
+npm run verifier-bulles -- 2   # chapitre 2
+```
+Le script signale un texte posé sur une zone protégée, une bulle de plus de 25 % de
+la case, un texte qui déborde, deux textes qui se touchent, un sujet coupé par le
+recadrage et un ordre de lecture douteux (de haut en bas, de gauche à droite).
 
 ## 11. Changer de modèle Gemini (et vitesse de l'IA)
 

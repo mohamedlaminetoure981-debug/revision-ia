@@ -113,6 +113,7 @@ export async function render(el) {
         <button class="btn ghost" id="t-bd-poses">Galerie des poses</button>
         <button class="btn ghost" id="t-bd-decors">Galerie des décors</button>
         <button class="btn ghost" id="t-bd-images">🖼️ Illustrations des cases</button>
+        <button class="btn ghost" id="t-bd-bubbles">✏️ Éditer les bulles</button>
       </div>
       <p class="tiny muted">Planches enregistrées : ${mangaCount}. Le boss démo n'enregistre rien.</p>
       <h3>⚔️ Duels & statut WhatsApp</h3>
@@ -304,6 +305,10 @@ export async function render(el) {
     modal(`<h3>🖼️ Illustrations des cases (${done}/${total})</h3>
       <p class="tiny muted">Dépose l'image sur github.com dans le dossier indiqué (.webp, .png ou .jpg), avec ce nom exact. Elle remplace le dessin au prochain déploiement. Voir le README.</p>
       ${html}<button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
+  $('#t-bd-bubbles').onclick = async () => {
+    const { openBubbleEditor } = await import('./bubble-editor.js');
+    openBubbleEditor();
   };
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);

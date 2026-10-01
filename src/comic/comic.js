@@ -189,8 +189,16 @@ function figure(c, w, h, time) {
 // ---------------------------------------------------------------------
 // EFFETS de case
 // ---------------------------------------------------------------------
-function effect(fx, w, h, r) {
+// avoid : zones [x0, y0, x1, y1] (px de la case) à ne pas recouvrir (visages… des illustrations)
+function effect(fx, w, h, r, avoid = []) {
   const col = fx.color || INK;
+  // Effets "ponctuels" (éclat, halo) : supprimés s'ils toucheraient une zone protégée
+  // (l'illustration a déjà ses propres éclats et lumières).
+  if (avoid.length && (fx.type === 'impact' || fx.type === 'lueur')) {
+    const cx = w * (fx.x ?? 0.5); const cy = h * (fx.y ?? 0.5);
+    const R = fx.type === 'impact' ? (fx.size ?? 0.25) * Math.min(w, h) * 1.2 : (fx.size ?? 0.5) * Math.max(w, h) * 0.5;
+    if (avoid.some(([a, b, c, d]) => cx + R > a && cx - R < c && cy + R > b && cy - R < d)) return '';
+  }
   switch (fx.type) {
     case 'vitesse': { // lignes de vitesse parallèles
       const a = ((fx.angle ?? 0) * Math.PI) / 180;
@@ -251,7 +259,10 @@ function effect(fx, w, h, r) {
       let s = '';
       for (let i = 0; i < (fx.n || 26); i++) {
         const gw = w * (0.05 + r() * 0.3); const gh = h * (0.01 + r() * 0.05);
-        s += `<rect x="${f(r() * w)}" y="${f(r() * h)}" width="${f(gw)}" height="${f(gh)}" fill="${['#7c3aed', '#0b0614', '#c4b5fd', '#22d3ee'][Math.floor(r() * 4)]}" opacity="${f(0.35 + r() * 0.5)}"/>`;
+        const gx = r() * w; const gy = r() * h;
+        const col = ['#7c3aed', '#0b0614', '#c4b5fd', '#22d3ee'][Math.floor(r() * 4)]; const op = 0.35 + r() * 0.5;
+        if (avoid.some(([a, b, c, d]) => gx < c && gx + gw > a && gy < d && gy + gh > b)) continue;
+        s += `<rect x="${f(gx)}" y="${f(gy)}" width="${f(gw)}" height="${f(gh)}" fill="${col}" opacity="${f(op)}"/>`;
       }
       return s;
     }
@@ -270,35 +281,92 @@ const fillVars = (t) => String(t ?? '').replace(/\{(\w+)\}/g, (m, k) => VARS[k] 
 function wrap(text, maxChars) {
   text = fillVars(text);
   // Espace insécable devant ! ? : ; » (le signe reste collé au mot).
-  const words = String(text).replace(/ ([!?:;»])/g, '\u00a0$1').replace(/« /g, '«\u00a0').split(/[ \t\n]+/).filter(Boolean);
+  const words = String(text).replace(/ ([!?:;»])/g, ' $1').replace(/« /g, '« ').split(/[ \t\n]+/).filter(Boolean);
   const lines = [];
   let cur = '';
-  for (const wd of words) { if ((cur + ' ' + wd).trim().length > maxChars && cur) { lines.push(cur); cur = wd; } else cur = (cur + ' ' + wd).trim(); }
+  for (const wd of words) {
+    // On passe à la ligne si le mot ne tient plus, ou après une fin de phrase
+    // quand la ligne est déjà assez remplie (coupure plus naturelle).
+    const endOfSentence = /[.!?…]$/.test(cur) && cur.length >= maxChars * 0.55;
+    if (cur && ((cur + ' ' + wd).length > maxChars || endOfSentence)) { lines.push(cur); cur = wd; } else cur = (cur + ' ' + wd).trim();
+  }
   if (cur) lines.push(cur);
   return lines;
+}
+
+/**
+ * Taille de texte AUTOMATIQUE (en unités de page) selon la taille de la case.
+ * Le lecteur "case par case" zoome sur la case : sur un téléphone de 360 px
+ * (zone ≈ 340 × 600 px), une case de largeur w est affichée à l'échelle
+ * k = min(340 / w, 600 / h). On vise un texte d'environ 12 à 14 px à l'écran
+ * sur ce petit téléphone (plus grand sur les grands écrans, mais toujours
+ * dans la même proportion par rapport à l'image).
+ */
+const TARGET_PX = { parole: 12.5, cri: 14, caption: 11.5 };
+const SIZE_MAX = { parole: 29, cri: 32, caption: 25 };
+export function autoTextSize(box, kind = 'parole') {
+  const k = Math.min(340 / box.w, 600 / box.h);
+  return Math.round(Math.min(SIZE_MAX[kind], Math.max(16, TARGET_PX[kind] / k)));
+}
+
+// Largeur moyenne d'un caractère (en em) : Unbounded (cris) est bien plus large.
+const CHAR_W = { parole: 0.56, cri: 0.68 };
+const MAX_COVER = 0.25; // une bulle ne couvre pas plus de 25 % de la case
+
+/**
+ * Géométrie d'une bulle (sans la dessiner) : lignes, centre, rayons, part de la case couverte.
+ * Taille du texte : b.size, sinon automatique (autoTextSize), réduite au besoin
+ * pour ne pas dépasser 25 % de la case. Lignes équilibrées : la bulle garde une
+ * forme d'ovale (pas de grande bulle plate pour trois mots).
+ */
+export function bubbleGeom(b, box) {
+  const type = b.type || 'parole';
+  const kind = type === 'cri' ? 'cri' : 'parole';
+  const text = fillVars(b.text);
+  const area = box.area || box.w * box.h;
+  let size = b.size || autoTextSize(box, kind);
+  const minSize = b.size ? size : size * 0.72;
+  let g;
+  for (;;) {
+    const perChar = size * CHAR_W[kind];
+    const maxW = Math.max(perChar * 6, (b.w ?? 0.5) * box.w - size * 1.4);
+    const longest = Math.max(...text.split(/\s+/).map((wd) => wd.length), 1);
+    const ideal = Math.max(Math.min(text.length, 14), Math.ceil(Math.sqrt(text.length * (kind === 'cri' ? 3.6 : 5.2))));
+    // Lignes équilibrées : nombre de lignes visé, puis largeur la plus petite qui le respecte.
+    const maxChars = Math.max(longest, Math.floor(maxW / perChar));
+    const want = Math.max(1, Math.ceil(text.length / Math.min(ideal, maxChars)));
+    let lines = wrap(text, maxChars);
+    for (let c = Math.max(longest, Math.ceil(text.length / want)); c <= maxChars; c++) {
+      const l = wrap(text, c);
+      if (l.length <= want) { lines = l; break; }
+    }
+    const tw = Math.max(...lines.map((l) => l.length)) * perChar;
+    const lh = size * 1.18;
+    const th = lines.length * lh;
+    const big = type === 'cri' ? 1.08 : 1;
+    const rx = ((tw / 2) * 1.3 + size * 0.45) * big;
+    const ry = ((th / 2) * 1.3 + size * 0.4) * big;
+    const cover = (Math.PI * rx * ry * (type === 'cri' ? 1.3 : type === 'pensee' ? 1.2 : 1)) / area;
+    g = { type, size, lines, lh, th, rx, ry, cover, cx: box.x + (b.x ?? 0.5) * box.w, cy: box.y + (b.y ?? 0.2) * box.h };
+    if (cover <= MAX_COVER || size * 0.93 < minSize) break;
+    size *= 0.93;
+  }
+  return g;
 }
 
 /**
  * b = { type, text, x, y, w, who, tail, size }
  *   type : 'parole' | 'pensee' | 'cri' | 'murmure'
  *   x, y : centre de la bulle dans la case (0-1) ; w : largeur max (0-1)
- *   who  : index du perso qui parle (la queue pointe vers sa tête)
+ *   size : taille du texte (sinon automatique selon la case)
+ *   who  : index du perso qui parle (la queue pointe vers sa bouche/tête)
  *   tail : [x, y] cible manuelle de la queue (0-1, dans la case), ou false
  */
 function bubble(b, box, heads) {
-  const type = b.type || 'parole';
-  const size = b.size || (type === 'cri' ? 36 : 31);
-  const maxW = (b.w ?? 0.5) * box.w;
-  const perChar = size * 0.55;
-  const lines = wrap(b.text, Math.max(8, Math.floor(maxW / perChar)));
-  const tw = Math.max(...lines.map((l) => l.length)) * perChar;
-  const lh = size * 1.18;
-  const th = lines.length * lh;
-  const cx = box.x + (b.x ?? 0.5) * box.w; const cy = box.y + (b.y ?? 0.2) * box.h;
-  const big = type === 'cri' ? 1.18 : 1;
-  const rx = (tw / 2 + size * 1.1) * big; const ry = (th / 2 + size * 0.75) * big;
+  const { type, size, lines, lh, th, rx, ry, cx, cy } = bubbleGeom(b, box);
   const fill = b.fill || '#fff';
   const ink = b.ink || INK;
+  const sw = Math.max(4, size * 0.2);
   let s = '';
   // Queue
   let target = null;
@@ -310,11 +378,14 @@ function bubble(b, box, heads) {
   if (target) {
     const dx = target[0] - cx; const dy = target[1] - cy; const L = Math.hypot(dx, dy) || 1;
     const ux = dx / L; const uy = dy / L;
-    const edge = Math.min(L * 0.75, Math.hypot(rx * ux, ry * uy) + Math.min(110, L * 0.35));
+    const rim = Math.hypot(rx * ux, ry * uy); // distance centre → bord de la bulle (approx.)
+    // La pointe s'arrête juste avant la bouche (sans la toucher).
+    let edge = Math.max(rim + size * 0.6, Math.min(L - size * 0.5, rim + Math.min(size * 4, (L - rim) * 0.85)));
+    if (type === 'pensee') edge = Math.max(edge, rim + size * 2); // ronds de pensée bien séparés
     const tip = [cx + ux * edge, cy + uy * edge];
-    const nx = -uy; const ny = ux; const bw = Math.min(rx, ry) * 0.32;
+    const nx = -uy; const ny = ux; const bw = Math.min(rx, ry) * 0.3;
     if (type === 'pensee') {
-      for (let i = 1; i <= 3; i++) { const t = 0.35 + i * 0.22; s += `<circle cx="${f(cx + (tip[0] - cx) * t)}" cy="${f(cy + (tip[1] - cy) * t)}" r="${f(size * (0.55 - i * 0.12))}" fill="${fill}" stroke="${ink}" stroke-width="3"/>`; }
+      for (let i = 1; i <= 3; i++) { const t = (rim + (edge - rim) * (i / 3.2)) / edge; s += `<circle cx="${f(cx + (tip[0] - cx) * t)}" cy="${f(cy + (tip[1] - cy) * t)}" r="${f(size * (0.5 - i * 0.11))}" fill="${fill}" stroke="${ink}" stroke-width="${f(sw * 0.45)}"/>`; }
     } else {
       tailD = `M${f(cx + nx * bw)},${f(cy + ny * bw)} Q${f((cx + tip[0]) / 2 + nx * bw * 0.3)},${f((cy + tip[1]) / 2 + ny * bw * 0.3)} ${f(tip[0])},${f(tip[1])} Q${f((cx + tip[0]) / 2 - nx * bw * 0.1)},${f((cy + tip[1]) / 2 - ny * bw * 0.1)} ${f(cx - nx * bw)},${f(cy - ny * bw)} Z`;
     }
@@ -322,58 +393,78 @@ function bubble(b, box, heads) {
   // Forme de la bulle
   let shape;
   if (type === 'cri') {
-    const n = 22; let d = '';
+    const n = 18; let d = '';
     const R = rng(Math.round(cx + cy));
-    for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2; const k = i % 2 ? 1.0 : 1.25 + R() * 0.18; d += `${i ? 'L' : 'M'}${f(cx + Math.cos(a) * rx * k)},${f(cy + Math.sin(a) * ry * k)} `; }
+    for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2; const k = i % 2 ? 0.98 : 1.14 + R() * 0.1; d += `${i ? 'L' : 'M'}${f(cx + Math.cos(a) * rx * k)},${f(cy + Math.sin(a) * ry * k)} `; }
     shape = `${d}Z`;
   } else if (type === 'pensee') {
     const n = 11; let d = '';
     for (let i = 0; i < n; i++) {
       const a1 = (i / n) * Math.PI * 2; const a2 = ((i + 1) / n) * Math.PI * 2; const am = (a1 + a2) / 2;
       const p1 = [cx + Math.cos(a1) * rx, cy + Math.sin(a1) * ry]; const p2 = [cx + Math.cos(a2) * rx, cy + Math.sin(a2) * ry];
-      const pm = [cx + Math.cos(am) * rx * 1.28, cy + Math.sin(am) * ry * 1.28];
+      const pm = [cx + Math.cos(am) * rx * 1.18, cy + Math.sin(am) * ry * 1.18];
       d += `${i ? '' : `M${f(p1[0])},${f(p1[1])} `}Q${f(pm[0])},${f(pm[1])} ${f(p2[0])},${f(p2[1])} `;
     }
     shape = `${d}Z`;
   } else {
     shape = `M${f(cx - rx)},${f(cy)} A${f(rx)},${f(ry)} 0 1 1 ${f(cx + rx)},${f(cy)} A${f(rx)},${f(ry)} 0 1 1 ${f(cx - rx)},${f(cy)} Z`;
   }
-  const dash = type === 'murmure' ? ' stroke-dasharray="10 7"' : '';
+  const dash = type === 'murmure' ? ` stroke-dasharray="${f(size * 0.32)} ${f(size * 0.22)}"` : '';
   // Contour : queue + bulle fusionnées (contour d'abord, remplissage ensuite)
-  s += `${tailD ? `<path d="${tailD}" fill="${ink}" stroke="${ink}" stroke-width="7" stroke-linejoin="round"${dash}/>` : ''}
-    <path d="${shape}" fill="${ink}" stroke="${ink}" stroke-width="7" stroke-linejoin="round"${dash}/>
+  s += `${tailD ? `<path d="${tailD}" fill="${ink}" stroke="${ink}" stroke-width="${f(sw)}" stroke-linejoin="round"${dash}/>` : ''}
+    <path d="${shape}" fill="${ink}" stroke="${ink}" stroke-width="${f(sw)}" stroke-linejoin="round"${dash}/>
     ${tailD ? `<path d="${tailD}" fill="${fill}"/>` : ''}<path d="${shape}" fill="${fill}"/>`;
-  if (dash) s += `<path d="${shape}" fill="none" stroke="${fill}" stroke-width="3"/>`;
+  if (dash) s += `<path d="${shape}" fill="none" stroke="${fill}" stroke-width="${f(sw * 0.45)}"/>`;
   const weight = type === 'cri' ? 900 : 700;
   const family = type === 'cri' ? DISPLAY : FONT;
-  s += `<text x="${f(cx)}" y="${f(cy - th / 2 + lh * 0.78)}" text-anchor="middle" font-family="${family}" font-size="${size}" font-weight="${weight}" fill="${b.color || INK}"${b.italic || type === 'murmure' ? ' font-style="italic"' : ''}>
+  s += `<text x="${f(cx)}" y="${f(cy - th / 2 + lh * 0.78)}" text-anchor="middle" font-family="${family}" font-size="${f(size)}" font-weight="${weight}" fill="${b.color || INK}"${b.italic || type === 'murmure' ? ' font-style="italic"' : ''}>
     ${lines.map((l, i) => `<tspan x="${f(cx)}" dy="${i ? f(lh) : 0}">${esc(l)}</tspan>`).join('')}</text>`;
   return s;
 }
 
-/** Cartouche de narration : { text, x, y, w, style: 'jaune'|'noir'|'blanc' } (x, y = coin haut-gauche). */
-function caption(cp, box) {
-  const size = cp.size || 27;
+/** Géométrie d'un cartouche : rectangle compact (x, y = coin haut-gauche, ou haut-droit si right). */
+export function captionGeom(cp, box) {
+  const size = cp.size || autoTextSize(box, 'caption');
+  const perChar = size * 0.56;
+  const padX = size * 0.5; const padY = size * 0.36;
   const maxW = (cp.w ?? 0.6) * box.w;
-  const lines = wrap(cp.text, Math.max(8, Math.floor((maxW - 34) / (size * 0.56))));
-  const lh = size * 1.22;
-  const w = Math.min(maxW, Math.max(...lines.map((l) => l.length)) * size * 0.56 + 36);
-  const h = lines.length * lh + 24;
-  let x = box.x + (cp.x ?? 0.03) * box.w; let y = box.y + (cp.y ?? 0.03) * box.h;
+  const lines = wrap(cp.text, Math.max(8, Math.floor((maxW - padX * 2) / perChar)));
+  const lh = size * 1.2;
+  const w = Math.min(maxW, Math.max(...lines.map((l) => l.length)) * perChar + padX * 2);
+  const h = lines.length * lh + padY * 2;
+  let x = box.x + (cp.x ?? 0.03) * box.w; const y = box.y + (cp.y ?? 0.03) * box.h;
   if (cp.right) x = box.x + box.w - w - (cp.x ?? 0.03) * box.w;
+  return { size, lines, lh, w, h, x, y, padX, padY, cover: (w * h) / (box.area || box.w * box.h) };
+}
+
+/** Cartouche de narration : { text, x, y, w, size, right, style: 'jaune'|'noir'|'blanc'|'rouge' }. */
+function caption(cp, box) {
+  const { size, lines, lh, w, h, x, y, padX, padY } = captionGeom(cp, box);
   const st = { jaune: ['#fff1a8', INK], noir: ['#0d0a12', '#f4efe6'], blanc: ['#ffffff', INK], rouge: ['#b8221c', '#fff'] }[cp.style || 'jaune'];
-  return `<rect x="${f(x + 5)}" y="${f(y + 5)}" width="${f(w)}" height="${f(h)}" fill="#000" opacity=".35"/>
-    <rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="${st[0]}" stroke="${INK}" stroke-width="3.5"/>
-    <text x="${f(x + 16)}" y="${f(y + 12 + lh * 0.78)}" font-family="${FONT}" font-size="${size}" font-weight="700" font-style="italic" fill="${st[1]}">
-      ${lines.map((l, i) => `<tspan x="${f(x + 16)}" dy="${i ? f(lh) : 0}">${esc(l)}</tspan>`).join('')}</text>`;
+  const sh = size * 0.15;
+  return `<rect x="${f(x + sh)}" y="${f(y + sh)}" width="${f(w)}" height="${f(h)}" fill="#000" opacity=".35"/>
+    <rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="${st[0]}" stroke="${INK}" stroke-width="${f(Math.max(2.5, size * 0.12))}"/>
+    <text x="${f(x + padX)}" y="${f(y + padY + lh * 0.78)}" font-family="${FONT}" font-size="${f(size)}" font-weight="700" font-style="italic" fill="${st[1]}">
+      ${lines.map((l, i) => `<tspan x="${f(x + padX)}" dy="${i ? f(lh) : 0}">${esc(l)}</tspan>`).join('')}</text>`;
+}
+
+/** Géométrie d'une onomatopée : centre, taille, angle et coins du rectangle (tourné). */
+export function sfxGeom(o, box) {
+  const x = box.x + (o.x ?? 0.5) * box.w; const y = box.y + (o.y ?? 0.5) * box.h;
+  const size = o.size || 90;
+  const rot = o.rot ?? -10;
+  const hw = (String(o.text).length * size * 0.74) / 2 + size * 0.16; // demi-largeur (police Unbounded + contour)
+  const top = size * 0.95; const bot = size * 0.3; // au-dessus / en dessous de la ligne de base
+  const a = (rot * Math.PI) / 180; const c = Math.cos(a); const s = Math.sin(a);
+  const corners = [[-hw, -top], [hw, -top], [hw, bot], [-hw, bot]].map(([u, v]) => [x + u * c - v * s, y + u * s + v * c]);
+  return { x, y, size, rot, corners, cover: (hw * 2 * (top + bot)) / (box.area || box.w * box.h) };
 }
 
 /** Onomatopée dessinée : { text, x, y, size, rot, color, skew } */
 function sfx(o, box) {
-  const x = box.x + (o.x ?? 0.5) * box.w; const y = box.y + (o.y ?? 0.5) * box.h;
-  const size = o.size || 90;
+  const { x, y, size, rot } = sfxGeom(o, box);
   const col = o.color || '#ffd23f';
-  const t = `translate(${f(x)},${f(y)}) rotate(${o.rot ?? -10}) skewX(${o.skew ?? -8})`;
+  const t = `translate(${f(x)},${f(y)}) rotate(${rot}) skewX(${o.skew ?? -8})`;
   const letters = [...String(o.text)];
   let tx = '';
   // Lettres de tailles légèrement différentes : plus vivant qu'un texte plat
@@ -398,8 +489,37 @@ function assetUrl(p) {
   return /^(https?:|data:)/.test(p) ? p : import.meta.env.BASE_URL + String(p).replace(/^\//, '');
 }
 
+/**
+ * Recadrage d'une illustration (iw × ih) pour REMPLIR une case (w × h), en gardant
+ * le point focal (fx, fy, entre 0 et 1 dans l'image) le plus près possible du centre.
+ * Le résultat ne dépend pas de l'écran : la page a toujours le même repère (1000 × 1500).
+ * @returns {{ x, y, dw, dh, toPanel([u, v]) → [x, y] en fractions de la case }}
+ */
+export function cropImage(w, h, iw, ih, focus = [0.5, 0.5]) {
+  if (!iw || !ih) iw = w, ih = h; // dimensions inconnues : recadrage centré
+  const s = Math.max(w / iw, h / ih);
+  const dw = iw * s; const dh = ih * s;
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const x = clamp(w / 2 - focus[0] * dw, w - dw, 0);
+  const y = clamp(h / 2 - focus[1] * dh, h - dh, 0);
+  return { x, y, dw, dh, toPanel: ([u, v]) => [(x + u * dw) / w, (y + v * dh) / h] };
+}
+
+/** Aire d'un polygone (formule du lacet). */
+const polyArea = (poly) => Math.abs(poly.reduce((s, p, i) => { const q = poly[(i + 1) % poly.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+
+/** Prépare une case : cadre, illustration éventuelle, position des bouches/têtes. */
+export function panelInfo(panel, poly, idx, pageIdx, chapterId) {
+  const box = { ...bboxOf(poly), area: polyArea(poly) };
+  const story = storyImage(chapterId, pageIdx, idx);
+  const src = story?.src || panel.image || null;
+  const il = panel.illus || {};
+  const crop = src ? cropImage(box.w, box.h, story?.w, story?.h, il.focus) : null;
+  return { box, src, crop, illus: il };
+}
+
 function renderPanel(panel, poly, idx, pageIdx, chapterId) {
-  const box = bboxOf(poly);
+  const { box, src: image, crop, illus } = panelInfo(panel, poly, idx, pageIdx, chapterId);
   const { w, h } = box;
   const clip = uid('pc');
   const r = rng((pageIdx + 1) * 97 + idx * 13);
@@ -408,17 +528,20 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   let inner = '';
   const heads = [];
   const overflow = [];
-  const image = storyImage(chapterId, pageIdx, idx) || panel.image;
   if (image) {
-    // Illustration recadrée au centre pour remplir la case. Les persos ne sont
-    // pas dessinés, mais leur position sert encore à orienter les bulles.
-    inner = `<image href="${esc(assetUrl(image))}" x="0" y="0" width="${f(w)}" height="${f(h)}" preserveAspectRatio="xMidYMid slice"/>`;
-    (panel.chars || []).forEach((c) => {
-      const fig = figure(c, w, h, time);
-      heads.push(fig.head);
+    // Illustration recadrée pour remplir la case, en gardant le point focal
+    // (panel.illus.focus). Les persos ne sont pas dessinés : les bulles visent
+    // les bouches notées dans panel.illus.mouths (sinon la position du perso).
+    inner = `<image href="${esc(assetUrl(image))}" x="${f(crop.x)}" y="${f(crop.y)}" width="${f(crop.dw)}" height="${f(crop.dh)}" preserveAspectRatio="none"/>`;
+    (panel.chars || []).forEach((c, i) => {
+      const m = illus.mouths?.[i];
+      if (m) { const [u, v] = crop.toPanel(m); heads.push([u * w, v * h]); return; }
+      heads.push(figure(c, w, h, time).head);
     });
-    // Effets par-dessus l'image (sauf les lueurs "de fond", prévues derrière les persos)
-    for (const fx of (panel.fx || []).filter((x) => x.layer !== 'back')) inner += effect(fx, w, h, r);
+    // Effets par-dessus l'image (sauf les lueurs "de fond", prévues derrière les persos),
+    // sans recouvrir les zones protégées (visages, action…).
+    const avoid = (illus.keep || []).map(([a, b, c, d]) => { const p0 = crop.toPanel([a, b]); const p1 = crop.toPanel([c, d]); return [p0[0] * w, p0[1] * h, p1[0] * w, p1[1] * h]; });
+    for (const fx of (panel.fx || []).filter((x) => x.layer !== 'back')) inner += effect(fx, w, h, r, avoid);
   } else {
     inner = decorSVG(bg.id, w, h, { ...bg, seed: bg.seed ?? (idx + 3) * (pageIdx + 2) });
     for (const fx of (panel.fx || []).filter((x) => x.layer === 'back' || ['concentration', 'vitesse'].includes(x.type) && x.layer !== 'front')) inner += effect(fx, w, h, r);
@@ -440,12 +563,13 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   // Personnages qui DÉBORDENT du cadre (moments forts)
   if (overflow.length) out += local(overflow.join(''));
   out += '</g>';
-  // Textes au-dessus de tout
+  // Textes au-dessus de tout (chacun dans un groupe repérable par l'éditeur de bulles)
   let text = '';
-  for (const s of panel.sfx || []) text += sfx(s, box);
-  for (const c of panel.captions || []) text += caption(c, box);
-  for (const b of panel.bubbles || []) text += bubble(b, box, heads);
-  return { svg: out, text, box, illustrated: !!image };
+  const tag = (k, i, s) => `<g data-edit="${idx}:${k}:${i}">${s}</g>`;
+  (panel.sfx || []).forEach((s, i) => { text += tag('sfx', i, sfx(s, box)); });
+  (panel.captions || []).forEach((c, i) => { text += tag('captions', i, caption(c, box)); });
+  (panel.bubbles || []).forEach((b, i) => { text += tag('bubbles', i, bubble(b, box, heads)); });
+  return { svg: out, text, box, heads, illustrated: !!image, crop };
 }
 
 /**
@@ -466,7 +590,7 @@ export function renderPage(page, pageIdx = 0, chapterId = 0) {
     const r = renderPanel(p, poly, i, pageIdx, chapterId);
     body += r.svg;
     texts += r.text;
-    panels.push({ box: r.box, poly, sound: p.sound, sfxSound: p.sfxSound });
+    panels.push({ box: r.box, poly, heads: r.heads, crop: r.crop, illustrated: r.illustrated, sound: p.sound, sfxSound: p.sfxSound });
   });
   const bg = page.gutter === 'noir' ? '#0a0810' : '#f7f4ee';
   const pageClip = uid('pg');
