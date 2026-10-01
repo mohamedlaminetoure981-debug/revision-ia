@@ -529,6 +529,41 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 
 ---
 
+## 10 sexies. Nouvelles fonctions (v1.4 et suivantes)
+
+### 📖 Le cours en manga (Nia)
+- Bouton **📖 Manga** sur chaque notion du résumé, et **📖 Version manga** sur chaque story.
+- L'IA écrit SEULEMENT le contenu des 4 cases (JSON : perso, expression, réplique,
+  narration, onomatopée). La consigne est `mangaPrompt` dans `src/data/prompts.js`.
+- L'appli dessine la planche elle-même (`src/ui/manga.js`) : 4 cases verticales,
+  bordures épaisses, trame de points, lignes de vitesse, bulles, onomatopées,
+  avec les personnages SVG. Les cases apparaissent une par une (streaming).
+- Chaque planche est **enregistrée** (store `mangas`) : jamais regénérée, lisible hors ligne.
+- Le passage du cours est affiché sous la planche (vérification ✓).
+- **📤 Partager l'image** : PNG 1080 px de large (menu Partager du téléphone, sinon téléchargement).
+
+### 📚 Le mode Histoire (Kaï) — AUCUN appel à l'IA
+- Accès : tuile **Mode Histoire** sur l'accueil (adresse `#/histoire`).
+- Histoire fixe en 12 chapitres : `src/data/story.js` (modifie les textes librement).
+- Tes révisions donnent des points : +1 fiche maîtrisée, +3 quiz ≥ 70 %,
+  +3 exercice ≥ 10/20, +10 boss vaincu. Seuils : `CHAPTER_POINTS` dans `src/core/story.js`.
+- Chaque **matière est un arc** avec sa barre. À 6 points, son **boss** apparaît.
+- Le chapitre 12 demande en plus d'avoir vaincu un boss.
+
+### 💀 Le boss de fin d'arc (Ren) — `src/views/boss.js`
+- Un examen blanc en combat : les questions viennent des quiz DÉJÀ créés pour la matière
+  (l'IA n'est appelée que s'il y en a moins de 5, une seule fois).
+- Barre de vie du boss (≈ 70 % des questions à réussir), 3 cœurs pour toi.
+- Bonne réponse = coup + réplique d'un allié + aura ; 3 d'affilée = aura forte.
+- Victoire : K.O., pouvoir ultime, confettis, XP, badges « Tueur de boss » / « Intouchable ».
+
+### Répliques, sons, tests
+- Répliques des nouvelles fonctions (et taquineries du Mode Créateur) : section
+  `FEATURE_LINES` de `src/data/characters.js`.
+- Nouveaux sons générés (aucun fichier) : `page`, `ink`, `unlock`, `hit`, `boss`, `victory`.
+- Panneau créateur → **🆕 Nouvelles fonctions** : planche démo, image, ouvrir tous les
+  chapitres, lire un chapitre, boss démo (n'enregistre rien), remettre l'histoire à zéro.
+
 ## 11. Changer de modèle Gemini (et vitesse de l'IA)
 
 Par défaut : **`gemini-3.5-flash-lite`**, le modèle gratuit le plus **rapide** et le moins

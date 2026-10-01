@@ -23,25 +23,27 @@ import { unitLabel, prepareCourse } from '../core/generate.js';
 import { getJob, onJob } from '../core/jobs.js';
 import { suspendPowers, resumePowers } from '../ui/powers.js';
 
+// Dernière story lue par cours (retour depuis la "Version manga" → même endroit).
+const lastIndex = {};
 const MAX_SLIDE_CHARS = 650; // au-delà, un bloc est découpé en plusieurs écrans
 
 /** Transforme les parties du résumé en liste d'écrans (slides). */
 function buildSlides(sections) {
   const slides = [];
-  for (const s of sections) {
-    if (!s) continue;
+  sections.forEach((s, si) => {
+    if (!s) return;
     for (const b of s.blocks || []) {
       // On découpe les longs blocs par paragraphes pour garder "une notion par écran".
       const paras = String(b.text || '').split(/\n{2,}/);
       let buf = '';
-      const flush = () => { if (buf.trim()) slides.push({ section: s.title, pages: s.pages, kind: b.kind, text: buf.trim() }); buf = ''; };
+      const flush = () => { if (buf.trim()) slides.push({ section: s.title, si, pages: s.pages, kind: b.kind, text: buf.trim() }); buf = ''; };
       for (const p of paras) {
         if (buf && buf.length + p.length > MAX_SLIDE_CHARS) flush();
         buf += (buf ? '\n\n' : '') + p;
       }
       flush();
     }
-  }
+  });
   return slides;
 }
 
@@ -60,7 +62,7 @@ export async function render(el, [courseId]) {
     sections = job.data.sections || [];
   }
   let slides = buildSlides(sections);
-  let i = 0;
+  let i = !live && lastIndex[courseId] < slides.length ? lastIndex[courseId] : 0;
   let rewarded = false;
 
   el.innerHTML = `
@@ -91,6 +93,7 @@ export async function render(el, [courseId]) {
   }
 
   function show(dir = 1) {
+    lastIndex[courseId] = i;
     bar();
     if (i >= slides.length) return live ? showWaiting() : showEnd();
     const s = slides[i];
@@ -102,7 +105,8 @@ export async function render(el, [courseId]) {
         <div class="rich">${rich(s.text)}</div>
       </div>
       <button class="story-nav prev" aria-label="Précédent"></button>
-      <button class="story-nav next" aria-label="Suivant"></button>`;
+      <button class="story-nav next" aria-label="Suivant"></button>
+      ${live ? '' : `<a class="story-manga" href="#/manga/${course.id}/${s.si}" aria-label="Version manga de cette notion">📖 Version manga</a>`}`;
     stage.querySelector('.prev').onclick = prev;
     stage.querySelector('.next').onclick = next;
 

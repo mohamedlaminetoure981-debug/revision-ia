@@ -11,7 +11,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS, TEAM, EXPRESSIONS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, mascot, confirmBox, toast } from '../ui/ui.js';
+import { esc, mascot, confirmBox, toast, modal } from '../ui/ui.js';
 import { power } from '../ui/powers.js';
 import { runWithCouncil } from '../ui/council.js';
 import { confetti, onomatopoeia } from '../ui/fx.js';
@@ -20,6 +20,10 @@ import { creatorWelcome } from '../ui/creator-scene.js';
 import { creatorName } from '../core/creator.js';
 import { speedSection, bindSpeed } from './creator-speed.js';
 import { playSfx, voice, VOICE_LIST } from '../ui/sfx.js';
+import { stripSVG, stripToPng } from '../ui/manga.js';
+import { shareImage } from '../ui/share.js';
+import { DEMO_STRIP } from '../core/manga.js';
+import { storyState, saveStory } from '../core/story.js';
 
 const LEVELS = [
   { level: 'excellent', label: '19/20', name: '🏆 Excellent' },
@@ -29,7 +33,7 @@ const LEVELS = [
 ];
 
 export async function render(el) {
-  const [courses, cards, model] = await Promise.all([db.getAll('courses'), db.getAll('cards'), db.getSetting('model')]);
+  const [courses, cards, model, story, mangaCount] = await Promise.all([db.getAll('courses'), db.getAll('cards'), db.getSetting('model'), storyState(), db.getAll('mangas').then((m) => m.length)]);
   let expr = 'neutre';
 
   el.innerHTML = `
@@ -86,6 +90,20 @@ export async function render(el) {
         <button class="btn ghost" id="t-install">Installation</button>
         <button class="btn ghost" id="t-welcome">Accueil créateur</button>
       </div>
+    </div>
+
+    <div class="tile" style="margin-bottom:12px">
+      <h2 style="margin-top:0">🆕 Nouvelles fonctions</h2>
+      <h3>📖 Cours en manga & Histoire</h3>
+      <div class="panel-grid">
+        <button class="btn ghost" id="t-manga">Planche démo</button>
+        <button class="btn ghost" id="t-manga-png">Image de la planche</button>
+        <button class="btn ghost" id="t-story-all">${story.unlockAll ? '🔓 Chapitres : tous ouverts' : '🔒 Chapitres : normal'}</button>
+        <a class="btn ghost" href="#/histoire/1">Lire le chapitre 1</a>
+        <a class="btn ghost" href="#/boss/__demo">Boss démo</a>
+        <button class="btn ghost" id="t-story-reset">Remettre l'histoire à zéro</button>
+      </div>
+      <p class="tiny muted">Planches enregistrées : ${mangaCount}. Le boss démo n'enregistre rien.</p>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
@@ -165,9 +183,28 @@ export async function render(el) {
   $('#t-install').onclick = () => openInstall();
   $('#t-welcome').onclick = () => creatorWelcome();
 
+  // --- Nouvelles fonctions : manga & histoire ---
+  $('#t-manga').onclick = () => {
+    modal(`<div class="manga-frame" style="--c:${CHARACTERS.nia.color}">${stripSVG(DEMO_STRIP, { subtitle: 'Démo' })}</div>
+      <button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+    playSfx('page');
+  };
+  $('#t-manga-png').onclick = async () => shareImage(await stripToPng(DEMO_STRIP, { subtitle: 'Démo' }), 'manga-demo.png', 'Planche démo');
+  $('#t-story-all').onclick = async () => {
+    await saveStory({ ...story, unlockAll: !story.unlockAll });
+    toast(story.unlockAll ? 'Chapitres : déblocage normal.' : 'Tous les chapitres et boss sont ouverts (Mode Créateur).', 'ok');
+    render(el);
+  };
+  $('#t-story-reset').onclick = async () => {
+    await db.setSetting('story', null);
+    toast('Histoire remise à zéro (chapitres lus, boss vaincus).');
+    render(el);
+  };
+
   $('#reset').onclick = async () => {
     if (!(await confirmBox('Réinitialiser l’appli ? Tous les cours, fiches, résultats et la progression seront effacés (clé API et Mode Créateur gardés).', 'Réinitialiser'))) return;
-    for (const st of ['courses', 'images', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams']) await db.clear(st);
+    for (const st of ['courses', 'images', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams', 'mangas', 'focus']) await db.clear(st);
+    await db.setSetting('story', null);
     await db.setSetting('profile', null);
     toast('Appli réinitialisée.');
     location.hash = '#/bienvenue';

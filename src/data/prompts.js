@@ -413,3 +413,50 @@ ${exam.questions.map((q, i) => `[${i}] (${q.kind}, ${q.points} pts) ${q.statemen
 COURS :
 ${text}`;
 }
+
+// =====================================================================
+// 8. LE COURS EN MANGA (yonkoma : planche de 4 cases)
+// ---------------------------------------------------------------------
+// L'IA écrit UNIQUEMENT le contenu des 4 cases ; l'appli dessine la planche
+// avec les personnages SVG. Persos et expressions possibles ci-dessous.
+// =====================================================================
+const MANGA_CHARS = ['kai', 'mory', 'nia', 'sora', 'ren', 'awa', 'tidiane', 'binta'];
+const MANGA_EXPR = ['neutre', 'joie', 'reflexion', 'celebration', 'encouragement', 'surprise', 'concentration', 'clin'];
+
+export const MANGA_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    title: { type: 'STRING', description: 'Titre court et drôle de la planche' },
+    panels: {
+      type: 'ARRAY',
+      description: 'Exactement 4 cases, dans l’ordre de lecture',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          character: { type: 'STRING', enum: MANGA_CHARS },
+          expression: { type: 'STRING', enum: MANGA_EXPR },
+          line: { type: 'STRING', description: 'Réplique (max 120 caractères, SANS LaTeX)' },
+          narration: { type: 'STRING', description: 'Petit texte de narration optionnel (max 60 caractères), sinon vide' },
+          sfx: { type: 'STRING', description: 'Onomatopée manga optionnelle (ex. "BAM!", "?!"), sinon vide' },
+        },
+        required: ['character', 'expression', 'line', 'narration', 'sfx'],
+      },
+    },
+    source: SOURCE,
+  },
+  required: ['title', 'panels', 'source'],
+};
+
+export function mangaPrompt(notion, text) {
+  return `Écris un yonkoma (manga en 4 cases) où l'équipe s'explique cette notion avec humour.
+Persos : kai (guide), mory (geek), nia (explique avec des métaphores), sora (rapide, conclut),
+ren (rival qui ne comprend pas / taquine), awa (coach rigoureuse), tidiane (calme), binta (hype).
+Ex. : Ren ne comprend pas → Nia explique avec une métaphore → quelqu'un précise → Sora conclut.
+Contenu EXACT et fidèle au cours. Répliques courtes, sans LaTeX (écris x², √x, a/b).
+4 cases exactement. Source : page + citation.
+
+NOTION : ${notion}
+
+COURS :
+${text}`;
+}

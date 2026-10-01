@@ -145,6 +145,38 @@ const SOUNDS = {
     tone({ type: 'sine', f: 110, to: 55, dur: 0.5, vol: 0.5, at: 0.47 });
     noise({ dur: 0.4, vol: 0.35, type: 'highpass', f: 3000, at: 0.47 });
   },
+  // --- Cours en manga / mode Histoire ---
+  // Page qu'on tourne (froissement de papier)
+  page: () => {
+    noise({ dur: 0.28, vol: 0.3, f: 1800, to: 5000, q: 0.8 });
+    noise({ dur: 0.12, vol: 0.18, f: 900, at: 0.16, q: 2 });
+  },
+  // Coup de pinceau : une case apparaît
+  ink: () => noise({ dur: 0.1, vol: 0.22, type: 'highpass', f: 3000, to: 1200, q: 1 }),
+  // Chapitre débloqué : cadenas qui saute + accord
+  unlock: () => {
+    tone({ type: 'square', f: 1200, to: 800, dur: 0.05, vol: 0.15 });
+    [659, 880, 1318].forEach((f, i) => tone({ type: 'triangle', f, dur: 0.3, vol: 0.18, at: 0.08 + i * 0.07 }));
+  },
+  // Coup porté au boss (impact sec + éclat)
+  hit: () => {
+    tone({ type: 'sine', f: 160, to: 50, dur: 0.22, vol: 0.6 });
+    noise({ dur: 0.18, vol: 0.45, type: 'lowpass', f: 3000, to: 400 });
+    tone({ type: 'square', f: 1600, to: 2400, dur: 0.06, vol: 0.08, at: 0.02 });
+  },
+  // Attaque du boss (grondement sombre)
+  boss: () => {
+    tone({ type: 'sawtooth', f: 70, to: 45, dur: 0.6, vol: 0.3 });
+    noise({ dur: 0.5, vol: 0.35, type: 'lowpass', f: 600, to: 120, q: 0.8 });
+    tone({ type: 'square', f: 110, to: 82, dur: 0.4, vol: 0.08, at: 0.1 });
+  },
+  // Victoire : fanfare héroïque
+  victory: () => {
+    [392, 523, 659, 784].forEach((f, i) => tone({ type: 'square', f, dur: 0.16, vol: 0.12, at: i * 0.11 }));
+    [523, 659, 784, 1046].forEach((f) => tone({ type: 'triangle', f, dur: 1.1, vol: 0.14, at: 0.5 }));
+    tone({ type: 'sine', f: 98, to: 49, dur: 0.8, vol: 0.4, at: 0.5 });
+    setTimeout(() => SOUNDS.sparkle(), 600);
+  },
   // Compatibilité (anciens noms)
   level_up: () => SOUNDS.level(),
 };

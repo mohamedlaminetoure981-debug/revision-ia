@@ -14,10 +14,12 @@
 //   reviews   : historique des révisions de fiches (pour les statistiques)
 //   exercises : exercices d'application (phase 2)
 //   exams     : évaluations complètes (phase 2)
+//   mangas    : planches "cours en manga" déjà générées (jamais regénérées)
+//   focus     : sessions du mode Focus (dojo)
 // =====================================================================
 
 const DB_NAME = 'revision-ia';
-const DB_VERSION = 1; // ⚠️ à augmenter si tu ajoutes un store ou un index
+const DB_VERSION = 2; // ⚠️ à augmenter si tu ajoutes un store ou un index
 
 // Description des stores et de leurs index (pour rechercher vite).
 const STORES = {
@@ -30,6 +32,8 @@ const STORES = {
   reviews: { keyPath: 'id', indexes: ['cardId', 'day'] },
   exercises: { keyPath: 'id', indexes: ['courseId'] },
   exams: { keyPath: 'id', indexes: [] },
+  mangas: { keyPath: 'id', indexes: ['courseId'] },
+  focus: { keyPath: 'id', indexes: ['day'] },
 };
 
 let dbPromise = null;
@@ -169,7 +173,7 @@ export async function setSetting(key, value) {
 
 // Stores inclus dans la sauvegarde. Les images (lourdes) ne sont pas
 // incluses : le texte transcrit du cours suffit pour réviser.
-const BACKUP_STORES = ['courses', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams'];
+const BACKUP_STORES = ['courses', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams', 'mangas', 'focus'];
 
 /** Crée un objet contenant toutes les données (sauf la clé API). */
 export async function exportAll() {

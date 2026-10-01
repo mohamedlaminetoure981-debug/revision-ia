@@ -32,6 +32,9 @@ export const XP_RULES = {
   courseAdded: 40, // nouveau cours ajouté
   exercise: 20, // exercice corrigé (+ 2 XP par point obtenu sur 20)
   exam: 60, // examen blanc terminé (+ 4 XP par point obtenu sur 20)
+  manga: 8, // planche manga lue (1re fois)
+  chapter: 15, // chapitre du mode Histoire lu (1re fois)
+  boss: 100, // boss de fin d'arc vaincu (+ 5 XP par bonne réponse)
 };
 
 /** Objectifs du jour affichés sur l'accueil. */

@@ -5,6 +5,7 @@
 // =====================================================================
 
 import * as db from '../core/db.js';
+import { storyOverview } from '../core/story.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
 import { esc, mascot, say, line, subjectColor, subjectEmoji, displayName } from '../ui/ui.js';
@@ -25,7 +26,10 @@ function countUp(el, to, ms = 900) {
 
 export async function render(el) {
   const p = getProfileSync();
-  const [courses, cards, apiKey] = await Promise.all([db.getAll('courses'), db.getAll('cards'), db.getSetting('apiKey')]);
+  const [courses, cards, apiKey, story] = await Promise.all([db.getAll('courses'), db.getAll('cards'), db.getSetting('apiKey'), storyOverview()]);
+  const unlocked = story.chapters.filter((c) => c.unlocked);
+  const unread = unlocked.filter((c) => !c.read).length;
+  const bossReady = story.arcs.some((a) => a.ready && !a.defeated);
   const due = cards.filter((c) => isDue(c)).length;
   const streak = currentStreak(p);
   const lv = levelInfo(p.xp);
@@ -91,6 +95,14 @@ export async function render(el) {
       </div>
 
       <a class="btn block span-2 pulse" href="${next.href}">${next.label}</a>
+
+      <a class="tile span-2 story-tile" href="#/histoire">
+        <div class="row nowrap">${characterHTML('kai', { expression: unread ? 'celebration' : 'clin', size: 60, enter: false })}
+          <div class="grow"><div class="label">Mode Histoire · ${unlocked.length}/12</div>
+            <strong>${unread ? `📖 ${unread} chapitre${unread > 1 ? 's' : ''} à lire !` : bossReady ? '💀 Un boss t’attend…' : 'La Jeunesse contre l’Oubli'}</strong>
+            <div class="tiny muted">Révise pour débloquer la suite de l’histoire.</div></div>
+          ${unread || bossReady ? '<span class="dot-new"></span>' : ''}</div>
+      </a>
 
       ${lastCourse ? `
         <a class="tile span-2 course-card" href="#/course/${lastCourse.id}" style="--c:${subjectColor(lastCourse.subject)}">

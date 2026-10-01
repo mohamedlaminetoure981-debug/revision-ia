@@ -235,7 +235,8 @@ export async function render(el) {
 
   $('#wipe').onclick = async () => {
     if (!(await confirmBox('Effacer TOUS tes cours, fiches, résultats et ta progression ? Exporte une sauvegarde avant !', 'Tout effacer'))) return;
-    for (const st of ['courses', 'images', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams']) await db.clear(st);
+    for (const st of ['courses', 'images', 'cards', 'quizzes', 'results', 'reviews', 'exercises', 'exams', 'mangas', 'focus']) await db.clear(st);
+    await db.setSetting('story', null);
     await db.setSetting('profile', null);
     location.hash = '#/bienvenue';
     location.reload();

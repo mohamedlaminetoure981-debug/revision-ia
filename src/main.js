@@ -37,6 +37,9 @@ import * as exercise from './views/exercise.js';
 import * as exam from './views/exam.js';
 import * as stats from './views/stats.js';
 import * as creatorPanel from './views/creator-panel.js';
+import * as manga from './views/manga.js';
+import * as story from './views/story.js';
+import * as boss from './views/boss.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -56,6 +59,9 @@ const ROUTES = {
   exam: { view: exam }, //                        #/exam[/ID_EXAMEN]
   stats: { view: stats }, //                      #/stats
   createur: { view: creatorPanel }, //            #/createur (Mode Créateur seulement)
+  manga: { view: manga, fullscreen: true }, //    #/manga/ID_COURS/N°_NOTION
+  histoire: { view: story, fullscreen: (args) => !!args[0] }, // #/histoire[/N°_CHAPITRE]
+  boss: { view: boss, fullscreen: true }, //      #/boss/MATIÈRE
 };
 
 const app = document.getElementById('app');
@@ -78,8 +84,10 @@ async function route() {
   }
   if (name === 'createur' && !isCreator()) name = 'profil'; // panneau réservé au créateur
   const r = ROUTES[name] || ROUTES[''];
-  nav.hidden = !!r.fullscreen;
-  document.getElementById('sound-toggle')?.toggleAttribute('hidden', !!r.fullscreen);
+  // fullscreen peut dépendre de l'adresse (ex. liste des chapitres vs lecture).
+  const fullscreen = typeof r.fullscreen === 'function' ? r.fullscreen(args) : !!r.fullscreen;
+  nav.hidden = fullscreen;
+  document.getElementById('sound-toggle')?.toggleAttribute('hidden', fullscreen);
   onRoute(ROUTES[name] ? name : ''); // bandeau d'installation (caché sur certains écrans)
   nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats', 'createur'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
@@ -87,7 +95,7 @@ async function route() {
     const box = document.createElement('div');
     // Petite animation d'entrée (sauf plein écran : l'animation "transform"
     // empêcherait les écrans plein écran d'occuper tout l'écran).
-    if (!r.fullscreen) box.className = 'view-enter';
+    if (!fullscreen) box.className = 'view-enter';
     await r.view.render(box, args);
     app.innerHTML = '';
     app.appendChild(box);

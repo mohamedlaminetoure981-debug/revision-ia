@@ -47,6 +47,13 @@ export const BADGES = [
   { id: 'level_10', icon: '🌟', name: 'Niveau 10', desc: 'Atteindre le niveau 10', test: (c) => c.level >= 10 },
   { id: 'level_25', icon: '🚀', name: 'Niveau 25', desc: 'Atteindre le niveau 25', test: (c) => c.level >= 25 },
   { id: 'subjects_3', icon: '🌈', name: 'Touche-à-tout', desc: 'Des cours dans 3 matières', test: (c) => new Set(c.courses.map((x) => x.subject)).size >= 3 },
+  // --- Manga & Histoire ---
+  { id: 'manga_first', icon: '📖', name: 'Mangaka', desc: 'Lire ta première planche manga', test: (c) => (c.profile.totals?.mangas || 0) >= 1 },
+  { id: 'manga_10', icon: '🖋️', name: 'Collectionneur de planches', desc: 'Lire 10 planches manga', test: (c) => (c.profile.totals?.mangas || 0) >= 10 },
+  { id: 'story_5', icon: '📚', name: 'Fan de la série', desc: 'Lire 5 chapitres du mode Histoire', test: (c) => (c.profile.totals?.chapters || 0) >= 5 },
+  { id: 'story_all', icon: '🎬', name: 'Fin de saison', desc: 'Lire les 12 chapitres de la saison 1', test: (c) => (c.profile.totals?.chapters || 0) >= 12 },
+  { id: 'boss_first', icon: '👊', name: 'Tueur de boss', desc: 'Vaincre un boss de fin d’arc', test: (c) => c.results.some((r) => r.type === 'boss' && r.won) },
+  { id: 'boss_flawless', icon: '🛡️', name: 'Intouchable', desc: 'Vaincre un boss sans perdre de cœur', test: (c) => c.results.some((r) => r.type === 'boss' && r.won && r.hearts === 3) },
   { id: 'bug_hunter', icon: '🕵️', name: 'Chasseur d’erreurs', desc: 'Signaler ou corriger une fiche', test: (c) => c.cards.some((x) => x.flagged || x.edited) },
 ];
 

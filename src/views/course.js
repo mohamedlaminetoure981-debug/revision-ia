@@ -115,9 +115,10 @@ async function renderSummary(el, course) {
     <div class="row between" style="margin:14px 0 6px"><h2 style="margin:0">Lecture complète</h2>
       <button class="linkbtn small" id="regen">🔄 Refaire</button></div>
     <p class="tiny dim">Les blocs <strong style="color:var(--neon-pink)">💡 Explication ajoutée</strong> viennent de Nia, pas du cours original.</p>
-    ${course.summary.map((s) => `
+    ${course.summary.map((s, si) => `
       <section class="tile" style="margin-bottom:10px">
-        <h2>${esc(s.title)}</h2>
+        <div class="row between nowrap"><h2 style="margin:0">${esc(s.title)}</h2>
+          <a class="btn small manga-btn" href="#/manga/${course.id}/${si}" title="Version manga">📖 Manga</a></div>
         ${s.pages?.length ? `<div class="tiny dim">${label}${s.pages.length > 1 ? 's' : ''} ${s.pages.join(', ')}</div>` : ''}
         ${s.blocks.map((b) => (b.kind === 'explication'
           ? `<div class="explain"><div class="tag">💡 Explication ajoutée</div><div class="rich">${rich(b.text)}</div></div>`

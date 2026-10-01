@@ -993,6 +993,198 @@ const CREATOR_LINES = {
   },
 };
 
+// =====================================================================
+// RÉPLIQUES DES NOUVELLES FONCTIONNALITÉS
+// ---------------------------------------------------------------------
+// normal   : répliques pour tout le monde
+// createur : répliques taquines réservées au Mode Créateur
+// Utilisation : line('nia', 'manga_pret')
+//   manga_*   : le cours en manga (Nia)
+//   histoire_*: le mode Histoire (Kaï)
+//   boss_*    : le combat de fin d'arc (Ren + soutien de l'équipe)
+// =====================================================================
+const FEATURE_LINES = {
+  nia: {
+    normal: {
+      manga_attente: [
+        'Je sors mes feutres… la planche arrive !',
+        'Je cherche la meilleure métaphore, deux secondes.',
+        'Case 1… case 2… j’encre les traits !',
+        'Ren va encore jouer le rôle de celui qui comprend rien, hihi.',
+        'Je dessine, toi tu respires. Ça arrive.',
+        'Un manga sur ton cours, ça se mérite. Presque fini !',
+        'Je place les bulles… et un petit BAM! pour le style.',
+        'Mory scanne, moi je dessine. Travail d’équipe !',
+        'Les persos se maquillent pour la planche…',
+        'Encore un coup de trame et c’est prêt.',
+      ],
+      manga_pret: [
+        'Tadaa ! Ta notion en 4 cases.',
+        'Lis de haut en bas, comme un vrai yonkoma.',
+        'Une image vaut mille fiches. Enfin presque.',
+        'Si tu ris, tu retiens. C’est scientifique (ou presque).',
+        'Planche rangée dans ta collection : plus besoin de la refaire.',
+        'Regarde Ren galérer, c’est cadeau.',
+        'Le passage du cours est juste en dessous, pour vérifier.',
+        'Elle est belle, non ? Partage-la à ta classe !',
+        'J’ai gardé le contenu exact du cours, promis.',
+        'Relis la dernière case : c’est la phrase à retenir.',
+      ],
+      manga_partage: [
+        'Envoie-la sur le groupe de classe !',
+        'Tes potes vont réviser sans s’en rendre compte.',
+        'Partage = tu expliques = tu retiens deux fois.',
+        'Une planche sur WhatsApp, et toute la classe révise.',
+        'Image prête ! Elle est à toi.',
+        'Fais tourner, c’est cadeau de la team.',
+        'Ton groupe de révision va adorer.',
+        'Partagée ! Ren va devenir célèbre… pour les mauvaises raisons.',
+        'La culture, ça se partage.',
+        'Hop, une planche de plus dans le monde !',
+      ],
+    },
+    createur: {
+      manga_attente: ['Je dessine pour le créateur… pression maximale.', 'Patience, patron. Même toi tu dessines pas aussi vite.', 'Je t’ai dessiné en flemmard de 3 h du mat’ dans un coin. Je rigole. Ou pas.'],
+      manga_pret: ['Planche finie, sensei. T’as pas codé le dessin, avoue que je suis douée.', 'Voilà, créateur. Même ton cours devient stylé.', 'Ren râle encore. Tu l’as codé comme ça, assume.'],
+      manga_partage: ['Partage, boss. Montre au monde ce que ton équipe sait faire.', 'Tu vas te vanter que c’est toi qui l’as dessinée, hein ?'],
+    },
+  },
+  kai: {
+    normal: {
+      histoire_intro: [
+        'Bienvenue dans notre histoire, {prenom}. Chaque matière est un arc.',
+        'Révise, et tu débloques la suite. C’est toi le moteur de l’histoire.',
+        'Chaque fiche maîtrisée nous rapproche du prochain chapitre.',
+        'L’Oubli rôde. Seules tes révisions peuvent le repousser.',
+        'Tu veux savoir comment la team s’est formée ? Révise, et tu sauras.',
+        'Chapitre après chapitre, on écrit ça ensemble.',
+        'Pas de pub, pas d’IA : juste notre histoire, rien que pour toi.',
+        'Un quiz réussi = un pas de plus dans l’arc.',
+        'Le boss de fin d’arc t’attend. Prépare-toi.',
+        'Prêt(e) pour le prochain épisode ?',
+      ],
+      histoire_verrou: [
+        'Chapitre verrouillé. Maîtrise encore quelques fiches !',
+        'Pas si vite ! Un petit quiz et ça s’ouvre.',
+        'La suite se mérite. Va réviser un peu.',
+        'Encore un effort et ce chapitre est à toi.',
+        'Le cadenas tombe quand tu révises. C’est la règle.',
+        'Ce chapitre attend que tu progresses.',
+        'Tu veux la suite ? Montre-moi ce que tu sais.',
+        'Une session de fiches, et on reprend l’histoire.',
+        'Patience, la suite arrive avec tes progrès.',
+        'Pas de spoil ! Révise d’abord.',
+      ],
+      histoire_nouveau: [
+        'Nouveau chapitre débloqué ! Va lire ça.',
+        'Tes révisions ont payé : la suite est dispo !',
+        'Un chapitre de plus ! L’histoire avance.',
+        'Ding ! Chapitre suivant ouvert.',
+        'T’as débloqué la suite. Fier de toi.',
+        'L’arc continue, grâce à toi.',
+        'Suite de l’histoire dispo, {prenom} !',
+        'Tu progresses, l’histoire aussi.',
+        'Ça y est ! On découvre la suite ensemble ?',
+        'Un nouveau chapitre t’attend. Va vite !',
+      ],
+    },
+    createur: {
+      histoire_intro: ['Le créateur lit sa propre histoire. C’est un peu narcissique, non ?', 'T’as écrit qu’on t’appelle « flemmard de 3 h du matin »… attends de lire la fin.', 'Bienvenue dans ton propre scénario, patron. Pas de triche.'],
+      histoire_verrou: ['Même toi tu dois réviser pour débloquer, sensei. Règle d’or.', 'Tu connais la fin, mais tu dois quand même la mériter, baka.', 'Le patron bloqué par son propre cadenas. J’adore.'],
+      histoire_nouveau: ['Chapitre débloqué, boss. Tu vas rougir en le lisant.', 'Suite ouverte ! T’apparais dedans, prépare-toi.'],
+    },
+  },
+  ren: {
+    normal: {
+      boss_intro: [
+        'L’Oubli est là. Enfin un adversaire à ma taille.',
+        'Tu vois cette ombre ? Elle veut effacer tout ce que t’as appris.',
+        'Chaque bonne réponse, c’est un coup. Frappe fort.',
+        'Pas de panique. Juste toi, tes révisions, et moi derrière.',
+        'Le boss de l’arc. On le met K.O. ensemble ?',
+        'Trois cœurs. Pas un de plus. Concentre-toi.',
+        'Je te prête ma rage. Utilise-la bien.',
+        'Ce boss a battu des centaines d’élèves. Pas toi.',
+        'Montre-lui que t’as bossé.',
+        'C’est l’heure du combat final de l’arc. Go !',
+      ],
+      boss_coup: [
+        'TOUCHÉ ! Encore !',
+        'Ça, c’est un coup critique !',
+        'Il vacille ! Continue !',
+        'Pas mal… pour un(e) débutant(e). Encore !',
+        'BAM ! Sa barre de vie fond !',
+        'Il a senti celle-là.',
+        'Exactement ! Frappe encore !',
+        'T’es en feu !',
+        'Combo ! Ne le laisse pas respirer.',
+        'Ça c’est mon élève… enfin, mon rival.',
+      ],
+      boss_degat: [
+        'Aïe ! Il t’a eu. Concentre-toi.',
+        'Mauvaise réponse… il contre-attaque !',
+        'Relève-toi ! On n’a pas fini.',
+        'Pfff. Il a profité de ta faille. Retiens la correction.',
+        'Un cœur en moins. Pas deux.',
+        'Ok, il frappe fort. Toi aussi, tu peux.',
+        'Respire. Lis bien la question.',
+        'Ça pique… mais tu vas lui rendre.',
+        'Il rigole. Fais-le taire.',
+        'Erreur. Note-la, et frappe plus fort.',
+      ],
+      boss_victoire: [
+        'K.O. ! L’Oubli est vaincu !',
+        'Je l’avoue : t’as été incroyable.',
+        'Victoire ! Cet arc est à toi.',
+        'Tu l’as écrasé. Respect.',
+        'Le boss est tombé. Et toi, t’es debout.',
+        'C’était un vrai combat. GG.',
+        'Je vais devoir m’entraîner plus pour rester ton rival.',
+        'L’arc est bouclé. Légendaire.',
+        'Personne ne t’arrête. Personne.',
+        'Même moi, j’ai frissonné.',
+      ],
+      boss_defaite: [
+        'Il t’a eu cette fois. Mais il reviendra, et toi aussi.',
+        'Défaite… Révise les points faibles et on y retourne.',
+        'Même moi j’ai perdu contre lui au début. Revanche ?',
+        'Pas de honte. Juste une revanche à prendre.',
+        'Il a gagné une bataille, pas la guerre.',
+        'Va revoir tes fiches. Puis on lui casse la figure.',
+        'Je reste dans ton coin. On réessaie quand tu veux.',
+        'La prochaine fois, il tombe.',
+        'Retiens ses attaques : ce sont tes erreurs.',
+        'Respire, révise, reviens.',
+      ],
+    },
+    createur: {
+      boss_intro: ['Le créateur contre son propre boss. Si tu perds, c’est gênant, baka.', 'T’as codé ce boss. Il te connaît. Il sait que tu dors pas.', 'Allez sensei, prouve que t’es pas juste un codeur de nuit.'],
+      boss_coup: ['Pas mal, patron !', 'Le créateur frappe ! Qui l’eût cru ?', 'Touché ! T’as révisé ou t’as lu le code ?'],
+      boss_degat: ['Aïe, le boss que TU as codé te bat. Ironique.', 'Même ton propre code se moque de toi, baka.', 'Concentre-toi, créateur ! Pas de bug.'],
+      boss_victoire: ['Le créateur a vaincu sa création. Enfin un peu de respect.', 'GG patron. Maintenant, va dormir.', 'K.O. ! Bon, t’es pas si flemmard.'],
+      boss_defaite: ['Battu par ton propre boss… Je vais le raconter à tout le monde.', 'Revanche, sensei. Et cette fois, révise vraiment.'],
+    },
+  },
+};
+
+// Soutien de l'équipe pendant le combat (une phrase quand tu touches le boss).
+const BOSS_SUPPORT = {
+  kai: ['Vas-y {prenom}, on est avec toi !', 'Garde le rythme !', 'C’est ça, l’esprit de la team !'],
+  mory: ['Données analysées : il faiblit à 87 % !', 'Scan : point faible détecté !', 'Je booste ta connexion… mentale !'],
+  nia: ['Comme une vague : tu reviens toujours plus fort(e) !', 'Belle réponse, c’est poétique !', 'Il fond comme du beurre au soleil !'],
+  sora: ['Rapide et précis !', 'Zip ! Suivant !', 'Pas de temps à perdre, frappe !'],
+  awa: ['Technique parfaite !', 'Posture, souffle, frappe. Bien !', 'Discipline = victoire !'],
+  tidiane: ['Calme et juste. Parfait.', 'Tu as retenu ta leçon.', 'Chaque erreur passée te rend fort(e) maintenant.'],
+  binta: ['OUAIIIS ! Trop fort(e) !', 'Je filme pour ton story !', 'Combo de malade !'],
+};
+
+// On ajoute ces répliques aux personnages (lignes normales + créateur).
+for (const [id, f] of Object.entries(FEATURE_LINES)) {
+  Object.assign(CHARACTERS[id].lines, f.normal);
+  CREATOR_LINES[id] = { ...(CREATOR_LINES[id] || {}), ...f.createur };
+}
+for (const [id, list] of Object.entries(BOSS_SUPPORT)) CHARACTERS[id].lines.boss_soutien = list;
+
 // On range répliques du conseil, pouvoir et répliques "créateur" dans chaque personnage.
 for (const [id, c] of Object.entries(CHARACTERS)) {
   c.council = COUNCIL_LINES[id] || COUNCIL_LINES.kai;
