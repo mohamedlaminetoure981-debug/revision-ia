@@ -529,7 +529,7 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 
 ---
 
-## 10 sexies. Nouvelles fonctions (v1.4 et suivantes)
+## 10 sexies. Nouvelles fonctions (v1.4 à v1.7)
 
 ### 📖 Le cours en manga (Nia)
 - Bouton **📖 Manga** sur chaque notion du résumé, et **📖 Version manga** sur chaque story.
@@ -595,6 +595,34 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
 - Sessions enregistrées (store `focus`) : minutes du jour / 7 jours / total dans Profil.
 - Badges : Premier entraînement, Esprit d'acier (session sans sortie), Maître du dojo (10 h).
 - Nouveaux sons : `gong`, `oops`.
+
+### 🧠 « Explique-moi comme si j'étais nul » (Ren) — `src/core/feynman.js`, `src/views/feynman.js`
+- Accès : onglet Quiz → **🧠 Explique-moi**, ou bouton 🧠 à côté de chaque notion du résumé.
+- Ren fait semblant de ne rien comprendre ; tu expliques par écrit (60 caractères minimum).
+- L'IA (d'après ton cours) fait poser à Ren 2 ou 3 questions naïves mais piégeuses (en streaming),
+  tu réponds une par une (ou « Je sais pas »).
+- Résultat avec le conseil de correction : note de compréhension /20, ce qui est bien expliqué,
+  oublié, faux, une correction courte et le passage du cours.
+- Jamais deux fois le même appel : une explication identique réutilise les questions déjà reçues.
+- Consignes : `feynmanQuestionsPrompt` et `feynmanGradePrompt` dans `src/data/prompts.js`.
+
+### 🌙 Veille d'examen (toute l'équipe) — `src/core/veille.js`, `src/views/veille.js`
+- Accès : onglet Quiz → **🌙 Veille d'exam**.
+- Tu choisis la matière, ton temps (1 à 6 h) et l'heure de l'examen.
+- Le plan vient de TES stats (fiches ratées, oublis, questions manquées) : cycle d'environ 1 h
+  = focus au dojo 25 min → pause → fiches fragiles 15 min → quiz 10 min → pause,
+  puis toujours un **mini examen final** (8 questions, d'abord celles déjà ratées).
+- On réutilise tes fiches et quiz : l'IA n'est appelée que s'il n'existe aucun quiz pour la matière.
+- Les blocs se cochent seuls (dojo, fiches, quiz) ; l'équipe se charge en puissance au fil de la nuit ;
+  examen final réussi (≥ 70 %) → **pouvoir ultime**.
+- Tidiane veille sur ton sommeil : heure de coucher conseillée (8 h 30 avant l'examen)
+  et proposition de raccourcir le plan si besoin.
+- Ambiance de nuit (étoiles, lune) + grillons générés en option (🦗).
+
+### 🧪 Tester les nouveautés (Mode Créateur)
+Panneau créateur → **🆕 Nouvelles fonctions** : planche manga démo, chapitres tous ouverts,
+boss démo, duel démo et longueur du lien, statuts démo, carte légendaire, réouverture du paquet,
+dojo d'1 minute, ambiances, veille (tout cocher sauf l'examen final, effacer).
 
 ### Répliques, sons, tests
 - Répliques des nouvelles fonctions (et taquineries du Mode Créateur) : section
@@ -678,9 +706,13 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **Phase 3** : conseil de correction animé (téléportation, table, délibération,
   révélation), auras et pouvoirs spéciaux des 8 persos, règles de rareté, réglage
   complète / courte / désactivée.
+- ✅ **v1.4** : cours en manga (planches yonkoma), mode Histoire (12 chapitres), boss de fin d'arc.
+- ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
+- ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
+- ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
 
 Bibliothèques utilisées (incluses dans l'appli, rien à télécharger en plus) :
 [Vite](https://vite.dev), [KaTeX](https://katex.org) (formules),
-[pdf.js](https://mozilla.github.io/pdf.js/) (lecture des PDF),
+[pdf.js](https://mozilla.github.io/pdf.js/) (lecture des PDF), [lz-string](https://github.com/pieroxy/lz-string) (liens de duel),
 polices [Unbounded](https://fonts.google.com/specimen/Unbounded) et
 [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) (via Fontsource).

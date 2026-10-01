@@ -324,7 +324,7 @@ details > summary .rich p { display: inline; margin: 0; }
 /* =====================================================================
    MODE FOCUS (dojo)
    ===================================================================== */
-.dojo { background-image: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%), repeating-linear-gradient(90deg, transparent 0 60px, rgba(255, 255, 255, .02) 60px 62px); }
+.dojo { background-image: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%), repeating-linear-gradient(90deg, transparent 0 60px, rgba(255, 255, 255, .02) 60px 62px); background-size: auto; }
 .stepper { gap: 6px; align-items: center; }
 .dojo-ring { position: relative; width: min(72vw, 280px); aspect-ratio: 1; margin: 0 auto; }
 .dojo-ring > svg { position: absolute; inset: 0; transform: rotate(-90deg); }
@@ -338,3 +338,29 @@ details > summary .rich p { display: inline; margin: 0; }
 @keyframes dojo-breathe { 50% { transform: scale(1.03); } }
 @media (prefers-reduced-motion: reduce) { .dojo-train .ch, .dojo-rest .ch { animation: none; } }
 #amb { flex-wrap: wrap; } #amb button { min-width: 45%; }
+
+/* =====================================================================
+   EXPLIQUE-MOI (Feynman) + VEILLE D'EXAMEN
+   ===================================================================== */
+.feynman textarea { width: 100%; }
+.feynman-chat { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.feynman-chat .msg { padding: 10px 12px; border-radius: 16px; max-width: 88%; font-size: .95rem; animation: story-in .3s; }
+.feynman-chat .msg.me { align-self: flex-end; background: color-mix(in srgb, var(--neon-violet, #8B5CF6) 22%, var(--surface)); border-bottom-right-radius: 4px; }
+.feynman-chat .msg.ren { align-self: flex-start; background: var(--surface); border: 2px solid var(--c); border-bottom-left-radius: 4px; }
+.fb { margin: 10px 0; padding: 10px 12px; border-radius: 14px; background: var(--surface); border-left: 4px solid var(--border-strong); }
+.fb ul { margin: 6px 0 0; padding-left: 1.2em; }
+.fb.ok { border-color: var(--neon-green); } .fb.warn { border-color: var(--neon-yellow); } .fb.bad { border-color: var(--neon-pink); }
+.notion-pick summary { cursor: pointer; }
+.notion-row { display: flex; align-items: center; gap: 8px; padding: 10px 4px; border-top: 1px solid var(--border); color: var(--text); text-decoration: none; }
+.veille-night { background-color: #050816; background-image: radial-gradient(circle at 85% 8%, #fff8d6 0 18px, rgba(255, 248, 214, .25) 19px, transparent 60px), radial-gradient(1.2px 1.2px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 20%, #fff, transparent), radial-gradient(1.4px 1.4px at 40% 70%, #fff, transparent), radial-gradient(1px 1px at 85% 60%, #fff, transparent), radial-gradient(1px 1px at 10% 85%, #fff, transparent), linear-gradient(180deg, #0a1030, #050816 70%); background-size: auto; color: #eef; }
+.veille-night.dawn { background-image: radial-gradient(circle at 50% 110%, #ffb02088, transparent 60%), linear-gradient(180deg, #1a1450, #3a1d5e 60%, #ff7a59); background-size: auto; }
+.veille-team { display: flex; justify-content: center; flex-wrap: wrap; gap: 0; margin-top: 4px; }
+.veille-plan { display: flex; flex-direction: column; gap: 6px; }
+.vblock { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1); }
+.vblock .grow { display: flex; flex-direction: column; min-width: 0; }
+.vblock .vtime { width: 3.2em; font-variant-numeric: tabular-nums; font-size: .8rem; opacity: .7; }
+.vblock .vicon { font-size: 1.3rem; }
+.vblock.next { border-color: var(--neon-pink); box-shadow: 0 0 16px color-mix(in srgb, var(--neon-pink) 35%, transparent); }
+.vblock.done { opacity: .55; }
+.vblock.t-final { border-style: dashed; border-color: #FFD23F; }
+.veille-tile { background-image: radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), linear-gradient(160deg, #0a1030, var(--surface)); }

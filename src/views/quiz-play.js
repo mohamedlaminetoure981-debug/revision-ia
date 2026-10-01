@@ -31,7 +31,10 @@ export async function render(el, [quizId]) {
       <p>Ce quiz n'existe plus.</p><a class="btn" href="#/quiz">Retour</a></div>`;
     return;
   }
-  const back = `#/course/${course.id}/quiz`;
+  // Lancé depuis le plan de veille d'examen → on y retourne.
+  let fromVeille = false;
+  try { fromVeille = sessionStorage.getItem('veilleReturn') === '1'; } catch { /* ignoré */ }
+  const back = fromVeille ? '#/veille' : `#/course/${course.id}/quiz`;
   const useTimer = await db.getSetting('quizTimer');
   const previous = (await db.getByIndex('results', 'courseId', course.id)).filter((r) => r.quizId === quiz.id);
   const record = previous.length ? Math.max(...previous.map((r) => r.score)) : null;

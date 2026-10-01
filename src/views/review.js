@@ -20,6 +20,7 @@ import { celebrate, vibrate, sound, confetti, onomatopoeia, hypeWord } from '../
 import { reportCard } from './report.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { pendingCount } from '../core/collection.js';
+import { loadVeille, saveVeille } from '../core/veille.js';
 
 // Direction du swipe → note SM-2, texte du tampon, XP.
 const DIRS = {
@@ -44,13 +45,18 @@ function when(n) {
   return n === 0 ? 'auj.' : n === 1 ? 'demain' : `${n} j`;
 }
 
-export async function render(el, [courseId]) {
+export async function render(el, [courseId, blockId]) {
   const courses = Object.fromEntries((await db.getAll('courses')).map((c) => [c.id, c]));
-  const all = courseId ? await db.getByIndex('cards', 'courseId', courseId) : await db.getAll('cards');
-  const queue = shuffle(all.filter((c) => isDue(c) && courses[c.courseId]));
+  // Mode veille d'examen : on révise les fiches fragiles du bloc, même si elles ne sont pas "dues".
+  const veille = courseId === 'veille' ? await loadVeille() : null;
+  const vblock = veille?.plan.find((b) => b.id === blockId);
+  let all;
+  if (vblock) all = (await db.getAll('cards')).filter((c) => vblock.cardIds?.includes(c.id));
+  else all = courseId ? await db.getByIndex('cards', 'courseId', courseId) : await db.getAll('cards');
+  const queue = shuffle(all.filter((c) => (vblock || isDue(c)) && courses[c.courseId]));
   const initial = queue.length;
   const counts = { rate: 0, difficile: 0, moyen: 0, facile: 0 };
-  const back = courseId ? `#/course/${courseId}/fiches` : '#/';
+  const back = vblock ? '#/veille' : courseId ? `#/course/${courseId}/fiches` : '#/';
   const sora = CHARACTERS.sora;
   let done = 0;
   let xpTotal = 0;
@@ -258,6 +264,7 @@ export async function render(el, [courseId]) {
 
   function finish() {
     const good = counts.facile + counts.moyen;
+    if (vblock) { vblock.done = true; saveVeille(veille); }
     zone.innerHTML = `
       <div class="face" style="position:relative;inset:auto;height:100%;text-align:center;justify-content:center;align-items:center;gap:8px">
         ${characterHTML('sora', { expression: 'celebration', size: 150 })}

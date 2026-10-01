@@ -118,7 +118,8 @@ async function renderSummary(el, course) {
     ${course.summary.map((s, si) => `
       <section class="tile" style="margin-bottom:10px">
         <div class="row between nowrap"><h2 style="margin:0">${esc(s.title)}</h2>
-          <a class="btn small manga-btn" href="#/manga/${course.id}/${si}" title="Version manga">📖 Manga</a></div>
+          <span class="row nowrap" style="gap:6px"><a class="btn small ghost manga-btn" href="#/feynman/${course.id}/${si}" title="Explique cette notion à Ren">🧠</a>
+          <a class="btn small manga-btn" href="#/manga/${course.id}/${si}" title="Version manga">📖 Manga</a></span></div>
         ${s.pages?.length ? `<div class="tiny dim">${label}${s.pages.length > 1 ? 's' : ''} ${s.pages.join(', ')}</div>` : ''}
         ${s.blocks.map((b) => (b.kind === 'explication'
           ? `<div class="explain"><div class="tag">💡 Explication ajoutée</div><div class="rich">${rich(b.text)}</div></div>`

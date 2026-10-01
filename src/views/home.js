@@ -26,6 +26,7 @@ function countUp(el, to, ms = 900) {
 }
 
 export async function render(el) {
+  try { sessionStorage.removeItem('veilleReturn'); } catch { /* ignoré */ }
   const p = getProfileSync();
   const [courses, cards, apiKey, story] = await Promise.all([db.getAll('courses'), db.getAll('cards'), db.getSetting('apiKey'), storyOverview()]);
   const unlocked = story.chapters.filter((c) => c.unlocked);

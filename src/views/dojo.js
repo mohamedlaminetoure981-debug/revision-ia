@@ -42,6 +42,8 @@ export async function render(el, [mode]) {
   if (mode === 'test' && isCreator()) { prefs.work = 1; prefs.rest = 1; }
   const comp = getProfileSync()?.companion || 'kai';
   const awa = CHARACTERS.awa;
+  let home = '#/';
+  try { if (sessionStorage.getItem('veilleReturn') === '1') home = '#/veille'; } catch { /* ignoré */ }
   const stats = await focusStats();
   let timer = null;
   let session = null; // { phase:'work'|'rest', endAt, total(ms), leaves, hiddenAt, aura }
@@ -53,7 +55,7 @@ export async function render(el, [mode]) {
   function setup() {
     el.innerHTML = `
       <div class="fs dojo" style="--c:${awa.color};overflow-y:auto">
-        <div class="fs-top"><a class="fs-close" href="#/" style="display:grid;place-items:center;text-decoration:none">✕</a>
+        <div class="fs-top"><a class="fs-close" href="${home}" style="display:grid;place-items:center;text-decoration:none">✕</a>
           <div class="grow"><div class="label">Mode Focus</div><strong>🥋 Le dojo d'Awa</strong></div></div>
         <div style="max-width:440px;width:100%;margin:0 auto">
           <div class="mascot" style="--c:${awa.color};margin:10px 0">${characterHTML('awa', { expression: 'concentration', size: 84 })}
@@ -206,7 +208,7 @@ export async function render(el, [mode]) {
           <div class="bubble"><span class="who">Awa</span><span class="say">${esc(line('awa', pure ? 'focus_fin' : 'focus_fin_triche'))}</span></div></div>
         <div class="row" style="justify-content:center;gap:8px">
           <button class="btn" id="rest">☕ Pause ${prefs.rest} min</button>
-          <a class="btn ghost" href="#/">🏠 Accueil</a>
+          <a class="btn ghost" href="${home}">${home === '#/veille' ? '🌙 Retour au plan' : '🏠 Accueil'}</a>
         </div>
       </div>`;
     sound(pure ? 'victory' : 'gong');

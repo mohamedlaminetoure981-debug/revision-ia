@@ -460,3 +460,64 @@ NOTION : ${notion}
 COURS :
 ${text}`;
 }
+
+// =====================================================================
+// 9. "EXPLIQUE-MOI COMME SI J'ÉTAIS NUL" (méthode Feynman, avec Ren)
+// ---------------------------------------------------------------------
+// Étape 1 : Ren lit l'explication de l'élève et pose 2-3 questions naïves
+//           mais piégeuses (sur les trous de l'explication).
+// Étape 2 : note de compréhension + points oubliés/faux + correction courte.
+// =====================================================================
+export const FEYNMAN_QUESTIONS_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    reaction: { type: 'STRING', description: 'Réaction courte de Ren à l’explication (taquin, 1 phrase)' },
+    questions: { type: 'ARRAY', items: { type: 'STRING' }, description: '2 ou 3 questions naïves mais piégeuses' },
+  },
+  required: ['reaction', 'questions'],
+};
+
+export function feynmanQuestionsPrompt(notion, explanation, text) {
+  return `Tu joues Ren, un élève qui fait semblant de ne RIEN comprendre. L'élève t'explique une notion.
+Pose 2 ou 3 questions naïves (vocabulaire simple, tutoiement) mais piégeuses, qui visent ce qui
+MANQUE ou est FLOU ou FAUX dans son explication, d'après le cours. Une question par idée. Pas de LaTeX.
+
+NOTION : ${notion}
+
+EXPLICATION DE L'ÉLÈVE :
+${explanation}
+
+COURS (référence) :
+${text}`;
+}
+
+export const FEYNMAN_GRADE_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    grade: { type: 'INTEGER', description: 'Note de compréhension sur 20' },
+    understood: { type: 'ARRAY', items: { type: 'STRING' }, description: 'Ce que l’élève a bien compris (court)' },
+    missed: { type: 'ARRAY', items: { type: 'STRING' }, description: 'Points importants oubliés' },
+    wrong: { type: 'ARRAY', items: { type: 'STRING' }, description: 'Erreurs ou confusions' },
+    correction: { type: 'STRING', description: 'Explication correcte et courte de la notion (5 lignes max)' },
+    source: SOURCE,
+  },
+  required: ['grade', 'understood', 'missed', 'wrong', 'correction', 'source'],
+};
+
+export function feynmanGradePrompt(notion, explanation, qa, text) {
+  return `Évalue la compréhension de l'élève qui a expliqué une notion puis répondu aux questions de Ren.
+Base-toi UNIQUEMENT sur le cours. Sois juste et bienveillant. Note sur 20.
+Liste ce qui est compris, oublié, faux (listes courtes, vides si rien). Correction courte et exacte.
+Source : page + citation exacte du cours.
+
+NOTION : ${notion}
+
+EXPLICATION :
+${explanation}
+
+QUESTIONS DE REN ET RÉPONSES :
+${qa.map((x, i) => `${i + 1}. ${x.q}\n→ ${x.a || '(pas de réponse)'}`).join('\n')}
+
+COURS :
+${text}`;
+}

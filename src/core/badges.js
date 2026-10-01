@@ -61,6 +61,10 @@ export const BADGES = [
   { id: 'focus_first', icon: '🥋', name: 'Premier entraînement', desc: 'Terminer une session au dojo', test: (c) => c.focus.some((f) => f.completed) },
   { id: 'focus_pure', icon: '🧘', name: 'Esprit d’acier', desc: 'Session complète sans quitter l’appli', test: (c) => c.focus.some((f) => f.completed && !f.leaves && f.minutes >= 20) },
   { id: 'focus_10h', icon: '⏳', name: 'Maître du dojo', desc: '10 heures de focus au total', test: (c) => c.focus.reduce((s, f) => s + (f.minutes || 0), 0) >= 600 },
+  // --- Explique-moi & veille ---
+  { id: 'feynman_first', icon: '🧠', name: 'Prof d’un jour', desc: 'Expliquer une notion à Ren', test: (c) => c.results.some((r) => r.type === 'feynman' && r.grading) },
+  { id: 'feynman_ace', icon: '🎓', name: 'Ren a compris !', desc: '18/20 à « Explique-moi »', test: (c) => c.results.some((r) => r.type === 'feynman' && r.score >= 18) },
+  { id: 'veille_ultime', icon: '🌙', name: 'Nuit légendaire', desc: 'Réussir l’examen final d’une veille', test: (c) => !!c.veille?.final?.passed },
   { id: 'bug_hunter', icon: '🕵️', name: 'Chasseur d’erreurs', desc: 'Signaler ou corriger une fiche', test: (c) => c.cards.some((x) => x.flagged || x.edited) },
 ];
 
@@ -70,7 +74,8 @@ export async function badgeContext() {
   const [courses, cards, reviews, results, focus] = await Promise.all([
     db.getAll('courses'), db.getAll('cards'), db.getAll('reviews'), db.getAll('results'), db.getAll('focus'),
   ]);
-  return { profile, level: levelFromXp(profile.xp), courses, cards, reviews, results, focus };
+  const veille = await db.getSetting('veille');
+  return { profile, level: levelFromXp(profile.xp), courses, cards, reviews, results, focus, veille };
 }
 
 /**

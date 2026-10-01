@@ -43,6 +43,8 @@ import * as boss from './views/boss.js';
 import * as duel from './views/duel.js';
 import * as collection from './views/collection.js';
 import * as dojo from './views/dojo.js';
+import * as feynman from './views/feynman.js';
+import * as veille from './views/veille.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -68,6 +70,8 @@ const ROUTES = {
   duel: { view: duel, fullscreen: true }, //      #/duel/QUIZ_COMPRESSÉ (marche même sans profil)
   collection: { view: collection, fullscreen: (args) => args[0] === 'ouvrir' }, // #/collection[/ouvrir]
   dojo: { view: dojo, fullscreen: true }, //      #/dojo (mode Focus)
+  feynman: { view: feynman, fullscreen: (args) => !!args[0] }, // #/feynman[/ID_COURS/N°_NOTION]
+  veille: { view: veille, fullscreen: true }, //  #/veille (veille d'examen)
 };
 
 const app = document.getElementById('app');
@@ -96,7 +100,7 @@ async function route() {
   nav.hidden = fullscreen;
   document.getElementById('sound-toggle')?.toggleAttribute('hidden', fullscreen);
   onRoute(ROUTES[name] ? name : ''); // bandeau d'installation (caché sur certains écrans)
-  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats', 'createur', 'collection'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam'].includes(name) && a.dataset.route === 'quiz')));
+  nav.querySelectorAll('a').forEach((a) => a.classList.toggle('active', a.dataset.route === name || (name === 'course' && a.dataset.route === 'cours') || (['reglages', 'stats', 'createur', 'collection'].includes(name) && a.dataset.route === 'profil') || (['exo', 'exam', 'feynman', 'veille'].includes(name) && a.dataset.route === 'quiz')));
   app.innerHTML = '<div class="spinner"></div>';
   try {
     const box = document.createElement('div');

@@ -34,6 +34,10 @@ export async function render(el) {
         <div class="label">Avec Awa</div><h3 style="margin:4px 0">✍️ Exercices</h3><div class="tiny muted">Corrigés étape par étape</div></button>
       <a class="tile neon" href="#/exam" style="--c:${ren.color}">
         <div class="label">Contre Ren</div><h3 style="margin:4px 0">📝 Examen blanc</h3><div class="tiny muted">Chrono + barème /20</div></a>
+      <a class="tile neon" href="#/feynman" style="--c:${ren.color}">
+        <div class="label">Ren fait le nul</div><h3 style="margin:4px 0">🧠 Explique-moi</h3><div class="tiny muted">Comme si j'étais nul</div></a>
+      <a class="tile neon veille-tile" href="#/veille" style="--c:${CHARACTERS.kai.color}">
+        <div class="label">Toute l'équipe</div><h3 style="margin:4px 0">🌙 Veille d'exam</h3><div class="tiny muted">Plan intensif de la nuit</div></a>
     </div>
 
     <h2>⚔️ Choisis ton terrain</h2>

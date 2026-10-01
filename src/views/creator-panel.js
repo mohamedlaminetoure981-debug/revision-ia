@@ -124,6 +124,13 @@ export async function render(el) {
         ${AMBIENT_LIST.map((a) => `<button class="btn ghost" data-amb="${a}">Ambiance ${a}</button>`).join('')}
         <button class="btn ghost" id="t-amb-stop">Couper l'ambiance</button>
       </div>
+      <h3>🧠 Explique-moi & 🌙 Veille</h3>
+      <div class="panel-grid">
+        <a class="btn ghost" href="#/feynman">Explique-moi (choix)</a>
+        <a class="btn ghost" href="#/veille/nouveau">Nouvelle veille</a>
+        <button class="btn ghost" id="t-veille-done">Veille : tout cocher sauf l'examen</button>
+        <button class="btn ghost" id="t-veille-reset">Effacer la veille</button>
+      </div>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
@@ -235,6 +242,16 @@ export async function render(el) {
   el.querySelectorAll('[data-amb]').forEach((b) => { b.onclick = () => startAmbient(b.dataset.amb); });
   $('#t-amb-stop').onclick = () => stopAmbient();
   window.addEventListener('hashchange', stopAmbient, { once: true });
+  // --- Veille ---
+  $('#t-veille-done').onclick = async () => {
+    const v = await db.getSetting('veille');
+    if (!v) { toast('Crée d’abord une veille.'); return; }
+    v.plan.forEach((b) => { if (b.type !== 'final') b.done = true; });
+    delete v.finishedAt;
+    await db.setSetting('veille', v);
+    location.hash = '#/veille';
+  };
+  $('#t-veille-reset').onclick = async () => { await db.setSetting('veille', null); toast('Veille effacée.'); };
   $('#t-story-reset').onclick = async () => {
     await db.setSetting('story', null);
     toast('Histoire remise à zéro (chapitres lus, boss vaincus).');
