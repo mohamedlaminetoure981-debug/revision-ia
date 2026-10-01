@@ -6,10 +6,11 @@
   <title>Révision IA</title>
   <meta name="description" content="Révise tes cours avec l'IA et ton équipe de persos. Marche hors ligne.">
   <meta name="theme-color" content="#0B0A14">
-  <!-- L'appli gère elle-même ses thèmes sombre ET clair : le navigateur ne doit
-       pas modifier ses couleurs ("mode sombre forcé" de Samsung Internet ou de
-       Chrome, qui délavait les personnages). -->
-  <meta name="color-scheme" content="dark light">
+  <!-- L'appli gère elle-même son thème (choisi dans Réglages, sombre par défaut).
+       Le navigateur ne doit JAMAIS modifier ses couleurs ("mode sombre forcé"
+       de Samsung Internet ou de Chrome, qui délavait les personnages).
+       Thème sombre → "dark" ; thème clair → "only light" (mis à jour par l'appli). -->
+  <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <!-- Les chemins commençant par / sont corrigés automatiquement par Vite
@@ -19,7 +20,13 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <script>
     // Applique le thème (sombre/clair) AVANT l'affichage, pour éviter un flash.
-    try { if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
+    try {
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.dataset.theme = 'light';
+        document.querySelector('meta[name=color-scheme]').content = 'only light';
+        document.querySelector('meta[name=theme-color]').content = '#F6F3FF';
+      }
+    } catch (e) {}
   </script>
 </head>
 <body>

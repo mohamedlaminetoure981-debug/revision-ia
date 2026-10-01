@@ -184,3 +184,10 @@ details > summary .rich p { display: inline; margin: 0; }
 .sound-toggle[hidden] { display: none; }
 .volume-row { display: flex; align-items: center; gap: 10px; margin: 6px 0 4px; }
 .volume-row input[type=range] { flex: 1; accent-color: var(--neon-violet); }
+
+/* ---------- Message Samsung Internet (Tidiane, une seule fois) ---------- */
+.tile.samsung-tip {
+  position: fixed; top: calc(10px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+  z-index: 95; width: min(calc(100% - 20px), 520px); padding: 10px 12px; border-color: #60A5FA;
+  animation: slide-up .3s;
+}

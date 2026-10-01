@@ -68,15 +68,9 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   --overlay: rgba(6, 5, 12, 0.75);
 
-  /* "only" = le navigateur ne doit JAMAIS assombrir/inverser nos couleurs
-     (mode sombre forcé de Samsung Internet / Chrome) : l'appli gère son thème. */
-  color-scheme: only dark;
-}
-
-/* Indice pour Samsung Internet : l'appli gère déjà le mode sombre du téléphone,
-   donc pas besoin de le forcer. Aucun changement visuel. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: only dark; }
+  /* Thème sombre : on déclare "dark" au navigateur = l'appli est DÉJÀ sombre,
+     il ne doit pas appliquer son "mode sombre forcé" (qui délavait les persos). */
+  color-scheme: dark;
 }
 
 /* =====================================================================
@@ -107,4 +101,20 @@
   --subject-4: #7BC300;
   --subject-6: #E0A800;
   color-scheme: only light; /* thème clair : interdit aussi l'assombrissement forcé */
+}
+
+/* =====================================================================
+   SIGNAL "CETTE APPLI GÈRE DÉJÀ SON MODE SOMBRE"
+   ---------------------------------------------------------------------
+   Quand le TÉLÉPHONE est en mode sombre, Samsung Internet cherche ce bloc
+   pour savoir si le site gère lui-même le mode sombre ; s'il le trouve, il
+   n'applique pas son propre mode sombre (qui délavait les personnages).
+   Les couleurs ci-dessous sont EXACTEMENT celles du thème choisi dans
+   l'appli (var(--…)) : le thème du téléphone ne change donc RIEN à l'écran.
+   Le thème se choisit uniquement dans l'appli (Réglages).
+   ===================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+  :root[data-theme="light"] { color-scheme: only light; }
+  html, body { background-color: var(--bg); color: var(--text); }
 }

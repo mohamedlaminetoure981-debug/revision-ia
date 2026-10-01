@@ -18,6 +18,7 @@ import { loadProfile } from './core/game.js';
 import { loadCreator, isCreator } from './core/creator.js';
 import { loadFxPrefs } from './ui/fx.js';
 import { playSfx } from './ui/sfx.js';
+import { samsungTip } from './ui/samsung-tip.js';
 import { esc, showError } from './ui/ui.js';
 import { initInstall, onRoute } from './ui/install.js';
 
@@ -127,6 +128,8 @@ async function soundToggle() {
 export function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name=theme-color]').content = theme === 'light' ? '#F6F3FF' : '#0B0A14';
+  // Signal au navigateur : "cette appli gère déjà son thème, ne touche pas aux couleurs".
+  document.querySelector('meta[name=color-scheme]').content = theme === 'light' ? 'only light' : 'dark';
   try { localStorage.setItem('theme', theme); } catch { /* navigation privée */ }
 }
 
@@ -192,6 +195,7 @@ initInstall();
   updateNet();
   window.addEventListener('hashchange', route);
   await route();
+  setTimeout(samsungTip, 1500); // plan de secours Samsung Internet (une seule fois)
   db.requestPersistence();
   registerSW();
 })();
