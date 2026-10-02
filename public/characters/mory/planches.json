@@ -1,0 +1,18 @@
+{
+  "planche-a": {
+    "zones": {
+      "neutre": [0, 0, 25, 50],
+      "joie": [75, 0, 25, 50],
+      "reflexion": [0, 50, 50, 50],
+      "celebration": [50, 50, 50, 50]
+    }
+  },
+  "planche-b": {
+    "zones": {
+      "encouragement": [0, 0, 25, 50],
+      "surprise": [50, 0, 25, 50],
+      "clin": [75, 0, 25, 50],
+      "concentration": [0, 50, 50, 50]
+    }
+  }
+}

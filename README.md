@@ -340,15 +340,32 @@ dossier du perso un petit fichier **`planches.json`** (sur github.com : **Add fi
   `"planche-c": { … }` pour un fichier `planche-c.jpg`) ;
 - facultatif : `"fond": "#2fd52a"` pour imposer la couleur du fond (sinon détectée).
 
+**Disposition irrégulière ?** Au lieu des cases, donne une **zone** par expression, en
+**pourcentages de l'image** : `[x, y, largeur, hauteur]` (0 0 = coin en haut à gauche).
+Exemple (Mory : en haut 4 petits portraits, en bas 2 grands) :
+```json
+{
+  "planche-a": { "zones": { "neutre": [0, 0, 25, 50], "joie": [75, 0, 25, 50],
+                            "reflexion": [0, 50, 50, 50], "celebration": [50, 50, 50, 50] } },
+  "planche-b": { "zones": { "encouragement": [0, 0, 25, 50], "surprise": [50, 0, 25, 50],
+                            "clin": [75, 0, 25, 50], "concentration": [0, 50, 50, 50] } }
+}
+```
+Une zone n'a pas besoin d'être précise : le script se recentre tout seul sur le portrait
+et efface les morceaux d'un portrait voisin qui dépassent dans la zone (une main, une
+mèche…). On peut mélanger `"cases"` et `"zones"` dans une même planche.
+
 Pour changer une expression, il suffit de modifier un numéro de case dans ce fichier.
 
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
 - il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) ;
 - il trouve la grille même s'il y a des **marges** ou des **traits de séparation** ;
 - il retire le fond avec des bords adoucis, **sans liseré vert** ;
-- il **cadre les portraits à l'identique** : haut des cheveux à la même hauteur et même
-  largeur de tête → même taille de visage, yeux à la même place d'une expression à
-  l'autre. Un buste coupé par le bord de sa case est fondu en douceur sur les côtés ;
+- il **cadre les portraits à l'identique** (même taille de visage, yeux à la même place),
+  même si les portraits d'une planche ont des tailles différentes : l'expression
+  « neutre » sert de référence ; une tête entière est alignée par le haut des cheveux et
+  sa largeur, une tête coupée par le bord de sa case est recalée sur le visage de la
+  référence. Les bords coupés (côtés, haut des cheveux) sont fondus en douceur ;
 - il exporte des **WebP transparents** : 300 px pour l'appli (pré-téléchargés, donc
   instantanés hors ligne) et 720 px pour les images partagées. Les planches d'origine
   ne sont pas publiées.
