@@ -324,7 +324,7 @@ export async function render(el) {
         <div class="pt-grid">${cells}</div>`;
     }).join('');
     modal(`<h3>🧑 Personnages en images</h3>
-      <p class="tiny muted">Planche A : neutre, joie, réflexion, célébration · Planche B : encouragement, surprise, concentration, clin (grille 2 × 2, fond vert #00FF00). Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
+      <p class="tiny muted">Par défaut : grille 2 × 2 (A : neutre, joie, réflexion, célébration · B : encouragement, surprise, concentration, clin). Autre grille ou choix de cases : fichier planches.json dans le dossier du perso. Fond uni (vert de préférence), détecté automatiquement. Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
       <div style="max-height:62vh;overflow-y:auto">${rows}</div>
       <button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };
