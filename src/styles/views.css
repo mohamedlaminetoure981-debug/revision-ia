@@ -413,3 +413,8 @@ details > summary .rich p { display: inline; margin: 0; }
 image.story-full { opacity: 0; transition: opacity .35s ease; }
 image.story-full.on { opacity: 1; }
 .be image.story-full { opacity: 1; transition: none; }
+/* Panneau créateur : aperçu des portraits découpés (damier = transparence) */
+.pt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.pt-cell { margin: 0; text-align: center; font-size: .65rem; color: var(--muted, #aaa); }
+.pt-cell img, .pt-cell > span { display: grid; place-items: center; width: 100%; aspect-ratio: 200 / 232; border-radius: 8px; object-fit: contain;
+  background: repeating-conic-gradient(#cfcfd6 0 25%, #f2f2f5 0 50%) 0 0 / 14px 14px; }

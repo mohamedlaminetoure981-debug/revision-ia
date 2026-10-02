@@ -151,3 +151,17 @@
   .ch *, .ch, .bubble { animation: none !important; }
 }
 :root[data-motion="off"] .ch *, :root[data-motion="off"] .ch, :root[data-motion="off"] .bubble { animation: none !important; }
+
+/* ---------- Personnages en IMAGES (planches d'expressions) ----------
+   L'image remplace le dessin ; l'aura (SVG) reste derrière. Les animations
+   du perso entier (apparition, sauts, secousses, téléportation…) s'appliquent
+   au conteneur .ch : elles marchent telles quelles. Le dessin animait aussi
+   ses morceaux (tête, buste, lunettes) : l'image a ses équivalents ci-dessous. */
+.ch .ch-aura-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.ch .ch-img { position: relative; object-fit: contain; object-position: 50% 100%; user-select: none; -webkit-user-select: none;
+  transform-origin: 50% 100%; animation: img-breathe 3.2s ease-in-out infinite; }
+@keyframes img-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.014) translateY(-0.5px); } }
+/* Animations signature qui bougeaient l'intérieur du dessin → la tête "hoche" l'image entière. */
+.ch[data-img].sig-salut .ch-img, .ch[data-img].sig-lunettes .ch-img, .ch[data-img].sig-reflexion .ch-img,
+.ch[data-img].sig-bras-croises .ch-img, .ch[data-img].sig-haussement .ch-img { animation: img-nod 1.2s ease-in-out; }
+@keyframes img-nod { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-3deg) translateY(-2px); } 65% { transform: rotate(2deg); } }

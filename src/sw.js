@@ -77,6 +77,9 @@ async function image(req, url) {
   const cache = await caches.open(IMAGES);
   const hit = await cache.match(req);
   if (hit) return hit;
+  // Pré-téléchargée avec le site (portraits des persos) : même fichier, sans le ?v=.
+  const pre = await (await caches.open(CACHE)).match(req, { ignoreSearch: true });
+  if (pre) return pre;
   try {
     const res = await fetch(req);
     if (res.ok) {

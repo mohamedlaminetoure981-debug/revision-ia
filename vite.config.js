@@ -18,6 +18,7 @@ import { defineConfig } from 'vite';
 import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
+import { processSheets, findSheets, CHAR_DIR } from './scripts/planches.mjs';
 
 const base = process.env.BASE_PATH || '/';
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
@@ -46,7 +47,10 @@ function serviceWorker() {
       // Les illustrations du Mode Histoire ne sont PAS pré-téléchargées : elles
       // sont mises en cache la première fois qu'on lit le chapitre.
       const files = [...Object.keys(bundle), ...listPublic()]
-        .filter((f) => !SKIP.test(f) && f !== 'sw.js' && !f.startsWith('story/') && !f.endsWith('.gitkeep'));
+        .filter((f) => !SKIP.test(f) && f !== 'sw.js' && !f.startsWith('story/') && !f.endsWith('.gitkeep'))
+        // Personnages : portraits 300 px pré-téléchargés (affichage instantané, hors ligne) ;
+        // ni les planches d'origine, ni les grands formats (720 px, chargés à la demande).
+        .filter((f) => !/^characters\/.*(planche-|-720\.webp$)/i.test(f));
       const list = ['./', ...files.map((f) => `./${f}`)];
       // Le nom du cache change à chaque nouvelle version du site.
       const version = createHash('md5').update(list.join()).digest('hex').slice(0, 8);
@@ -75,6 +79,69 @@ function serviceWorker() {
   };
 }
 let outDir = 'dist';
+
+// ---------------------------------------------------------------------
+// PERSONNAGES EN IMAGES (planches d'expressions sur fond vert)
+// ---------------------------------------------------------------------
+// public/characters/<id>/planche-a.jpg et planche-b.jpg → 8 portraits détourés
+// (scripts/planches.mjs), donnés à l'appli par le module "virtual:character-images"
+// (lu par src/ui/character.js). Sans planche : le dessin SVG reste affiché.
+const CHAR_ID = 'virtual:character-images';
+function characterImages() {
+  let sharp = null; let isBuild = false; let cache = null; let cacheKey = '';
+  const vid = `\0${CHAR_ID}`;
+  const stamp = () => JSON.stringify(Object.values(findSheets()).flatMap((s) => Object.values(s).map((f) => [f, statSync(f).mtimeMs, statSync(f).size])));
+  const get = async () => {
+    const key = stamp();
+    if (!cache || key !== cacheKey) {
+      sharp ||= await loadSharp();
+      cache = sharp ? await processSheets(sharp) : { files: {}, images: {}, report: {} };
+      cacheKey = key;
+      for (const [id, r] of Object.entries(cache.report)) console.log(`  🧑 ${id} : ${Object.entries(r).map(([e, v]) => `${e} ${v}`).join(' · ')}`);
+    }
+    return cache;
+  };
+  return {
+    name: 'character-images',
+    configResolved(config) { isBuild = config.command === 'build'; },
+    resolveId(id) { return id === CHAR_ID ? vid : null; },
+    async load(id) {
+      if (id !== vid) return null;
+      const { images } = await get();
+      return `export default ${JSON.stringify(images)};`;
+    },
+    // En local : portraits servis depuis la mémoire ; une planche modifiée recharge la page.
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const m = (req.url || '').split('?')[0].match(/\/(characters\/[\w-]+\/[\w-]+\.webp)$/);
+        if (!m) return next();
+        const buf = (await get()).files[m[1]];
+        if (!buf) return next();
+        res.setHeader('Content-Type', 'image/webp');
+        res.end(buf);
+      });
+      server.watcher.add(CHAR_DIR);
+      const refresh = (file) => {
+        if (!/public[\\/]characters[\\/].*planche-/i.test(file)) return;
+        const mod = server.moduleGraph.getModuleById(vid);
+        if (mod) server.moduleGraph.invalidateModule(mod);
+        server.ws.send({ type: 'full-reload' });
+      };
+      ['add', 'change', 'unlink'].forEach((ev) => server.watcher.on(ev, refresh));
+    },
+    async generateBundle() {
+      if (!isBuild) return;
+      for (const [fileName, source] of Object.entries((await get()).files)) this.emitFile({ type: 'asset', fileName, source });
+    },
+    // Les planches d'origine (lourdes) ne sont pas publiées : seuls les portraits découpés le sont.
+    closeBundle() {
+      if (!isBuild) return;
+      for (const sheets of Object.values(findSheets())) {
+        for (const f of Object.values(sheets)) { const copied = join(outDir, relative('public', f)); if (existsSync(copied)) rmSync(copied); }
+      }
+    },
+  };
+}
 
 /**
  * Précharge les 2 polices principales (alphabet latin) dès la lecture de index.html :
@@ -269,7 +336,7 @@ export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
 
 export default defineConfig({
   base,
-  plugins: [storyImages(), serviceWorker(), preloadFonts()],
+  plugins: [storyImages(), characterImages(), serviceWorker(), preloadFonts()],
   // Infos affichées dans le Panneau Créateur.
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

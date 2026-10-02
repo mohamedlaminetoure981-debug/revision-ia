@@ -93,6 +93,7 @@ export async function render(el) {
         <button class="btn ghost" id="t-ono">Onomatopée</button>
         <button class="btn ghost" id="t-install">Installation</button>
         <button class="btn ghost" id="t-welcome">Accueil créateur</button>
+        <button class="btn ghost" id="t-portraits">🧑 Personnages en images</button>
       </div>
     </div>
 
@@ -305,6 +306,27 @@ export async function render(el) {
     modal(`<h3>🖼️ Illustrations des cases (${done}/${total})</h3>
       <p class="tiny muted">Dépose l'image sur github.com dans le dossier indiqué (.webp, .png ou .jpg), avec ce nom exact. Elle remplace le dessin au prochain déploiement. Voir le README.</p>
       ${html}<button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
+  // --- Personnages en images : aperçu des expressions découpées des planches ---
+  $('#t-portraits').onclick = async () => {
+    const { characterImages } = await import('../ui/character.js');
+    const SHEETS = { a: ['neutre', 'joie', 'reflexion', 'celebration'], b: ['encouragement', 'surprise', 'concentration', 'clin'] };
+    const base = import.meta.env.BASE_URL;
+    const rows = TEAM.map((id) => {
+      const imgs = characterImages(id);
+      const sheet = (k) => SHEETS[k].some((e) => imgs[e]);
+      const cells = Object.values(SHEETS).flat().map((e) => `<figure class="pt-cell">${imgs[e]
+        ? `<img src="${base}${imgs[e].src}" alt="${e}" loading="lazy">`
+        : '<span class="tiny dim">dessin SVG</span>'}<figcaption>${e}</figcaption></figure>`).join('');
+      return `<h3 style="color:${CHARACTERS[id].color};margin:14px 0 4px">${esc(CHARACTERS[id].name)}</h3>
+        <p class="tiny" style="margin:0 0 6px">${sheet('a') ? '✅' : '⬜'} <code style="user-select:all">public/characters/${id}/planche-a.jpg</code><br>
+        ${sheet('b') ? '✅' : '⬜'} <code style="user-select:all">public/characters/${id}/planche-b.jpg</code></p>
+        <div class="pt-grid">${cells}</div>`;
+    }).join('');
+    modal(`<h3>🧑 Personnages en images</h3>
+      <p class="tiny muted">Planche A : neutre, joie, réflexion, célébration · Planche B : encouragement, surprise, concentration, clin (grille 2 × 2, fond vert #00FF00). Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
+      <div style="max-height:62vh;overflow-y:auto">${rows}</div>
+      <button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };
   $('#t-bd-bubbles').onclick = async () => {
     const { openBubbleEditor } = await import('./bubble-editor.js');

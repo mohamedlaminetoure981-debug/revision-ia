@@ -17,11 +17,17 @@
 //     .ch-glasses  lunettes (Mory)
 //   .ch-fx         effets devant (étincelles, goutte de sueur, « ! »…)
 //
-// Si une IMAGE est définie pour une expression (champ `images` du
-// personnage), elle remplace le dessin SVG. Rien d'autre à modifier.
+// PERSONNAGES EN IMAGES : si des planches d'expressions existent
+// (public/characters/<id>/planche-a.jpg et planche-b.jpg, découpées
+// automatiquement au build, voir scripts/planches.mjs), les portraits
+// remplacent le dessin SVG PARTOUT. Les animations du perso entier
+// (apparition, sauts, respiration, téléportation…), l'aura et les pouvoirs
+// restent autour de l'image. Sans planche : le dessin SVG reste affiché.
+// (Le champ `images` d'un perso dans characters.js reste possible et a la priorité.)
 // =====================================================================
 
 import { CHARACTERS } from '../data/characters.js';
+import CHAR_IMAGES from 'virtual:character-images';
 
 let uid = 0; // identifiants uniques (plusieurs persos sur la même page)
 
@@ -614,6 +620,12 @@ const MANGA_FX = { sweat: [134, 78], vein: [124, 70] };
  * @param {object} [opts]     { aura: 0..3 }
  */
 export function characterSVG(id, expression = 'neutre', opts = {}) {
+  // Illustration disponible : même cadre 200 × 232, image en grand format (images partagées).
+  const img = characterImage(id, expression);
+  if (img) {
+    const halo = opts.aura ? `<g class="ch-aura">${aura(opts.aura, { color: CHARACTERS[id].color }, `s${++uid}`)}</g>` : '';
+    return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">${halo}<image href="${assetUrl(img.large || img.src)}" x="0" y="0" width="200" height="232" preserveAspectRatio="xMidYMax meet"/></svg>`;
+  }
   return `<svg viewBox="0 0 200 232" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="ch-svg ch-manga">${characterBust(id, expression, opts)}</svg>`;
 }
 
@@ -711,6 +723,31 @@ function assetUrl(path) {
 }
 
 /**
+ * Illustration d'un perso pour une expression : { src, srcset, large } ou null.
+ * Une expression sans image prend l'image "neutre" (sinon : dessin SVG).
+ */
+export function characterImage(id, expression = 'neutre') {
+  const manual = CHARACTERS[id]?.images || {};
+  const auto = CHAR_IMAGES[id] || {};
+  const pick = (e) => (manual[e] ? { src: manual[e], large: manual[e] } : auto[e]);
+  return pick(expression) || pick('neutre') || null;
+}
+
+/** Les illustrations découpées d'un perso (aperçu du Panneau créateur). */
+export function characterImages(id) { return CHAR_IMAGES[id] || {}; }
+
+/** Portrait en image (plusieurs tailles) + aura en SVG derrière, pour un élément .ch. */
+function imageInner(id, img, o = {}) {
+  const ch = CHARACTERS[id];
+  const level = Number(o.aura) || 0;
+  const halo = level ? `<svg class="ch-aura-svg" viewBox="0 0 200 232" aria-hidden="true"><g class="ch-aura">${aura(level, { color: ch.color }, `i${++uid}`)}</g></svg>` : '';
+  const srcset = img.srcset
+    ? ` srcset="${img.srcset.split(', ').map((p) => { const [u, w] = p.split(' '); return `${assetUrl(u)} ${w}`; }).join(', ')}" sizes="${Math.round(o.size || 140)}px"`
+    : '';
+  return `${halo}<img src="${assetUrl(img.src)}"${srcset} alt="${ch.name}" class="ch-img" decoding="async" draggable="false">`;
+}
+
+/**
  * HTML d'un personnage prêt à insérer dans la page.
  * @param {string} id
  * @param {object} [o] { expression, size (px), aura (0-3), enter (animation d'apparition), cls }
@@ -719,14 +756,12 @@ export function characterHTML(id, o = {}) {
   const ch = CHARACTERS[id];
   if (!ch) return '';
   const expression = o.expression || 'neutre';
-  const img = ch.images?.[expression] || ch.images?.neutre;
-  const inner = img
-    ? `<img src="${assetUrl(img)}" alt="${ch.name}" class="ch-img">`
-    : characterSVG(id, expression, { aura: o.aura });
+  const img = characterImage(id, expression);
+  const inner = img ? imageInner(id, img, { aura: o.aura, size: o.size }) : characterSVG(id, expression, { aura: o.aura });
   // Délai de clignement aléatoire : chaque perso cligne à son rythme.
   const blink = (Math.random() * 3).toFixed(2);
   return `<div class="ch ch-${id} ${o.enter === false ? '' : 'ch-enter'} ${o.cls || ''}" data-ch="${id}" data-expr="${expression}" data-aura="${o.aura || 0}"
-    style="--c:${ch.color};--size:${o.size || 140}px;--blink-delay:${blink}s" role="img" aria-label="${ch.name}">${inner}</div>`;
+    style="--c:${ch.color};--size:${o.size || 140}px;--blink-delay:${blink}s"${img ? ' data-img="1"' : ''} role="img" aria-label="${ch.name}">${inner}</div>`;
 }
 
 /** Change l'expression d'un personnage déjà affiché. */
@@ -734,10 +769,10 @@ export function setExpression(el, expression) {
   if (!el) return;
   const id = el.dataset.ch;
   const ch = CHARACTERS[id];
-  const img = ch.images?.[expression] || ch.images?.neutre;
+  const img = characterImage(id, expression);
   el.dataset.expr = expression;
   el.innerHTML = img
-    ? `<img src="${assetUrl(img)}" alt="${ch.name}" class="ch-img">`
+    ? imageInner(id, img, { aura: el.dataset.aura, size: parseFloat(el.style.getPropertyValue('--size')) || 140 })
     : characterSVG(id, expression, { aura: Number(el.dataset.aura) || 0 });
 }
 

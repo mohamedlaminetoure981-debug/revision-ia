@@ -303,21 +303,48 @@ Panneau créateur.
 Pour dessiner une nouvelle coiffure ou tenue : `src/ui/character.js`, fonctions `hair()`
 et `outfit()` (chaque style est un `case` avec des formes SVG).
 
-### Remplacer un perso par des images dessinées
-1. Dessine (ou fais dessiner) une image par expression, fond transparent, format
-   **PNG ou WebP**, proportions ≈ 200 × 232 (portrait).
-2. Dépose-les dans **`public/characters/`**, par ex. `kai-neutre.webp`, `kai-joie.webp`.
-3. Dans `characters.js` :
-   ```js
-   images: {
-     neutre: 'characters/kai-neutre.webp',
-     joie: 'characters/kai-joie.webp',
-     celebration: 'characters/kai-celebration.webp',
-   },
-   ```
-   Expressions possibles : `neutre`, `joie`, `reflexion`, `celebration`, `encouragement`,
-   `surprise`, `concentration`, `clin`. Une expression sans image utilise l'image `neutre`
-   (ou le dessin SVG s'il n'y a aucune image). **Rien d'autre à modifier.**
+### 🧑 Remplacer un perso par des illustrations (planches d'expressions)
+**Aucun code à toucher.** Pour chaque personnage, 2 images (« planches »), chacune
+une grille **2 × 2** de portraits en buste sur **fond vert uni `#00FF00`** :
+
+| Planche | en haut à gauche | en haut à droite | en bas à gauche | en bas à droite |
+|---|---|---|---|---|
+| **A** `planche-a.jpg` | neutre | joie | réflexion | célébration |
+| **B** `planche-b.jpg` | encouragement | surprise | concentration | clin |
+
+**Déposer les planches depuis github.com :**
+1. Ouvre le dépôt, puis les dossiers `public` → `characters` → `kai` (le perso voulu :
+   `kai`, `mory`, `nia`, `sora`, `ren`, `awa`, `tidiane`, `binta`). S'il n'existe pas
+   encore : **Add file** → **Create new file**, tape `public/characters/nia/.gitkeep`,
+   puis **Commit changes**.
+2. Renomme tes images **`planche-a.jpg`** et **`planche-b.jpg`** (.png ou .webp acceptés).
+3. **Add file** → **Upload files** → choisis les 2 planches → **Commit changes**.
+4. Attends 2 à 3 minutes (onglet **Actions** ✅) : le perso apparaît en illustration
+   **partout** (accueil, quiz, conseil de correction, pouvoirs, cartes, statut…).
+5. Vérifie le résultat : appli → **Panneau créateur** → **🧑 Personnages en images**
+   (les 8 expressions découpées, sur un damier qui montre la transparence).
+
+**Ce que le build fait tout seul** (`scripts/planches.mjs`) :
+- il trouve la grille même s'il y a des **marges** ou des **traits de séparation** ;
+- il retire le fond vert avec des bords adoucis, **sans liseré vert** ;
+- il **cadre les 8 portraits à l'identique** (même largeur d'épaules, même centre, même
+  bas de buste) : le visage garde la même taille et les yeux la même place d'une
+  expression à l'autre ;
+- il exporte des **WebP transparents** : 300 px pour l'appli (pré-téléchargés, donc
+  instantanés hors ligne) et 720 px pour les images partagées. Les planches d'origine
+  ne sont pas publiées.
+
+Les animations du personnage entier (apparition, respiration, sauts, secousses,
+téléportation), l'**aura** et les **pouvoirs** restent autour de l'illustration.
+Sans planche, le dessin SVG reste affiché. Une planche seule (A ou B) suffit : les
+expressions manquantes prennent l'image « neutre » (ou le dessin s'il n'y a pas de A).
+
+**Conseils pour la génération :** fond vert vraiment uni, personnage bien détaché du
+fond, **pas de vert dans les vêtements ni les effets** (il deviendrait transparent),
+même cadrage en buste sur les 8 cases (épaules coupées en bas de chaque case).
+
+(Avancé : le champ `images` d'un perso dans `characters.js` permet encore d'indiquer
+des fichiers à la main ; il a la priorité sur les planches.)
 
 ### Ajouter les voix (plus tard)
 Dépose des fichiers audio courts dans `public/voices/`, puis :

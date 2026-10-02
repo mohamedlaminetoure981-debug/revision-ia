@@ -123,8 +123,25 @@ export function stripSVG(strip, o = {}) {
   </svg>`;
 }
 
+/**
+ * Un SVG transformé en PNG ne peut pas charger d'images externes : les illustrations
+ * (personnages en images…) sont donc intégrées au SVG (data: URI) avant la conversion.
+ */
+async function inlineImages(svg) {
+  const urls = [...new Set([...svg.matchAll(/<image[^>]*\shref="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('data:')))];
+  for (const u of urls) {
+    try {
+      const blob = await (await fetch(u.replace(/&amp;/g, '&'))).blob();
+      const data = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
+      svg = svg.split(`href="${u}"`).join(`href="${data}"`);
+    } catch { /* image absente : laissée telle quelle */ }
+  }
+  return svg;
+}
+
 /** Convertit un SVG (texte) en image (Blob PNG, ou JPEG plus léger), largeur `width` px. */
 export async function svgToPng(svg, width = 1080, type = 'image/png', quality = 0.9) {
+  svg = await inlineImages(svg);
   const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   try {
