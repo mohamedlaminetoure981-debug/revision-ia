@@ -324,12 +324,31 @@ une grille **2 × 2** de portraits en buste sur **fond vert uni `#00FF00`** :
 5. Vérifie le résultat : appli → **Panneau créateur** → **🧑 Personnages en images**
    (les 8 expressions découpées, sur un damier qui montre la transparence).
 
+**Grille d'une autre taille, ou plus de portraits que nécessaire ?** Ajoute dans le
+dossier du perso un petit fichier **`planches.json`** (sur github.com : **Add file** →
+**Create new file**, nom `public/characters/kai/planches.json`). Exemple (Kaï) :
+```json
+{
+  "planche-a": { "grille": [2, 4], "cases": { "neutre": 1, "joie": 3, "reflexion": 5, "celebration": 8 } },
+  "planche-b": { "grille": [2, 4], "cases": { "encouragement": 1, "surprise": 2, "clin": 4, "concentration": 5 } }
+}
+```
+- `"grille": [rangées, colonnes]` ;
+- `"cases"` : numéro de la case pour chaque expression, en comptant **de gauche à droite,
+  rangée du haut puis rangée suivante** (1 = en haut à gauche). Les autres cases sont ignorées ;
+- tu peux répartir les 8 expressions comme tu veux entre les planches (et en ajouter :
+  `"planche-c": { … }` pour un fichier `planche-c.jpg`) ;
+- facultatif : `"fond": "#2fd52a"` pour imposer la couleur du fond (sinon détectée).
+
+Pour changer une expression, il suffit de modifier un numéro de case dans ce fichier.
+
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
+- il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) ;
 - il trouve la grille même s'il y a des **marges** ou des **traits de séparation** ;
-- il retire le fond vert avec des bords adoucis, **sans liseré vert** ;
-- il **cadre les 8 portraits à l'identique** (même largeur d'épaules, même centre, même
-  bas de buste) : le visage garde la même taille et les yeux la même place d'une
-  expression à l'autre ;
+- il retire le fond avec des bords adoucis, **sans liseré vert** ;
+- il **cadre les portraits à l'identique** : haut des cheveux à la même hauteur et même
+  largeur de tête → même taille de visage, yeux à la même place d'une expression à
+  l'autre. Un buste coupé par le bord de sa case est fondu en douceur sur les côtés ;
 - il exporte des **WebP transparents** : 300 px pour l'appli (pré-téléchargés, donc
   instantanés hors ligne) et 720 px pour les images partagées. Les planches d'origine
   ne sont pas publiées.

@@ -18,7 +18,7 @@ import { defineConfig } from 'vite';
 import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
-import { processSheets, findSheets, CHAR_DIR } from './scripts/planches.mjs';
+import { processSheets, sheetFiles, CHAR_DIR } from './scripts/planches.mjs';
 
 const base = process.env.BASE_PATH || '/';
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
@@ -50,7 +50,7 @@ function serviceWorker() {
         .filter((f) => !SKIP.test(f) && f !== 'sw.js' && !f.startsWith('story/') && !f.endsWith('.gitkeep'))
         // Personnages : portraits 300 px pré-téléchargés (affichage instantané, hors ligne) ;
         // ni les planches d'origine, ni les grands formats (720 px, chargés à la demande).
-        .filter((f) => !/^characters\/.*(planche-|-720\.webp$)/i.test(f));
+        .filter((f) => !f.startsWith('characters/') || /^characters\/[\w-]+\/[a-z]+\.webp$/.test(f));
       const list = ['./', ...files.map((f) => `./${f}`)];
       // Le nom du cache change à chaque nouvelle version du site.
       const version = createHash('md5').update(list.join()).digest('hex').slice(0, 8);
@@ -83,14 +83,14 @@ let outDir = 'dist';
 // ---------------------------------------------------------------------
 // PERSONNAGES EN IMAGES (planches d'expressions sur fond vert)
 // ---------------------------------------------------------------------
-// public/characters/<id>/planche-a.jpg et planche-b.jpg → 8 portraits détourés
+// public/characters/<id>/ : planches (+ planches.json facultatif) → 8 portraits détourés
 // (scripts/planches.mjs), donnés à l'appli par le module "virtual:character-images"
 // (lu par src/ui/character.js). Sans planche : le dessin SVG reste affiché.
 const CHAR_ID = 'virtual:character-images';
 function characterImages() {
   let sharp = null; let isBuild = false; let cache = null; let cacheKey = '';
   const vid = `\0${CHAR_ID}`;
-  const stamp = () => JSON.stringify(Object.values(findSheets()).flatMap((s) => Object.values(s).map((f) => [f, statSync(f).mtimeMs, statSync(f).size])));
+  const stamp = () => JSON.stringify(sheetFiles().map((f) => [f, statSync(f).mtimeMs, statSync(f).size]));
   const get = async () => {
     const key = stamp();
     if (!cache || key !== cacheKey) {
@@ -122,7 +122,7 @@ function characterImages() {
       });
       server.watcher.add(CHAR_DIR);
       const refresh = (file) => {
-        if (!/public[\\/]characters[\\/].*planche-/i.test(file)) return;
+        if (!/public[\\/]characters[\\/]/i.test(file)) return;
         const mod = server.moduleGraph.getModuleById(vid);
         if (mod) server.moduleGraph.invalidateModule(mod);
         server.ws.send({ type: 'full-reload' });
@@ -136,9 +136,7 @@ function characterImages() {
     // Les planches d'origine (lourdes) ne sont pas publiées : seuls les portraits découpés le sont.
     closeBundle() {
       if (!isBuild) return;
-      for (const sheets of Object.values(findSheets())) {
-        for (const f of Object.values(sheets)) { const copied = join(outDir, relative('public', f)); if (existsSync(copied)) rmSync(copied); }
-      }
+      for (const f of sheetFiles()) { const copied = join(outDir, relative('public', f)); if (existsSync(copied)) rmSync(copied); }
     },
   };
 }
