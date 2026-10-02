@@ -8,7 +8,7 @@
 //
 // ➕ Pour AJOUTER UN ÉCRAN :
 //   1. crée src/views/mon-ecran.js avec `export async function render(el, args)`
-//   2. importe-le ci-dessous et ajoute une ligne dans ROUTES
+//   2. ajoute une ligne dans ROUTES : { load: () => import('./views/mon-ecran.js') }
 //   3. (optionnel) ajoute un lien dans la barre du bas (index.html)
 // =====================================================================
 
@@ -19,59 +19,38 @@ import { loadCreator, isCreator } from './core/creator.js';
 import { loadFxPrefs } from './ui/fx.js';
 import { playSfx } from './ui/sfx.js';
 import { samsungTip } from './ui/samsung-tip.js';
-import { esc, showError } from './ui/ui.js';
+import { esc, showError, preloadMath } from './ui/ui.js';
 import { initInstall, onRoute } from './ui/install.js';
-
-import * as welcome from './views/welcome.js';
+// L'accueil est chargé tout de suite (c'est le premier écran) ; les autres écrans
+// sont téléchargés/lus SEULEMENT quand on les ouvre : démarrage bien plus rapide.
 import * as home from './views/home.js';
-import * as courses from './views/courses.js';
-import * as course from './views/course.js';
-import * as add from './views/add.js';
-import * as stories from './views/stories.js';
-import * as review from './views/review.js';
-import * as quizHub from './views/quiz-hub.js';
-import * as quizPlay from './views/quiz-play.js';
-import * as profile from './views/profile.js';
-import * as settings from './views/settings.js';
-import * as exercise from './views/exercise.js';
-import * as exam from './views/exam.js';
-import * as stats from './views/stats.js';
-import * as creatorPanel from './views/creator-panel.js';
-import * as manga from './views/manga.js';
-import * as story from './views/story.js';
-import * as boss from './views/boss.js';
-import * as duel from './views/duel.js';
-import * as collection from './views/collection.js';
-import * as dojo from './views/dojo.js';
-import * as feynman from './views/feynman.js';
-import * as veille from './views/veille.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
 const ROUTES = {
-  '': { view: home }, //                          #/
-  bienvenue: { view: welcome, fullscreen: true }, // #/bienvenue
-  cours: { view: courses }, //                    #/cours
-  course: { view: course }, //                    #/course/ID/onglet
-  ajouter: { view: add }, //                      #/ajouter
-  stories: { view: stories, fullscreen: true }, // #/stories/ID
-  review: { view: review, fullscreen: true }, //  #/review[/ID]
-  quiz: { view: quizHub }, //                     #/quiz
-  play: { view: quizPlay, fullscreen: true }, //  #/play/ID_QUIZ
-  profil: { view: profile }, //                   #/profil
-  reglages: { view: settings }, //                #/reglages
-  exo: { view: exercise }, //                     #/exo/ID_EXERCICE
-  exam: { view: exam }, //                        #/exam[/ID_EXAMEN]
-  stats: { view: stats }, //                      #/stats
-  createur: { view: creatorPanel }, //            #/createur (Mode Créateur seulement)
-  manga: { view: manga, fullscreen: true }, //    #/manga/ID_COURS/N°_NOTION
-  histoire: { view: story, fullscreen: (args) => !!args[0] }, // #/histoire[/N°_CHAPITRE]
-  boss: { view: boss, fullscreen: true }, //      #/boss/MATIÈRE
-  duel: { view: duel, fullscreen: true }, //      #/duel/QUIZ_COMPRESSÉ (marche même sans profil)
-  collection: { view: collection, fullscreen: (args) => args[0] === 'ouvrir' }, // #/collection[/ouvrir]
-  dojo: { view: dojo, fullscreen: true }, //      #/dojo (mode Focus)
-  feynman: { view: feynman, fullscreen: (args) => !!args[0] }, // #/feynman[/ID_COURS/N°_NOTION]
-  veille: { view: veille, fullscreen: true }, //  #/veille (veille d'examen)
+  '': { load: () => home }, //                          #/
+  bienvenue: { load: () => import('./views/welcome.js'), fullscreen: true }, // #/bienvenue
+  cours: { load: () => import('./views/courses.js') }, //                    #/cours
+  course: { load: () => import('./views/course.js') }, //                    #/course/ID/onglet
+  ajouter: { load: () => import('./views/add.js') }, //                      #/ajouter
+  stories: { load: () => import('./views/stories.js'), fullscreen: true }, // #/stories/ID
+  review: { load: () => import('./views/review.js'), fullscreen: true }, //  #/review[/ID]
+  quiz: { load: () => import('./views/quiz-hub.js') }, //                     #/quiz
+  play: { load: () => import('./views/quiz-play.js'), fullscreen: true }, //  #/play/ID_QUIZ
+  profil: { load: () => import('./views/profile.js') }, //                   #/profil
+  reglages: { load: () => import('./views/settings.js') }, //                #/reglages
+  exo: { load: () => import('./views/exercise.js') }, //                     #/exo/ID_EXERCICE
+  exam: { load: () => import('./views/exam.js') }, //                        #/exam[/ID_EXAMEN]
+  stats: { load: () => import('./views/stats.js') }, //                      #/stats
+  createur: { load: () => import('./views/creator-panel.js') }, //            #/createur (Mode Créateur seulement)
+  manga: { load: () => import('./views/manga.js'), fullscreen: true }, //    #/manga/ID_COURS/N°_NOTION
+  histoire: { load: () => import('./views/story.js'), fullscreen: (args) => !!args[0] }, // #/histoire[/N°_CHAPITRE]
+  boss: { load: () => import('./views/boss.js'), fullscreen: true }, //      #/boss/MATIÈRE
+  duel: { load: () => import('./views/duel.js'), fullscreen: true }, //      #/duel/QUIZ_COMPRESSÉ (marche même sans profil)
+  collection: { load: () => import('./views/collection.js'), fullscreen: (args) => args[0] === 'ouvrir' }, // #/collection[/ouvrir]
+  dojo: { load: () => import('./views/dojo.js'), fullscreen: true }, //      #/dojo (mode Focus)
+  feynman: { load: () => import('./views/feynman.js'), fullscreen: (args) => !!args[0] }, // #/feynman[/ID_COURS/N°_NOTION]
+  veille: { load: () => import('./views/veille.js'), fullscreen: true }, //  #/veille (veille d'examen)
 };
 
 const app = document.getElementById('app');
@@ -107,7 +86,8 @@ async function route() {
     // Petite animation d'entrée (sauf plein écran : l'animation "transform"
     // empêcherait les écrans plein écran d'occuper tout l'écran).
     if (!fullscreen) box.className = 'view-enter';
-    await r.view.render(box, args);
+    const view = await r.load();
+    await view.render(box, args);
     app.innerHTML = '';
     app.appendChild(box);
     window.scrollTo(0, 0);
@@ -216,5 +196,9 @@ initInstall();
   await route();
   setTimeout(samsungTip, 1500); // plan de secours Samsung Internet (une seule fois)
   db.requestPersistence();
-  registerSW();
+  // La vérification de mise à jour (service worker) ne retarde JAMAIS l'affichage :
+  // elle se fait quand l'appli est au repos, en arrière-plan.
+  const idle = (f, timeout) => ('requestIdleCallback' in window ? window.requestIdleCallback(() => f(), { timeout }) : setTimeout(f, 1500));
+  idle(registerSW, 4000);
+  idle(preloadMath, 8000); // formules prêtes avant d'ouvrir un cours
 })();

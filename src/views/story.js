@@ -72,6 +72,15 @@ export async function render(el, [chapterId]) {
     a.onclick = (e) => { e.preventDefault(); say(el.querySelector('.mascot'), 'histoire_verrou', { expression: 'clin', anim: 'shake' }); play(a, 'shake'); };
   });
   if (fresh) { sound('unlock'); setTimeout(() => onomatopoeia('NOUVEAU CHAPITRE!'), 300); }
+  // Préchargement discret du chapitre qu'on va probablement ouvrir (le premier non lu) :
+  // le lecteur BD et les images de sa page 1 seront déjà là au moment du clic.
+  const next = o.chapters.find((c) => c.unlocked && !c.read) || o.chapters.filter((c) => c.unlocked).at(-1);
+  if (next && hasComic(next.id)) {
+    setTimeout(async () => {
+      const [{ pageBoxes, assetUrl }, { preloadPage }, data] = await Promise.all([import('../comic/comic.js'), import('../comic/story-images.js'), loadComic(next.id), import('../comic/reader.js')]);
+      if (data?.pages?.[0]) preloadPage(next.id, data.pages[0], 0, pageBoxes(data.pages[0]), assetUrl, 'low');
+    }, 400);
+  }
 }
 
 // ---------------------------------------------------------------------

@@ -15,7 +15,7 @@
 // =====================================================================
 
 import { hasComic, loadComic } from '../data/comic/index.js';
-import { renderPage, bubbleGeom, captionGeom, sfxGeom } from '../comic/comic.js';
+import { renderPage, revealImages, bubbleGeom, captionGeom, sfxGeom } from '../comic/comic.js';
 import { caseKey, layoutFileName, LAYOUT_PROPS, applyLayout } from '../comic/story-images.js';
 import { esc, toast, confirmBox } from '../ui/ui.js';
 
@@ -87,6 +87,7 @@ export async function openBubbleEditor() {
     const box = current.panels[panelIdx].box;
     const m = 30;
     stage.innerHTML = current.svg;
+    revealImages(stage);
     const svg = stage.querySelector('svg');
     svg.setAttribute('viewBox', `${box.x - m} ${box.y - m} ${box.w + m * 2} ${box.h + m * 2}`);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');

@@ -144,7 +144,12 @@ export default {
           bg: { id: 'toit', time: 'nuit', horizon: 0.42, props: false, roofY: 1.2 },
           chars: [{ id: 'oubli', pose: 'cri', shot: 'pied', x: 0.7, y: 0.98, fill: 0.78, seed: 4 }],
           fx: [{ type: 'glitch', n: 10 }, { type: 'vignette', opacity: 0.55 }],
-          captions: [{ text: 'Au même moment, au-dessus de Kaloum, les lumières s’éteignent une à une.', x: 0.03, y: 0.04, w: 0.55, style: 'noir' }],
+          illus: {
+            focus: [0.6, 0.45],
+            keep: [[0.66, 0.08, 0.82, 0.25, 'visage de l’Oubli'], [0.55, 0.08, 0.88, 0.68, 'l’Oubli'], [0.38, 0.36, 0.6, 0.64, 'tentacules (gauche)'], [0.85, 0.28, 0.99, 0.56, 'tentacules (droite)'], [0.05, 0.52, 0.8, 0.86, 'Kaloum (les lumières)']],
+            free: [[0, 0, 0.55, 0.45, 'ciel étoilé'], [0, 0.86, 1, 1, 'mer']],
+          },
+          captions: [{ text: 'Au même moment, au-dessus de Kaloum, les lumières s’éteignent une à une.', x: 0.03, y: 0.04, w: 0.5, style: 'noir' }],
           sound: 'boss',
         },
         {

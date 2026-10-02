@@ -55,6 +55,44 @@ function serviceWorker() {
         .replace('__VERSION__', version);
       this.emitFile({ type: 'asset', fileName: 'sw.js', source });
     },
+    // Sécurité : si un fichier de la liste n'existe pas vraiment dans dist/ (fichier
+    // supprimé par Vite après coup), l'installation du service worker échouerait
+    // et l'appli ne marcherait plus hors ligne. On retire donc ces entrées.
+    closeBundle() {
+      const file = join(outDir, 'sw.js');
+      if (!existsSync(file)) return;
+      const src = readFileSync(file, 'utf8');
+      const m = src.match(/const PRECACHE = (\[[\s\S]*?\]);/);
+      if (!m) return;
+      const list = JSON.parse(m[1]);
+      const ok = list.filter((u) => u === './' || existsSync(join(outDir, u.slice(2))));
+      if (ok.length !== list.length) {
+        console.warn(`  ⚠️ service worker : ${list.length - ok.length} fichier(s) absent(s) retiré(s) de la liste`);
+        writeFileSync(file, src.replace(m[1], JSON.stringify(ok, null, 1)));
+      }
+    },
+    configResolved(config) { outDir = config.build.outDir; },
+  };
+}
+let outDir = 'dist';
+
+/**
+ * Précharge les 2 polices principales (alphabet latin) dès la lecture de index.html :
+ * elles sont prêtes AVANT le premier affichage, au lieu d'être découvertes en plein
+ * rendu (ce qui obligeait le navigateur à refaire toute la mise en page).
+ */
+function preloadFonts() {
+  return {
+    name: 'preload-fonts',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const fonts = Object.keys(ctx.bundle || {}).filter((f) => /(plus-jakarta-sans|unbounded)-latin-wght-normal-.*\.woff2$/.test(f));
+        const tags = fonts.map((f) => ({ tag: 'link', attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `${base}${f}`, crossorigin: '' }, injectTo: 'head' }));
+        return { html, tags };
+      },
+    },
   };
 }
 
@@ -66,7 +104,10 @@ function serviceWorker() {
 // chapitre 1. Ce plugin :
 //   - cherche ces fichiers et donne leur liste à l'appli (module
 //     "virtual:story-images", lu par src/comic/story-images.js) ;
-//   - au build, les optimise : WebP, 1200 px maximum, moins de 200 Ko
+//   - au build, les optimise en WebP, en 3 LARGEURS (600, 900 et 1200 px ;
+//     la plus grande fait moins de 200 Ko) : l'appli choisit selon l'écran ;
+//   - crée pour chaque image un APERÇU FLOU minuscule (≈ 300 octets) inclus
+//     dans l'appli : la case s'affiche aussitôt, puis l'image nette arrive en fondu
 //     (avec "sharp" ; s'il manque, l'image est publiée telle quelle) ;
 //   - lit aussi public/story/chapitre-N/bulles-chapitre-N.json (positions
 //     des bulles enregistrées avec l'éditeur du Panneau créateur).
@@ -74,8 +115,10 @@ function serviceWorker() {
 const STORY_DIR = 'public/story';
 const STORY_FILE = /^page-(\d+)-case-(\d+)\.(webp|png|jpe?g)$/i;
 const STORY_ID = 'virtual:story-images';
-const STORY_MAX_PX = 1200;
-const STORY_MAX_BYTES = 200 * 1024;
+const STORY_WIDTHS = [600, 900, 1200]; // la plus grande garde le nom sans suffixe
+const STORY_MAX_BYTES = { 600: 70 * 1024, 900: 130 * 1024, 1200: 200 * 1024 };
+/** Nom publié d'une largeur : chapitre-1/page-1-case-1.webp (1200) ou …-600.webp */
+const variantName = (key, w) => (w === 1200 ? `${key}.webp` : `${key}-${w}.webp`);
 
 /** { 'chapitre-1/page-2-case-3': 'chapitre-1/Page-2-Case-3.PNG', … } (le .webp gagne s'il y a des doublons) */
 function scanStory() {
@@ -117,20 +160,29 @@ async function loadSharp() {
   try { return (await import('sharp')).default; } catch { return null; }
 }
 
-/** WebP ≤ 1200 px ; qualité baissée (puis taille réduite) jusqu'à passer sous 200 Ko. */
-async function optimize(sharp, input) {
-  let px = STORY_MAX_PX;
+/** WebP de largeur max `width` ; qualité baissée (puis taille réduite) jusqu'à passer sous le plafond. */
+async function optimize(sharp, input, width = 1200) {
+  let px = width;
   let out;
   for (let tries = 0; tries < 18; tries++) {
     const q = 82 - (tries % 6) * 8; // 82 → 42
     out = await sharp(input).rotate()
       .resize({ width: px, height: px, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: q, effort: 5 }).toBuffer();
-    if (out.length <= STORY_MAX_BYTES) break;
+    if (out.length <= STORY_MAX_BYTES[width]) break;
     if (tries % 6 === 5) px = Math.round(px * 0.8);
   }
   return out;
 }
+
+/** Aperçu flou : image de 20 px de large, en data: URI (quelques centaines d'octets). */
+async function lqip(sharp, file) {
+  const buf = await sharp(file).rotate().resize({ width: 20 }).webp({ quality: 40 }).toBuffer();
+  return `data:image/webp;base64,${buf.toString('base64')}`;
+}
+
+/** Largeurs à publier pour une image de largeur `w` (jamais d'agrandissement). */
+const widthsFor = (w) => { const l = STORY_WIDTHS.filter((x) => x <= w); return l.length ? (l.includes(1200) ? l : [...l, 1200]) : [1200]; };
 
 function storyImages() {
   let isBuild = false;
@@ -148,15 +200,26 @@ function storyImages() {
     async load(id) {
       if (id !== vid) return null;
       sharp ||= await loadSharp();
-      // { clé: { src, w, h } } : les dimensions servent au recadrage (point focal).
+      // { clé: { src, w, h, lqip, srcs: { 600: …, 900: …, 1200: … } } }
+      // w, h : dimensions (recadrage sur le point focal) ; lqip : aperçu flou ;
+      // srcs : fichiers par largeur (l'appli choisit selon l'écran).
       const images = {};
       for (const [key, file] of Object.entries(scanStory())) {
-        const meta = sharp ? await sharp(join(STORY_DIR, file)).metadata().catch(() => ({})) : {};
+        const path = join(STORY_DIR, file);
+        const meta = sharp ? await sharp(path).metadata().catch(() => ({})) : {};
         const turned = (meta.orientation || 1) >= 5; // photo pivotée (EXIF)
+        const w = (turned ? meta.height : meta.width) || 0;
+        const optimized = isBuild && sharp;
+        // ?v=empreinte du fichier : une image remplacée sur GitHub change d'adresse,
+        // donc le cache (service worker) ne garde jamais une ancienne version.
+        const v = `?v=${createHash('md5').update(readFileSync(path)).digest('hex').slice(0, 8)}`;
+        const srcs = optimized ? Object.fromEntries(widthsFor(w).map((x) => [x, `story/${variantName(key, x)}${v}`])) : { [w || 1200]: `story/${file}${v}` };
         images[key] = {
-          src: `story/${isBuild && sharp ? `${key}.webp` : file}`,
-          w: (turned ? meta.height : meta.width) || 0,
+          src: optimized ? `story/${variantName(key, 1200)}${v}` : `story/${file}${v}`,
+          w,
           h: (turned ? meta.width : meta.height) || 0,
+          lqip: sharp ? await lqip(sharp, path).catch(() => '') : '',
+          srcs,
         };
       }
       return `export const IMAGES = ${JSON.stringify(images)};
@@ -184,14 +247,21 @@ export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
         return;
       }
       for (const [key, file] of list) {
-        const buf = await optimize(sharp, readFileSync(join(STORY_DIR, file)));
-        const dest = join(outDir, 'story', `${key}.webp`);
-        mkdirSync(join(dest, '..'), { recursive: true });
-        // Copie brute faite par Vite (dossier public/) : remplacée par la version optimisée.
+        const input = readFileSync(join(STORY_DIR, file));
+        const meta = await sharp(input).metadata();
+        const w = (meta.orientation || 1) >= 5 ? meta.height : meta.width;
+        const sizes = [];
+        for (const width of widthsFor(w)) {
+          const buf = await optimize(sharp, input, width);
+          const dest = join(outDir, 'story', variantName(key, width));
+          mkdirSync(join(dest, '..'), { recursive: true });
+          writeFileSync(dest, buf);
+          sizes.push(`${width} px ${Math.round(buf.length / 1024)} Ko`);
+        }
+        // Copie brute faite par Vite (dossier public/) : remplacée par les versions optimisées.
         const copied = join(outDir, 'story', file);
-        if (copied !== dest && existsSync(copied)) rmSync(copied);
-        writeFileSync(dest, buf);
-        console.log(`  🖼️  story/${key}.webp  ${Math.round(buf.length / 1024)} Ko`);
+        if (!file.endsWith(`${key.split('/')[1]}.webp`) && existsSync(copied)) rmSync(copied);
+        console.log(`  🖼️  story/${key}  ${sizes.join(' · ')}`);
       }
     },
   };
@@ -199,7 +269,7 @@ export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
 
 export default defineConfig({
   base,
-  plugins: [storyImages(), serviceWorker()],
+  plugins: [storyImages(), serviceWorker(), preloadFonts()],
   // Infos affichées dans le Panneau Créateur.
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

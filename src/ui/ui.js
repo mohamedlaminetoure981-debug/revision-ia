@@ -13,8 +13,6 @@
 //  sourceHtml()   : passage source d'une fiche/question (fiabilité)
 // =====================================================================
 
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from './character.js';
 import { getProfileSync } from '../core/game.js';
@@ -35,13 +33,34 @@ export function esc(s) {
 // Markdown + formules
 // ---------------------------------------------------------------------
 
-/** Affiche une formule LaTeX avec KaTeX (ou le texte brut en cas d'erreur). */
-function renderMath(tex, display) {
+// KaTeX (formules, ~270 Ko) n'est PAS chargé au démarrage : il arrive à la demande
+// (ou en arrière-plan quand l'appli est au repos, voir preloadMath). En attendant,
+// la formule s'affiche en texte, puis elle est remplacée automatiquement.
+let katex = null;
+let katexLoading = null;
+const rawMath = (tex, display) => esc(display ? `$$${tex}$$` : `$${tex}$`);
+function mathHTML(tex, display) {
   try {
     return katex.renderToString(tex, { displayMode: display, throwOnError: false, output: 'html' });
   } catch {
-    return `<code>${esc(display ? `$$${tex}$$` : `$${tex}$`)}</code>`;
+    return `<code>${rawMath(tex, display)}</code>`;
   }
+}
+
+/** Charge KaTeX (une seule fois), puis met en forme les formules en attente. */
+export function preloadMath() {
+  katexLoading ||= import('./math.js').then((m) => {
+    katex = m.default;
+    document.querySelectorAll('.math-pending').forEach((el) => { el.outerHTML = mathHTML(el.dataset.tex, el.dataset.display === '1'); });
+  }).catch(() => { katexLoading = null; });
+  return katexLoading;
+}
+
+/** Affiche une formule LaTeX avec KaTeX (ou le texte brut en attendant / en cas d'erreur). */
+function renderMath(tex, display) {
+  if (katex) return mathHTML(tex, display);
+  preloadMath();
+  return `<span class="math-pending" data-tex="${esc(tex)}" data-display="${display ? 1 : 0}">${rawMath(tex, display)}</span>`;
 }
 
 /** Mise en forme dans une ligne : gras, italique. */

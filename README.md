@@ -680,6 +680,22 @@ l'ancienne). Pour **revenir au dessin** : ouvre l'image sur github.com → menu 
 - Les images ne sont pas pré-téléchargées à l'installation : elles se chargent (puis
   restent hors ligne) quand on lit le chapitre.
 
+### ⚡ Pour que tout s'affiche vite (automatique)
+- **Aperçu flou** : au build, chaque image reçoit un minuscule aperçu (≈ 250 octets)
+  inclus dans l'appli. La case s'affiche aussitôt en flou, puis l'image nette arrive
+  en fondu. La case qu'on regarde est téléchargée **seule d'abord**, les autres ensuite.
+- **3 tailles** par image (600, 900 et 1200 px de large) : l'appli prend la plus
+  petite qui reste nette sur l'écran (et un cran plus léger si la connexion est lente
+  ou en mode « économie de données »).
+- **Préchargement** : la liste des chapitres prépare la page 1 du prochain chapitre ;
+  pendant la lecture d'une page, la page suivante est déjà téléchargée.
+- **Cache permanent** des illustrations (service worker) : une image vue une fois
+  reste instantanée et disponible hors ligne, même après une mise à jour du site. Une
+  image remplacée sur GitHub change d'adresse (`?v=…`) : jamais d'ancienne version.
+- **Démarrage** : seuls l'accueil et le strict nécessaire sont chargés au lancement ;
+  les autres écrans et le moteur de formules (KaTeX) arrivent à la demande. La
+  vérification de mise à jour se fait en arrière-plan, quand l'appli est au repos.
+
 ### ✏️ Déplacer les bulles (sans toucher au code)
 1. Dans l'appli : **Panneau créateur** → **✏️ Éditer les bulles**.
 2. Choisis le **chapitre** et la **case** en haut de l'écran.

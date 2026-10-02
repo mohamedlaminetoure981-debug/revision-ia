@@ -409,3 +409,7 @@ details > summary .rich p { display: inline; margin: 0; }
 .be-tools { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: #07050c; border-top: 1px solid #2a2338; min-height: 64px; }
 .be-pick { display: flex; gap: 8px; padding: 0 12px 8px; }
 .be-pick select { flex: 1; min-width: 0; }
+/* Mode Histoire : l'image nette apparaît en fondu par-dessus l'aperçu flou */
+image.story-full { opacity: 0; transition: opacity .35s ease; }
+image.story-full.on { opacity: 1; }
+.be image.story-full { opacity: 1; transition: none; }

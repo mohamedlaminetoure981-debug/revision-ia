@@ -15,7 +15,7 @@
 // =====================================================================
 
 import { bodySVG, INK } from './body.js';
-import { storyImage } from './story-images.js';
+import { storyImage, pickSrc } from './story-images.js';
 import { decorSVG, gradeFor, rng, TIMES } from './decors.js';
 import { oubliSVG, poingSVG, piedsSVG } from './entities.js';
 import { figureSVG, FIGURES } from './figures.js';
@@ -82,6 +82,15 @@ export function layoutPage(page) {
     prevTilt = tilt;
   });
   return polys;
+}
+
+/** Cadres { x, y, w, h } des cases d'une page (pour choisir/précharger les images). */
+export function pageBoxes(page) {
+  const grid = layoutPage(page);
+  return (page.panels || []).map((p, i) => {
+    if (p.r) { const [x, y, w, h] = p.r; return { x, y, w, h }; }
+    return grid[i] ? bboxOf(grid[i]) : { x: 0, y: 0, w: 948, h: 600 };
+  });
 }
 
 const bboxOf = (poly) => {
@@ -485,7 +494,7 @@ function grading(time, w, h) {
 // ---------------------------------------------------------------------
 // UNE CASE
 // ---------------------------------------------------------------------
-function assetUrl(p) {
+export function assetUrl(p) {
   return /^(https?:|data:)/.test(p) ? p : import.meta.env.BASE_URL + String(p).replace(/^\//, '');
 }
 
@@ -512,14 +521,15 @@ const polyArea = (poly) => Math.abs(poly.reduce((s, p, i) => { const q = poly[(i
 export function panelInfo(panel, poly, idx, pageIdx, chapterId) {
   const box = { ...bboxOf(poly), area: polyArea(poly) };
   const story = storyImage(chapterId, pageIdx, idx);
-  const src = story?.src || panel.image || null;
+  // Taille d'image adaptée à l'écran (600 / 900 / 1200 px), voir story-images.js.
+  const src = (story && pickSrc(story, box)) || panel.image || null;
   const il = panel.illus || {};
   const crop = src ? cropImage(box.w, box.h, story?.w, story?.h, il.focus) : null;
-  return { box, src, crop, illus: il };
+  return { box, src, crop, illus: il, lqip: story?.lqip || '' };
 }
 
 function renderPanel(panel, poly, idx, pageIdx, chapterId) {
-  const { box, src: image, crop, illus } = panelInfo(panel, poly, idx, pageIdx, chapterId);
+  const { box, src: image, crop, illus, lqip } = panelInfo(panel, poly, idx, pageIdx, chapterId);
   const { w, h } = box;
   const clip = uid('pc');
   const r = rng((pageIdx + 1) * 97 + idx * 13);
@@ -532,7 +542,18 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
     // Illustration recadrée pour remplir la case, en gardant le point focal
     // (panel.illus.focus). Les persos ne sont pas dessinés : les bulles visent
     // les bouches notées dans panel.illus.mouths (sinon la position du perso).
-    inner = `<image href="${esc(assetUrl(image))}" x="${f(crop.x)}" y="${f(crop.y)}" width="${f(crop.dw)}" height="${f(crop.dh)}" preserveAspectRatio="none"/>`;
+    // 1) APERÇU FLOU (inclus dans l'appli) : affiché immédiatement ;
+    // 2) image nette par-dessus, invisible jusqu'à son chargement puis en fondu
+    //    (classe story-full, rendue visible par revealImages()).
+    const at = `x="${f(crop.x)}" y="${f(crop.y)}" width="${f(crop.dw)}" height="${f(crop.dh)}" preserveAspectRatio="none"`;
+    if (lqip) {
+      const blur = uid('bl');
+      inner = `<filter id="${blur}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${f(Math.max(crop.dw, crop.dh) / 60)}" edgeMode="duplicate"/></filter>
+        <image href="${lqip}" ${at} filter="url(#${blur})"/>
+        <image class="story-full" data-href="${esc(assetUrl(image))}" ${at}/>`;
+    } else {
+      inner = `<image href="${esc(assetUrl(image))}" ${at}/>`;
+    }
     (panel.chars || []).forEach((c, i) => {
       const m = illus.mouths?.[i];
       if (m) { const [u, v] = crop.toPanel(m); heads.push([u * w, v * h]); return; }
@@ -570,6 +591,28 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   (panel.captions || []).forEach((c, i) => { text += tag('captions', i, caption(c, box)); });
   (panel.bubbles || []).forEach((b, i) => { text += tag('bubbles', i, bubble(b, box, heads)); });
   return { svg: out, text, box, heads, illustrated: !!image, crop };
+}
+
+/**
+ * Fait apparaître en fondu chaque image nette (.story-full) dès qu'elle est
+ * téléchargée et décodée ; en attendant, l'aperçu flou reste visible.
+ * Ordre : la case `first` (celle qu'on regarde) SEULE, puis toutes les autres.
+ * @returns {Promise} résolue quand toutes les images de la page sont prêtes
+ */
+export function revealImages(root, first = 0) {
+  const els = [...root.querySelectorAll('image.story-full[data-href]')];
+  if (!els.length) return Promise.resolve();
+  const order = [...els.splice(Math.min(first, els.length - 1), 1), ...els];
+  // L'image est posée tout de suite (déjà en cache : elle s'affiche aussitôt) ;
+  // le fondu démarre dès que le navigateur l'a chargée.
+  const show = (el) => new Promise((done) => {
+    const ok = () => { el.classList.add('on'); done(); };
+    el.addEventListener('load', ok, { once: true });
+    el.addEventListener('error', ok, { once: true });
+    el.setAttribute('href', el.dataset.href);
+    el.removeAttribute('data-href');
+  });
+  return show(order[0]).then(() => Promise.all(order.slice(1).map(show)));
 }
 
 /**

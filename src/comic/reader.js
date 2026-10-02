@@ -10,7 +10,8 @@
 // Une seule page est dessinée à la fois (fluide sur petit Android).
 // =====================================================================
 
-import { renderPage, PAGE_W, PAGE_H } from './comic.js';
+import { renderPage, revealImages, pageBoxes, assetUrl, PAGE_W, PAGE_H } from './comic.js';
+import { setDisplayWidth, preloadPage } from './story-images.js';
 import { playSfx, startAmbient, stopAmbient } from '../ui/sfx.js';
 import { vibrate } from '../ui/fx.js';
 import * as db from '../core/db.js';
@@ -54,10 +55,30 @@ export async function openReader(el, chapter, meta, onEnd) {
 
   const total = chapter.pages.length;
 
+  // Taille d'image adaptée à l'écran : largeur à laquelle une case { w, h } est
+  // affichée (en px CSS), en mode "case par case" (zoom) ou "page entière".
+  setDisplayWidth((box) => {
+    const vw = view.clientWidth || window.innerWidth; const vh = view.clientHeight || window.innerHeight;
+    const zoomed = Math.min(vw - 20, (box.w * (vh - 20)) / box.h);
+    const page = (box.w * Math.min(vw, 760)) / PAGE_W;
+    return Math.max(zoomed, page);
+  });
+  const preload = (idx, priority) => {
+    const pg = chapter.pages[idx];
+    return pg ? preloadPage(chapter.id ?? meta.id, pg, idx, pageBoxes(pg), assetUrl, priority) : Promise.resolve();
+  };
+  // Ouverture : la page 1 est chargée en priorité par drawPage (case 1 d'abord),
+  // puis la page 2 en arrière-plan.
+
   function drawPage(dir = 1) {
     const page = chapter.pages[pageIdx];
     current = renderPage(page, pageIdx, chapter.id ?? meta.id);
     holder.innerHTML = current.svg;
+    // Aperçus flous → images nettes en fondu (la case affichée d'abord) ;
+    // dès que la page est prête, on prépare déjà la suivante.
+    const shown = pageIdx;
+    revealImages(holder, dir > 0 ? 0 : (chapter.pages[pageIdx].panels || []).length - 1)
+      .then(() => { if (shown === pageIdx) preload(pageIdx + 1, 'low'); });
     const svg = holder.querySelector('svg');
     // Voile qui assombrit tout sauf la case en cours (mode case par case)
     svg.insertAdjacentHTML('beforeend', `<path id="bd-veil" fill="#05030a" fill-rule="evenodd" opacity="0" d=""/>`);
