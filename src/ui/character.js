@@ -909,19 +909,19 @@ function lifeExtra(el, L, now) {
  * La place de la bulle est réservée dès le début (le texte à venir est
  * invisible) : rien ne bouge autour.
  */
-export function speak(chEl, sayEl, text) {
+export function speak(chEl, sayEl, text, { perChar = 30, max = 2200 } = {}) {
   text = String(text ?? '');
-  if (!sayEl) return;
+  if (!sayEl) return 0;
   clearTimeout(sayEl._tw);
   chEl?.classList?.remove('ch-talking');
-  if (reducedMotion() || !text) { sayEl.textContent = text; return; }
+  if (reducedMotion() || !text) { sayEl.textContent = text; return 0; }
   const on = document.createElement('span');
   const off = document.createElement('span');
   off.className = 'tw-off';
   off.textContent = text;
   sayEl.replaceChildren(on, off);
-  // Durée : ~30 ms par caractère, entre 0,4 s et 2,2 s.
-  const total = Math.min(2200, Math.max(400, text.length * 30));
+  // Durée : ~30 ms par caractère, entre 0,4 s et 2,2 s (réglable : perChar, max).
+  const total = Math.min(max, Math.max(Math.min(400, max), text.length * perChar));
   const parts = text.split(/(\s+)/).filter(Boolean);
   let i = 0; let shown = 0;
   const talking = chEl?.dataset?.img ? chEl : null;
@@ -941,6 +941,9 @@ export function speak(chEl, sayEl, text) {
     sayEl._tw = setTimeout(step, ms);
   };
   sayEl._tw = setTimeout(step, 0); // la bulle est peut-être pas encore dans la page
+  // Pour finir d'écrire tout de suite (ex. l'élève touche l'écran).
+  sayEl._finish = () => { clearTimeout(sayEl._tw); sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); };
+  return total + 180; // durée de l'écriture (ms)
 }
 
 /** Un mot prononcé : petit mouvement (alterné, pour relancer l'animation à chaque mot). */

@@ -15,6 +15,9 @@
 //  - si elle finit plus tôt, la scène va jusqu'au bout (3 à 5 s) ;
 //  - si elle dure plus longtemps, les persos continuent de délibérer.
 // Bouton "Passer" toujours visible. Réglage : complète / courte / désactivée.
+// Chaque bulle reste le temps d'être lue (bubble.js → groupSay) ; toucher
+// l'écran passe à la suivante. Peu de répliques : 1 (courte) ou 2 (complète)
+// si la note est vite prête.
 // =====================================================================
 
 import * as db from '../core/db.js';
@@ -23,7 +26,7 @@ import { characterHTML, play, setExpression } from './character.js';
 import { esc, progress } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
 import { isCreator, creatorName } from '../core/creator.js';
-import { groupBubble, clearBubbles } from './bubble.js';
+import { groupSay, clearBubbles, waitRead } from './bubble.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -91,7 +94,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     <div class="council-status"></div>`;
   document.body.appendChild(el);
   let skipped = false;
-  el.querySelector('.council-skip').onclick = () => { skipped = true; el.querySelector('.council-skip').textContent = '⏳'; };
+  el.querySelector('.council-skip').onclick = () => { skipped = true; el.querySelector('.council-skip').textContent = '⏳'; el.dispatchEvent(new Event('scene-skip')); };
 
   const seats = {};
   const start = performance.now();
@@ -125,7 +128,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
   let turn = 0;
   let spokeAfterResult = 0;
   // Une seule bulle à la fois, toujours entièrement dans l'écran (voir bubble.js).
-  const say = (id, text) => { if (seats[id]) groupBubble(el, seats[id], id, text); };
+  const say = (id, text) => (seats[id] ? groupSay(el, seats[id], id, text) : Promise.resolve());
   const react = (level) => { // les muets réagissent
     for (const id of silent) {
       const chEl = seats[id]?.querySelector('.ch');
@@ -147,12 +150,12 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     if (res && elapsed >= minDuration && (spokeAfterResult >= (short ? 0 : 1))) break;
     const id = speakers[turn % speakers.length];
     turn++;
-    say(id, councilLine(id, res ? res.level : 'deliberation'));
+    const reading = say(id, councilLine(id, res ? res.level : 'deliberation')); // écrite + temps de lecture
     if (res) spokeAfterResult++;
     const chEl = seats[id]?.querySelector('.ch');
     if (chEl) { setExpression(chEl, res ? (res.level === 'excellent' ? 'surprise' : res.level === 'a_retravailler' ? 'encouragement' : 'joie') : pick(['reflexion', 'concentration', 'surprise'])); play(chEl, 'bounce'); }
     react(res?.level);
-    await Promise.race([sleep(short ? 600 : 850), job.then(() => sleep(short ? 300 : 450))]);
+    await reading;
     if (performance.now() - start > 60000 && !finished) setStatus('La correction prend du temps… la connexion est lente, on patiente.');
   }
 
@@ -172,13 +175,14 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     }
     // La réplique du perso qui annonce s'affiche sous la note (pas de chevauchement).
     const rc = CHARACTERS[revealer];
+    const revealLine = councilLine(revealer, res.level);
     sound('reveal');
     const rv = document.createElement('div');
     rv.innerHTML = `
       ${res.level === 'excellent' ? `<div class="shockwave" style="--c:${color}"></div><div class="burst" style="--c:${color}"></div>` : ''}
       ${res.level === 'a_retravailler' || res.level === 'moyen' ? '<div class="warm-glow"></div>' : ''}
       <div class="reveal" style="--c:${color}"><div class="note">${esc(res.label)}</div><div class="lbl">${LEVEL_LABEL[res.level]}</div>
-        <div class="bubble" style="--c:${rc.color}"><span class="who">${esc(rc.name)}</span>${esc(councilLine(revealer, res.level))}</div></div>`;
+        <div class="bubble" style="--c:${rc.color}"><span class="who">${esc(rc.name)}</span>${esc(revealLine)}</div></div>`;
     el.appendChild(rv);
     if (res.level === 'excellent') { // explosion d'énergie
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'celebration'));
@@ -189,7 +193,8 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'encouragement'));
       vibrate(20);
     }
-    await Promise.race([sleep(short ? 700 : 1300), new Promise((r) => { el.onclick = r; })]);
+    // La note et la réplique restent le temps d'être lues (toucher = continuer).
+    await waitRead(el, null, short ? 300 : 700, revealLine);
   }
   el.remove();
   return value;

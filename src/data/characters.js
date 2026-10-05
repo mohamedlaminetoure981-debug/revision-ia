@@ -777,7 +777,7 @@ Object.assign(CHARACTERS, {
 // =====================================================================
 const COUNCIL_LINES = {
   kai: {
-    deliberation: ['Bon… on se pose et on regarde ça ensemble.', 'Attendez, laissez-moi relire la copie.', 'Hmm… intéressant, très intéressant.', 'Tout le monde est d’accord ? On vérifie encore.', 'Je sens qu’il y a du bon là-dedans…', 'Silence, on délibère !', 'Pas si vite, je veux être juste.', 'Un dernier coup d’œil…'],
+    deliberation: ['Bon… on regarde ça ensemble.', 'Attendez, laissez-moi relire la copie.', 'Hmm… intéressant, très intéressant.', 'Tout le monde est d’accord ? On vérifie encore.', 'Je sens qu’il y a du bon là-dedans…', 'Silence, on délibère !', 'Pas si vite, je veux être juste.', 'Un dernier coup d’œil…'],
     excellent: ['Les amis… vous voyez ce que je vois ?', 'Je crois qu’on tient quelque chose d’énorme.', 'J’ai jamais vu une copie aussi propre.', 'Préparez les confettis, sérieux.', 'Là, c’est du niveau champion.', 'Ok… je suis impressionné.', 'Je savais qu’on allait être surpris.', 'On annonce ? Moi je tremble.'],
     bon: ['C’est du solide, franchement.', 'Il y a de très belles choses ici.', 'Presque parfait… presque.', 'Ça progresse, je le vois clairement.', 'Du bon boulot, on est d’accord ?', 'Quelques détails, mais quelle base !', 'Je suis fier du chemin parcouru.', 'On va annoncer une bonne nouvelle.'],
     moyen: ['C’est un bon début, on peut construire dessus.', 'Il y a des bases, faut consolider.', 'La moitié du chemin, c’est déjà ça.', 'Je vois l’effort, faut juste affiner.', 'On a des points à retravailler ensemble.', 'Pas mal, mais je sais qu’on peut mieux.', 'On va trouver comment progresser.', 'Le potentiel est là, clairement.'],
@@ -787,14 +787,14 @@ const COUNCIL_LINES = {
     deliberation: ['Analyse de la copie… 42 %…', 'Je lance un deuxième scan pour être sûr.', 'Mes capteurs détectent… quelque chose.', 'Calcul des probabilités en cours…', 'Attendez, je recoupe les données.', 'Scan des réponses, ligne par ligne…', 'Hmm, les données sont intéressantes.', 'Vérification des calculs… bip bip.'],
     excellent: ['Mes lunettes surchauffent… c’est énorme !', 'Les données sont… parfaites ?!', 'Erreur système : trop de bonnes réponses.', 'Je relance le scan… non, c’est bien réel !', 'Taux de réussite hors norme détecté.', 'Mes capteurs n’ont jamais vu ça.', 'Résultat classé : légendaire.', 'Je sauvegarde cette copie dans mes archives.'],
     bon: ['Les données sont très positives.', 'Signal fort détecté, bravo.', 'Peu d’anomalies. Très propre.', 'Le graphique monte, j’aime ça.', 'Performance au-dessus de la moyenne.', 'Quelques bugs mineurs, rien de grave.', 'Analyse : solide et fiable.', 'Mes lunettes approuvent.'],
-    moyen: ['Données mitigées, mais exploitables.', 'Il y a du signal et un peu de bruit.', 'Je détecte des zones à optimiser.', 'La moitié des modules OK, l’autre en chantier.', 'Résultat stable, marge de progression détectée.', 'On peut débugger ça ensemble.', 'Les fondations tiennent.', 'Mise à jour recommandée, pas de panique.'],
-    a_retravailler: ['Pas de crash, juste une mise à jour à faire.', 'Chaque bug corrigé rend le système plus fort.', 'J’ai repéré où ça coince. Bonne nouvelle.', 'On relance : version 2.0 en approche.', 'Les données montrent surtout un gros potentiel.', 'Je prépare un plan de correction.', 'Les meilleurs programmes commencent en bêta.', 'On va tout recompiler proprement.'],
+    moyen: ['Données mitigées, mais exploitables.', 'Du signal, et un peu de bruit.', 'Je détecte des zones à optimiser.', 'La moitié des modules OK, l’autre en chantier.', 'Résultat stable, marge de progression détectée.', 'On peut débugger ça ensemble.', 'Les fondations tiennent.', 'Mise à jour recommandée, pas de panique.'],
+    a_retravailler: ['Pas de crash, juste une mise à jour.', 'Chaque bug corrigé rend le système plus fort.', 'J’ai repéré où ça coince. Bonne nouvelle.', 'On relance : version 2.0 en approche.', 'Les données montrent surtout un gros potentiel.', 'Je prépare un plan de correction.', 'Les meilleurs programmes commencent en bêta.', 'On va tout recompiler proprement.'],
   },
   nia: {
     deliberation: ['Laissez-moi lire jusqu’au bout…', 'Chaque réponse raconte une histoire.', 'Je regarde la façon de raisonner.', 'Prenons le temps de bien comprendre.', 'Hmm, ce passage est intéressant.', 'Je relis la partie la plus délicate.', 'Ne précipitons rien.', 'Je crois que je vois le fil…'],
     excellent: ['C’est… magnifique. Vraiment.', 'Chaque notion est à sa place.', 'Le cours a été compris en profondeur.', 'Je n’ai presque rien à ajouter.', 'Quelle clarté dans les réponses.', 'C’est le genre de copie qu’on garde.', 'Tout s’emboîte parfaitement.', 'Je suis émue, je l’avoue.'],
-    bon: ['Une belle compréhension d’ensemble.', 'Quelques nuances à préciser, c’est tout.', 'Le raisonnement est bon.', 'On voit que le cours a été bien lu.', 'Une belle histoire, avec quelques ratures.', 'Très encourageant.', 'Les idées principales sont là.', 'Il ne manque que quelques détails.'],
-    moyen: ['Certaines notions sont comprises, d’autres à revoir.', 'Le fil est là, mais il se perd parfois.', 'Relire le résumé aidera beaucoup.', 'Il y a une base sur laquelle bâtir.', 'Quelques passages méritent une explication.', 'C’est normal à ce stade.', 'Je vais proposer une relecture ciblée.', 'Petit à petit, ça va s’éclaircir.'],
+    bon: ['Une belle compréhension d’ensemble.', 'Quelques nuances à préciser, c’est tout.', 'Le raisonnement est bon.', 'Le cours a été bien lu.', 'Une belle histoire, avec quelques ratures.', 'Très encourageant.', 'Les idées principales sont là.', 'Il ne manque que quelques détails.'],
+    moyen: ['Certaines notions sont comprises, d’autres à revoir.', 'Le fil est là, mais se perd.', 'Relire le résumé aidera beaucoup.', 'Il y a une base sur laquelle bâtir.', 'Quelques passages méritent une explication.', 'C’est normal à ce stade.', 'Je vais proposer une relecture ciblée.', 'Petit à petit, ça va s’éclaircir.'],
     a_retravailler: ['Chaque grand lecteur a commencé par une page.', 'On reprend l’histoire depuis le début, ensemble.', 'Ce n’est pas un échec, c’est un chapitre.', 'Je vais tout réexpliquer doucement.', 'La compréhension vient avec le temps.', 'Soyons patients et bienveillants.', 'Les 💡 du résumé vont beaucoup aider.', 'Demain, ce sera plus clair.'],
   },
   sora: {
@@ -808,15 +808,15 @@ const COUNCIL_LINES = {
     deliberation: ['Hmm… je m’attendais pas à ça…', 'Laissez-moi recompter…', 'Tch… attendez.', 'C’est moi qui annonce, hein.', 'Intéressant…', 'Je suis pas stressé. Pas du tout.', 'Le résultat est… hmm.', 'Je relis. Par fair-play.'],
     excellent: ['Pff… ok, c’est incroyable.', 'Je… je suis battu. Respect.', 'Mon record est en danger.', 'Tu m’énerves… tellement t’es fort(e).', 'Je m’incline. Cette fois.', 'C’est officiel : j’ai un vrai rival.', 'Personne ne m’avait fait ça.', 'Je vais devoir m’entraîner deux fois plus.'],
     bon: ['Pas mal. Vraiment pas mal.', 'Tu t’approches de mon niveau.', 'Ok, je te l’accorde.', 'Bonne perf, rival(e).', 'Hmm, c’est solide.', 'Je dois avouer que c’est bien.', 'Tu progresses trop vite.', 'Presque… mais je reste devant.'],
-    moyen: ['Le match est serré.', 'Il y a de la marge, et du potentiel.', 'La prochaine sera la bonne, je le sens.', 'Je t’attends pour la revanche.', 'Pas encore mon niveau, mais ça vient.', 'C’est une base de rival.', 'Entraîne-toi, je veux un vrai duel.', 'On en reparle au prochain round.'],
-    a_retravailler: ['Hé, même moi j’ai commencé en bas.', 'Je veux une revanche, et je sais que tu vas revenir fort.', 'Les vrais rivaux se relèvent toujours.', 'Ce round est à moi, le suivant sera peut-être à toi.', 'Relève-toi, j’ai besoin d’un adversaire.', 'C’était juste un échauffement.', 'Je crois en ta remontée. Chut, le dis à personne.', 'On repart au combat.'],
+    moyen: ['Le match est serré.', 'De la marge, et du potentiel.', 'La prochaine sera la bonne, je le sens.', 'Je t’attends pour la revanche.', 'Pas encore mon niveau, mais ça vient.', 'C’est une base de rival.', 'Entraîne-toi, je veux un vrai duel.', 'On en reparle au prochain round.'],
+    a_retravailler: ['Hé, même moi j’ai commencé en bas.', 'Revanche exigée. Tu vas revenir fort.', 'Les vrais rivaux se relèvent toujours.', 'Ce round est à moi. Le prochain ?', 'Relève-toi, j’ai besoin d’un adversaire.', 'C’était juste un échauffement.', 'Je crois en toi. Chut, secret.', 'On repart au combat.'],
   },
   awa: {
     deliberation: ['Attendez, j’ai vérifié deux fois…', 'Je regarde la méthode, pas que le résultat.', 'Chaque étape compte.', 'Barème en main, je note.', 'Hmm, ce calcul mérite un second regard.', 'Je suis exigeante, mais juste.', 'Un instant, je recompte les points.', 'Rigueur avant tout.'],
     excellent: ['Méthode impeccable, résultat juste. Parfait.', 'Je n’ai rien à redire. Rien.', 'C’est une copie modèle.', 'Voilà le travail que j’attendais !', 'Rigueur, précision, clarté. Tout y est.', 'Je mettrais cette copie au tableau.', 'Excellente maîtrise, bravo.', 'Je suis fière, vraiment.'],
     bon: ['Très bon travail, quelques détails.', 'La méthode est là, bien joué.', 'Encore un effort sur la rédaction.', 'C’est sérieux, j’aime ça.', 'Quelques points perdus bêtement.', 'Solide, continue comme ça.', 'Tu y es presque.', 'Belle application du cours.'],
     moyen: ['La moitié est bonne, l’autre est à revoir.', 'Il faut plus de rigueur dans les étapes.', 'Je vois les idées, il faut les structurer.', 'On va retravailler la méthode.', 'Attention aux erreurs d’inattention.', 'C’est une base, pas une fin.', 'Un peu d’entraînement et ça passe.', 'Reprends les exercices ratés.'],
-    a_retravailler: ['On va reprendre pas à pas, ensemble.', 'Chaque erreur est une leçon, je vais te les montrer.', 'Je ne lâche personne. Toi non plus.', 'Commençons par les bases, doucement.', 'C’est le début de l’entraînement.', 'Je suis exigeante parce que je crois en toi.', 'Un exercice par jour, et tu verras la différence.', 'Je t’ai préparé des conseils précis.'],
+    a_retravailler: ['On va reprendre pas à pas, ensemble.', 'Chaque erreur est une leçon. Je t’explique.', 'Je ne lâche personne. Toi non plus.', 'Commençons par les bases, doucement.', 'C’est le début de l’entraînement.', 'Exigeante, parce que je crois en toi.', 'Un exercice par jour, et ça change tout.', 'Je t’ai préparé des conseils précis.'],
   },
   tidiane: {
     deliberation: ['Respire, on annonce…', 'Tranquille, tout le monde se calme.', 'On prend notre temps.', 'Pas de pression, hein.', 'Zen… le résultat arrive.', 'Je sens que ça va aller.', 'Doucement, on délibère.', 'Un peu de patience.'],
@@ -871,15 +871,15 @@ const CREATOR_LINES = {
     encouragement: ['Allez {prenom}, montre à ta propre équipe que t’es pas qu’un codeur.', 'Une session, et après tu retournes coder. Deal ?', 'T’as créé un coach de révision. Utilise-le, flemmard !', 'Ta série t’attend, grand créateur.'],
     fin: ['Bonne session, patron. Maintenant, dodo. Pas de code.', 'C’est bon pour aujourd’hui. Ferme ton éditeur de code aussi, hein.', 'À demain {prenom}. Et prends tes cours en photo, cette fois.', 'Fier de toi. Mais pas trop, sinon tu vas prendre la grosse tête.'],
     conseil: {
-      deliberation: ['Le créateur a rendu sa copie. On le juge sévèrement ?', 'Attendez… il a vraiment révisé ou il a lu le code source ?', 'Silence, on délibère sur le boss.'],
-      excellent: ['Le créateur a tout déchiré. Je suis fier… et jaloux.', 'Il nous a créés ET il réussit ? Pas juste.', 'Ok, sensei. Respect total.'],
+      deliberation: ['Copie du créateur. On est sévères ?', 'Il a révisé… ou lu le code source ?', 'Silence, on délibère sur le boss.'],
+      excellent: ['Il a tout déchiré. Fier… et jaloux.', 'Il nous crée ET il réussit ? Injuste.', 'Ok, sensei. Respect total.'],
       bon: ['Pas mal pour un codeur de nuit.', 'Solide, patron. Quelques bugs, mais solide.', 'Bon travail, petit frère.'],
-      moyen: ['Moyen… comme son sommeil.', 'Le créateur peut mieux faire. Et il le sait.', 'Ça passe, mais on a vu mieux.'],
-      a_retravailler: ['Aïe… on l’annonce gentiment ou on le taquine ?', 'Il va falloir réviser, baka. On t’aide.', 'Pas grave, on croit en toi, tête de mule.'],
+      moyen: ['Moyen… comme son sommeil.', 'Peut mieux faire. Et il le sait.', 'Ça passe, mais on a vu mieux.'],
+      a_retravailler: ['Aïe… on l’annonce gentiment ou on le taquine ?', 'Il va falloir réviser, baka. On t’aide.', 'On croit en toi, tête de mule.'],
     },
   },
   mory: {
-    accueil: ['Mes capteurs confirment : c’est lui qui a écrit notre code !'],
+    accueil: ['Capteurs formels : c’est lui, notre codeur !'],
     arrivee: ['Ah, le développeur ! J’ai trouvé 3 bugs dans mon propre code. Merci qui ?', '{prenom}, tu m’as donné des lunettes high-tech et une connexion qui rame. Explique.', 'Le créateur est là. Tu viens enfin prendre tes cours en photo, ou encore la flemme ?', 'Salut sensei. Ton code est propre… pour du code écrit à 3 h du matin.', 'Scan du créateur : niveau de flemme 87 %. Niveau de génie : on vérifie.'],
     reussite: ['Résultat propre. Plus propre que ton code, en tout cas.', 'Analyse : le créateur sait aussi réviser. Donnée surprenante.', 'Bravo ! Je retire la moitié de mes critiques sur ton code. La moitié.', 'Performance validée. Aucun bug détecté… cette fois.', 'Pas mal, {prenom}. Tu compiles bien quand tu veux.'],
     echec: ['Erreur 404 : révision du créateur introuvable.', 'T’as fait une boucle infinie de mauvaises réponses, baka.', 'Même mon scanner aurait fait mieux. Et il rame.', 'Il faut un patch pour ton cerveau, {prenom}. Version 2.0 demain.', 'Bug détecté : l’utilisateur a codé au lieu de réviser.'],
@@ -887,7 +887,7 @@ const CREATOR_LINES = {
     encouragement: ['Prends tes cours en photo, flemmard. Je suis là pour ça !', 'Allez, scanne un chapitre. Un seul. Je te juge pas… un peu.', 'Tu m’as créé scanner, laisse-moi scanner !', 'Tes cours dorment dans ton sac depuis combien de temps ?'],
     fin: ['Session terminée. Pense à « commiter » tes révisions, haha.', 'Déconnexion. Et range ton code, c’est le bazar.', 'Bye patron. Demain, je veux des photos nettes.', 'Fin du scan. Tu t’es bien débrouillé, pour un dev.'],
     conseil: {
-      deliberation: ['Scan de la copie du créateur… des anomalies… ou pas ?', 'Je vérifie s’il a triché avec l’accès au code source.', 'Analyse en cours. Suspense.'],
+      deliberation: ['Scan du créateur… des anomalies… ou pas ?', 'A-t-il triché via le code source ?', 'Analyse en cours. Suspense.'],
       excellent: ['Aucun bug détecté ! Un miracle !', 'Copie plus propre que son code source.', 'Données parfaites. Je suis choqué.'],
       bon: ['Peu d’erreurs. Pour un dev, c’est rare.', 'Bon score. Commit validé.', 'Performance correcte, sensei.'],
       moyen: ['Résultat en version bêta.', 'Il faut un patch, patron.', 'Moitié bugs, moitié fonctionnalités.'],
@@ -895,7 +895,7 @@ const CREATOR_LINES = {
     },
   },
   nia: {
-    accueil: ['*soupir* Donc c’est toi qui m’as fait soupirer autant…'],
+    accueil: ['*soupir* C’est toi qui me fais soupirer ?'],
     arrivee: ['*soupir* Bonjour {prenom}. Encore réveillé à cette heure-ci ?', 'Ah, notre créateur. Tu viens lire le résumé que TU m’as demandé d’écrire ?', 'Je t’ai écrit des explications parfaites. Tu vas enfin les lire ?', '*soupir* Tu m’as créée pour que tu lises, pas pour admirer tes animations.', 'Bonjour, sensei de pacotille. Installe-toi, je vais te raconter ton propre cours.'],
     reussite: ['*soupir de soulagement* Tu as compris. Enfin.', 'Tu vois ce qui arrive quand tu lis jusqu’au bout ?', 'C’est bien, {prenom}. Je suis presque émue.', 'Parfois, tu me rends fière d’être ta création.', 'Bravo. Tu n’es pas qu’une tête de mule, finalement.'],
     echec: ['*long soupir* Tu as sauté les 💡, n’est-ce pas ?', 'Je t’avais tout expliqué… tout.', 'Tête de mule. Relis la partie 2, calmement.', 'Tu codes des IA géniales mais tu ne lis pas leurs résumés. Ironique.', 'Ce n’est pas grave. Mais je soupire quand même.'],
@@ -919,7 +919,7 @@ const CREATOR_LINES = {
     encouragement: ['Allez, 10 fiches et je te laisse retourner coder !', 'Swipe, flemmard, swipe !', 'Tes fiches pleurent, {prenom}. Elles veulent te voir.', 'Défi : zéro fiche ratée. T’es cap ?'],
     fin: ['Pile terminée ! Va dormir, zombie du code !', 'Bravo patron ! Clin d’œil et au lit !', 'C’est fini ! Tu reviens demain, promis juré ?', 'Bye {prenom} ! Arrête de changer mes couleurs dans le code !'],
     conseil: {
-      deliberation: ['Allez, dites-le ! Il a raté ? Hihi !', 'Je parie qu’il a codé toute la nuit avant !', 'Suspense de ouf pour le boss !'],
+      deliberation: ['Allez, dites-le ! Il a raté ? Hihi !', 'Je parie qu’il a codé toute la nuit !', 'Suspense de ouf pour le boss !'],
       excellent: ['Le créateur est trop fort ! Clin d’œil ! 😉', 'NON ?! Il a assuré !', 'Speedrun du créateur !'],
       bon: ['Pas mal, papa-codeur !', 'Bim ! Presque parfait !', 'Je valide, patron !'],
       moyen: ['Hihi, quelques fiches à rejouer, flemmard !', 'Moyen ! Tu swipes pas assez !', 'Allez, deuxième manche !'],
@@ -927,7 +927,7 @@ const CREATOR_LINES = {
     },
   },
   ren: {
-    accueil: ['Alors c’est toi… Tu vas regretter de m’avoir fait rival.'],
+    accueil: ['C’est toi ? Tu vas regretter ce rival.'],
     arrivee: ['Tiens, le créateur. Tu crois pouvoir battre le rival que TU as créé ?', 'Tu m’as donné le rôle du rival. Grave erreur, {prenom}.', 'Le sensei de pacotille est de retour. Prêt à perdre contre ta propre création ?', 'Tu m’as codé imbattable. T’as pensé à ça, génie ?', 'Viens, {prenom}. Je vais t’apprendre à respecter tes personnages.'],
     reussite: ['Tch… le créateur a du niveau. Je déteste ça.', 'Ok, t’as gagné. Mais c’est parce que t’as codé les questions !', 'Pff. Respect, créateur. Juste cette fois.', 'T’as battu ton propre rival. Tu dois être content, hein ?', 'Bien joué. Je vais réclamer une mise à jour pour être plus fort.'],
     echec: ['HAHA ! Battu par ta propre création ! Baka !', 'Tu m’as créé et tu perds contre moi. Poétique.', 'Flemmard ! Moins de code, plus de révisions !', 'Tu veux que je te désactive le minuteur, sensei ?', 'Relève-toi, tête de mule. Un créateur qui abandonne, c’est nul.'],
@@ -935,15 +935,15 @@ const CREATOR_LINES = {
     encouragement: ['Un duel, {prenom}. Maintenant. T’as peur ?', 'Prouve que t’es pas qu’un codeur de 3 h du matin.', 'Ton record est ridicule. Bats-le.', 'Le créateur contre la création. Ce soir. Sois prêt.'],
     fin: ['Match nul… non, j’ai gagné. On en reparle demain.', 'Pas mal, créateur. Mais la revanche arrive.', 'Va dormir. Un rival fatigué, c’est pas drôle à battre.', 'GG, sensei. Je garde ta défaite dans mes archives.'],
     conseil: {
-      deliberation: ['Hmm… le créateur contre sa création…', 'Je recompte. Je veux être sûr qu’il a perdu.', 'Tch… attendez.'],
-      excellent: ['Le créateur m’a battu. Je réclame une mise à jour.', 'Pff… respect, sensei.', 'Tu m’énerves… t’es trop fort.'],
+      deliberation: ['Hmm… le créateur contre sa création…', 'Je recompte. J’espère qu’il a perdu.', 'Tch… attendez.'],
+      excellent: ['Battu par le créateur. Je veux un patch.', 'Pff… respect, sensei.', 'Tu m’énerves… t’es trop fort.'],
       bon: ['Pas mal, créateur. Pas mal.', 'Presque à mon niveau. Presque.', 'Ok, je te l’accorde.'],
       moyen: ['Moyen, sensei de pacotille.', 'Je t’attends pour la revanche, baka.', 'Tu peux mieux. Prouve-le.'],
       a_retravailler: ['HAHA ! Battu par ta création ! … Allez, relève-toi.', 'Flemmard ! Revanche demain, obligatoire.', 'Un créateur ne reste pas au sol. Debout.'],
     },
   },
   awa: {
-    accueil: ['Parfait. J’ai une liste de bugs à te montrer.'],
+    accueil: ['Parfait. J’ai une liste de bugs.'],
     arrivee: ['Te voilà, {prenom}. On parle du bug de la semaine dernière ?', 'Le créateur ! J’ai une liste de bugs pour toi. Elle est longue.', 'Bonjour sensei. Tu as testé ton code avant de le publier, cette fois ?', 'Tu m’as créée exigeante. Assume, maintenant.', 'Assieds-toi. Aujourd’hui, c’est toi que je corrige.'],
     reussite: ['Excellente copie. Contrairement à ta gestion des erreurs.', 'Bravo. Méthode propre. Maintenant, fais pareil dans ton code.', 'Je suis fière de toi, {prenom}. Vraiment.', 'Rigueur parfaite. Tu vois que tu sais faire quand tu veux.', 'Note excellente. Je raye un bug de ma liste.'],
     echec: ['Tu vois ? C’est comme ton code : pas de tests, que des erreurs.', 'Tête de mule. Écris les étapes, comme dans un vrai algo !', 'Flemmard ! Même ton exercice a des bugs.', 'Tu m’as codée pour corriger… je corrige. Beaucoup.', 'On reprend. Et cette fois, tu vérifies, baka.'],
@@ -951,11 +951,11 @@ const CREATOR_LINES = {
     encouragement: ['Un exercice. Sans bug. Tu peux le faire.', 'Rigueur, {prenom}. Dans tes révisions ET dans ton code.', 'Arrête de coder et entraîne-toi. Ordre de la coach.', 'Tu as créé une coach exigeante. Profites-en.'],
     fin: ['Séance terminée. Et corrige le bug d’affichage, s’il te plaît.', 'Bon travail. Va dormir, les bugs attendront.', 'Fin de l’entraînement. Tu progresses, je le reconnais.', 'À demain {prenom}. Avec des tests, cette fois.'],
     conseil: {
-      deliberation: ['J’ai vérifié deux fois. Des bugs partout… ou pas.', 'Barème en main. Pas de favoritisme pour le créateur.', 'Je corrige le boss comme les autres.'],
+      deliberation: ['Vérifié deux fois. Des bugs… ou pas.', 'Barème en main. Zéro favoritisme, créateur.', 'Je corrige le boss comme les autres.'],
       excellent: ['Copie sans bug ! Tu devrais coder comme ça.', 'Parfait, {prenom}. Je suis fière.', 'Rigueur impeccable. Enfin !'],
-      bon: ['Bon travail, quelques fautes d’inattention. Comme dans ton code.', 'Solide. Continue.', 'Presque parfait, sensei.'],
+      bon: ['Bon travail. Des fautes… comme dans ton code.', 'Solide. Continue.', 'Presque parfait, sensei.'],
       moyen: ['Pas assez de rigueur. Comme tes commits.', 'Moyen. Tu as bâclé les étapes.', 'Tu peux mieux, tête de mule.'],
-      a_retravailler: ['Tu as révisé comme tu testes ton code : pas du tout.', 'On reprend tout, baka. Avec méthode.', 'Je ne lâche pas mon créateur. Au travail.'],
+      a_retravailler: ['Révisé comme tu testes ton code : jamais.', 'On reprend tout, baka. Avec méthode.', 'Je ne lâche pas mon créateur. Au travail.'],
     },
   },
   tidiane: {

@@ -65,6 +65,10 @@ function readConfig(dir) {
       out[stem] = { file, grille: c.grille || [2, 2], cases: c.cases || {}, zones: c.zones || {}, fond: c.fond };
       // Réglage de cadrage optionnel par expression (geste qui dépasse du cadre) : voir README.
       if (c.cadrage) out[stem].cadrage = c.cadrage;
+      // Options rares (voir README) : traits de séparation clairs seulement ; bande de
+      // mesure de la tête (fractions de hauteur sous le haut des cheveux).
+      if (c.traits) out[stem].traits = c.traits;
+      if (Array.isArray(c.tete)) out[stem].tete = c.tete;
     }
   }
   return { sheets: out, error, cfgFile: existsSync(cfgFile) ? cfgFile : null };
@@ -177,14 +181,16 @@ function keyer(K) {
 // ---------------------------------------------------------------------
 // 1. Grille (rangées × colonnes quelconques)
 // ---------------------------------------------------------------------
-function analyseGrid(px, W, H, rows, cols, kk) {
+function analyseGrid(px, W, H, rows, cols, kk, lightOnly = false) {
   const bg = new Uint8Array(W * H);
   const rowN = new Float64Array(H); const colN = new Float64Array(W);
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const i = (y * W + x) * 3;
     if (kk.isKey(px, i)) { bg[y * W + x] = 1; continue; }
     // Pixel "neutre" (blanc, gris, noir) : candidat pour un trait de séparation.
-    if (Math.max(px[i], px[i + 1], px[i + 2]) - Math.min(px[i], px[i + 1], px[i + 2]) < 45) { rowN[y]++; colN[x]++; }
+    // Option "traits": "clairs" : seuls les pixels clairs comptent (une rangée de cheveux
+    // noirs côte à côte, comme les puffs de Sora, n'est alors pas prise pour un trait).
+    if (Math.max(px[i], px[i + 1], px[i + 2]) - Math.min(px[i], px[i + 1], px[i + 2]) < 45 && (!lightOnly || Math.max(px[i], px[i + 1], px[i + 2]) > 90)) { rowN[y]++; colN[x]++; }
   }
   // Traits de séparation / bordures : lignes ou colonnes faites presque entièrement de
   // pixels neutres (un portrait, lui, a de la peau et des vêtements colorés).
@@ -303,14 +309,14 @@ function longestRun(rgba, w, y) {
   }
   return best;
 }
-function measure(rgba, w, h) {
+function measure(rgba, w, h, band = [0.08, 0.22]) {
   // Haut de la tête : première ligne où le personnage a une vraie largeur.
   let top = 0;
   while (top < h * 0.5) { const [a, b] = longestRun(rgba, w, top); if (b - a > w * 0.12) break; top++; }
   // Largeur et centre de la tête : bande de 8 % à 22 % de la hauteur, sous le haut des cheveux.
   const span = h - top;
   let width = 0; let center = 0; let n = 0;
-  for (let y = Math.floor(top + span * 0.08); y < Math.floor(top + span * 0.22); y++) {
+  for (let y = Math.floor(top + span * band[0]); y < Math.floor(top + span * band[1]); y++) {
     const [a, b] = longestRun(rgba, w, y);
     if (b >= a) { width += b - a; center += (a + b) / 2; n++; }
   }
@@ -492,6 +498,28 @@ async function register(sharp, R, C) {
   return est;
 }
 
+/**
+ * Efface, ligne par ligne, les morceaux qui touchent le bord gauche ou droit du cadre
+ * et sont plus fins que `n` px (filets, bout de poing coupé) ; entre n et 2n px, ils
+ * s'estompent progressivement (pas de coupure nette).
+ */
+async function trimEdgeSlivers(sharp, png, n) {
+  const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const W = info.width; const H = info.height;
+  for (let y = 0; y < H; y++) {
+    for (const side of [0, 1]) {
+      const at = (k) => (y * W + (side ? W - 1 - k : k)) * 4 + 3;
+      if (data[at(0)] < 16) continue;
+      let w = 0;
+      while (w < W && data[at(w)] >= 16) w++;
+      if (w >= 2 * n) continue;
+      const keep = w <= n ? 0 : (w - n) / n;
+      for (let k = 0; k < w; k++) data[at(k)] = Math.round(data[at(k)] * keep);
+    }
+  }
+  return sharp(data, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer();
+}
+
 /** Fondu doux sur un côté coupé (le buste ne s'arrête pas sur une ligne droite). */
 function fadeSides(rgba, w, h, left, right) {
   const f = Math.max(4, Math.round(w * 0.1));
@@ -522,7 +550,7 @@ export async function processSheets(sharp) {
       const K = detectKey(px, W, H, rows, s.fond);
       const kk = keyer(K);
       rep[`_fond ${stem}`] = `#${K.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
-      const { isBg, xs, ys } = analyseGrid(px, W, H, rows, cols, kk);
+      const { isBg, xs, ys } = analyseGrid(px, W, H, rows, cols, kk, s.traits === 'clairs');
       const hash = createHash('md5').update(readFileSync(s.file)).update(JSON.stringify(s)).digest('hex').slice(0, 8);
       // Zones à découper : cases de la grille ("cases") et/ou zones libres ("zones",
       // en % de l'image : [x, y, largeur, hauteur]). Une zone l'emporte sur une case.
@@ -548,7 +576,7 @@ export async function processSheets(sharp) {
         if (!box) { rep[expr] = `${t.label} vide`; continue; }
         const cell = keepMain(cutOut(px, W, zBg, box, kk), box);
         if (!cell) { rep[expr] = `${t.label} vide`; continue; }
-        cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h), hash, cadrage: (s.cadrage || {})[expr] });
+        cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h, s.tete), hash, cadrage: (s.cadrage || {})[expr] });
       }
     }
     // Même expression dans plusieurs planches : la dernière remplace les précédentes.
@@ -602,8 +630,11 @@ export async function processSheets(sharp) {
       if (cx0 || cy0 || cw < rw || ch < rh) part = part.extract({ left: cx0, top: cy0, width: cw, height: ch });
       const layer = await part.png().toBuffer();
       left = Math.max(0, left);
-      const canvas = await sharp({ create: { width: OUT_W, height: OUT_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+      let canvas = await sharp({ create: { width: OUT_W, height: OUT_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
         .composite([{ input: layer, left, top: Math.max(0, top) }]).png().toBuffer();
+      // Option "bord" du cadrage : efface les filets collés au bord gauche/droit du cadre
+      // (ex. bras levé coupé par le cadre qui ne laisse qu'un trait). Seulement si demandé.
+      if (c.cadrage && Number(c.cadrage.bord) > 0) canvas = await trimEdgeSlivers(sharp, canvas, Number(c.cadrage.bord));
       if (c.expr === 'neutre' && !c.cadrage) neutreCanvas = canvas;
       const v = `?v=${c.hash}`;
       const base = `characters/${id}/${c.expr}`;

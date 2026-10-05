@@ -1,4 +1,7 @@
 {
-  "planche-a": { "zones": { "neutre": [0, 0, 29, 100], "joie": [30, 0, 28, 50], "reflexion": [30, 50, 28, 50], "celebration": [59, 0, 41, 100] } },
-  "planche-b": { "zones": { "encouragement": [0, 0, 25, 100], "surprise": [51, 0, 24, 50], "concentration": [26, 50, 24, 50], "clin": [51, 50, 24, 50] } }
+  "planche-a": {
+    "zones": { "neutre": [0, 0, 29, 100], "joie": [30, 0, 28, 50], "reflexion": [30, 50, 28, 50], "celebration": [59, 0, 41, 100] },
+    "cadrage": { "celebration": { "bord": 10 } }
+  },
+  "planche-b": { "zones": { "encouragement": [0, 0, 24.4, 100], "surprise": [51, 0, 24, 50], "concentration": [26, 50, 24, 50], "clin": [51, 50, 24, 50] } }
 }

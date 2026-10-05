@@ -1,4 +1,34 @@
 {
-  "planche-a": { "grille": [2, 4], "cases": { "neutre": 1, "joie": 3, "reflexion": 5, "celebration": 7 } },
-  "planche-b": { "grille": [2, 4], "cases": { "encouragement": 1, "surprise": 3, "concentration": 5, "clin": 7 } }
+  "planche-a": {
+    "traits": "clairs",
+    "tete": [0.5, 0.6],
+    "zones": {
+      "neutre": [0, 0, 49.4, 49],
+      "joie": [50.4, 0, 49.6, 49],
+      "reflexion": [0, 50.8, 25.2, 49.2],
+      "celebration": [50.4, 50.8, 24.9, 49.2]
+    },
+    "cadrage": {
+      "neutre": { "zoom": 0.73, "dy": -4 },
+      "joie": { "zoom": 0.73, "dy": -4 },
+      "reflexion": { "zoom": 0.73, "dy": -4 },
+      "celebration": { "zoom": 0.73, "dy": -4 }
+    }
+  },
+  "planche-b": {
+    "traits": "clairs",
+    "tete": [0.5, 0.6],
+    "zones": {
+      "encouragement": [0, 0, 25.55, 49],
+      "surprise": [50.4, 0, 49.6, 49],
+      "concentration": [0, 50.8, 25.4, 49.2],
+      "clin": [50.4, 50.8, 24.6, 49.2]
+    },
+    "cadrage": {
+      "encouragement": { "zoom": 0.73, "dy": -4, "fondu": false },
+      "surprise": { "zoom": 0.73, "dy": -4, "fondu": false },
+      "concentration": { "zoom": 0.73, "dy": -4, "fondu": false },
+      "clin": { "zoom": 0.73, "dy": -4, "fondu": false }
+    }
+  }
 }

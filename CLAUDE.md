@@ -63,6 +63,8 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   dossier du perso (portrait neutre retouché, téléchargé depuis le Panneau créateur) ;
   `scripts/calques.mjs` recale et extrait la zone qui change. Persos vivants (fondu,
   respiration, parole mot par mot) : `src/ui/character.js` (`speak`, `setExpression`).
+  Options rares d'une planche : `"traits": "clairs"`, `"tete": [a, b]`, et `"bord"` dans
+  un cadrage (Sora, Awa). Toujours vérifier que les autres persos restent identiques à l'octet.
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
   et BD dans `src/data/comic/chapitres/chNN.js`. Les révisions donnent des points
   (seuils dans `src/core/story.js`) ; chaque matière est un arc avec un boss (`src/views/boss.js`).

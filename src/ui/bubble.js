@@ -6,7 +6,10 @@
 //  - placée au-dessus du perso qui parle, puis RECALÉE pour rester
 //    entièrement dans l'écran (bords gauche/droite, haut, bas) ;
 //  - si elle ne tient pas au-dessus, elle passe en dessous du perso ;
-//  - la pointe de la bulle vise toujours le perso qui parle.
+//  - la pointe de la bulle vise toujours le perso qui parle ;
+//  - TEMPS DE LECTURE : la bulle s'écrit vite, puis reste affichée
+//    1 s + le temps de lire (≈ 15 caractères/s), entre 2 et 5 s (groupSay).
+//    Toucher l'écran passe tout de suite à la bulle suivante.
 // =====================================================================
 
 import { CHARACTERS } from '../data/characters.js';
@@ -30,13 +33,47 @@ export function groupBubble(scene, seat, id, text, minTop = 70) {
   b.className = 'bubble group-say';
   b.style.setProperty('--c', CHARACTERS[id]?.color || 'var(--neon-violet)');
   b.innerHTML = `<span class="who">${esc(CHARACTERS[id]?.name || '')}</span><span class="say"></span>`;
-  // La bulle s'écrit mot par mot (sa taille finale est réservée tout de suite).
-  speak(seat.querySelector('.ch'), b.querySelector('.say'), text);
+  // La bulle s'écrit mot par mot, assez vite (sa taille finale est réservée tout de suite) :
+  // l'attente se fait ensuite sur le texte complet.
+  b._writeMs = speak(seat.querySelector('.ch'), b.querySelector('.say'), text, { perChar: 18, max: 1100 });
   scene.appendChild(b);
   place(scene, seat, b, minTop);
   playSfx('bubble');
   setTimeout(() => voice(id), 60);
   return b;
+}
+
+/** Temps de lecture d'une réplique : 1 s + ≈ 15 caractères par seconde, entre 2 et 5 s. */
+export function readTime(text) {
+  return Math.min(5000, Math.max(2000, 1000 + (String(text || '').length / 15) * 1000));
+}
+
+/**
+ * Attend que la réplique soit lue : fin de l'écriture + temps de lecture, OU un toucher
+ * sur la scène (hors boutons), OU l'événement "scene-skip" (bouton Passer).
+ */
+export function waitRead(scene, sayEl, writeMs, text) {
+  return new Promise((resolve) => {
+    let over = false;
+    const end = () => {
+      if (over) return;
+      over = true;
+      clearTimeout(timer);
+      scene.removeEventListener('click', onTap);
+      scene.removeEventListener('scene-skip', end);
+      resolve();
+    };
+    const onTap = (e) => { if (e.target.closest('button')) return; sayEl?._finish?.(); end(); };
+    const timer = setTimeout(end, (writeMs || 0) + readTime(text));
+    scene.addEventListener('click', onTap);
+    scene.addEventListener('scene-skip', end);
+  });
+}
+
+/** Bulle d'un perso dans une scène de groupe, puis attente de la lecture (voir waitRead). */
+export function groupSay(scene, seat, id, text, minTop = 70) {
+  const b = groupBubble(scene, seat, id, text, minTop);
+  return waitRead(scene, b.querySelector('.say'), b._writeMs, text);
 }
 
 /** Retire toutes les bulles de la scène. */

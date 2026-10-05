@@ -404,8 +404,20 @@ seulement, avec `"cadrage"` dans la planche concernée. Sans `"cadrage"`, rien n
   le haut). Décaler vers le côté opposé au geste permet de moins dézoomer.
 - `fondu` : `false` pour ne pas estomper le bord de l'image (par défaut, le bord est estompé
   quand le buste touche le bord de la planche, ce qui effacerait le bout des doigts).
-- Les trois réglages sont facultatifs. Pour vérifier : lancer le build et regarder le
+- `bord` (en px sur 720) : efface les filets collés au bord gauche/droit du cadre (ex. bras
+  levé coupé par le cadre qui ne laisse qu'un trait, Awa/célébration : `"bord": 10`).
+- Les réglages sont facultatifs. Pour vérifier : lancer le build et regarder le
   portrait (doigts entiers, yeux alignés avec les autres expressions).
+
+**Options rares d'une planche** (utilisées seulement si présentes, ex. Sora) :
+- `"traits": "clairs"` : seuls les traits de séparation CLAIRS (blancs, gris) sont
+  repérés. Utile quand des cheveux noirs côte à côte (les puffs de Sora) couvrent presque
+  toute la largeur : sans ça, une rangée de cheveux passerait pour un trait (bande vide).
+- `"tete": [0.5, 0.6]` : hauteur (fractions sous le haut des cheveux) où l'on mesure la
+  largeur de la tête pour égaliser les visages. Par défaut [0.08, 0.22] ; avec des puffs
+  séparés, on mesure plus bas (le visage) pour un centrage et une taille justes.
+Sora utilise les deux, des zones précises et un `"zoom": 0.73` identique sur ses 8
+expressions (ses puffs, très larges, tiennent entiers dans le cadre).
 
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
 - il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) : vert,
@@ -452,6 +464,10 @@ Sans nouvelle image, les portraits paraissent vivants (`src/ui/character.js` + b
 - **coups de tête** de temps en temps (une seule petite boucle pour toute l'appli) ;
 - **parole** : `speak(perso, bulle, texte)` écrit la bulle mot par mot (sa taille est
   réservée d'avance : rien ne saute) et le perso bouge légèrement à chaque mot.
+- **Scènes de groupe** (conseil de correction, accueil du créateur) : chaque bulle s'écrit
+  vite puis reste 1 s + le temps de lire (≈ 15 caractères/s), entre 2 et 5 s ; toucher
+  l'écran passe à la suivante (`groupSay` dans `src/ui/bubble.js`). Peu de répliques par
+  scène (3 pour l'accueil du créateur), chacune de 8 mots au plus.
 Uniquement `transform` et `opacity`, dans des calques imbriqués à l'intérieur du perso :
 les apparitions, signatures, auras, pouvoirs et téléportations ne sont pas touchés.
 Tout s'arrête si le téléphone demande de réduire les animations.
@@ -1009,6 +1025,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.17.1** : cadrage de Sora (puffs entiers), bord d'Awa nettoyé, Panneau créateur
+  sans défilement horizontal, bulles des scènes de groupe lisibles (temps de lecture,
+  toucher = suivante, répliques ≤ 8 mots).
 - ✅ **v1.16** : persos vivants (fondu entre expressions, respiration, micro-mouvements,
   bulles qui s'écrivent). **v1.17** : clignement et bouche (calques tirés de
   `yeux-fermes.png` / `bouche-ouverte.png`), bouton « Télécharger » des portraits.

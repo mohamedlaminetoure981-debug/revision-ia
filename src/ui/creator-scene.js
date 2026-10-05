@@ -4,7 +4,9 @@
 // Toute l'équipe se téléporte EN MÊME TEMPS autour de la table, chacun
 // réagit ("C'est… LE créateur ?!"), puis confettis et couronne 👑.
 // Les répliques viennent de la section "createur" (clé `accueil`) du
-// fichier des personnages.
+// fichier des personnages. Seuls 3 persos parlent (Kaï + 2 au hasard), avec
+// le temps de lire chaque bulle (toucher l'écran = bulle suivante) ; les
+// autres réagissent en silence.
 // =====================================================================
 
 import { CHARACTERS, TEAM } from '../data/characters.js';
@@ -12,7 +14,7 @@ import { characterHTML, play, setExpression } from './character.js';
 import { esc } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
 import { creatorName } from '../core/creator.js';
-import { groupBubble, clearBubbles } from './bubble.js';
+import { groupSay, clearBubbles } from './bubble.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // Positions : deux rangées autour de la table (en % de l'écran).
@@ -52,15 +54,23 @@ export function creatorWelcome() {
       if (done) return;
       el.querySelector('.council-title').innerHTML = `C’est… LE CRÉATEUR ?!<small>Bienvenue, ${esc(creatorName())} 👑</small>`;
       onomatopoeia('SENSEI?!');
-      // 2. Chacun réagit à tour de rôle (bulle + animation signature).
-      for (const { id, seat } of seats) {
+      // 2. Trois persos parlent à tour de rôle (Kaï + 2 au hasard), avec le temps de
+      //    lire chaque bulle ; les autres réagissent en silence, un par un.
+      const others = seats.filter((s) => s.id !== 'kai').sort(() => Math.random() - 0.5);
+      const speakers = [seats.find((s) => s.id === 'kai') || others.shift(), ...others.slice(0, 2)].filter(Boolean);
+      seats.filter((s) => !speakers.includes(s)).forEach(({ seat }, k) => setTimeout(() => {
         if (done) return;
-        // Une seule bulle à la fois, recalée pour rester dans l'écran.
-        groupBubble(el, seat, id, CHARACTERS[id].createur?.accueil?.[0] || '…', 80);
         const chEl = seat.querySelector('.ch');
         setExpression(chEl, 'joie');
         play(chEl, 'signature');
-        await sleep(reduced ? 500 : 950);
+      }, 300 + k * 250));
+      for (const { id, seat } of speakers) {
+        if (done) return;
+        const chEl = seat.querySelector('.ch');
+        setExpression(chEl, 'joie');
+        play(chEl, 'signature');
+        // Une seule bulle à la fois, recalée pour rester dans l'écran.
+        await groupSay(el, seat, id, CHARACTERS[id].createur?.accueil?.[0] || '…', 80);
       }
       if (done) return;
       // 3. Tout le monde fête l'arrivée du créateur.

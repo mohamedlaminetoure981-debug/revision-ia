@@ -176,11 +176,13 @@ export async function render(el) {
     };
   });
   // Toutes les expressions de tous les persos (pour comparer d'un coup d'œil).
+  // Rangées qui passent à la ligne (jamais de défilement horizontal) et assez de marge
+  // autour de chaque portrait pour la respiration et les petits mouvements.
   $('#all').onchange = (e) => {
     $('#all-box').innerHTML = e.target.checked ? TEAM.map((id) => `
       <h3 style="color:${CHARACTERS[id].color};margin:12px 0 4px">${esc(CHARACTERS[id].name)}</h3>
-      <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px">${EXPRESSIONS.map((x) => `
-        <div class="center tiny dim">${characterHTML(id, { expression: x, size: 76, enter: false })}${x}</div>`).join('')}</div>`).join('') : '';
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px 6px;padding:6px 4px">${EXPRESSIONS.map((x) => `
+        <div class="tiny dim" style="display:flex;flex-direction:column;align-items:center;gap:2px">${characterHTML(id, { expression: x, size: 76, enter: false })}${x}</div>`).join('')}</div>`).join('') : '';
   };
 
   el.querySelectorAll('[data-sig]').forEach((b) => {
