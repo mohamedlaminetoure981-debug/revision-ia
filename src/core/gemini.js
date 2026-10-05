@@ -24,6 +24,7 @@
 import { getSetting, setSetting } from './db.js';
 import { parseJsonLatex } from './mathfix.js';
 import { countRequest, markExhausted, isExhausted, resetTimeText } from './quota.js';
+import { t, getLang, LANGS } from '../i18n/index.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
@@ -59,7 +60,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /** Attend le retour de la connexion internet (événement "online"). */
 function waitForOnline(onStatus) {
   if (navigator.onLine) return Promise.resolve();
-  onStatus?.('📡 Pas de connexion… en attente du réseau');
+  onStatus?.(t('📡 Pas de connexion… en attente du réseau'));
   return new Promise((resolve) => window.addEventListener('online', resolve, { once: true }));
 }
 
@@ -74,23 +75,23 @@ function classifyHttpError(status, body) {
   const msg = body?.error?.message || '';
   const reason = JSON.stringify(body?.error?.details || '');
   if (status === 400 && /API key not valid|API_KEY_INVALID/i.test(msg + reason)) {
-    return { error: new AIError('BAD_KEY', '🔑 Clé API invalide. Vérifie-la dans les Réglages.') };
+    return { error: new AIError('BAD_KEY', t('🔑 Clé API invalide. Vérifie-la dans les Réglages.')) };
   }
   if (status === 403) {
-    return { error: new AIError('BAD_KEY', '🔑 Clé API refusée (permission). Vérifie ta clé ou crée-en une nouvelle sur Google AI Studio.') };
+    return { error: new AIError('BAD_KEY', t('🔑 Clé API refusée (permission). Vérifie ta clé ou crée-en une nouvelle sur Google AI Studio.')) };
   }
   if (status === 404) {
-    return { error: new AIError('BAD_MODEL', `🤖 Modèle introuvable (${msg}).`), switchModel: true };
+    return { error: new AIError('BAD_MODEL', `${t("🤖 Modèle introuvable (")}${msg}).`), switchModel: true };
   }
   if (status === 413 || /too large|exceeds the maximum|payload size/i.test(msg)) {
-    return { error: new AIError('TOO_BIG', '📦 Fichier trop gros pour être envoyé. Réduis le nombre de pages ou de photos.') };
+    return { error: new AIError('TOO_BIG', t('📦 Fichier trop gros pour être envoyé. Réduis le nombre de pages ou de photos.')) };
   }
   if (status === 429) {
     const perDay = /PerDay|per day|daily/i.test(msg + reason);
     return {
       error: new AIError('QUOTA', perDay
-        ? '⏳ Quota gratuit du jour dépassé pour ce modèle.'
-        : '⏳ Quota gratuit dépassé. Réessaie dans quelques minutes.'),
+        ? t('⏳ Quota gratuit du jour dépassé pour ce modèle.')
+        : t('⏳ Quota gratuit dépassé. Réessaie dans quelques minutes.')),
       switchModel: true, perDay,
     };
   }
@@ -98,12 +99,12 @@ function classifyHttpError(status, body) {
     return { error: new AIError('BAD_REQUEST', msg), noThinking: true };
   }
   if (status === 400) {
-    return { error: new AIError('BAD_REQUEST', `Requête refusée par Gemini : ${msg}`) };
+    return { error: new AIError('BAD_REQUEST', `${t("Requête refusée par Gemini :")} ${msg}`) };
   }
   if (status >= 500) {
-    return { error: new AIError('SERVER', '🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.'), switchModel: true };
+    return { error: new AIError('SERVER', t('🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.')), switchModel: true };
   }
-  return { error: new AIError('UNKNOWN', `Erreur ${status} : ${msg || 'inconnue'}`) };
+  return { error: new AIError('UNKNOWN', `${t("Erreur")} ${status} : ${msg || 'inconnue'}`) };
 }
 
 // ---------------------------------------------------------------------
@@ -162,12 +163,12 @@ function buildBody({ parts, schema, system, temperature, thinking }, model) {
 // ---------------------------------------------------------------------
 // Validation du JSON (même schéma que celui envoyé à Gemini)
 // ---------------------------------------------------------------------
-export function validate(value, schema, path = 'réponse') {
+export function validate(value, schema, path = t('réponse')) {
   const errors = [];
   const type = String(schema.type || '').toUpperCase();
   const fail = (m) => errors.push(`${path} : ${m}`);
   if (type === 'OBJECT') {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) return [`${path} : objet attendu`];
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return [`${path} ${t(": objet attendu")}`];
     for (const key of schema.required || []) {
       if (value[key] === undefined || value[key] === null) fail(`champ "${key}" manquant`);
     }
@@ -175,17 +176,17 @@ export function validate(value, schema, path = 'réponse') {
       if (value[key] !== undefined && value[key] !== null) errors.push(...validate(value[key], sub, `${path}.${key}`));
     }
   } else if (type === 'ARRAY') {
-    if (!Array.isArray(value)) return [`${path} : liste attendue`];
+    if (!Array.isArray(value)) return [`${path} ${t(": liste attendue")}`];
     value.forEach((v, i) => errors.push(...validate(v, schema.items, `${path}[${i}]`)));
   } else if (type === 'STRING') {
-    if (typeof value !== 'string') fail('texte attendu');
+    if (typeof value !== 'string') fail(t('texte attendu'));
     else if (schema.enum && !schema.enum.includes(value)) fail(`valeur "${value}" non autorisée`);
   } else if (type === 'INTEGER') {
-    if (!Number.isInteger(value)) fail('nombre entier attendu');
+    if (!Number.isInteger(value)) fail(t('nombre entier attendu'));
   } else if (type === 'NUMBER') {
-    if (typeof value !== 'number') fail('nombre attendu');
+    if (typeof value !== 'number') fail(t('nombre attendu'));
   } else if (type === 'BOOLEAN') {
-    if (typeof value !== 'boolean') fail('vrai/faux attendu');
+    if (typeof value !== 'boolean') fail(t('vrai/faux attendu'));
   }
   return errors;
 }
@@ -248,7 +249,7 @@ export async function loadTimings() {
 // ---------------------------------------------------------------------
 // Un appel à un modèle (streaming ou non)
 // ---------------------------------------------------------------------
-async function callModel(model, apiKey, body, { stream, onText, t }) {
+async function callModel(model, apiKey, body, { stream, onText, tm }) {
   const url = `${API_BASE}${encodeURIComponent(model)}:${stream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`;
   const ctrl = new AbortController();
   const payload = JSON.stringify(body);
@@ -269,7 +270,7 @@ async function callModel(model, apiKey, body, { stream, onText, t }) {
     }
     if (!stream) {
       const data = await res.json();
-      t.firstText = t.firstText || performance.now();
+      tm.firstText = tm.firstText || performance.now();
       return { text: extractText(data) };
     }
     // --- Streaming SSE : lignes "data: {json}" ---
@@ -294,7 +295,7 @@ async function callModel(model, apiKey, body, { stream, onText, t }) {
         try { chunk = JSON.parse(payload); } catch { continue; }
         const piece = extractText(chunk, true);
         if (piece) {
-          if (!t.firstText) t.firstText = performance.now();
+          if (!tm.firstText) tm.firstText = performance.now();
           text += piece;
           onText?.(text);
         }
@@ -309,20 +310,35 @@ async function callModel(model, apiKey, body, { stream, onText, t }) {
 /** Extrait le texte d'une réponse (en ignorant les "pensées"). */
 function extractText(data, partial = false) {
   if (data?.promptFeedback?.blockReason) {
-    throw new AIError('BLOCKED', `Gemini a refusé de traiter ce contenu (${data.promptFeedback.blockReason}).`);
+    throw new AIError('BLOCKED', `${t("Gemini a refusé de traiter ce contenu (")}${data.promptFeedback.blockReason}).`);
   }
   const cand = data?.candidates?.[0];
   if (!cand) {
     if (partial) return '';
-    throw new AIError('EMPTY', 'Réponse vide de Gemini.');
+    throw new AIError('EMPTY', t('Réponse vide de Gemini.'));
   }
   if (cand.finishReason === 'SAFETY' || cand.finishReason === 'PROHIBITED_CONTENT') {
-    throw new AIError('BLOCKED', 'Gemini a bloqué la réponse (filtre de sécurité).');
+    throw new AIError('BLOCKED', t('Gemini a bloqué la réponse (filtre de sécurité).'));
   }
   if (cand.finishReason === 'MAX_TOKENS') {
-    throw new AIError('TOO_LONG', 'Réponse trop longue (coupée). Essaie avec un cours plus court.');
+    throw new AIError('TOO_LONG', t('Réponse trop longue (coupée). Essaie avec un cours plus court.'));
   }
   return (cand.content?.parts || []).filter((p) => typeof p.text === 'string' && !p.thought).map((p) => p.text).join('');
+}
+
+/**
+ * Langue du contenu créé (Réglages → « Langue du contenu créé par l'IA ») :
+ * consigne ajoutée à la fin de la consigne système. Rien en français avec
+ * le réglage par défaut (les demandes restent exactement les mêmes).
+ * Pas de traduction : Gemini écrit directement dans la bonne langue.
+ */
+async function languageNote() {
+  if (await getSetting('genLang') === 'cours') {
+    return 'LANGUE : écris tout dans la langue du cours fourni (pas forcément le français). "quote" reste copié mot pour mot.';
+  }
+  const lang = getLang();
+  if (lang === 'fr') return '';
+  return `LANGUE : écris tout (titres, textes, questions, choix, explications, corrections, commentaires) en ${LANGS[lang]} (code ${lang}), même si le cours est dans une autre langue ; garde le ton (tutoiement, simple). "quote" reste copié mot pour mot du cours, dans sa langue d'origine.`;
 }
 
 /**
@@ -339,11 +355,12 @@ function extractText(data, partial = false) {
  * @param {string}   [opts.streamKey]  nom de la liste à diffuser au fil de l'eau (ex. 'sections')
  * @param {Function} [opts.onItem]     (élément, index) appelé pour chaque élément complet reçu
  * @param {string}   [opts.label]      nom de l'étape (mesures), ex. 'résumé'
+ * @param {boolean}  [opts.keepLanguage] true = garder la langue du document (transcription)
  */
 export async function generateJSON(opts) {
   const { schema, check, onStatus, streamKey, onItem, label = 'IA' } = opts;
   const apiKey = (await getSetting('apiKey') || '').trim();
-  if (!apiKey) throw new AIError('NO_KEY', '🔑 Aucune clé API. Va dans Réglages pour coller ta clé Gemini.');
+  if (!apiKey) throw new AIError('NO_KEY', t('🔑 Aucune clé API. Va dans Réglages pour coller ta clé Gemini.'));
   const primary = (await getSetting('model') || MODEL_CHAIN[0]).trim();
   // opts.model : forcer UN modèle précis (banc d'essai du Panneau créateur).
   const all = opts.model ? [opts.model] : [primary, ...MODEL_CHAIN.filter((m) => m !== primary)];
@@ -351,8 +368,10 @@ export async function generateJSON(opts) {
   for (const m of all) if (opts.model || !(await isExhausted(m))) chain.push(m);
   if (!chain.length) throw quotaDayError();
   const req = { temperature: 0.4, thinking: 'minimal', ...opts };
+  const note = opts.keepLanguage ? '' : await languageNote();
+  if (note) req.system = req.system ? `${req.system}\n${note}` : note;
 
-  const t = { label, start: performance.now(), firstText: 0, end: 0, model: '', retries: 0, switches: [], stream: !!streamKey };
+  const tm = { label, start: performance.now(), firstText: 0, end: 0, model: '', retries: 0, switches: [], stream: !!streamKey };
   let lastError = null;
   let jsonTries = 0;
   let sameModel = false; // true = on réessaie le même modèle (sans bascule)
@@ -363,19 +382,19 @@ export async function generateJSON(opts) {
     await waitForOnline(onStatus);
     if (i > 0 && !sameModel) {
       const wait = quickSwitch ? 0 : SWITCH_DELAYS[Math.min(i - 1, SWITCH_DELAYS.length - 1)];
-      onStatus?.(quickSwitch ? `⏳ ${chain[i - 1]} : quota du jour épuisé → ${model}…` : `⚡ ${chain[i - 1]} occupé → bascule sur ${model}…`);
-      t.switches.push(model);
+      onStatus?.(quickSwitch ? `⏳ ${chain[i - 1]} ${t(": quota du jour épuisé →")} ${model}…` : `⚡ ${chain[i - 1]} ${t("occupé → bascule sur")} ${model}…`);
+      tm.switches.push(model);
       await sleep(wait);
     }
     quickSwitch = false;
     sameModel = false;
-    t.model = model;
-    onStatus?.(`via ${model}`); // modèle utilisé, affiché discrètement
+    tm.model = model;
+    onStatus?.(`${t("via")} ${model}`); // modèle utilisé, affiché discrètement
     let emitted = 0; // éléments déjà envoyés à onItem (streaming)
     let result;
     try {
       result = await callModel(model, apiKey, buildBody(req, model), {
-        stream: !!streamKey, t,
+        stream: !!streamKey, tm,
         onText: streamKey ? (txt) => {
           const items = completeItems(txt, streamKey);
           for (; emitted < items.length; emitted++) onItem?.(items[emitted], emitted);
@@ -384,25 +403,25 @@ export async function generateJSON(opts) {
     } catch (e) {
       if (e instanceof AIError) throw e; // contenu bloqué, trop long…
       // Coupure réseau ou délai dépassé : modèle suivant.
-      lastError = new AIError('NETWORK', '📡 Connexion interrompue. Vérifie ton internet puis réessaie.');
-      t.retries++;
+      lastError = new AIError('NETWORK', t('📡 Connexion interrompue. Vérifie ton internet puis réessaie.'));
+      tm.retries++;
       continue;
     }
 
     if (result.http) {
       const h = result.http;
-      if (h.noThinking) { noThinking.add(model); i--; sameModel = true; t.retries++; continue; } // même modèle, sans réglage de réflexion
+      if (h.noThinking) { noThinking.add(model); i--; sameModel = true; tm.retries++; continue; } // même modèle, sans réglage de réflexion
       if (h.error.code === 'BAD_REQUEST' && /schema|Unknown name|Invalid JSON payload/i.test(h.error.message) && !schemaSwitched) {
         schemaSwitched = true;
         schemaFormat = schemaFormat === 'openapi' ? 'jsonschema' : 'openapi';
-        i--; sameModel = true; t.retries++; continue;
+        i--; sameModel = true; tm.retries++; continue;
       }
       lastError = h.error;
       // Quota du jour épuisé (ou modèle introuvable) : mémorisé jusqu'à la recharge.
       if (h.perDay && !opts.model) { await markExhausted(model, 'quota'); quickSwitch = true; }
       if (h.error.code === 'BAD_MODEL' && !opts.model) { await markExhausted(model, 'absent'); quickSwitch = true; }
       if (!h.switchModel) break; // erreur définitive (clé invalide, fichier trop gros…)
-      t.retries++;
+      tm.retries++;
       continue;
     }
 
@@ -410,7 +429,7 @@ export async function generateJSON(opts) {
     let json;
     // parseJsonLatex : répare le LaTeX mal échappé (\frac, \times, \neq… abîmés ou illisibles en JSON).
     try { json = parseJsonLatex(result.text); } catch { json = null; }
-    const problems = json ? validate(json, schema) : ['JSON illisible'];
+    const problems = json ? validate(json, schema) : [t('JSON illisible')];
     const extra = json && !problems.length && check ? check(json) : null;
     if (json && !problems.length && !extra) {
       // Streaming : on transmet les éventuels derniers éléments.
@@ -418,17 +437,17 @@ export async function generateJSON(opts) {
         const all = json[streamKey] || [];
         for (; emitted < all.length; emitted++) onItem(all[emitted], emitted);
       }
-      t.end = performance.now();
+      tm.end = performance.now();
       record({
-        label, model, stream: t.stream, retries: t.retries, switches: t.switches,
-        firstMs: Math.round((t.firstText || t.end) - t.start), totalMs: Math.round(t.end - t.start),
+        label, model, stream: tm.stream, retries: tm.retries, switches: tm.switches,
+        firstMs: Math.round((tm.firstText || tm.end) - tm.start), totalMs: Math.round(tm.end - tm.start),
         date: new Date().toISOString(),
       });
       return json;
     }
     console.warn('JSON non conforme :', problems, extra);
-    lastError = new AIError('BAD_JSON', `L'IA a renvoyé une réponse mal formée (${(problems[0] || extra)}). Réessaie.`);
-    t.retries++;
+    lastError = new AIError('BAD_JSON', `${t("L'IA a renvoyé une réponse mal formée (")}${(problems[0] || extra)}). Réessaie.`);
+    tm.retries++;
     if (jsonTries++ >= MAX_JSON_RETRIES) break;
   }
   // Tous les modèles sont épuisés pour la journée : message avec l'heure de recharge.
@@ -437,13 +456,13 @@ export async function generateJSON(opts) {
     for (const m of all) if (!(await isExhausted(m))) left++;
     if (!left && !opts.model) throw quotaDayError();
   }
-  throw lastError || new AIError('SERVER', '🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.');
+  throw lastError || new AIError('SERVER', t('🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.'));
 }
 
 /** Erreur "plus aucun modèle gratuit disponible aujourd'hui" (Tidiane l'explique). */
 function quotaDayError() {
   const at = resetTimeText();
-  const e = new AIError('QUOTA_DAY', `⏳ Le quota gratuit du jour est épuisé sur tous les modèles Gemini. Il se recharge à ${at} (heure de ton téléphone).`);
+  const e = new AIError('QUOTA_DAY', `${t("⏳ Le quota gratuit du jour est épuisé sur tous les modèles Gemini. Il se recharge à")} ${at} ${t("(heure de ton téléphone).")}`);
   e.resetAt = at;
   return e;
 }

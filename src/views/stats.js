@@ -20,6 +20,7 @@ import { BADGES } from '../core/badges.js';
 import { confetti, onomatopoeia, vibrate } from '../ui/fx.js';
 import { offerStatus } from '../ui/status.js';
 import { latexToText } from '../core/mathfix.js';
+import { t, locale } from '../i18n/index.js';
 
 const DAY_NAMES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 
@@ -70,24 +71,24 @@ export async function render(el) {
   const earned = BADGES.filter((b) => p.badges?.[b.id]);
 
   el.innerHTML = `
-    <div class="screen-head"><a class="back-btn" href="#/profil">←</a><h1>📊 Mes stats</h1></div>
+    <div class="screen-head"><a class="back-btn" href="#/profil">←</a><h1>${t("📊 Mes stats")}</h1></div>
     <div class="tile neon" style="--c:${CHARACTERS.binta.color};margin-bottom:12px">
       ${mascot('binta', { situation: reviews.length ? 'arrivee' : 'encouragement', expression: 'joie', size: 96 })}
-      <button class="btn pink block" id="wrapped" style="margin-top:12px">✨ Mon récap de la semaine</button>
+      <button class="btn pink block" id="wrapped" style="margin-top:12px">${t("✨ Mon récap de la semaine")}</button>
     </div>
 
     <div class="bento" style="margin-bottom:12px">
-      <div class="tile grad"><div class="label">Niveau</div><div class="big">${lv.level}</div><div class="tiny">${p.xp} XP au total</div></div>
-      <div class="tile"><div class="label">Série</div><div class="big">🔥 ${streak}</div><div class="tiny muted">record ${p.bestStreak || 0} j</div></div>
-      <div class="tile"><div class="label">Fiches réussies</div><div class="big">${success === null ? '—' : `${success}%`}</div><div class="tiny muted">${reviews.length} révisions</div></div>
-      <div class="tile"><div class="label">Moyennes /20</div>
-        <div class="small" style="margin-top:6px">🎯 Quiz : <strong>${avg('quiz') ?? '—'}</strong><br>✍️ Exos : <strong>${avg('exercise') ?? '—'}</strong><br>📝 Examens : <strong>${avg('exam') ?? '—'}</strong></div></div>
+      <div class="tile grad"><div class="label">${t("Niveau")}</div><div class="big">${lv.level}</div><div class="tiny">${p.xp} ${t("XP au total")}</div></div>
+      <div class="tile"><div class="label">${t("Série")}</div><div class="big">🔥 ${streak}</div><div class="tiny muted">${t("record")} ${p.bestStreak || 0} j</div></div>
+      <div class="tile"><div class="label">${t("Fiches réussies")}</div><div class="big">${success === null ? '—' : `${success}%`}</div><div class="tiny muted">${reviews.length} ${t("révisions")}</div></div>
+      <div class="tile"><div class="label">${t("Moyennes /20")}</div>
+        <div class="small" style="margin-top:6px">${t("🎯 Quiz :")} <strong>${avg('quiz') ?? '—'}</strong><br>${t("✍️ Exos :")} <strong>${avg('exercise') ?? '—'}</strong><br>${t("📝 Examens :")} <strong>${avg('exam') ?? '—'}</strong></div></div>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
-      <h2 style="margin-top:0">Activité · 14 derniers jours</h2>
-      <p class="tiny muted" id="bar-info">XP gagnés par jour. Touche une barre pour voir le détail.</p>
-      <div class="xp-chart" role="img" aria-label="XP gagnés par jour sur les 14 derniers jours">
+      <h2 style="margin-top:0">${t("Activité · 14 derniers jours")}</h2>
+      <p class="tiny muted" id="bar-info">${t("XP gagnés par jour. Touche une barre pour voir le détail.")}</p>
+      <div class="xp-chart" role="img" aria-label="${t("XP gagnés par jour sur les 14 derniers jours")}">
         ${days.map((d) => `
           <button class="xp-col ${d.day === today() ? 'today' : ''}" data-day="${d.day}" data-xp="${d.xp}" aria-label="${d.day} : ${d.xp} XP">
             ${d === bestDay && d.xp ? `<span class="xp-top">${d.xp}</span>` : ''}
@@ -95,34 +96,34 @@ export async function render(el) {
             <span class="xp-day">${d.label}</span>
           </button>`).join('')}
       </div>
-      <details style="margin-top:8px"><summary class="tiny muted">Voir les chiffres</summary>
-        <table class="data-table"><thead><tr><th>Jour</th><th>XP</th></tr></thead>
+      <details style="margin-top:8px"><summary class="tiny muted">${t("Voir les chiffres")}</summary>
+        <table class="data-table"><thead><tr><th>${t("Jour")}</th><th>XP</th></tr></thead>
         <tbody>${days.map((d) => `<tr><td>${d.day}</td><td>${d.xp}</td></tr>`).join('')}</tbody></table></details>
     </div>
 
     <div class="tile" style="margin-bottom:12px">
-      <h2 style="margin-top:0">Progression par matière</h2>
-      <p class="tiny muted">Part des fiches maîtrisées (réussies au moins 2 fois de suite).</p>
+      <h2 style="margin-top:0">${t("Progression par matière")}</h2>
+      <p class="tiny muted">${t("Part des fiches maîtrisées (réussies au moins 2 fois de suite).")}</p>
       ${subjectRows.length ? subjectRows.map((s) => `
         <div class="subj-row">
           <div class="row between small"><strong>${esc(s.name)}</strong><span class="muted">${s.pct} % · ${s.mastered}/${s.total}</span></div>
           <div class="bar"><div style="width:${s.pct}%;background:${subjectColor(s.name)}"></div></div>
-        </div>`).join('') : '<p class="small muted">Révise des fiches pour voir ta progression ici.</p>'}
+        </div>`).join('') : `<p class="small muted">${t("Révise des fiches pour voir ta progression ici.")}</p>`}
     </div>
 
     <div class="tile" style="margin-bottom:12px">
-      <h2 style="margin-top:0">Notions les plus ratées</h2>
+      <h2 style="margin-top:0">${t("Notions les plus ratées")}</h2>
       ${missedCards.length || topQuiz.length ? `
         ${missedCards.map((x) => `
           <a class="missed" href="#/course/${x.card.courseId}/fiches">
             <span class="chip bad">✗ ${x.n}</span><span class="grow small">${esc(x.card.question.slice(0, 120))}</span></a>`).join('')}
         ${topQuiz.map(([q, n]) => `
           <div class="missed"><span class="chip warn">🎯 ${n}</span><span class="grow small">${esc(latexToText(q).slice(0, 120))}</span></div>`).join('')}`
-      : '<p class="small muted">Rien pour l’instant. Soit t’es un génie, soit faut réviser 😏</p>'}
+      : `<p class="small muted">${t("Rien pour l’instant. Soit t’es un génie, soit faut réviser 😏")}</p>`}
     </div>
 
     <div class="tile" id="badges" style="margin-bottom:12px">
-      <div class="row between"><h2 style="margin:0">Badges</h2><span class="chip neon" style="--c:var(--neon-pink)">${earned.length}/${BADGES.length}</span></div>
+      <div class="row between"><h2 style="margin:0">${t("Badges")}</h2><span class="chip neon" style="--c:var(--neon-pink)">${earned.length}/${BADGES.length}</span></div>
       <div class="badge-grid">
         ${BADGES.map((b) => `
           <div class="badge ${p.badges?.[b.id] ? 'won' : ''}" title="${esc(b.desc)}">
@@ -139,7 +140,7 @@ export async function render(el) {
     b.title = `${b.dataset.day} : ${b.dataset.xp} XP`;
     b.onclick = () => {
       el.querySelectorAll('.xp-col').forEach((x) => x.classList.toggle('sel', x === b));
-      info.textContent = `${new Date(`${b.dataset.day}T12:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} : ${b.dataset.xp} XP`;
+      info.textContent = `${new Date(`${b.dataset.day}T12:00`).toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long' })} : ${b.dataset.xp} XP`;
     };
   });
 
@@ -164,20 +165,20 @@ function weeklyWrapped(el, { p, cards, reviews, results }) {
   const badgesWeek = BADGES.filter((b) => p.badges?.[b.id] && p.badges[b.id].slice(0, 10) >= since);
 
   const slides = [
-    { cls: 'w1', html: `<div class="kicker">Ta semaine en XP</div><div class="huge">${xp}</div><div class="mid">points gagnés en 7 jours</div>` },
-    { cls: 'w2', html: `<div class="kicker">Jours actifs</div><div class="huge">${activeDays}/7</div><div class="mid">${activeDays >= 6 ? 'Machine de guerre 🔥' : activeDays >= 3 ? 'Belle régularité !' : 'On vise plus la semaine prochaine ?'}</div>` },
-    { cls: 'w3', html: `<div class="kicker">Tes révisions</div><div class="huge">${rev.length}</div><div class="mid">fiches swipées · ${res.length} quiz/exos/examens</div>` },
+    { cls: 'w1', html: `<div class="kicker">${t("Ta semaine en XP")}</div><div class="huge">${xp}</div><div class="mid">${t("points gagnés en 7 jours")}</div>` },
+    { cls: 'w2', html: `<div class="kicker">${t("Jours actifs")}</div><div class="huge">${activeDays}/7</div><div class="mid">${activeDays >= 6 ? t('Machine de guerre 🔥') : activeDays >= 3 ? t('Belle régularité !') : t('On vise plus la semaine prochaine ?')}</div>` },
+    { cls: 'w3', html: `<div class="kicker">${t("Tes révisions")}</div><div class="huge">${rev.length}</div><div class="mid">${t("fiches swipées ·")} ${res.length} quiz/exos/examens</div>` },
     { cls: 'w4', html: topSubject
-      ? `<div class="kicker">Ta matière star</div><div class="mid" style="font-size:2rem">${esc(topSubject[0])}</div><div class="small">${topSubject[1]} révisions cette semaine</div>`
-      : '<div class="kicker">Ta matière star</div><div class="mid">Pas encore de révision cette semaine</div>' },
+      ? `<div class="kicker">${t("Ta matière star")}</div><div class="mid" style="font-size:2rem">${esc(topSubject[0])}</div><div class="small">${topSubject[1]} ${t("révisions cette semaine")}</div>`
+      : `<div class="kicker">${t("Ta matière star")}</div><div class="mid">${t("Pas encore de révision cette semaine")}</div>` },
     { cls: 'w1', html: worst
-      ? `<div class="kicker">La notion qui te résiste</div><div class="mid" style="font-size:1.15rem;max-width:420px">« ${esc(worst.question.slice(0, 140))} »</div><div class="small">On la bat la semaine prochaine 💪</div>`
-      : '<div class="kicker">Notion qui te résiste</div><div class="huge">0</div><div class="mid">Aucune. Respect.</div>' },
+      ? `<div class="kicker">${t("La notion qui te résiste")}</div><div class="mid" style="font-size:1.15rem;max-width:420px">« ${esc(worst.question.slice(0, 140))} »</div><div class="small">${t("On la bat la semaine prochaine 💪")}</div>`
+      : `<div class="kicker">${t("Notion qui te résiste")}</div><div class="huge">0</div><div class="mid">${t("Aucune. Respect.")}</div>` },
     { cls: 'w5', html: `${characterHTML('binta', { expression: 'celebration', size: 160 })}
         <div class="bubble top" style="max-width:340px;margin:10px auto;text-align:left;--c:${CHARACTERS.binta.color}"><span class="who">Binta</span>${esc(line('binta', 'fin'))}</div>
-        <div class="mid">${badgesWeek.length ? `${badgesWeek.map((b) => b.icon).join(' ')} ${badgesWeek.length} badge(s) cette semaine` : 'Prochain badge : la semaine prochaine ?'}</div>
-        <button class="btn pink block" id="wstatus" style="max-width:320px;margin:10px auto 0">📸 Mon récap en statut WhatsApp</button>
-        <button class="btn block" id="wclose" style="max-width:320px;margin:8px auto 0">Fermer</button>` },
+        <div class="mid">${badgesWeek.length ? `${badgesWeek.map((b) => b.icon).join(' ')} ${badgesWeek.length} ${t("badge(s) cette semaine")}` : t('Prochain badge : la semaine prochaine ?')}</div>
+        <button class="btn pink block" id="wstatus" style="max-width:320px;margin:10px auto 0">${t("📸 Mon récap en statut WhatsApp")}</button>
+        <button class="btn block" id="wclose" style="max-width:320px;margin:8px auto 0">${t("Fermer")}</button>` },
   ];
   let s = 0;
   const layer = document.createElement('div');
@@ -185,20 +186,20 @@ function weeklyWrapped(el, { p, cards, reviews, results }) {
   const draw = () => {
     layer.innerHTML = `<div class="wrapped ${slides[s].cls}">
       <div class="bars">${slides.map((_, k) => `<i class="${k <= s ? 'on' : ''}"></i>`).join('')}</div>
-      ${slides[s].html}${s < slides.length - 1 ? '<div class="tap">Tape pour continuer →</div>' : ''}</div>`;
+      ${slides[s].html}${s < slides.length - 1 ? `<div class="tap">${t("Tape pour continuer →")}</div>` : ''}</div>`;
     const w = layer.querySelector('.wrapped');
     if (s < slides.length - 1) {
       w.onclick = () => { s++; vibrate(8); draw(); };
     } else {
       confetti();
-      onomatopoeia('WRAPPED!');
+      onomatopoeia(t('WRAPPED!'));
       play(w.querySelector('.ch'), 'signature');
       w.querySelector('#wclose').onclick = () => layer.remove();
       w.querySelector('#wstatus').onclick = (e) => {
         e.stopPropagation();
         layer.remove();
-        offerStatus({ charId: 'binta', kicker: 'Ma semaine', big: `${xp} XP`, sub: `${activeDays}/7 jours actifs`,
-          lines: [`${rev.length} fiches révisées`, topSubject ? `Matière star : ${topSubject[0]}` : ''] });
+        offerStatus({ charId: 'binta', kicker: t('Ma semaine'), big: `${xp} XP`, sub: `${activeDays}${t("/7 jours actifs")}`,
+          lines: [`${rev.length} ${t("fiches révisées")}`, topSubject ? `${t("Matière star :")} ${topSubject[0]}` : ''] });
       };
     }
   };

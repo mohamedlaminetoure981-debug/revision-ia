@@ -2,6 +2,7 @@
 node_modules/
 dist/
 *.log
+# .env = ta clé Gemini pour le script de traduction (npm run traduire) : JAMAIS sur GitHub
 .env
 .env.*
 # Sauvegardes de l'application (contiennent tes cours)

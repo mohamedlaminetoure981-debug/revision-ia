@@ -18,6 +18,7 @@ import { stripSVG, stripToPng } from '../ui/manga.js';
 import { shareImage, fileName } from '../ui/share.js';
 import { getOrGenerateManga, cachedManga, notionOf } from '../core/manga.js';
 import { addXp, XP_RULES } from '../core/game.js';
+import { t } from '../i18n/index.js';
 
 export async function render(el, [courseId, idx = '0']) {
   const course = await db.get('courses', courseId);
@@ -30,9 +31,9 @@ export async function render(el, [courseId, idx = '0']) {
   el.innerHTML = `
     <div class="fs manga-view" style="--c:${nia.color}">
       <div class="fs-top">
-        <button class="fs-close" id="close" aria-label="Fermer">✕</button>
+        <button class="fs-close" id="close" aria-label="${t("Fermer")}">✕</button>
         <div class="grow" style="min-width:0">
-          <div class="tiny dim">📖 Version manga · ${index + 1}/${total}</div>
+          <div class="tiny dim">${t("📖 Version manga ·")} ${index + 1}/${total}</div>
           <div class="manga-notion">${mathText(notion.title)}</div>
         </div>
       </div>
@@ -65,7 +66,7 @@ export async function render(el, [courseId, idx = '0']) {
   if (!strip) {
     if (!navigator.onLine) {
       frame.innerHTML = '';
-      say.textContent = 'Pour dessiner une NOUVELLE planche, il me faut internet. Une fois créée, elle reste dispo hors ligne !';
+      say.textContent = t('Pour dessiner une NOUVELLE planche, il me faut internet. Une fois créée, elle reste dispo hors ligne !');
       setExpression(niaEl, 'encouragement');
     }
     drawLive();
@@ -80,7 +81,7 @@ export async function render(el, [courseId, idx = '0']) {
     } catch (e) {
       status.textContent = '';
       showError(e, () => render(el, [courseId, idx]));
-      say.textContent = 'Oups, ma plume a glissé… On réessaie ?';
+      say.textContent = t('Oups, ma plume a glissé… On réessaie ?');
       return;
     }
     status.textContent = '';
@@ -98,7 +99,7 @@ export async function render(el, [courseId, idx = '0']) {
   if (!strip.read) {
     strip.read = true;
     await db.put('mangas', strip);
-    onomatopoeia('MANGA!', { color: CHARACTERS.nia.color });
+    onomatopoeia(t('MANGA!'), { color: CHARACTERS.nia.color });
     celebrate(await addXp(XP_RULES.manga, 'mangas'), frame);
   }
 
@@ -106,25 +107,25 @@ export async function render(el, [courseId, idx = '0']) {
   after.innerHTML = `
     ${strip.source ? sourceHtml(course, strip.source) : ''}
     <div class="row" style="gap:8px;margin-top:12px">
-      <button class="btn grow" id="share">📤 Partager l'image</button>
+      <button class="btn grow" id="share">${t("📤 Partager l'image")}</button>
     </div>
     <div class="row between" style="margin-top:10px">
-      ${index > 0 ? `<a class="btn ghost small" href="#/manga/${courseId}/${index - 1}">← Notion précédente</a>` : '<span></span>'}
-      ${index < total - 1 ? `<a class="btn ghost small" href="#/manga/${courseId}/${index + 1}">Notion suivante →</a>` : ''}
+      ${index > 0 ? `<a class="btn ghost small" href="#/manga/${courseId}/${index - 1}">${t("← Notion précédente")}</a>` : '<span></span>'}
+      ${index < total - 1 ? `<a class="btn ghost small" href="#/manga/${courseId}/${index + 1}">${t("Notion suivante →")}</a>` : ''}
     </div>`;
   after.querySelector('#share').onclick = async (ev) => {
     const b = ev.currentTarget;
     b.disabled = true;
-    b.textContent = '⏳ Image en préparation…';
+    b.textContent = t('⏳ Image en préparation…');
     try {
       const png = await stripToPng(strip, { subtitle: course.subject });
-      const r = await shareImage(png, fileName('manga', strip.title), `📖 ${strip.title} — révisé en manga avec Révision IA`);
+      const r = await shareImage(png, fileName('manga', strip.title), `📖 ${strip.title} ${t("— révisé en manga avec Révision IA")}`);
       if (r === 'shared') say.textContent = line('nia', 'manga_partage');
     } catch (e) {
-      toast('Impossible de créer l’image sur ce téléphone.', 'error');
+      toast(t('Impossible de créer l’image sur ce téléphone.'), 'error');
       console.error(e);
     }
     b.disabled = false;
-    b.textContent = "📤 Partager l'image";
+    b.textContent = t("📤 Partager l'image");
   };
 }

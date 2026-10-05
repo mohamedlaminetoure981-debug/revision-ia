@@ -22,6 +22,7 @@ import { rewardSummary } from './course.js';
 import { unitLabel, prepareCourse } from '../core/generate.js';
 import { getJob, onJob } from '../core/jobs.js';
 import { suspendPowers, resumePowers } from '../ui/powers.js';
+import { t } from '../i18n/index.js';
 
 // Dernière story lue par cours (retour depuis la "Version manga" → même endroit).
 const lastIndex = {};
@@ -68,7 +69,7 @@ export async function render(el, [courseId]) {
   el.innerHTML = `
     <div class="fs" style="--c:${nia.color}">
       <div class="fs-top">
-        <button class="fs-close" id="close" aria-label="Fermer">✕</button>
+        <button class="fs-close" id="close" aria-label="${t("Fermer")}">✕</button>
         <div class="story-bar-cont"><div></div></div>
         <span class="tiny dim" id="cnt"></span>
       </div>
@@ -101,19 +102,19 @@ export async function render(el, [courseId]) {
     stage.innerHTML = `
       <div class="story-card ${isExplain ? 'explain-card' : ''} ${dir < 0 ? 'rev' : ''}">
         <span class="sec">${mathText(s.section)}${s.pages?.length ? ` · ${label} ${s.pages.join(', ')}` : ''}</span>
-        ${isExplain ? '<h2 style="color:var(--neon-pink)">💡 Explication ajoutée</h2>' : ''}
+        ${isExplain ? `<h2 style="color:var(--neon-pink)">${t("💡 Explication ajoutée")}</h2>` : ''}
         <div class="rich">${rich(s.text)}</div>
       </div>
-      <button class="story-nav prev" aria-label="Précédent"></button>
-      <button class="story-nav next" aria-label="Suivant"></button>
-      ${live ? '' : `<a class="story-manga" href="#/manga/${course.id}/${s.si}" aria-label="Version manga de cette notion">📖 Version manga</a>`}`;
+      <button class="story-nav prev" aria-label="${t("Précédent")}"></button>
+      <button class="story-nav next" aria-label="${t("Suivant")}"></button>
+      ${live ? '' : `<a class="story-manga" href="#/manga/${course.id}/${s.si}" aria-label="${t("Version manga de cette notion")}">${t("📖 Version manga")}</a>`}`;
     stage.querySelector('.prev').onclick = prev;
     stage.querySelector('.next').onclick = next;
 
     // Nia réagit : elle "explique" sur les écrans 💡, sinon parfois une réplique.
     if (isExplain) {
       setExpression(niaEl, 'reflexion');
-      speak(niaEl, bubble, 'Ce passage était peu expliqué dans le cours, alors je t’ai ajouté ça.');
+      speak(niaEl, bubble, t('Ce passage était peu expliqué dans le cours, alors je t’ai ajouté ça.'));
     } else if (i % 4 === 0 && i > 0) {
       setExpression(niaEl, 'joie');
       speak(niaEl, bubble, line('nia', 'encouragement'));
@@ -127,11 +128,11 @@ export async function render(el, [courseId]) {
     stage.innerHTML = `
       <div class="story-card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px">
         ${characterHTML('nia', { expression: 'concentration', size: 120, enter: false })}
-        <h2>${slides.length ? 'Nia écrit la suite…' : 'Nia lit ton cours…'}</h2>
+        <h2>${slides.length ? t('Nia écrit la suite…') : t('Nia lit ton cours…')}</h2>
         <div class="dots-loader"><i></i><i></i><i></i></div>
-        <p class="tiny muted" id="live-status">${esc(job?.data?.status || 'Connexion à l’IA…')}</p>
+        <p class="tiny muted" id="live-status">${esc(job?.data?.status || t('Connexion à l’IA…'))}</p>
       </div>
-      <button class="story-nav prev" aria-label="Précédent"></button>`;
+      <button class="story-nav prev" aria-label="${t("Précédent")}"></button>`;
     stage.querySelector('.prev').onclick = prev;
   }
 
@@ -139,11 +140,11 @@ export async function render(el, [courseId]) {
     stage.innerHTML = `
       <div class="story-card" style="text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px">
         ${characterHTML('nia', { expression: 'celebration', size: 170 })}
-        <h2 class="grad-text" style="font-size:1.6rem">Résumé terminé !</h2>
+        <h2 class="grad-text" style="font-size:1.6rem">${t("Résumé terminé !")}</h2>
         <p class="muted">${esc(line('nia', 'reussite'))}</p>
-        <a class="btn green block" href="#/course/${course.id}/fiches">🗂️ Passer aux fiches avec Sora</a>
-        <a class="btn ghost block" href="#/course/${course.id}/resume">📄 Lecture complète</a>
-        <button class="linkbtn" id="again">↺ Revoir depuis le début</button>
+        <a class="btn green block" href="#/course/${course.id}/fiches">${t("🗂️ Passer aux fiches avec Sora")}</a>
+        <a class="btn ghost block" href="#/course/${course.id}/resume">${t("📄 Lecture complète")}</a>
+        <button class="linkbtn" id="again">${t("↺ Revoir depuis le début")}</button>
       </div>`;
     stage.querySelector('#again').onclick = () => { i = 0; show(); };
     setExpression(niaEl, 'joie');
@@ -151,7 +152,7 @@ export async function render(el, [courseId]) {
     if (!rewarded) {
       rewarded = true;
       confetti(110, { color: CHARACTERS.nia.color });
-      onomatopoeia('YOSH!', { color: CHARACTERS.nia.color });
+      onomatopoeia(t('YOSH!'), { color: CHARACTERS.nia.color });
       sound('level');
       vibrate([20, 40, 20]);
       await rewardSummary(stage.querySelector('.ch'));

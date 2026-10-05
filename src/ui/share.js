@@ -7,6 +7,7 @@
 // =====================================================================
 
 import { toast } from './ui.js';
+import { t } from '../i18n/index.js';
 
 /**
  * @param {Blob}   blob      image PNG
@@ -33,7 +34,7 @@ export async function shareImage(blob, filename, text = '') {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast('📥 Image enregistrée dans tes téléchargements.', 'ok');
+  toast(t('📥 Image enregistrée dans tes téléchargements.'), 'ok');
   return 'downloaded';
 }
 

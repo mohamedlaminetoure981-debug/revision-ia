@@ -15,6 +15,7 @@ import { characterHTML, play } from '../ui/character.js';
 import { esc, line } from '../ui/ui.js';
 import { createProfile, getProfileSync, saveProfile } from '../core/game.js';
 import { confetti, onomatopoeia, vibrate, sound } from '../ui/fx.js';
+import { t, LANGS, getLang, setLang } from '../i18n/index.js';
 
 const DRAFT_KEY = 'welcomeDraft';
 function readDraft() {
@@ -46,12 +47,12 @@ export async function render(el) {
     const kai = CHARACTERS.kai;
     el.innerHTML = `
       <div class="welcome" style="--c:${kai.color}">
+        <div class="seg" id="lang" style="width:100%;max-width:260px;margin:0 auto 6px">${Object.entries(LANGS).map(([code, n]) => `<button data-l="${code}" lang="${code}" class="${code === getLang() ? 'active' : ''}">${n}</button>`).join('')}</div>
         ${characterHTML('kai', { expression: 'joie', size: 190 })}
         <div class="bubble top" style="text-align:left"><span class="who">${kai.name}</span>
-          Yo ! Moi c'est <strong>Kaï</strong>. Bienvenue dans la team !
-          Ici on révise avec l'IA, en mode jeu. Comment on t'appelle ?</div>
-        <input type="text" id="name" placeholder="Ton prénom" maxlength="24" value="${esc(name)}" autocomplete="given-name">
-        <button class="btn block" id="go">C'est parti ! 🚀</button>
+          ${t("Yo ! Moi c'est")} <strong>Kaï</strong>${t(". Bienvenue dans la team !\n          Ici on révise avec l'IA, en mode jeu. Comment on t'appelle ?")}</div>
+        <input type="text" id="name" placeholder="${t("Ton prénom")}" maxlength="24" value="${esc(name)}" autocomplete="given-name">
+        <button class="btn block" id="go">${t("C'est parti ! 🚀")}</button>
       </div>`;
     const ch = el.querySelector('.ch');
     setTimeout(() => play(ch, 'signature'), 500);
@@ -64,6 +65,10 @@ export async function render(el) {
       draw();
     };
     el.querySelector('#go').onclick = go;
+    // Langue : le prénom déjà tapé est gardé (brouillon) pendant le rechargement.
+    el.querySelectorAll('#lang button').forEach((b) => {
+      b.onclick = () => { saveDraft({ name: el.querySelector('#name').value.trim() }); setLang(b.dataset.l); };
+    });
     el.querySelector('#name').onkeydown = (e) => { if (e.key === 'Enter') go(); };
     // Chaque frappe est gardée (variable + brouillon) : le champ n'est jamais "perdu".
     el.querySelector('#name').oninput = (e) => { name = e.target.value; saveDraft({ name: name.trim() }); };
@@ -73,7 +78,7 @@ export async function render(el) {
   function drawMember(id) {
     const c = CHARACTERS[id];
     const intro = id === 'kai'
-      ? `Moi, je suis ton guide : je t'accueille et je fixe tes objectifs du jour, ${name}.`
+      ? `${t("Moi, je suis ton guide : je t'accueille et je fixe tes objectifs du jour,")} ${name}.`
       : line(id, 'arrivee');
     el.innerHTML = `
       <div class="welcome team-slide" style="--c:${c.color}">
@@ -86,8 +91,8 @@ export async function render(el) {
         <p class="muted">${esc(c.personality)}</p>
         <div class="bubble top" style="text-align:left"><span class="who">${esc(c.name)}</span>${esc(intro)}</div>
         <div class="row nowrap">
-          <button class="btn ghost" id="skip">Passer</button>
-          <button class="btn grow" id="next">${step < others.length ? 'Suivant →' : 'Choisir mon compagnon'}</button>
+          <button class="btn ghost" id="skip">${t("Passer")}</button>
+          <button class="btn grow" id="next">${step < others.length ? t('Suivant →') : t('Choisir mon compagnon')}</button>
         </div>
       </div>`;
     const ch = el.querySelector('.ch');
@@ -101,8 +106,8 @@ export async function render(el) {
   function drawPick() {
     el.innerHTML = `
       <div class="welcome">
-        <h1>Choisis ton <span class="grad-text">compagnon</span></h1>
-        <p class="muted">Il t'accompagnera sur l'accueil et son aura évoluera avec ta série de jours 🔥</p>
+        <h1>${t("Choisis ton")} <span class="grad-text">${t("compagnon")}</span></h1>
+        <p class="muted">${t("Il t'accompagnera sur l'accueil et son aura évoluera avec ta série de jours 🔥")}</p>
         <div class="pick-grid">
           ${others.map((id) => `
             <button class="pick ${chosen === id ? 'sel' : ''}" data-id="${id}" style="--c:${CHARACTERS[id].color}">
@@ -111,7 +116,7 @@ export async function render(el) {
             </button>`).join('')}
         </div>
         <div id="pick-say" class="bubble top" style="text-align:left;${chosen ? '' : 'visibility:hidden'}"></div>
-        <button class="btn block green" id="done" ${chosen ? '' : 'disabled'}>C'est mon choix !</button>
+        <button class="btn block green" id="done" ${chosen ? '' : 'disabled'}>${t("C'est mon choix !")}</button>
       </div>`;
     el.querySelectorAll('.pick').forEach((b) => {
       b.onclick = () => {
@@ -138,7 +143,7 @@ export async function render(el) {
       }
       clearDraft();
       confetti(150, { color: CHARACTERS[chosen].color });
-      onomatopoeia("LET'S GO!", { color: CHARACTERS[chosen].color, big: true });
+      onomatopoeia(t("LET'S GO!"), { color: CHARACTERS[chosen].color, big: true });
       vibrate([20, 40, 60]);
       sound('level');
       setTimeout(() => { location.hash = '#/'; }, 900);

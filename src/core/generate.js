@@ -20,6 +20,7 @@ import { generateJSON, blobToBase64 } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { initialState } from './srs.js';
 import { startJob, getJob } from './jobs.js';
+import { t } from '../i18n/index.js';
 
 const CHUNK_CHARS = 20000; // taille maximale d'un morceau (en caractères)
 const OLD_CHUNK_CHARS = 12000; // ancienne taille : gardée pour les cours déjà commencés
@@ -81,7 +82,7 @@ async function runChunked(course, kind, label, onStatus, fn) {
   const p = prog(course, kind);
   for (let i = 0; i < parts.length; i++) {
     if (p.done.includes(i)) continue;
-    const status = (t) => onStatus?.(`${label} — partie ${i + 1}/${parts.length}${t ? ' : ' + t : '…'}`);
+    const status = (msg) => onStatus?.(`${label} ${t("— partie")} ${i + 1}/${parts.length}${msg ? ' : ' + msg : '…'}`);
     status();
     await fn(parts[i], i, status);
     p.done.push(i);
@@ -98,7 +99,7 @@ async function runChunkedParallel(course, kind, label, onStatus, fn, limit = 2) 
   const worker = async () => {
     while (todo.length) {
       const i = todo.shift();
-      const status = (t) => onStatus?.(`${label} — ${finished}/${parts.length} parties prêtes${t ? ' · ' + t : ''}`);
+      const status = (msg) => onStatus?.(`${label} — ${finished}/${parts.length} ${t("parties prêtes")}${msg ? ' · ' + msg : ''}`);
       status();
       await fn(parts[i], i, status);
       p.done.push(i);
@@ -126,7 +127,7 @@ export async function generateSummary(course, onStatus, onSection) {
   Object.keys(course.summaryParts).sort((a, b) => a - b).forEach((k) => {
     course.summaryParts[k].forEach((sec, j) => onSection?.(sec, before(Number(k)) + j));
   });
-  await runChunked(course, 'summary', 'Résumé', onStatus, async (pages, i, status) => {
+  await runChunked(course, 'summary', t('Résumé'), onStatus, async (pages, i, status) => {
     const res = await generateJSON({
       parts: [{ text: P.summaryPrompt(P.courseText(pages, unitLabel(course)), unitLabel(course)) }],
       schema: P.SUMMARY_SCHEMA,
@@ -203,7 +204,7 @@ export async function generatePack(course, onStatus, onSection) {
   for (let i = 0; i < parts.length; i++) {
     const want = { sections: !course.summaryParts[i], cards: !cardsP.done.includes(i), questions: !hasQuiz && !course.quizParts[i] };
     if (!want.sections && !want.cards && !want.questions) continue;
-    const status = (t) => onStatus?.(`${want.sections ? 'Résumé' : want.cards ? 'Fiches' : 'Quiz'} — partie ${i + 1}/${parts.length}${t ? ' : ' + t : '…'}`);
+    const status = (msg) => onStatus?.(`${want.sections ? t('Résumé') : want.cards ? t('Fiches') : t('Quiz')} ${t("— partie")} ${i + 1}/${parts.length}${msg ? ' : ' + msg : '…'}`);
     status();
     const res = await generateJSON({
       parts: [{ text: P.packPrompt(P.courseText(parts[i], unit), unit, want, perChunk) }],
@@ -220,9 +221,9 @@ export async function generatePack(course, onStatus, onSection) {
         onSection?.(sec, before(i) + idx);
       },
       check: (json) => {
-        if (want.sections && !json.sections.length) return 'résumé vide';
-        if (want.cards && !json.cards.length) return 'aucune fiche';
-        if (want.questions && !json.questions.some(goodQuestion)) return 'aucune question valable';
+        if (want.sections && !json.sections.length) return t('résumé vide');
+        if (want.cards && !json.cards.length) return t('aucune fiche');
+        if (want.questions && !json.questions.some(goodQuestion)) return t('aucune question valable');
         return null;
       },
     });
@@ -260,14 +261,14 @@ export async function resetSummary(course) {
 // ---------------------------------------------------------------------
 export async function generateCards(course, onStatus) {
   course.chunkChars = chunkSize(course);
-  await runChunkedParallel(course, 'cards', 'Fiches', onStatus, async (pages, i, status) => {
+  await runChunkedParallel(course, 'cards', t('Fiches'), onStatus, async (pages, i, status) => {
     const res = await generateJSON({
       parts: [{ text: P.cardsPrompt(P.courseText(pages, unitLabel(course))) }],
       schema: P.CARDS_SCHEMA,
       system: P.SYSTEM,
       onStatus: status,
       label: `fiches ${i + 1}`,
-      check: (json) => (json.cards.length ? null : 'aucune fiche'),
+      check: (json) => (json.cards.length ? null : t('aucune fiche')),
     });
     // Mode vérification : un 2e appel relit les fiches avant affichage.
     await saveCards(course, pages, i, res.cards, status);
@@ -287,7 +288,7 @@ export async function resetCards(course) {
 export async function generateQuiz(course, count, onStatus) {
   const previous = await db.getByIndex('quizzes', 'courseId', course.id);
   const avoid = previous.flatMap((q) => q.questions.map((x) => x.question));
-  onStatus?.('Création du quiz…');
+  onStatus?.(t('Création du quiz…'));
   const res = await generateJSON({
     parts: [{ text: P.quizPrompt(P.courseText(course.pages, unitLabel(course)), count, avoid) }],
     schema: P.QUIZ_SCHEMA,
@@ -298,7 +299,7 @@ export async function generateQuiz(course, count, onStatus) {
     // Vérifie que chaque question a des choix et une bonne réponse valide.
     check: (json) => {
       const bad = json.questions.findIndex((q) => q.choices.length < 2 || q.correctIndex < 0 || q.correctIndex >= q.choices.length);
-      return bad >= 0 ? `question ${bad + 1} mal formée` : json.questions.length ? null : 'aucune question';
+      return bad >= 0 ? `${t("question")} ${bad + 1} ${t("mal formée")}` : json.questions.length ? null : t('aucune question');
     },
   });
   let questions = res.questions;
@@ -322,7 +323,7 @@ export async function generateQuiz(course, count, onStatus) {
 
 /** Relit des fiches : corrige les réponses fausses, signale les fiches absurdes. */
 async function verifyCards(course, pages, cards, onStatus) {
-  onStatus?.('🔍 vérification des fiches…');
+  onStatus?.(t('🔍 vérification des fiches…'));
   const res = await generateJSON({
     parts: [{ text: P.verifyCardsPrompt(P.courseText(pages, unitLabel(course)), cards) }],
     schema: P.VERIFY_SCHEMA,
@@ -339,7 +340,7 @@ async function verifyCards(course, pages, cards, onStatus) {
 
 /** Relit un QCM : corrige la bonne réponse / l'explication, retire les questions ambiguës. */
 async function verifyQuiz(course, questions, onStatus) {
-  onStatus?.('🔍 vérification des questions…');
+  onStatus?.(t('🔍 vérification des questions…'));
   const res = await generateJSON({
     parts: [{ text: P.verifyQuizPrompt(P.courseText(course.pages, unitLabel(course)), questions) }],
     schema: P.VERIFY_SCHEMA,
@@ -367,14 +368,14 @@ async function verifyQuiz(course, questions, onStatus) {
 /** Crée `count` exercices d'application sur le cours et les enregistre. */
 export async function generateExercises(course, count, onStatus) {
   const previous = await db.getByIndex('exercises', 'courseId', course.id);
-  onStatus?.('Awa prépare les exercices…');
+  onStatus?.(t('Awa prépare les exercices…'));
   const res = await generateJSON({
     parts: [{ text: P.exercisesPrompt(P.courseText(course.pages, unitLabel(course)), count, previous.map((e) => e.title)) }],
     schema: P.EXERCISES_SCHEMA,
     system: P.SYSTEM,
     temperature: 0.7,
     onStatus,
-    check: (json) => (json.exercises.length ? null : 'aucun exercice'),
+    check: (json) => (json.exercises.length ? null : t('aucun exercice')),
   });
   const now = new Date().toISOString();
   const list = res.exercises.map((e) => ({
@@ -395,16 +396,16 @@ export async function correctExercise(course, exercise, answer, image, onStatus)
   const text = P.courseText(course.pages, unitLabel(course));
   const parts = [{ text: P.correctionPrompt(text, exercise.statement, answer, !!image) }];
   if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: await blobToBase64(image) } });
-  onStatus?.('Awa corrige ta copie…');
+  onStatus?.(t('Awa corrige ta copie…'));
   let correction = await generateJSON({
     parts, schema: P.CORRECTION_SCHEMA, system: P.SYSTEM, temperature: 0.2, onStatus,
     thinking: 'low', // un peu de réflexion pour vérifier les calculs
     label: 'correction exercice',
-    check: (j) => (j.grade < 0 || j.grade > 20 ? 'note hors de 0-20' : null),
+    check: (j) => (j.grade < 0 || j.grade > 20 ? t('note hors de 0-20') : null),
   });
   // Mode vérification : un 2e appel relit la correction.
   if (await db.getSetting('verifyMode')) {
-    onStatus?.('🔍 vérification de la correction…');
+    onStatus?.(t('🔍 vérification de la correction…'));
     const v = await generateJSON({
       parts: [{ text: P.verifyCorrectionPrompt(text, exercise.statement, answer, correction) }],
       schema: P.VERIFY_SCHEMA, system: P.SYSTEM, temperature: 0.1,
@@ -444,7 +445,7 @@ function multiCourseText(courses) {
 
 /** Crée un sujet d'examen blanc (barème sur 20) sur un ou plusieurs cours. */
 export async function generateExam(courses, minutes, onStatus) {
-  onStatus?.('Ren rédige le sujet…');
+  onStatus?.(t('Ren rédige le sujet…'));
   const res = await generateJSON({
     parts: [{ text: P.examPrompt(multiCourseText(courses), minutes) }],
     schema: P.EXAM_SCHEMA,
@@ -452,9 +453,9 @@ export async function generateExam(courses, minutes, onStatus) {
     temperature: 0.6,
     onStatus,
     check: (j) => {
-      if (!j.questions.length) return 'aucune question';
+      if (!j.questions.length) return t('aucune question');
       const bad = j.questions.findIndex((q) => q.kind === 'qcm' && (q.choices.length < 2 || q.correctIndex < 0 || q.correctIndex >= q.choices.length));
-      return bad >= 0 ? `QCM ${bad + 1} mal formé` : null;
+      return bad >= 0 ? `${t("QCM")} ${bad + 1} ${t("mal formé")}` : null;
     },
   });
   // Remet le barème exactement sur 20 si l'IA s'est trompée dans le total.
@@ -476,7 +477,7 @@ export async function correctExam(exam, courses, answers, onStatus) {
   // Mêmes réponses déjà corrigées : on réutilise la correction, sans redemander.
   const same = (exam.attempts || []).find((a) => JSON.stringify(a.answers) === JSON.stringify(answers));
   if (same) return same;
-  onStatus?.('Le jury délibère…');
+  onStatus?.(t('Le jury délibère…'));
   const res = await generateJSON({
     parts: [{ text: P.examCorrectionPrompt(multiCourseText(courses), exam, answers) }],
     schema: P.EXAM_CORRECTION_SCHEMA,
@@ -491,10 +492,10 @@ export async function correctExam(exam, courses, answers, onStatus) {
     const ai = res.questions.find((x) => x.index === i);
     if (q.kind === 'qcm') {
       const ok = answers[i] === q.correctIndex;
-      return { points: ok ? q.points : 0, comment: ok ? 'Bonne réponse ✓' : `Mauvaise réponse. ${ai?.comment || ''}`.trim() };
+      return { points: ok ? q.points : 0, comment: ok ? t('Bonne réponse ✓') : `${t("Mauvaise réponse.")} ${ai?.comment || ''}`.trim() };
     }
     const pts = Math.max(0, Math.min(q.points, Number(ai?.points) || 0));
-    return { points: pts, comment: ai?.comment || 'Pas de commentaire.' };
+    return { points: pts, comment: ai?.comment || t('Pas de commentaire.') };
   });
   const total = Math.round(details.reduce((s, d) => s + d.points, 0) * 2) / 2;
   const attempt = { date: new Date().toISOString(), answers, details, total, verdict: verdictOf(total), advice: res.advice };

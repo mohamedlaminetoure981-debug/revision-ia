@@ -21,11 +21,12 @@ import { startAmbient, stopAmbient, AMBIENT_LIST } from '../ui/sfx.js';
 import { getProfileSync, addXp } from '../core/game.js';
 import { today } from '../core/srs.js';
 import { isCreator } from '../core/creator.js';
+import { t } from '../i18n/index.js';
 
 const DEFAULTS = { work: 25, rest: 5, ambient: 'aucun' };
 const XP_PER_MIN = 2; // 25 min parfaites = 50 XP
 const PENALTY = 0.25; // −25 % d'XP par sortie de l'appli
-const AMBIENT_LABEL = { aucun: '🔇 Silence', pluie: '🌧️ Pluie', nuit: '🌙 Nuit', dojo: '🎋 Dojo' };
+const AMBIENT_LABEL = { aucun: t('🔇 Silence'), pluie: t('🌧️ Pluie'), nuit: t('🌙 Nuit'), dojo: t('🎋 Dojo') };
 
 /** Minutes de focus : aujourd'hui, 7 derniers jours, total. */
 export async function focusStats() {
@@ -56,22 +57,22 @@ export async function render(el, [mode]) {
     el.innerHTML = `
       <div class="fs dojo" style="--c:${awa.color};overflow-y:auto">
         <div class="fs-top"><a class="fs-close" href="${home}" style="display:grid;place-items:center;text-decoration:none">✕</a>
-          <div class="grow"><div class="label">Mode Focus</div><strong>🥋 Le dojo d'Awa</strong></div></div>
+          <div class="grow"><div class="label">${t("Mode Focus")}</div><strong>${t("🥋 Le dojo d'Awa")}</strong></div></div>
         <div style="max-width:440px;width:100%;margin:0 auto">
           <div class="mascot" style="--c:${awa.color};margin:10px 0">${characterHTML('awa', { expression: 'concentration', size: 84 })}
             <div class="bubble"><span class="who">Awa</span><span class="say">${esc(line('awa', 'focus_intro'))}</span></div></div>
           <div class="tile">
-            ${stepper('work', '⏱️ Travail', prefs.work, 5, 90, 5)}
-            ${stepper('rest', '☕ Pause', prefs.rest, 1, 30, 1)}
-            <div class="label" style="margin-top:12px">Ambiance (générée, rien à télécharger)</div>
+            ${stepper('work', t('⏱️ Travail'), prefs.work, 5, 90, 5)}
+            ${stepper('rest', t('☕ Pause'), prefs.rest, 1, 30, 1)}
+            <div class="label" style="margin-top:12px">${t("Ambiance (générée, rien à télécharger)")}</div>
             <div class="seg" id="amb">${['aucun', ...AMBIENT_LIST.filter((a) => AMBIENT_LABEL[a])].map((a) => `<button data-a="${a}" class="${prefs.ambient === a ? 'active' : ''}">${AMBIENT_LABEL[a]}</button>`).join('')}</div>
           </div>
-          <button class="btn pink block" id="start" style="margin:14px 0">🔔 Commencer l'entraînement</button>
+          <button class="btn pink block" id="start" style="margin:14px 0">${t("🔔 Commencer l'entraînement")}</button>
           <div class="bento">
-            <div class="tile"><div class="label">Aujourd'hui</div><div class="big">${stats.today}<span class="small"> min</span></div></div>
-            <div class="tile"><div class="label">7 jours</div><div class="big">${stats.week}<span class="small"> min</span></div></div>
+            <div class="tile"><div class="label">${t("Aujourd'hui")}</div><div class="big">${stats.today}<span class="small"> ${t("min")}</span></div></div>
+            <div class="tile"><div class="label">${t("7 jours")}</div><div class="big">${stats.week}<span class="small"> ${t("min")}</span></div></div>
           </div>
-          <p class="tiny muted center">Quitter l'appli pendant le travail = moins d'XP (−25 % par sortie). Awa voit tout. 👀</p>
+          <p class="tiny muted center">${t("Quitter l'appli pendant le travail = moins d'XP (−25 % par sortie). Awa voit tout. 👀")}</p>
         </div>
       </div>`;
     el.querySelectorAll('[data-step]').forEach((b) => {
@@ -98,7 +99,7 @@ export async function render(el, [mode]) {
   function stepper(k, label, v) {
     return `<div class="row between" style="margin:6px 0"><span>${label}</span>
       <div class="row nowrap stepper"><button class="btn ghost small" data-step="${k}" data-d="-1">−</button>
-      <b id="v-${k}" style="min-width:2.2em;text-align:center">${v}</b><span class="small muted">min</span>
+      <b id="v-${k}" style="min-width:2.2em;text-align:center">${v}</b><span class="small muted">${t("min")}</span>
       <button class="btn ghost small" data-step="${k}" data-d="1">+</button></div></div>`;
   }
 
@@ -111,8 +112,8 @@ export async function render(el, [mode]) {
     const work = phase === 'work';
     el.innerHTML = `
       <div class="fs dojo ${work ? 'working' : 'resting'}" style="--c:${work ? awa.color : CHARACTERS.tidiane.color}">
-        <div class="fs-top"><button class="fs-close" id="stop" aria-label="Arrêter">✕</button>
-          <div class="grow center"><strong>${work ? '🥋 Entraînement' : '☕ Pause'}</strong> <span class="tiny dim">${minutes} min</span></div>
+        <div class="fs-top"><button class="fs-close" id="stop" aria-label="${t("Arrêter")}">✕</button>
+          <div class="grow center"><strong>${work ? t('🥋 Entraînement') : t('☕ Pause')}</strong> <span class="tiny dim">${minutes} ${t("min")}</span></div>
           <span class="tiny" id="mult"></span></div>
         <div class="fs-body" style="justify-content:center;align-items:center;text-align:center">
           <div class="dojo-ring" id="ring">
@@ -122,7 +123,7 @@ export async function render(el, [mode]) {
           <div class="dojo-time" id="time"></div>
           <div class="mascot" style="--c:${awa.color};max-width:380px;margin:8px auto 0">${characterHTML(work ? 'awa' : 'tidiane', { expression: 'encouragement', size: 54, enter: false })}
             <div class="bubble"><span class="who">${work ? 'Awa' : 'Tidiane'}</span><span class="say" id="say">${esc(work ? line('awa', 'focus_debut') : line('tidiane', 'focus_pause'))}</span></div></div>
-          ${work ? '' : '<button class="btn ghost" id="skip" style="margin-top:12px">⏭️ Passer la pause</button>'}
+          ${work ? '' : `<button class="btn ghost" id="skip" style="margin-top:12px">${t("⏭️ Passer la pause")}</button>`}
         </div>
       </div>`;
     sound(work ? 'gong' : 'bubble');
@@ -201,18 +202,18 @@ export async function render(el, [mode]) {
     el.innerHTML = `
       <div class="fs dojo" style="--c:${awa.color};justify-content:center;text-align:center">
         ${characterHTML(comp, { expression: pure ? 'celebration' : session.leaves ? 'clin' : 'joie', size: 170, aura: pure ? 3 : 1 })}
-        <h1 class="display ${pure ? 'grad-text' : ''}" style="margin:8px 0">${completed ? (pure ? 'FOCUS PARFAIT !' : 'SESSION TERMINÉE') : 'SESSION COUPÉE'}</h1>
-        <p class="muted">${minutes} min · ${session.leaves ? `${session.leaves} sortie${session.leaves > 1 ? 's' : ''} (XP ×${mult.toFixed(2)})` : 'aucune sortie 👏'}</p>
+        <h1 class="display ${pure ? 'grad-text' : ''}" style="margin:8px 0">${completed ? (pure ? t('FOCUS PARFAIT !') : t('SESSION TERMINÉE')) : t('SESSION COUPÉE')}</h1>
+        <p class="muted">${minutes} ${t("min ·")} ${session.leaves ? `${session.leaves} ${t("sortie")}${session.leaves > 1 ? 's' : ''} (XP ×${mult.toFixed(2)})` : t('aucune sortie 👏')}</p>
         <div class="display" style="font-size:1.5rem;color:var(--neon-green)">+${xp} XP</div>
         <div class="mascot" style="--c:${awa.color};max-width:380px;margin:10px auto">${characterHTML('awa', { expression: pure ? 'celebration' : 'encouragement', size: 60 })}
           <div class="bubble"><span class="who">Awa</span><span class="say">${esc(line('awa', pure ? 'focus_fin' : 'focus_fin_triche'))}</span></div></div>
         <div class="row" style="justify-content:center;gap:8px">
-          <button class="btn" id="rest">☕ Pause ${prefs.rest} min</button>
-          <a class="btn ghost" href="${home}">${home === '#/veille' ? '🌙 Retour au plan' : '🏠 Accueil'}</a>
+          <button class="btn" id="rest">${t("☕ Pause")} ${prefs.rest} ${t("min")}</button>
+          <a class="btn ghost" href="${home}">${home === '#/veille' ? t('🌙 Retour au plan') : t('🏠 Accueil')}</a>
         </div>
       </div>`;
     sound(pure ? 'victory' : 'gong');
-    if (pure) { confetti(); onomatopoeia('OSU!'); setTimeout(() => power(comp, 'strong', { target: el.querySelector('.ch') }), 500); }
+    if (pure) { confetti(); onomatopoeia(t('OSU!')); setTimeout(() => power(comp, 'strong', { target: el.querySelector('.ch') }), 500); }
     el.querySelector('#rest').onclick = () => begin('rest');
     celebrate(await addXp(xp, 'focus'), el.querySelector('.display'));
   }

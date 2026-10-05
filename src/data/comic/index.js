@@ -25,6 +25,8 @@ export function hasComic(id) {
 export async function loadComic(id) {
   const load = FILES[fileOf(id)];
   if (!load) return null;
-  const [mod, { applyLayout }] = await Promise.all([load(), import('../../comic/story-images.js')]);
-  return applyLayout(JSON.parse(JSON.stringify(mod.default)));
+  const [mod, { applyLayout }, i18n] = await Promise.all([load(), import('../../comic/story-images.js'), import('../../i18n/index.js')]);
+  // Textes de la BD traduits (src/i18n/contenu/<langue>/bd.json), sinon français.
+  const copy = i18n.mergeContent(JSON.parse(JSON.stringify(mod.default)), i18n.getContent('bd')?.[`ch${String(id).padStart(2, '0')}`]);
+  return applyLayout(copy);
 }

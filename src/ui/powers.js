@@ -27,6 +27,7 @@ import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from './character.js';
 import { onomatopoeia, vibrate, sound, confetti } from './fx.js';
 import { rise } from './particles.js';
+import { t } from '../i18n/index.js';
 
 const RANK = { light: 1, strong: 2, ultimate: 3 };
 let suspended = 0;
@@ -156,14 +157,14 @@ function ultimate(charId, { text, sub, short = false } = {}) {
     el.innerHTML = `
       <div class="ult-fx">${reduced() ? '' : fx()}</div>
       ${characterHTML(charId, { expression: 'celebration', size: 240, aura: 3 })}
-      <div class="ult-name">${ch.power?.name || 'Pouvoir ultime'}</div>
+      <div class="ult-name">${ch.power?.name || t('Pouvoir ultime')}</div>
       ${sub ? `<div class="ult-sub">${sub}</div>` : ''}
       <div class="ult-flash"></div>
-      <button class="ult-skip">Passer ⏭</button>`;
+      <button class="ult-skip">${t("Passer ⏭")}</button>`;
     document.body.appendChild(el);
     if (!reduced()) {
       if (ch.power?.effect === 'lightning') el.querySelector('.ult-fx').classList.add('shake'); // secousse limitée au pouvoir (pas à la page)
-      setTimeout(() => onomatopoeia(text || 'POUVOIR ULTIME!', { color: ch.color, big: true }), 250);
+      setTimeout(() => onomatopoeia(text || t('POUVOIR ULTIME!'), { color: ch.color, big: true }), 250);
       confetti(ch.power?.effect === 'hype' ? 160 : 90, { color: ch.color, y: innerHeight * 0.45 });
     }
     vibrate([40, 30, 60, 30, 90]);

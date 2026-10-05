@@ -14,6 +14,7 @@ import { playSfx, setSfxPrefs } from './sfx.js';
 import { burst, rain, shatter, sparkle, reducedMotion } from './particles.js';
 import { getProfileSync } from '../core/game.js';
 import { CHARACTERS } from '../data/characters.js';
+import { t } from '../i18n/index.js';
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -158,7 +159,7 @@ export function xpFloat(amount, fromEl) {
   setTimeout(() => el.remove(), 1300);
 }
 
-const HYPE = ['YOSH!', "LET'S GO!", 'SUGOI!', 'GG!', 'BOOM!', 'NICE!', 'EZ!'];
+const HYPE = [t('YOSH!'), t("LET'S GO!"), t('SUGOI!'), 'GG!', t('BOOM!'), t('NICE!'), 'EZ!'];
 
 /** Onomatopée au hasard. */
 export function hypeWord() {
@@ -175,22 +176,22 @@ export function celebrate(result, fromEl) {
   if (result.levelUp) {
     setTimeout(() => {
       confetti(150);
-      onomatopoeia(`NIVEAU ${result.level}!`);
+      onomatopoeia(`${t("NIVEAU")} ${result.level}!`);
       sound('level');
       vibrate([30, 40, 30, 40, 60]);
     }, 300);
   } else if (result.auraUp) {
-    setTimeout(() => { confetti(); onomatopoeia('AURA UP!'); vibrate([20, 30, 40]); }, 300);
+    setTimeout(() => { confetti(); onomatopoeia(t('AURA UP!')); vibrate([20, 30, 40]); }, 300);
   } else if (result.streakUp && result.streak > 1) {
-    setTimeout(() => onomatopoeia(`🔥 ${result.streak} JOURS!`), 300);
+    setTimeout(() => onomatopoeia(`🔥 ${result.streak} ${t("JOURS!")}`), 300);
   }
   // Pouvoirs (phase 3) : ultimes RARES (séries 7/30/100 j, niveaux 10/25/50), aura forte au niveau gagné.
   import('./powers.js').then(async ({ power }) => {
     if (result.streakUp && [7, 30, 100].includes(result.streak)) {
       const { getProfileSync } = await import('../core/game.js');
-      power(getProfileSync()?.companion || 'kai', 'ultimate', { sub: `${result.streak} jours de suite !`, text: `🔥 ${result.streak} JOURS!` });
+      power(getProfileSync()?.companion || 'kai', 'ultimate', { sub: `${result.streak} ${t("jours de suite !")}`, text: `🔥 ${result.streak} ${t("JOURS!")}` });
     } else if (result.levelUp && [10, 25, 50].includes(result.level)) {
-      power('binta', 'ultimate', { sub: `Niveau ${result.level} atteint !`, text: `NIVEAU ${result.level}!` });
+      power('binta', 'ultimate', { sub: `${t("Niveau")} ${result.level} ${t("atteint !")}`, text: `${t("NIVEAU")} ${result.level}!` });
     }
   });
   // Binta fête les niveaux gagnés et les nouveaux badges.
@@ -203,7 +204,7 @@ export function celebrate(result, fromEl) {
 async function bintaParty(result) {
   const [{ modal, line, esc }, { characterHTML, play }] = await Promise.all([import('./ui.js'), import('./character.js')]);
   const items = [
-    ...(result.levelUp ? [{ icon: '⬆️', name: `Niveau ${result.level}`, desc: 'Nouveau niveau atteint !' }] : []),
+    ...(result.levelUp ? [{ icon: '⬆️', name: `${t("Niveau")} ${result.level}`, desc: t('Nouveau niveau atteint !') }] : []),
     ...(result.newBadges || []),
   ];
   const m = modal(`
@@ -215,13 +216,13 @@ async function bintaParty(result) {
           <div class="row nowrap"><span style="font-size:2.2rem">${b.icon}</span>
             <div class="grow" style="text-align:left"><strong>${esc(b.name)}</strong><div class="small muted">${esc(b.desc)}</div></div></div>
         </div>`).join('')}
-      ${result.levelUp ? '<button class="btn block" id="lv-status" style="margin-bottom:8px">📸 Statut WhatsApp</button>' : ''}
-      <button class="btn pink block" data-close>Trop bien ! ✨</button>
+      ${result.levelUp ? `<button class="btn block" id="lv-status" style="margin-bottom:8px">${t("📸 Statut WhatsApp")}</button>` : ''}
+      <button class="btn pink block" data-close>${t("Trop bien ! ✨")}</button>
     </div>`);
   m.el.querySelector('#lv-status')?.addEventListener('click', async () => {
     m.close();
     const { offerStatus } = await import('./status.js');
-    offerStatus({ kicker: 'Nouveau niveau', big: `NIV. ${result.level}`, sub: 'Level up !', lines: [] });
+    offerStatus({ kicker: t('Nouveau niveau'), big: `${t("NIV.")} ${result.level}`, sub: t('Level up !'), lines: [] });
   });
   confetti(120, { color: '#FF3D9A' });
   sound(result.newBadges?.length ? 'badge' : 'level');

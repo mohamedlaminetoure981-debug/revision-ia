@@ -21,13 +21,14 @@ import { reportCard } from './report.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { pendingCount } from '../core/collection.js';
 import { loadVeille, saveVeille } from '../core/veille.js';
+import { t } from '../i18n/index.js';
 
 // Direction du swipe → note SM-2, texte du tampon, XP.
 const DIRS = {
-  right: { grade: 'moyen', stamp: 'JE SAIS', xp: XP_RULES.card, btn: '→ Je sais' },
-  left: { grade: 'rate', stamp: 'À REVOIR', xp: XP_RULES.cardFail, btn: '← À revoir' },
-  up: { grade: 'facile', stamp: 'FACILE', xp: XP_RULES.cardEasy, btn: '↑ Facile' },
-  down: { grade: 'difficile', stamp: 'DIFFICILE', xp: XP_RULES.cardHard, btn: '↓ Difficile' },
+  right: { grade: 'moyen', stamp: t('JE SAIS'), xp: XP_RULES.card, btn: t('→ Je sais') },
+  left: { grade: 'rate', stamp: t('À REVOIR'), xp: XP_RULES.cardFail, btn: t('← À revoir') },
+  up: { grade: 'facile', stamp: 'FACILE', xp: XP_RULES.cardEasy, btn: t('↑ Facile') },
+  down: { grade: 'difficile', stamp: 'DIFFICILE', xp: XP_RULES.cardHard, btn: t('↓ Difficile') },
 };
 const SWIPE_MIN = 90; // distance (px) pour valider un swipe
 
@@ -42,7 +43,7 @@ function shuffle(list) {
 
 /** Texte "dans combien de temps" pour un intervalle en jours. */
 function when(n) {
-  return n === 0 ? 'auj.' : n === 1 ? 'demain' : `${n} j`;
+  return n === 0 ? t('auj.') : n === 1 ? 'demain' : `${n} j`;
 }
 
 export async function render(el, [courseId, blockId]) {
@@ -66,9 +67,9 @@ export async function render(el, [courseId, blockId]) {
     el.innerHTML = `
       <div class="fs" style="--c:${sora.color};justify-content:center;text-align:center">
         ${characterHTML('sora', { expression: 'clin', size: 180 })}
-        <h2>Rien à réviser pour l'instant !</h2>
+        <h2>${t("Rien à réviser pour l'instant !")}</h2>
         <p class="muted">${esc(line('sora', 'fin'))}</p>
-        <a class="btn" href="${back}">Retour</a>
+        <a class="btn" href="${back}">${t("Retour")}</a>
       </div>`;
     return;
   }
@@ -76,7 +77,7 @@ export async function render(el, [courseId, blockId]) {
   el.innerHTML = `
     <div class="fs" style="--c:${sora.color}">
       <div class="fs-top">
-        <a class="fs-close" href="${back}" aria-label="Fermer" style="display:grid;place-items:center;text-decoration:none">✕</a>
+        <a class="fs-close" href="${back}" aria-label="${t("Fermer")}" style="display:grid;place-items:center;text-decoration:none">✕</a>
         <div class="grow"><div class="bar"><div id="prog" style="width:0%"></div></div></div>
         <span class="tiny dim count" id="cnt">0/${initial}</span>
       </div>
@@ -117,24 +118,24 @@ export async function render(el, [courseId, blockId]) {
     zone.innerHTML = `
       ${queue[1] ? '<div class="swipe-card behind"><div class="face recto"></div></div>' : ''}
       <div class="swipe-card" id="card">
-        <span class="stamp right">JE SAIS</span><span class="stamp left">À REVOIR</span>
-        <span class="stamp up">FACILE</span><span class="stamp down">DIFFICILE</span>
+        <span class="stamp right">${t("JE SAIS")}</span><span class="stamp left">${t("À REVOIR")}</span>
+        <span class="stamp up">${t("FACILE")}</span><span class="stamp down">${t("DIFFICILE")}</span>
         <div class="flip" id="flip">
           <div class="face recto">
             <div class="part">${esc(course.title)} · ${mathText(card.part || '')}</div>
             <div class="q rich">${rich(card.question)}</div>
-            <div class="hint">👆 Tape pour retourner</div>
+            <div class="hint">${t("👆 Tape pour retourner")}</div>
           </div>
           <div class="face verso">
-            <div class="part">Réponse</div>
+            <div class="part">${t("Réponse")}</div>
             <div class="rich" style="font-size:1.08rem;margin-top:6px">${rich(card.answer)}</div>
             ${sourceHtml(course, card.source)}
             <div class="center" style="margin-top:auto;padding-top:10px">
-              <button class="linkbtn small" id="report">🚩 Signaler une erreur</button></div>
+              <button class="linkbtn small" id="report">${t("🚩 Signaler une erreur")}</button></div>
           </div>
         </div>
       </div>`;
-    actions.innerHTML = '<button class="btn block green" id="flipbtn">👀 Retourner la carte</button>';
+    actions.innerHTML = `<button class="btn block green" id="flipbtn">${t("👀 Retourner la carte")}</button>`;
     actions.querySelector('#flipbtn').onclick = flip;
     zone.querySelector('#report').onclick = (e) => {
       e.stopPropagation();
@@ -165,7 +166,7 @@ export async function render(el, [courseId, blockId]) {
         ${['left', 'down', 'right', 'up'].map((d) => `
           <button class="btn g-${DIRS[d].grade}" data-dir="${d}">${DIRS[d].btn}<small>${when(schedule(card, DIRS[d].grade).interval)}</small></button>`).join('')}
       </div>
-      <p class="tiny dim center" style="margin:6px 0 0">ou swipe la carte dans une direction</p>`;
+      <p class="tiny dim center" style="margin:6px 0 0">${t("ou swipe la carte dans une direction")}</p>`;
     actions.querySelectorAll('[data-dir]').forEach((b) => { b.onclick = () => answer(b.dataset.dir); });
   }
 
@@ -201,7 +202,7 @@ export async function render(el, [courseId, blockId]) {
       if (!moved) { cardEl.style.transform = ''; flip(); return; } // simple tape = retourner
       if (flipped && Math.hypot(dx, dy) >= SWIPE_MIN) { answer(dirOf()); return; }
       if (!flipped && Math.hypot(dx, dy) > 20) {
-        soraSay.textContent = 'Retourne d’abord la carte, petit malin 😉';
+        soraSay.textContent = t('Retourne d’abord la carte, petit malin 😉');
         play(soraEl, 'shake');
       }
       cardEl.style.transform = '';
@@ -247,7 +248,7 @@ export async function render(el, [courseId, blockId]) {
       done++;
       combo++;
       if (combo > 0 && combo % 5 === 0) {
-        onomatopoeia(`COMBO x${combo}!`);
+        onomatopoeia(`${t("COMBO x")}${combo}!`);
         talk('reussite', 'celebration', 'jump');
       } else if (grade === 'facile') {
         talk('reussite', 'clin', 'signature');
@@ -268,7 +269,7 @@ export async function render(el, [courseId, blockId]) {
     zone.innerHTML = `
       <div class="face" style="position:relative;inset:auto;height:100%;text-align:center;justify-content:center;align-items:center;gap:8px">
         ${characterHTML('sora', { expression: 'celebration', size: 150 })}
-        <h2 class="grad-text" style="font-size:1.6rem;margin:0">Pile terminée !</h2>
+        <h2 class="grad-text" style="font-size:1.6rem;margin:0">${t("Pile terminée !")}</h2>
         <div class="row" style="justify-content:center;gap:6px">
           <span class="chip" style="color:var(--neon-cyan)">↑ ${counts.facile}</span>
           <span class="chip ok">→ ${counts.moyen}</span>
@@ -277,16 +278,16 @@ export async function render(el, [courseId, blockId]) {
         </div>
         <div class="display" style="font-size:1.4rem;color:var(--neon-green)">+${xpTotal} XP</div>
       </div>`;
-    actions.innerHTML = `<a class="btn block" href="${back}">Terminer</a>`;
+    actions.innerHTML = `<a class="btn block" href="${back}">${t("Terminer")}</a>`;
     // Nouvelles cartes à collectionner gagnées pendant cette pile ?
     pendingCount().then((n) => {
       if (!n) return;
-      actions.insertAdjacentHTML('afterbegin', `<a class="btn pink block pack-btn" href="#/collection/ouvrir" style="margin-bottom:8px">🎁 ${n} carte${n > 1 ? 's' : ''} à ouvrir !</a>`);
+      actions.insertAdjacentHTML('afterbegin', `<a class="btn pink block pack-btn" href="#/collection/ouvrir" style="margin-bottom:8px">🎁 ${n} ${t("carte")}${n > 1 ? 's' : ''} ${t("à ouvrir !")}</a>`);
       sound('sparkle');
     });
     talk('fin', 'joie', 'signature');
     confetti();
-    onomatopoeia(good >= initial * 0.8 ? 'SUGOI!' : hypeWord());
+    onomatopoeia(good >= initial * 0.8 ? t('SUGOI!') : hypeWord());
     sound('level');
     resumePowers();
     // Bonne série de fiches (80 % réussies ou plus) : aura légère de Sora.

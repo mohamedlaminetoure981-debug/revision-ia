@@ -25,6 +25,7 @@ import { trackDrafts, setDraftRoute, restoreDrafts, clearDrafts } from './ui/dra
 // L'accueil est chargé tout de suite (c'est le premier écran) ; les autres écrans
 // sont téléchargés/lus SEULEMENT quand on les ouvre : démarrage bien plus rapide.
 import * as home from './views/home.js';
+import { t } from './i18n/index.js';
 
 // Nom de la route (1er mot après #/) → écran.
 // fullscreen : cache la barre du bas (stories, révision, quiz en cours…).
@@ -56,6 +57,13 @@ const ROUTES = {
 
 const app = document.getElementById('app');
 const nav = document.getElementById('nav');
+// Barre du bas (écrite dans index.html) : traduite au démarrage (rien ne change en français).
+const NAV_LABELS = { '': t('Accueil'), cours: t('Cours'), quiz: t('Quiz'), profil: t('Profil') };
+nav.querySelectorAll('a').forEach((a) => {
+  const label = a.lastChild;
+  if (label?.nodeType === Node.TEXT_NODE && NAV_LABELS[a.dataset.route] !== undefined) label.textContent = NAV_LABELS[a.dataset.route];
+  if (a.hasAttribute('aria-label')) a.setAttribute('aria-label', t('Ajouter un cours'));
+});
 let lastRoute = null; // écran précédent (les brouillons de saisie sont gardés tant qu'on y reste)
 
 /** Lit l'adresse (#/course/123/fiches) → { name: 'course', args: ['123', 'fiches'] } */
@@ -102,7 +110,7 @@ async function route() {
     window.scrollTo(0, 0);
   } catch (e) {
     showError(e);
-    app.innerHTML = `<div class="tile"><h2>Oups…</h2><p>${esc(e.message)}</p><a class="btn" href="#/">Retour à l'accueil</a></div>`;
+    app.innerHTML = `<div class="tile"><h2>${t("Oups…")}</h2><p>${esc(e.message)}</p><a class="btn" href="#/">${t("Retour à l'accueil")}</a></div>`;
   }
 }
 
@@ -119,7 +127,7 @@ async function soundToggle() {
   const draw = async () => {
     const on = await db.getSetting('sounds');
     b.textContent = on ? '🔊' : '🔇';
-    b.setAttribute('aria-label', on ? 'Couper le son' : 'Activer le son');
+    b.setAttribute('aria-label', on ? t('Couper le son') : t('Activer le son'));
   };
   b.onclick = async () => {
     const on = !(await db.getSetting('sounds'));
@@ -148,7 +156,7 @@ function updateNet() {
   if (!pill) {
     pill = document.createElement('div');
     pill.className = 'offline-pill';
-    pill.textContent = '📴 Hors ligne – révision OK';
+    pill.textContent = t('📴 Hors ligne – révision OK');
     document.body.appendChild(pill);
   }
 }
@@ -171,7 +179,7 @@ function showUpdateBar(label, onClick) {
     if (document.querySelector('.update-bar')) return;
     const bar = document.createElement('div');
     bar.className = 'update-bar tile neon';
-    bar.innerHTML = `<div class="row nowrap"><span class="grow"><strong>✨ Nouvelle version dispo !</strong></span>
+    bar.innerHTML = `<div class="row nowrap"><span class="grow"><strong>${t("✨ Nouvelle version dispo !")}</strong></span>
       <button class="btn small green">${label}</button></div>`;
     bar.querySelector('button').onclick = onClick;
     document.body.appendChild(bar);
@@ -186,7 +194,7 @@ function registerSW() {
   let controlled = !!navigator.serviceWorker.controller; // la page est-elle déjà gérée par un service worker ?
   let updateRequested = false; // l'élève a-t-il appuyé sur « Mettre à jour » ?
   navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).then((reg) => {
-    const offer = (worker) => showUpdateBar('Mettre à jour', () => {
+    const offer = (worker) => showUpdateBar(t('Mettre à jour'), () => {
       updateRequested = true;
       worker.postMessage('skipWaiting');
     });
@@ -202,7 +210,7 @@ function registerSW() {
     if (!controlled) { controlled = true; return; } // 1re installation : pas de rechargement
     if (updateRequested) { updateRequested = false; location.reload(); return; } // demandé par l'élève
     // Mise à jour activée ailleurs (autre onglet) : on propose de recharger, sans l'imposer.
-    showUpdateBar('Recharger', () => location.reload());
+    showUpdateBar(t('Recharger'), () => location.reload());
   });
 }
 

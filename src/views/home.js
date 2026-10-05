@@ -13,6 +13,7 @@ import { esc, mascot, say, line, subjectColor, subjectEmoji, displayName } from 
 import { isCreator } from '../core/creator.js';
 import { isDue, today } from '../core/srs.js';
 import { getProfileSync, currentStreak, activeToday, levelInfo, goals, auraLevel } from '../core/game.js';
+import { t } from '../i18n/index.js';
 
 /** Fait défiler un nombre de 0 à sa valeur (compteur animé). */
 function countUp(el, to, ms = 900) {
@@ -40,15 +41,15 @@ export async function render(el) {
   const comp = CHARACTERS[p.companion] || CHARACTERS.kai;
   const aura = auraLevel(streak);
   const hour = new Date().getHours();
-  const hello = hour < 5 ? 'Encore debout' : hour < 12 ? 'Bonjour' : hour < 18 ? 'Salut' : 'Bonsoir';
+  const hello = hour < 5 ? t('Encore debout') : hour < 12 ? t('Bonjour') : hour < 18 ? t('Salut') : t('Bonsoir');
 
   // Que propose le bouton "Continuer" ?
   const lastCourse = [...courses].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
   let next;
-  if (due) next = { href: '#/review', label: `🔁 Réviser ${due} fiche${due > 1 ? 's' : ''}` };
-  else if (lastCourse && !lastCourse.summary) next = { href: `#/course/${lastCourse.id}/resume`, label: '📖 Continuer mon dernier cours' };
-  else if (lastCourse && !gl.find((g) => g.id === 'quizzes').done) next = { href: '#/quiz', label: '🎯 Défier Ren au quiz' };
-  else next = { href: '#/ajouter', label: '➕ Ajouter un cours' };
+  if (due) next = { href: '#/review', label: `${t("🔁 Réviser")} ${due} ${t("fiche")}${due > 1 ? 's' : ''}` };
+  else if (lastCourse && !lastCourse.summary) next = { href: `#/course/${lastCourse.id}/resume`, label: t('📖 Continuer mon dernier cours') };
+  else if (lastCourse && !gl.find((g) => g.id === 'quizzes').done) next = { href: '#/quiz', label: t('🎯 Défier Ren au quiz') };
+  else next = { href: '#/ajouter', label: t('➕ Ajouter un cours') };
 
   el.innerHTML = `
     <div class="hello">
@@ -58,36 +59,36 @@ export async function render(el) {
     ${apiKey ? '' : `
       <a class="tile neon" href="#/reglages" style="--c:${CHARACTERS.tidiane.color};margin-bottom:12px">
         <div class="row nowrap">${characterHTML('tidiane', { expression: 'neutre', size: 56, enter: false })}
-        <div class="grow"><strong>Colle ta clé Gemini pour activer l'IA</strong>
-          <div class="small muted">Tranquille, ça prend 2 minutes. Touche ici →</div></div></div>
+        <div class="grow"><strong>${t("Colle ta clé Gemini pour activer l'IA")}</strong>
+          <div class="small muted">${t("Tranquille, ça prend 2 minutes. Touche ici →")}</div></div></div>
       </a>`}
 
     <div class="bento">
       <div class="tile span-2 speedlines companion-tile" style="--c:${comp.color};background:linear-gradient(135deg, color-mix(in srgb, ${comp.color} 30%, var(--surface)), var(--surface) 70%)">
         <div id="comp">${isCreator() ? `<span class="creator-aura">${characterHTML(p.companion, { expression: 'joie', size: 118, aura })}</span>` : characterHTML(p.companion, { expression: 'joie', size: 118, aura })}</div>
         <div class="grow">
-          <div class="label">Niveau ${isCreator() ? '<span class="creator-title">👑 Créateur</span>' : ''}</div>
+          <div class="label">${t("Niveau")} ${isCreator() ? `<span class="creator-title">${t("👑 Créateur")}</span>` : ''}</div>
           <div class="big"><span class="count" id="lvl">${lv.level}</span></div>
           <div class="bar" style="margin:8px 0 4px"><div id="xpbar" style="width:0%"></div></div>
           <div class="tiny muted"><span class="count" id="xp">0</span> / ${lv.to} XP</div>
-          <div class="tiny dim" style="margin-top:4px">${esc(comp.name)} · ${aura ? `aura niv. ${aura} ✨` : 'aura au jour 3 de série'}</div>
+          <div class="tiny dim" style="margin-top:4px">${esc(comp.name)} · ${aura ? `${t("aura niv.")} ${aura} ✨` : t('aura au jour 3 de série')}</div>
         </div>
       </div>
 
       <div class="tile ${streak ? 'grad' : ''}">
-        <div class="label">Série</div>
+        <div class="label">${t("Série")}</div>
         <div class="streak ${streak ? '' : 'cold'}">🔥 <span class="count" id="streak">${streak}</span></div>
-        <div class="tiny">${activeToday(p) ? 'Validé aujourd’hui ✓' : streak ? 'Révise pour la garder !' : 'Lance ta série !'}</div>
+        <div class="tiny">${activeToday(p) ? t('Validé aujourd’hui ✓') : streak ? t('Révise pour la garder !') : t('Lance ta série !')}</div>
       </div>
 
       <a class="tile ${due ? 'grad-green' : ''}" href="#/review">
-        <div class="label">Fiches du jour</div>
+        <div class="label">${t("Fiches du jour")}</div>
         <div class="big"><span class="count" id="due">${due}</span></div>
-        <div class="tiny">${due ? 'à swiper avec Sora' : 'Tout est à jour 🎉'}</div>
+        <div class="tiny">${due ? t('à swiper avec Sora') : t('Tout est à jour 🎉')}</div>
       </a>
 
       <div class="tile span-2">
-        <div class="row between"><h2 style="margin:0">Objectifs du jour</h2>
+        <div class="row between"><h2 style="margin:0">${t("Objectifs du jour")}</h2>
           <span class="chip neon" style="--c:var(--neon-green)">+${p.daily?.day === today() ? p.daily.xp : 0} XP</span></div>
         ${gl.map((g) => `
           <div class="goal ${g.done ? 'done' : ''}">
@@ -100,23 +101,23 @@ export async function render(el) {
       <a class="btn block span-2 pulse" href="${next.href}">${next.label}</a>
 
       <a class="tile dojo-tile" href="#/dojo" style="--c:${CHARACTERS.awa.color}">
-        <div class="label">Mode Focus</div><div class="big">🥋</div><div class="tiny">Dojo d'Awa</div></a>
+        <div class="label">${t("Mode Focus")}</div><div class="big">🥋</div><div class="tiny">${t("Dojo d'Awa")}</div></a>
       <a class="tile" href="#/collection" style="--c:${CHARACTERS.sora.color};position:relative">
-        <div class="label">Collection</div><div class="big">🃏</div><div class="tiny">${pending ? `🎁 ${pending} à ouvrir` : 'Mes cartes'}</div>
+        <div class="label">${t("Collection")}</div><div class="big">🃏</div><div class="tiny">${pending ? `🎁 ${pending} ${t("à ouvrir")}` : t('Mes cartes')}</div>
         ${pending ? '<span class="dot-new" style="position:absolute;top:10px;right:10px"></span>' : ''}</a>
 
       <a class="tile span-2 story-tile" href="#/histoire">
         <div class="row nowrap">${characterHTML('kai', { expression: unread ? 'celebration' : 'clin', size: 60, enter: false })}
-          <div class="grow"><div class="label">Mode Histoire · ${unlocked.length}/12</div>
-            <strong>${unread ? `📖 ${unread} chapitre${unread > 1 ? 's' : ''} à lire !` : bossReady ? '💀 Un boss t’attend…' : 'La Jeunesse contre l’Oubli'}</strong>
-            <div class="tiny muted">Révise pour débloquer la suite de l’histoire.</div></div>
+          <div class="grow"><div class="label">${t("Mode Histoire ·")} ${unlocked.length}/12</div>
+            <strong>${unread ? `📖 ${unread} ${t("chapitre")}${unread > 1 ? 's' : ''} ${t("à lire !")}` : bossReady ? t('💀 Un boss t’attend…') : t('La Jeunesse contre l’Oubli')}</strong>
+            <div class="tiny muted">${t("Révise pour débloquer la suite de l’histoire.")}</div></div>
           ${unread || bossReady ? '<span class="dot-new"></span>' : ''}</div>
       </a>
 
       ${lastCourse ? `
         <a class="tile span-2 course-card" href="#/course/${lastCourse.id}" style="--c:${subjectColor(lastCourse.subject)}">
           <span class="deco">${subjectEmoji(lastCourse.subject)}</span>
-          <div class="label">Dernier cours · ${esc(lastCourse.subject)}</div>
+          <div class="label">${t("Dernier cours ·")} ${esc(lastCourse.subject)}</div>
           <h3 style="margin:4px 0 0">${esc(lastCourse.title)}</h3>
         </a>` : ''}
     </div>

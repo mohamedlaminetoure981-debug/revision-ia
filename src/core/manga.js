@@ -13,6 +13,7 @@ import { generateJSON } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { unitLabel } from './generate.js';
 import { CHARACTERS } from '../data/characters.js';
+import { t } from '../i18n/index.js';
 
 /** Petite empreinte (non cryptographique) d'un texte. */
 function hash(s) {
@@ -45,14 +46,14 @@ export async function cachedManga(course, index) {
  */
 export async function getOrGenerateManga(course, index, onStatus, onPanel) {
   const notion = notionOf(course, index);
-  if (!notion) throw new Error('Notion introuvable dans le résumé.');
+  if (!notion) throw new Error(t('Notion introuvable dans le résumé.'));
   const id = mangaId(course, notion);
   const saved = await db.get('mangas', id);
   if (saved) return saved;
   // On n'envoie que les pages de la notion (plus court = plus rapide).
   const pages = notion.pages.length ? course.pages.filter((p) => notion.pages.includes(p.n)) : course.pages;
   const text = P.courseText(pages.length ? pages : course.pages, unitLabel(course)).slice(0, 14000);
-  onStatus?.('Nia dessine la planche…');
+  onStatus?.(t('Nia dessine la planche…'));
   const res = await generateJSON({
     parts: [{ text: P.mangaPrompt(notion.text.slice(0, 2500), text) }],
     schema: P.MANGA_SCHEMA,
@@ -62,7 +63,7 @@ export async function getOrGenerateManga(course, index, onStatus, onPanel) {
     label: 'manga',
     streamKey: 'panels',
     onItem: (p, idx) => { if (p?.line && idx < 4) onPanel?.(clean(p), idx); },
-    check: (json) => (json.panels.length >= 4 ? null : `seulement ${json.panels.length} cases au lieu de 4`),
+    check: (json) => (json.panels.length >= 4 ? null : `${t("seulement")} ${json.panels.length} ${t("cases au lieu de 4")}`),
   });
   const strip = {
     id,
@@ -91,11 +92,11 @@ function clean(p) {
 
 /** Planche de démonstration (Panneau créateur, sans IA). */
 export const DEMO_STRIP = {
-  title: 'Le théorème de Pythagore',
+  title: t('Le théorème de Pythagore'),
   panels: [
-    { character: 'ren', expression: 'surprise', line: 'Attends… a² + b² = c² ? Pourquoi pas a + b = c, c’est plus simple !', narration: 'Au dojo, 3 h du matin…', sfx: '?!' },
-    { character: 'nia', expression: 'reflexion', line: 'Imagine trois carrés collés aux côtés du triangle : les deux petits remplissent pile le grand.', narration: '', sfx: '' },
-    { character: 'awa', expression: 'concentration', line: 'Attention : ça marche SEULEMENT si le triangle est rectangle. c = l’hypoténuse.', narration: '', sfx: 'TAC!' },
-    { character: 'sora', expression: 'celebration', line: 'Triangle rectangle → a² + b² = c². Retenu en 2 secondes. Suivant !', narration: '', sfx: 'BAM!' },
+    { character: 'ren', expression: 'surprise', line: t('Attends… a² + b² = c² ? Pourquoi pas a + b = c, c’est plus simple !'), narration: t('Au dojo, 3 h du matin…'), sfx: '?!' },
+    { character: 'nia', expression: 'reflexion', line: t('Imagine trois carrés collés aux côtés du triangle : les deux petits remplissent pile le grand.'), narration: '', sfx: '' },
+    { character: 'awa', expression: 'concentration', line: t('Attention : ça marche SEULEMENT si le triangle est rectangle. c = l’hypoténuse.'), narration: '', sfx: t('TAC!') },
+    { character: 'sora', expression: 'celebration', line: t('Triangle rectangle → a² + b² = c². Retenu en 2 secondes. Suivant !'), narration: '', sfx: t('BAM!') },
   ],
 };

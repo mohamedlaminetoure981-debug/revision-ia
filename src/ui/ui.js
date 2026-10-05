@@ -20,6 +20,7 @@ import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { voice, playSfx } from './sfx.js';
 import { normalizeMath } from '../core/mathfix.js';
+import { t, locale } from '../i18n/index.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
 export function esc(s) {
@@ -258,11 +259,11 @@ export function modal(html, { onClose, locked = false } = {}) {
 }
 
 /** Demande une confirmation. Renvoie une Promise<boolean>. */
-export function confirmBox(message, okLabel = 'Confirmer') {
+export function confirmBox(message, okLabel = t('Confirmer')) {
   return new Promise((resolve) => {
     let answered = false;
     const m = modal(`<p style="font-weight:600">${esc(message)}</p>
-      <div class="row end" style="margin-top:14px"><button class="btn ghost small" data-close>Annuler</button>
+      <div class="row end" style="margin-top:14px"><button class="btn ghost small" data-close>${t("Annuler")}</button>
       <button class="btn danger small" id="cf-ok">${esc(okLabel)}</button></div>`,
     { onClose: () => { if (!answered) resolve(false); } });
     m.el.querySelector('#cf-ok').onclick = () => { answered = true; m.close(); resolve(true); };
@@ -283,8 +284,8 @@ export function progress(title, charId = 'kai') {
       <div class="ld-char">${characterHTML(charId, { expression: 'concentration', size: 130 })}</div>
       <div class="bubble"><span class="who">${esc(ch.name)}</span><span class="say">${esc(line(charId, 'attente'))}</span></div>
       <div class="dots-loader"><i></i><i></i><i></i></div>
-      <div class="status" id="pg-status">C'est parti…</div>
-      <p class="tiny dim">Garde l'appli ouverte pendant l'opération.</p>
+      <div class="status" id="pg-status">${t("C'est parti…")}</div>
+      <p class="tiny dim">${t("Garde l'appli ouverte pendant l'opération.")}</p>
     </div>`, { locked: true });
   let who = charId;
   const bubble = m.el.querySelector('.bubble');
@@ -324,11 +325,11 @@ export function showError(e, retry) {
     <div class="center" style="--c:${CHARACTERS.tidiane.color}">
       ${characterHTML('tidiane', { expression: 'encouragement', size: 120 })}
       <div class="bubble top" style="margin:10px 0 12px;text-align:left"><span class="who">Tidiane</span>${esc(e?.code === 'QUOTA_DAY'
-        ? `Google offre un nombre limité de demandes gratuites par jour, et on les a toutes utilisées sur chaque modèle. Pas de panique : tout revient à ${e.resetAt} (heure de ton téléphone). En attendant, tes fiches et tes quiz marchent sans l’IA !`
+        ? `${t("Google offre un nombre limité de demandes gratuites par jour, et on les a toutes utilisées sur chaque modèle. Pas de panique : tout revient à")} ${e.resetAt} ${t("(heure de ton téléphone). En attendant, tes fiches et tes quiz marchent sans l’IA !")}`
         : line('tidiane', 'erreur'))}</div>
       <p style="font-weight:700;font-size:1.02rem">${esc(msg)}</p>
       <div class="row" style="justify-content:center;margin-top:14px">
-        ${retry ? '<button class="btn" id="err-retry">🔁 Réessayer</button>' : ''}
+        ${retry ? `<button class="btn" id="err-retry">${t("🔁 Réessayer")}</button>` : ''}
         <button class="btn ghost" data-close>OK</button>
       </div>
     </div>`);
@@ -370,11 +371,11 @@ export function checkQuote(course, source) {
 /** HTML du passage source : Page 3 + « citation » + indicateur de vérification. */
 export function sourceHtml(course, source) {
   if (!source) return '';
-  const label = course.sourceType === 'photos' ? 'Photo' : 'Page';
+  const label = course.sourceType === 'photos' ? t('Photo') : t('Page');
   const badge = {
-    exact: '<span class="chip ok" title="Citation retrouvée dans le cours">✓ vérifiée</span>',
-    proche: '<span class="chip warn" title="Citation proche du cours">≈ proche</span>',
-    absente: '<span class="chip bad" title="Citation introuvable dans le cours : méfie-toi">⚠ non retrouvée</span>',
+    exact: `<span class="chip ok" title="${t("Citation retrouvée dans le cours")}">${t("✓ vérifiée")}</span>`,
+    proche: `<span class="chip warn" title="${t("Citation proche du cours")}">${t("≈ proche")}</span>`,
+    absente: `<span class="chip bad" title="${t("Citation introuvable dans le cours : méfie-toi")}">${t("⚠ non retrouvée")}</span>`,
   }[checkQuote(course, source)];
   return `<div class="source">📖 <strong>${label} ${esc(source.page)}</strong> ${badge}
     <blockquote>« ${esc(source.quote)} »</blockquote></div>`;
@@ -387,7 +388,7 @@ export function sourceHtml(course, source) {
 /** Formate une date ISO en français (ex. 12 mars 2026). */
 export function frDate(iso) {
   try {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   } catch { return iso; }
 }
 

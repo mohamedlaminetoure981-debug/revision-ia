@@ -13,6 +13,7 @@
 
 import { getSetting, setSetting } from './db.js';
 
+import { locale } from '../i18n/index.js';
 const TZ = 'America/Los_Angeles';
 
 /** Jour en cours chez Google (heure du Pacifique), ex. "2026-10-05". */
@@ -40,7 +41,7 @@ export function nextReset(now = new Date()) {
 
 /** Heure de la prochaine recharge, en heure locale du téléphone (ex. "08:00"). */
 export function resetTimeText(now = new Date()) {
-  return nextReset(now).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return nextReset(now).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 // État du jour : { day, counts: { modèle: n }, exhausted: { modèle: 'quota' | 'absent' } }

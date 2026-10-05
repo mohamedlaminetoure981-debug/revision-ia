@@ -10,6 +10,7 @@
 
 import * as db from '../core/db.js';
 import { esc, modal, toast, sourceHtml } from '../ui/ui.js';
+import { t } from '../i18n/index.js';
 
 /**
  * Ouvre la fenêtre de signalement d'une fiche.
@@ -19,20 +20,19 @@ import { esc, modal, toast, sourceHtml } from '../ui/ui.js';
  */
 export function reportCard(card, course, onDone) {
   const m = modal(`
-    <h3>🚩 Signaler une erreur</h3>
-    <p class="small muted">Compare avec le passage du cours, puis corrige la fiche, marque-la
-      comme fausse pour plus tard, ou supprime-la.</p>
+    <h3>${t("🚩 Signaler une erreur")}</h3>
+    <p class="small muted">${t("Compare avec le passage du cours, puis corrige la fiche, marque-la\n      comme fausse pour plus tard, ou supprime-la.")}</p>
     ${sourceHtml(course, card.source)}
-    <label class="field" for="rq">Question</label>
+    <label class="field" for="rq">${t("Question")}</label>
     <textarea id="rq">${esc(card.question)}</textarea>
-    <label class="field" for="ra">Réponse</label>
+    <label class="field" for="ra">${t("Réponse")}</label>
     <textarea id="ra">${esc(card.answer)}</textarea>
-    <p class="small muted">Astuce : formules entre $...$ (ex. $x^2$).</p>
+    <p class="small muted">${t("Astuce : formules entre $...$ (ex. $x^2$).")}</p>
     <div class="stack" style="margin-top:12px">
-      <button class="btn block" id="r-save">✅ Enregistrer la correction</button>
-      <button class="btn ghost block" id="r-flag">🚩 Marquer comme fausse (corriger plus tard)</button>
-      <button class="btn danger block" id="r-del">🗑️ Supprimer la fiche</button>
-      <button class="btn ghost block" data-close>Annuler</button>
+      <button class="btn block" id="r-save">${t("✅ Enregistrer la correction")}</button>
+      <button class="btn ghost block" id="r-flag">${t("🚩 Marquer comme fausse (corriger plus tard)")}</button>
+      <button class="btn danger block" id="r-del">${t("🗑️ Supprimer la fiche")}</button>
+      <button class="btn ghost block" data-close>${t("Annuler")}</button>
     </div>`);
   const $ = (s) => m.el.querySelector(s);
 
@@ -43,20 +43,20 @@ export function reportCard(card, course, onDone) {
     card.edited = true;
     await db.put('cards', card);
     m.close();
-    toast('Fiche corrigée ✅', 'ok');
+    toast(t('Fiche corrigée ✅'), 'ok');
     onDone?.();
   };
   $('#r-flag').onclick = async () => {
     card.flagged = true;
     await db.put('cards', card);
     m.close();
-    toast('Fiche marquée comme fausse. Elle ne sera plus proposée en révision.');
+    toast(t('Fiche marquée comme fausse. Elle ne sera plus proposée en révision.'));
     onDone?.();
   };
   $('#r-del').onclick = async () => {
     await db.del('cards', card.id);
     m.close();
-    toast('Fiche supprimée.');
+    toast(t('Fiche supprimée.'));
     onDone?.('deleted');
   };
 }
@@ -65,22 +65,22 @@ export function reportCard(card, course, onDone) {
 export function reportQuestion(quiz, index, course, onDone) {
   const q = quiz.questions[index];
   const m = modal(`
-    <h3>🚩 Signaler une erreur</h3>
+    <h3>${t("🚩 Signaler une erreur")}</h3>
     ${sourceHtml(course, q.source)}
-    <label class="field" for="rq">Question</label>
+    <label class="field" for="rq">${t("Question")}</label>
     <textarea id="rq">${esc(q.question)}</textarea>
-    <label class="field">Choix (coche la bonne réponse)</label>
+    <label class="field">${t("Choix (coche la bonne réponse)")}</label>
     ${q.choices.map((c, i) => `
       <div class="row" style="margin:6px 0">
         <input type="radio" name="good" value="${i}" ${i === q.correctIndex ? 'checked' : ''} style="width:20px;height:20px">
         <input type="text" class="grow" data-choice="${i}" value="${esc(c)}" style="width:auto">
       </div>`).join('')}
-    <label class="field" for="re">Explication</label>
+    <label class="field" for="re">${t("Explication")}</label>
     <textarea id="re">${esc(q.explanation)}</textarea>
     <div class="stack" style="margin-top:12px">
-      <button class="btn block" id="r-save">✅ Enregistrer la correction</button>
-      <button class="btn danger block" id="r-del">🗑️ Supprimer cette question</button>
-      <button class="btn ghost block" data-close>Annuler</button>
+      <button class="btn block" id="r-save">${t("✅ Enregistrer la correction")}</button>
+      <button class="btn danger block" id="r-del">${t("🗑️ Supprimer cette question")}</button>
+      <button class="btn ghost block" data-close>${t("Annuler")}</button>
     </div>`);
   const $ = (s) => m.el.querySelector(s);
 
@@ -92,14 +92,14 @@ export function reportQuestion(quiz, index, course, onDone) {
     q.edited = true;
     await db.put('quizzes', quiz);
     m.close();
-    toast('Question corrigée ✅', 'ok');
+    toast(t('Question corrigée ✅'), 'ok');
     onDone?.();
   };
   $('#r-del').onclick = async () => {
     quiz.questions.splice(index, 1);
     await db.put('quizzes', quiz);
     m.close();
-    toast('Question supprimée.');
+    toast(t('Question supprimée.'));
     onDone?.('deleted');
   };
 }

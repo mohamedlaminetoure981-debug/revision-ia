@@ -14,6 +14,7 @@ import { generateJSON } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { unitLabel } from './generate.js';
 import { notionOf } from './manga.js';
+import { t } from '../i18n/index.js';
 
 /** Empreinte d'un texte (pour reconnaître une explication déjà envoyée). */
 function hash(s) {
@@ -53,7 +54,7 @@ export async function askQuestions(course, index, explanation, onStatus, onQuest
     label: 'feynman questions',
     streamKey: 'questions',
     onItem: (q, i) => { if (typeof q === 'string' && i < 3) onQuestion?.(q, i); },
-    check: (j) => (j.questions.length >= 1 ? null : 'aucune question'),
+    check: (j) => (j.questions.length >= 1 ? null : t('aucune question')),
   });
   const attempt = {
     id: db.newId(), type: 'feynman', key, courseId: course.id, subject: course.subject, notion: notion.title, notionIndex: index,
@@ -76,7 +77,7 @@ export async function gradeExplanation(course, attempt, answers, onStatus) {
     thinking: 'low', // une évaluation demande un peu de réflexion
     onStatus,
     label: 'feynman note',
-    check: (j) => (j.grade >= 0 && j.grade <= 20 ? null : 'note hors de 0-20'),
+    check: (j) => (j.grade >= 0 && j.grade <= 20 ? null : t('note hors de 0-20')),
   });
   attempt.answers = answers;
   attempt.ansKey = ansKey;

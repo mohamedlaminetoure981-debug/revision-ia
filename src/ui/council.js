@@ -27,6 +27,7 @@ import { esc, progress } from './ui.js';
 import { confetti, onomatopoeia, vibrate, sound } from './fx.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { groupSay, clearBubbles, waitRead } from './bubble.js';
+import { t } from '../i18n/index.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -37,7 +38,7 @@ const councilLine = (id, key) => {
 };
 const shuffle = (l) => l.map((v) => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
 const LEVEL_COLOR = { excellent: 'var(--neon-green)', bon: 'var(--neon-cyan)', moyen: 'var(--neon-yellow)', a_retravailler: 'var(--neon-pink)' };
-const LEVEL_LABEL = { excellent: 'Excellent !', bon: 'Bon travail !', moyen: 'Ça se construit', a_retravailler: 'On progresse ensemble' };
+const LEVEL_LABEL = { excellent: t('Excellent !'), bon: t('Bon travail !'), moyen: t('Ça se construit'), a_retravailler: t('On progresse ensemble') };
 
 /** Choisit les persos : 2 à 4 qui parlent + 1-2 muets, jamais le même groupe 2 fois de suite. */
 function chooseCast(owner) {
@@ -88,8 +89,8 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
   const cast = [...speakers, ...silent];
   el.className = 'council';
   el.innerHTML = `
-    <div class="council-title">Le conseil délibère…<small>${esc(title)}</small></div>
-    <button class="council-skip">Passer ⏭</button>
+    <div class="council-title">${t("Le conseil délibère…")}<small>${esc(title)}</small></div>
+    <button class="council-skip">${t("Passer ⏭")}</button>
     <div class="council-table"></div>
     <div class="council-status"></div>`;
   document.body.appendChild(el);
@@ -156,7 +157,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     if (chEl) { setExpression(chEl, res ? (res.level === 'excellent' ? 'surprise' : res.level === 'a_retravailler' ? 'encouragement' : 'joie') : pick(['reflexion', 'concentration', 'surprise'])); play(chEl, 'bounce'); }
     react(res?.level);
     await reading;
-    if (performance.now() - start > 60000 && !finished) setStatus('La correction prend du temps… la connexion est lente, on patiente.');
+    if (performance.now() - start > 60000 && !finished) setStatus(t('La correction prend du temps… la connexion est lente, on patiente.'));
   }
 
   await job; // on attend toujours le vrai résultat
@@ -186,7 +187,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     el.appendChild(rv);
     if (res.level === 'excellent') { // explosion d'énergie
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'celebration'));
-      setTimeout(() => { confetti(140, { color }); onomatopoeia("LET'S GO!", { color, big: true }); sound('level'); }, 450); vibrate([30, 40, 60]);
+      setTimeout(() => { confetti(140, { color }); onomatopoeia(t("LET'S GO!"), { color, big: true }); sound('level'); }, 450); vibrate([30, 40, 60]);
     } else if (res.level === 'bon') {
       sound('good'); vibrate([20, 30]);
     } else { // encouragement chaleureux, jamais moqueur

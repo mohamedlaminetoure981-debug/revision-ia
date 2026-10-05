@@ -73,6 +73,14 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   C = case dans l'ordre de lecture. Sans image, le dessin SVG reste affiché. Les images
   sont optimisées au build (WebP, ≤ 1200 px). Liste des cases : Panneau créateur →
   « 🖼️ Illustrations des cases ». Détails : README section 10 septies.
+- **Langues** (`src/i18n/`) : tout texte d'interface s'écrit `t('Texte en français')` (le
+  français sert de repère, `t()` le renvoie tel quel en français). Après ajout/modif d'un texte :
+  `npm run i18n:extraire` (régénère `fr.json`) puis ajouter la traduction dans `en.json`.
+  Traduction manquante → français. Répliques/BD/Histoire traduites : `src/i18n/contenu/<langue>/`
+  (script `npm run traduire -- en`, clé dans `.env` local, jamais commité). Langue chargée avant
+  l'appli par `src/boot.js`. Réglage `genLang` ('app'/'cours') : consigne de langue ajoutée par
+  `languageNote()` dans `src/core/gemini.js` (rien en français par défaut). Mode Créateur = français.
+  Attention : ne jamais nommer une variable locale `t` dans un fichier qui importe `t`.
 - **Mode Créateur** (réservé à MLT) : activé par une phrase secrète (Profil → Réglages →
   Code créateur) ; seule son empreinte SHA-256 est dans `src/core/creator.js`. Donne le
   badge 👑, des répliques spéciales et le **Panneau créateur** (galerie des expressions,

@@ -34,7 +34,8 @@ qui **marche hors ligne** pour réviser. Tu importes un cours (photos ou PDF), e
 8. [Modifier les personnages, leurs répliques, les remplacer par des images](#8-modifier-les-personnages)
 9. [Modifier les consignes (prompts) de l'IA](#9-modifier-les-consignes-prompts-de-lia)
 10. [Ajouter une fonctionnalité](#10-ajouter-une-fonctionnalité) ·
-    [🖼️ Remplacer les cases de la BD par des illustrations](#10-septies-remplacer-les-cases-de-la-bd-par-des-illustrations)
+    [🖼️ Remplacer les cases de la BD par des illustrations](#10-septies-remplacer-les-cases-de-la-bd-par-des-illustrations) ·
+    [🌍 Langues de l'appli (anglais…)](#10-octies-langues-de-lappli)
 11. [Changer de modèle Gemini](#11-changer-de-modèle-gemini)
 12. [Sauvegarde de tes données](#12-sauvegarde-de-tes-données)
 13. [Dépannage](#13-dépannage)
@@ -182,7 +183,13 @@ revision-ia/
 │   └── characters/            ← dépose ici les images de persos (voir section 8)
 ├── .github/workflows/deploy.yml   Publication automatique sur GitHub Pages
 └── src/
+    ├── boot.js                Point d'entrée : charge la langue, PUIS l'appli (main.js)
     ├── main.js                Démarrage, liste des écrans (ROUTES), thème, mises à jour
+    ├── i18n/                  🌍 Langues (voir section 10 octies)
+    │   ├── index.js           t('texte'), choix de la langue, fusion des contenus traduits
+    │   ├── fr.json            Liste de tous les textes d'interface (npm run i18n:extraire)
+    │   ├── en.json            ⭐ Traduction anglaise de l'interface
+    │   └── contenu/<langue>/  Répliques, BD, Mode Histoire traduits (npm run traduire)
     ├── sw.js                  Service worker (modèle) : fonctionnement hors ligne
     ├── data/
     │   ├── characters.js      ⭐ LE FICHIER DES PERSONNAGES (noms, couleurs, répliques…)
@@ -947,6 +954,56 @@ Le script signale un texte posé sur une zone protégée, une bulle de plus de 2
 la case, un texte qui déborde, deux textes qui se touchent, un sujet coupé par le
 recadrage et un ordre de lecture douteux (de haut en bas, de gauche à droite).
 
+## 10 octies. Langues de l'appli
+
+L'appli existe en **français** (par défaut) et en **anglais**. Le choix se fait sur
+l'écran de bienvenue (boutons Français / English) et dans **Profil → Réglages → 🌍 Langue**.
+À la première visite, l'appli prend la langue du téléphone si elle est proposée, sinon le français.
+
+**Comment ça marche** (`src/i18n/index.js`) :
+- Dans le code, chaque texte de l'interface est écrit `t('Texte en français')`.
+  En français, `t()` renvoie le texte tel quel : l'appli française ne change pas.
+  Dans une autre langue, `t()` cherche la traduction dans `src/i18n/<langue>.json`.
+- **Traduction absente → le texte français s'affiche** (jamais de vide ni de code technique).
+- `src/i18n/fr.json` = la liste de tous les textes. Après avoir ajouté ou modifié un texte :
+  `npm run i18n:extraire` (il dit aussi combien de traductions manquent).
+- **Répliques des persos, BD, Mode Histoire** : fichiers `src/i18n/contenu/<langue>/`
+  (`personnages.json`, `bd.json`, `histoire.json`), même principe de repli sur le français.
+- Langues de droite à gauche (arabe…) : prévu (`<html dir="rtl">` posé tout seul).
+- Le **Mode Créateur** (Panneau créateur, outils) reste en français.
+- Changer de langue recharge la page, uniquement quand l'élève appuie sur le bouton
+  (le prénom déjà tapé est gardé).
+
+**Contenu créé par l'IA** : Réglages → « 🤖 Langue du contenu créé par l'IA » :
+- *Langue de l'appli* (par défaut) ou *Langue du cours*.
+- Résumés, fiches, quiz, corrections et explications sont écrits directement dans cette
+  langue (une phrase ajoutée à la consigne : **aucune demande en plus**).
+- La transcription des photos/PDF garde toujours la langue d'origine du cours.
+- En français avec le réglage par défaut, les demandes envoyées à Gemini sont exactement les mêmes qu'avant.
+
+### Traduire les répliques et la BD avec le script (sur ton PC)
+
+1. Dans le dossier du projet, crée un fichier texte nommé **`.env`** contenant une seule ligne :
+   ```
+   GEMINI_API_KEY=ta_clé_gemini
+   ```
+   Ce fichier n'est **jamais** envoyé sur GitHub (il est dans `.gitignore`).
+2. `npm install` (une seule fois), puis :
+   ```
+   npm run traduire -- en
+   ```
+   (ou seulement une partie : `npm run traduire -- en personnages`, `bd`, `histoire`, `interface`).
+3. Le script ne traduit **que ce qui manque**, garde les noms des persos, `{prenom}`, les emojis
+   et l'humour, et enregistre après chaque paquet : si ça coupe (internet, quota), relance-le,
+   il reprend où il s'était arrêté. Tout traduire ≈ 80 demandes Gemini (une seule fois).
+4. Vérifie avec `npm run dev`, puis commit + push des fichiers `.json` créés.
+
+Pour faire retraduire un texte : supprime-le du fichier `.json` et relance le script.
+Ajouter une nouvelle langue (ex. `ar`) : `npm run traduire -- ar`, puis ajouter
+`ar: 'العربية'` dans `LANGS` (`src/i18n/index.js`).
+
+---
+
 ## 11. Changer de modèle Gemini (et vitesse de l'IA)
 
 Par défaut : **`gemini-3.5-flash-lite`**, le modèle gratuit le plus **rapide** et le moins
@@ -1039,6 +1096,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.18.0** : appli multilingue (étape 1) — système de langues, interface en anglais,
+  choix de la langue (bienvenue + Réglages), langue du contenu créé par l'IA, script
+  `npm run traduire` prêt pour les répliques et la BD (étape 2, à lancer sur le PC).
 - ✅ **v1.17.4** : bouche de Sora réactivée (zone fixe elliptique) ; bulles des scènes de
   groupe ~30 % plus rapides (accueil du créateur 13,4 → 8,7 s, conseil 6,2 → 3,9 s).
 - ✅ **v1.17.2** : clignement actif pour les 8 persos, bouche pour 7 (Sora : à refaire) ;

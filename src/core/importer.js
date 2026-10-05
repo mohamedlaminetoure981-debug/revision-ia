@@ -17,6 +17,7 @@
 import * as db from './db.js';
 import { generateJSON, blobToBase64, AIError } from './gemini.js';
 import { SYSTEM, TRANSCRIBE_SCHEMA, transcribePrompt } from '../data/prompts.js';
+import { t } from '../i18n/index.js';
 
 export const MAX_PDF_MB = 50; // taille maximale d'un PDF
 export const MAX_IMAGES = 80; // nombre maximal de pages/photos par cours
@@ -27,7 +28,7 @@ const BATCH_SIZE = 8; // images envoyées par demande de transcription (réduit 
 /** Dessine une source (image ou page) dans un canvas réduit puis la compresse en JPEG. */
 function canvasToJpeg(canvas) {
   return new Promise((resolve, reject) => {
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Compression impossible'))), 'image/jpeg', JPEG_QUALITY);
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error(t('Compression impossible')))), 'image/jpeg', JPEG_QUALITY);
   });
 }
 
@@ -42,7 +43,7 @@ export async function compressImage(file) {
     source = await new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Image illisible : ${file.name || ''}`));
+      img.onerror = () => reject(new Error(`${t("Image illisible :")} ${file.name || ''}`));
       img.src = URL.createObjectURL(file);
     });
   }
@@ -76,7 +77,7 @@ function loadPdfJs() {
       return lib;
     }).catch((e) => {
       pdfjsPromise = null;
-      throw new AIError('NETWORK', `Impossible de charger le lecteur PDF (connexion ?). ${e.message}`);
+      throw new AIError('NETWORK', `${t("Impossible de charger le lecteur PDF (connexion ?).")} ${e.message}`);
     });
   }
   return pdfjsPromise;
@@ -89,19 +90,19 @@ function loadPdfJs() {
  */
 export async function readPdf(file, { visual = false, onStatus } = {}) {
   if (file.size > MAX_PDF_MB * 1024 * 1024) {
-    throw new AIError('TOO_BIG', `📦 PDF trop gros (${(file.size / 1048576).toFixed(1)} Mo). Maximum : ${MAX_PDF_MB} Mo.`);
+    throw new AIError('TOO_BIG', `${t("📦 PDF trop gros (")}${(file.size / 1048576).toFixed(1)} ${t("Mo). Maximum :")} ${MAX_PDF_MB} Mo.`);
   }
-  onStatus?.('Chargement du lecteur PDF…');
+  onStatus?.(t('Chargement du lecteur PDF…'));
   const pdfjs = await loadPdfJs();
   const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
   if (pdf.numPages > MAX_IMAGES) {
-    throw new AIError('TOO_BIG', `📦 PDF trop long (${pdf.numPages} pages). Maximum : ${MAX_IMAGES}. Découpe-le en plusieurs cours.`);
+    throw new AIError('TOO_BIG', `${t("📦 PDF trop long (")}${pdf.numPages} ${t("pages). Maximum :")} ${MAX_IMAGES}${t(". Découpe-le en plusieurs cours.")}`);
   }
 
   // 1. On essaie d'extraire le texte directement.
   const pages = [];
   for (let i = 1; i <= pdf.numPages; i++) {
-    onStatus?.(`Lecture du texte, page ${i}/${pdf.numPages}…`);
+    onStatus?.(`${t("Lecture du texte, page")} ${i}/${pdf.numPages}…`);
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
     const text = content.items.map((it) => it.str + (it.hasEOL ? '\n' : ' ')).join('').replace(/[ \t]+/g, ' ').trim();
@@ -113,7 +114,7 @@ export async function readPdf(file, { visual = false, onStatus } = {}) {
   // 2. PDF scanné (ou analyse visuelle) : on transforme chaque page en image.
   const images = [];
   for (let i = 1; i <= pdf.numPages; i++) {
-    onStatus?.(`Conversion en image, page ${i}/${pdf.numPages}…`);
+    onStatus?.(`${t("Conversion en image, page")} ${i}/${pdf.numPages}…`);
     const page = await pdf.getPage(i);
     const base = page.getViewport({ scale: 1 });
     const viewport = page.getViewport({ scale: Math.min(2.5, MAX_SIDE / Math.max(base.width, base.height)) });
@@ -138,7 +139,7 @@ export async function createCourse({ title, subject, sourceType, pages = [], ima
   const course = {
     id: db.newId(),
     title: title.trim(),
-    subject: subject.trim() || 'Divers',
+    subject: subject.trim() || t('Divers'),
     sourceType, // 'pdf' ou 'photos' (sert à écrire "Page 3" ou "Photo 3")
     createdAt: new Date().toISOString(),
     pages, // [{ n, text }] : texte du cours, page par page
@@ -171,11 +172,11 @@ export async function transcribeCourse(course, onStatus) {
     if (!todo.length) break;
     const batch = todo.slice(0, size);
     const numbers = batch.map((b) => b.n);
-    onStatus?.(`Transcription ${course.pages.length + 1}–${course.pages.length + batch.length} sur ${total} (envoi des images)…`);
+    onStatus?.(`${t("Transcription")} ${course.pages.length + 1}–${course.pages.length + batch.length} ${t("sur")} ${total} ${t("(envoi des images)…")}`);
 
     const parts = [{ text: transcribePrompt(numbers) }];
     for (const im of batch) {
-      parts.push({ text: `Image n°${im.n} :` });
+      parts.push({ text: `${t("Image n°")}${im.n} :` });
       parts.push({ inlineData: { mimeType: 'image/jpeg', data: await blobToBase64(im.blob) } });
     }
     const got = course.pages.length;
@@ -191,12 +192,13 @@ export async function transcribeCourse(course, onStatus) {
         schema: TRANSCRIBE_SCHEMA,
         system: SYSTEM,
         temperature: 0.1,
+        keepLanguage: true, // on recopie le cours tel quel, dans sa langue
         onStatus,
         label: `transcription ×${batch.length}`,
         // Chaque page complète est gardée dès qu'elle arrive.
         streamKey: 'pages',
         onItem: (p) => { if (keep(p)) db.put('courses', course); },
-        check: (json) => (json.pages.some((p) => numbers.includes(p.n)) ? null : 'aucune image transcrite'),
+        check: (json) => (json.pages.some((p) => numbers.includes(p.n)) ? null : t('aucune image transcrite')),
       });
       res.pages.forEach(keep);
     } catch (e) {
@@ -206,7 +208,7 @@ export async function transcribeCourse(course, onStatus) {
       if (course.pages.length === got) throw e;
     }
     await db.put('courses', course); // sauvegarde après chaque lot
-    if (course.pages.length === got) throw new AIError('BAD_JSON', 'Transcription impossible : aucune page lue. Réessaie.');
+    if (course.pages.length === got) throw new AIError('BAD_JSON', t('Transcription impossible : aucune page lue. Réessaie.'));
   }
   return course;
 }

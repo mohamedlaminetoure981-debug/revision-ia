@@ -11,6 +11,7 @@
 
 import * as db from '../core/db.js';
 import { characterHTML } from './character.js';
+import { t } from '../i18n/index.js';
 
 /** Samsung Internet + téléphone en mode sombre ? */
 function concerned() {
@@ -27,9 +28,8 @@ export async function samsungTip() {
   tip.innerHTML = `
     <div class="row nowrap">
       ${characterHTML('tidiane', { expression: 'clin', size: 46, enter: false })}
-      <p class="grow small" style="margin:0"><strong>Tidiane :</strong> Si les couleurs te semblent bizarres,
-        touche ⋮ puis « Site lumineux » 😉</p>
-      <button class="btn small ghost" id="tip-ok">Compris</button>
+      <p class="grow small" style="margin:0"><strong>${t("Tidiane :")}</strong> ${t("Si les couleurs te semblent bizarres,\n        touche ⋮ puis « Site lumineux » 😉")}</p>
+      <button class="btn small ghost" id="tip-ok">${t("Compris")}</button>
     </div>`;
   document.body.appendChild(tip);
   tip.querySelector('#tip-ok').onclick = async () => {

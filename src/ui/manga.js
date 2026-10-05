@@ -13,6 +13,7 @@
 import { CHARACTERS } from '../data/characters.js';
 import { characterSVG } from './character.js';
 import { latexToText } from '../core/mathfix.js';
+import { t } from '../i18n/index.js';
 
 const W = 600; // largeur de la planche
 const PH = 300; // hauteur d'une case
@@ -120,7 +121,7 @@ export function stripSVG(strip, o = {}) {
     <text x="36" y="45" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="20" font-weight="800" fill="#fff">${x(latexToText(strip.title || '').slice(0, 34))}</text>
     ${o.subtitle ? `<text x="${W - 36}" y="45" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#C6FF3D">${x(String(o.subtitle).slice(0, 30))}</text>` : ''}
     ${panels.map((p, i) => panel(p, i, uid)).join('')}
-    <text x="${W - 24}" y="${H - 12}" text-anchor="end" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="12" font-weight="800" fill="#8B5CF6">Révision IA ✦</text>
+    <text x="${W - 24}" y="${H - 12}" text-anchor="end" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="12" font-weight="800" fill="#8B5CF6">${t("Révision IA ✦")}</text>
   </svg>`;
 }
 

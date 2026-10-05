@@ -15,6 +15,7 @@ import { setDisplayWidth, preloadPage } from './story-images.js';
 import { playSfx, startAmbient, stopAmbient } from '../ui/sfx.js';
 import { vibrate } from '../ui/fx.js';
 import * as db from '../core/db.js';
+import { t } from '../i18n/index.js';
 
 const MODE_KEY = 'bdMode';
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -37,10 +38,10 @@ export async function openReader(el, chapter, meta, onEnd) {
   el.innerHTML = `
     <div class="bd">
       <div class="bd-top">
-        <a class="fs-close" href="#/histoire" aria-label="Fermer" style="display:grid;place-items:center;text-decoration:none">✕</a>
-        <div class="grow" style="min-width:0"><div class="tiny dim">Chapitre ${meta.id}/12 · <span id="bd-pg"></span></div>
+        <a class="fs-close" href="#/histoire" aria-label="${t("Fermer")}" style="display:grid;place-items:center;text-decoration:none">✕</a>
+        <div class="grow" style="min-width:0"><div class="tiny dim">${t("Chapitre")} ${meta.id}/12 · <span id="bd-pg"></span></div>
           <div class="bd-title">${esc(meta.emoji || '')} ${esc(chapter.title || meta.title)}</div></div>
-        <button class="icon-btn" id="bd-mode" aria-label="Changer de mode de lecture"></button>
+        <button class="icon-btn" id="bd-mode" aria-label="${t("Changer de mode de lecture")}"></button>
       </div>
       <div class="bd-view" id="bd-view"><div class="bd-page" id="bd-page"></div></div>
       <div class="bd-nav" id="bd-nav">
@@ -85,7 +86,7 @@ export async function openReader(el, chapter, meta, onEnd) {
     holder.classList.remove('bd-turn', 'bd-turn-back');
     void holder.offsetWidth;
     holder.classList.add(dir > 0 ? 'bd-turn' : 'bd-turn-back');
-    $('#bd-pg').textContent = `page ${pageIdx + 1}/${total}`;
+    $('#bd-pg').textContent = `${t("page")} ${pageIdx + 1}/${total}`;
     // Ambiance sonore de la page
     if (soundOn && page.ambient !== ambient) {
       ambient = page.ambient;
@@ -146,7 +147,7 @@ export async function openReader(el, chapter, meta, onEnd) {
   function applyMode() {
     view.classList.toggle('case', mode === 'case');
     $('#bd-mode').textContent = mode === 'case' ? '📄' : '🔍';
-    $('#bd-mode').title = mode === 'case' ? 'Lire la page entière' : 'Lire case par case';
+    $('#bd-mode').title = mode === 'case' ? t('Lire la page entière') : t('Lire case par case');
     if (mode === 'case') focusPanel(false); else pageMode();
   }
 

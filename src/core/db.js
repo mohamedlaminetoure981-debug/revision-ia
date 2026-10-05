@@ -154,6 +154,9 @@ export const DEFAULT_SETTINGS = {
   // Phase 3 : scène du conseil de correction ET pouvoirs spéciaux.
   // 'complete' (tout), 'short' (version courte, pas de pouvoir plein écran), 'off' (désactivé)
   council: 'short', // version courte par défaut : la note arrive vite
+  // Langue des résumés, fiches, quiz, corrections créés par l'IA :
+  // 'app' (langue de l'appli) ou 'cours' (langue du cours importé).
+  genLang: 'app',
   // Profil de jeu : prénom, compagnon, XP, série, badges… (voir core/game.js)
   profile: null,
 };

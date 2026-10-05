@@ -8,6 +8,7 @@ import { esc, toast, progress, showError, mascot, say } from '../ui/ui.js';
 import { compressImage, readPdf, createCourse, transcribeCourse, MAX_IMAGES, MAX_PDF_MB } from '../core/importer.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, vibrate, sound } from '../ui/fx.js';
+import { t } from '../i18n/index.js';
 
 export async function render(el) {
   const courses = await db.getAll('courses');
@@ -19,28 +20,28 @@ export async function render(el) {
   let mode = 'photos';
 
   el.innerHTML = `
-    <div class="screen-head"><h1>➕ Ajouter un cours</h1></div>
+    <div class="screen-head"><h1>${t("➕ Ajouter un cours")}</h1></div>
     <div id="mory" style="margin-bottom:14px">${mascot('mory', { situation: 'arrivee', expression: 'joie' })}</div>
 
     <div class="tile" style="margin-bottom:12px">
-      <label class="field" for="title" style="margin-top:0">Titre du cours</label>
-      <input id="title" data-draft="title" type="text" placeholder="Ex. : Chapitre 3 – Les graphes" maxlength="120">
-      <label class="field" for="subject">Matière</label>
-      <input id="subject" data-draft="subject" type="text" list="subjects" placeholder="Ex. : Algorithmique" maxlength="60">
+      <label class="field" for="title" style="margin-top:0">${t("Titre du cours")}</label>
+      <input id="title" data-draft="title" type="text" placeholder="${t("Ex. : Chapitre 3 – Les graphes")}" maxlength="120">
+      <label class="field" for="subject">${t("Matière")}</label>
+      <input id="subject" data-draft="subject" type="text" list="subjects" placeholder="${t("Ex. : Algorithmique")}" maxlength="60">
       <datalist id="subjects">${subjects.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
     </div>
 
     <div class="tile neon" style="--c:${color};margin-bottom:14px">
       <div class="seg" style="margin-bottom:12px">
-        <button data-mode="photos" class="active">📷 Photos</button>
-        <button data-mode="pdf">📄 PDF</button>
+        <button data-mode="photos" class="active">${t("📷 Photos")}</button>
+        <button data-mode="pdf">${t("📄 PDF")}</button>
       </div>
 
       <div id="photos-zone">
         <div class="bento">
-          <span class="btn filepick cyan">📷 Photo
+          <span class="btn filepick cyan">${t("📷 Photo")}
             <input id="cam" type="file" accept="image/*" capture="environment"></span>
-          <span class="btn ghost filepick">🖼️ Galerie
+          <span class="btn ghost filepick">${t("🖼️ Galerie")}
             <input id="gal" type="file" accept="image/*" multiple></span>
         </div>
         <div id="thumbs" class="thumbs"></div>
@@ -48,16 +49,15 @@ export async function render(el) {
       </div>
 
       <div id="pdf-zone" hidden>
-        <span class="btn ghost filepick block">📄 Choisir un PDF (max ${MAX_PDF_MB} Mo)
+        <span class="btn ghost filepick block">${t("📄 Choisir un PDF (max")} ${MAX_PDF_MB} Mo)
           <input id="pdf" type="file" accept="application/pdf,.pdf"></span>
         <p id="pdf-info" class="small muted"></p>
-        <label class="check"><span>Analyse visuelle par l'IA<br><span class="tiny muted">Pour les PDF pleins de formules ou de schémas.
-          Plus fiable mais plus lourd à envoyer. Un PDF scanné est toujours analysé visuellement.</span></span>
+        <label class="check"><span>${t("Analyse visuelle par l'IA")}<br><span class="tiny muted">${t("Pour les PDF pleins de formules ou de schémas.\n          Plus fiable mais plus lourd à envoyer. Un PDF scanné est toujours analysé visuellement.")}</span></span>
           <span class="switch"><input id="visual" type="checkbox"><span></span></span></label>
       </div>
     </div>
 
-    <button id="go" class="btn block">⚡ Scanner le cours</button>
+    <button id="go" class="btn block">${t("⚡ Scanner le cours")}</button>
   `;
 
   const $ = (s) => el.querySelector(s);
@@ -71,7 +71,7 @@ export async function render(el) {
       $('#photos-zone').hidden = mode !== 'photos';
       $('#pdf-zone').hidden = mode !== 'pdf';
       say(moryBox, null, {
-        text: mode === 'pdf' ? 'Un PDF avec du texte ? Je le lis directement, sans rien envoyer !' : 'Une page par photo, bien à plat, bien éclairée. Je compresse tout.',
+        text: mode === 'pdf' ? t('Un PDF avec du texte ? Je le lis directement, sans rien envoyer !') : t('Une page par photo, bien à plat, bien éclairée. Je compresse tout.'),
         expression: 'concentration', anim: 'signature',
       });
     };
@@ -80,11 +80,11 @@ export async function render(el) {
   // --- Miniatures ---
   function drawThumbs() {
     $('#thumbs').innerHTML = photos.map((p, i) => `
-      <div class="thumb"><img src="${p.url}" alt="Photo ${i + 1}"><span class="n">${i + 1}</span>
-      <button data-del="${i}" aria-label="Retirer">✕</button></div>`).join('');
+      <div class="thumb"><img src="${p.url}" alt="${t("Photo")} ${i + 1}"><span class="n">${i + 1}</span>
+      <button data-del="${i}" aria-label="${t("Retirer")}">✕</button></div>`).join('');
     const size = photos.reduce((s, p) => s + p.blob.size, 0);
     $('#photo-info').textContent = photos.length
-      ? `${photos.length} photo(s) · ≈ ${(size / 1048576).toFixed(2)} Mo à envoyer après compression`
+      ? `${photos.length} ${t("photo(s) · ≈")} ${(size / 1048576).toFixed(2)} ${t("Mo à envoyer après compression")}`
       : '';
     $('#thumbs').querySelectorAll('[data-del]').forEach((b) => {
       b.onclick = () => {
@@ -101,17 +101,17 @@ export async function render(el) {
     input.value = ''; // permet de reprendre une photo tout de suite
     if (!files.length) return;
     if (photos.length + files.length > MAX_IMAGES) {
-      showError(new Error(`📦 Maximum ${MAX_IMAGES} photos par cours. Découpe ton cours en plusieurs parties.`));
+      showError(new Error(`${t("📦 Maximum")} ${MAX_IMAGES} ${t("photos par cours. Découpe ton cours en plusieurs parties.")}`));
       return;
     }
-    const pg = progress('Mory compresse tes photos', 'mory');
+    const pg = progress(t('Mory compresse tes photos'), 'mory');
     try {
       for (let i = 0; i < files.length; i++) {
-        pg.set(`Photo ${i + 1}/${files.length}…`);
+        pg.set(`${t("Photo")} ${i + 1}/${files.length}…`);
         const blob = await compressImage(files[i]);
         photos.push({ blob, url: URL.createObjectURL(blob) });
       }
-      say(moryBox, null, { text: `${photos.length} page(s) prête(s). Encore une ou on lance le scan ?`, expression: 'joie', anim: 'bounce' });
+      say(moryBox, null, { text: `${photos.length} ${t("page(s) prête(s). Encore une ou on lance le scan ?")}`, expression: 'joie', anim: 'bounce' });
       vibrate();
     } catch (e) {
       showError(e);
@@ -127,7 +127,7 @@ export async function render(el) {
     pdfFile = e.target.files[0] || null;
     $('#pdf-info').textContent = pdfFile ? `${pdfFile.name} · ${(pdfFile.size / 1048576).toFixed(2)} Mo` : '';
     if (pdfFile && pdfFile.size > MAX_PDF_MB * 1048576) {
-      showError(new Error(`📦 Fichier trop gros (${(pdfFile.size / 1048576).toFixed(1)} Mo). Maximum : ${MAX_PDF_MB} Mo.`));
+      showError(new Error(`${t("📦 Fichier trop gros (")}${(pdfFile.size / 1048576).toFixed(1)} ${t("Mo). Maximum :")} ${MAX_PDF_MB} Mo.`));
       pdfFile = null;
     }
   };
@@ -137,11 +137,11 @@ export async function render(el) {
     const title = $('#title').value.trim();
     const subject = $('#subject').value.trim();
     const moan = (text) => { say(moryBox, null, { text, expression: 'surprise', anim: 'shake' }); vibrate([30, 30, 30]); };
-    if (!title) { moan('Il me faut un titre pour ranger le cours !'); $('#title').focus(); return; }
-    if (mode === 'photos' && !photos.length) { moan('Aucune photo… Ajoute au moins une page !'); return; }
-    if (mode === 'pdf' && !pdfFile) { moan('Choisis un fichier PDF d’abord.'); return; }
+    if (!title) { moan(t('Il me faut un titre pour ranger le cours !')); $('#title').focus(); return; }
+    if (mode === 'photos' && !photos.length) { moan(t('Aucune photo… Ajoute au moins une page !')); return; }
+    if (mode === 'pdf' && !pdfFile) { moan(t('Choisis un fichier PDF d’abord.')); return; }
 
-    const pg = progress('Mory scanne ton cours', 'mory');
+    const pg = progress(t('Mory scanne ton cours'), 'mory');
     let course = null;
     try {
       if (mode === 'pdf') {
@@ -158,7 +158,7 @@ export async function render(el) {
       if (course.pages.length < course.totalUnits) await transcribeCourse(course, pg.set);
       pg.done();
       sound('good');
-      toast('✅ Mory : cours scanné et rangé !', 'ok');
+      toast(t('✅ Mory : cours scanné et rangé !'), 'ok');
       celebrate(await addXp(XP_RULES.courseAdded));
       // Direction les stories : le résumé s'écrit en direct (streaming),
       // puis fiches et quiz se préparent en arrière-plan.

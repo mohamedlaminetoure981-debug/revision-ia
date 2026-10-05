@@ -18,6 +18,7 @@
 
 import * as db from './db.js';
 import { today, addDays } from './srs.js';
+import { t } from '../i18n/index.js';
 
 /** XP gagnés par action. */
 export const XP_RULES = {
@@ -39,10 +40,10 @@ export const XP_RULES = {
 
 /** Objectifs du jour affichés sur l'accueil. */
 export const DAILY_GOALS = [
-  { id: 'cards', label: 'Révise 10 fiches', target: 10, icon: '🗂️' },
-  { id: 'quizzes', label: 'Fais 1 quiz', target: 1, icon: '🎯' },
-  { id: 'summaries', label: 'Lis 1 résumé', target: 1, icon: '📖' },
-  { id: 'exercises', label: 'Fais 1 exercice avec Awa', target: 1, icon: '✍️' },
+  { id: 'cards', label: t('Révise 10 fiches'), target: 10, icon: '🗂️' },
+  { id: 'quizzes', label: t('Fais 1 quiz'), target: 1, icon: '🎯' },
+  { id: 'summaries', label: t('Lis 1 résumé'), target: 1, icon: '📖' },
+  { id: 'exercises', label: t('Fais 1 exercice avec Awa'), target: 1, icon: '✍️' },
 ];
 
 /** Paliers de la série qui font évoluer l'aura du compagnon. */
@@ -72,7 +73,7 @@ export async function saveProfile(p) {
 /** Crée un nouveau profil (première ouverture). */
 export async function createProfile(name, companion) {
   return saveProfile({
-    name: name.trim() || 'Champion',
+    name: name.trim() || t('Champion'),
     companion,
     xp: 0,
     streak: { count: 0, last: null },

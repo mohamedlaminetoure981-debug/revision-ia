@@ -15,12 +15,13 @@
 import * as db from './db.js';
 import { TEAM } from '../data/characters.js';
 import { latexToText } from './mathfix.js';
+import { t } from '../i18n/index.js';
 
 export const RARITIES = [
-  { id: 'commune', name: 'Commune', stars: 1, color: '#9AA3B5', min: 1 },
-  { id: 'rare', name: 'Rare', stars: 2, color: '#22D3EE', min: 6 },
-  { id: 'epique', name: 'Épique', stars: 3, color: '#A855F7', min: 15 },
-  { id: 'legendaire', name: 'Légendaire', stars: 4, color: '#FFD23F', min: 35 },
+  { id: 'commune', name: t('Commune'), stars: 1, color: '#9AA3B5', min: 1 },
+  { id: 'rare', name: t('Rare'), stars: 2, color: '#22D3EE', min: 6 },
+  { id: 'epique', name: t('Épique'), stars: 3, color: '#A855F7', min: 15 },
+  { id: 'legendaire', name: t('Légendaire'), stars: 4, color: '#FFD23F', min: 35 },
 ];
 const RANK = Object.fromEntries(RARITIES.map((r, i) => [r.id, i]));
 
