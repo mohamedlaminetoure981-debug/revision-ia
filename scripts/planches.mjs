@@ -635,7 +635,7 @@ export async function processSheets(sharp) {
       // Option "bord" du cadrage : efface les filets collés au bord gauche/droit du cadre
       // (ex. bras levé coupé par le cadre qui ne laisse qu'un trait). Seulement si demandé.
       if (c.cadrage && Number(c.cadrage.bord) > 0) canvas = await trimEdgeSlivers(sharp, canvas, Number(c.cadrage.bord));
-      if (c.expr === 'neutre' && !c.cadrage) neutreCanvas = canvas;
+      if (c.expr === 'neutre') neutreCanvas = canvas; // portrait final, même recadré (calques.mjs recale)
       const v = `?v=${c.hash}`;
       const base = `characters/${id}/${c.expr}`;
       files[`${base}.webp`] = await sharp(canvas).resize(...SIZES.small).webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();

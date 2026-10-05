@@ -494,6 +494,10 @@ différences de couleur de l'IA sont corrigées. L'appli fait alors **cligner** 
 (toutes les 2 à 6 s, parfois deux fois) et **bouger sa bouche** à chaque syllabe quand
 sa bulle s'écrit (sur l'expression neutre). Le Panneau créateur indique ✅ quand c'est actif.
 Sans ces fichiers, rien ne change. Les retouches elles-mêmes ne sont pas publiées.
+Retouche ratée (l'IA a changé plus que les yeux ou la bouche : sourcils, vêtements…) :
+la refaire, ou désactiver ce calque dans le `planches.json` du perso :
+`"calques": { "bouche": false }` (ou `"yeux": false`). Ex. Sora : sa bouche ouverte
+changeait aussi ses sourcils et son sweat.
 
 ### Animations
 Dans `src/styles/characters.css` : animations de base (respiration, clignement, cheveux),
@@ -1028,8 +1032,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
-- ✅ **v1.17.2** : clignement et bouche actifs pour Kaï, Mory, Nia, Ren, Awa, Tidiane et Binta
-  (zone de recherche plus robuste dans `scripts/calques.mjs`).
+- ✅ **v1.17.2** : clignement actif pour les 8 persos, bouche pour 7 (Sora : à refaire) ;
+  zone de recherche plus robuste dans `scripts/calques.mjs`.
 - ✅ **v1.17.1** : cadrage de Sora (puffs entiers), bord d'Awa nettoyé, Panneau créateur
   sans défilement horizontal, bulles des scènes de groupe lisibles (temps de lecture,
   toucher = suivante, répliques ≤ 8 mots).

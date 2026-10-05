@@ -20,7 +20,7 @@
 // Sans variante : rien ne change.
 // =====================================================================
 
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { detectKey, keyer, cutOut, measure, gray, shrink, bestMatch } from './planches.mjs';
@@ -120,9 +120,13 @@ function boxBlur(src, w, h, r) {
  */
 export async function buildLayers(sharp, dir, id, neutre, head) {
   const files = {}; const calques = {}; const report = {};
+  // planches.json peut désactiver un calque : "calques": { "bouche": false } (retouche ratée).
+  let off = {};
+  try { off = JSON.parse(readFileSync(join(dir, 'planches.json'), 'utf8')).calques || {}; } catch { /* pas de réglage */ }
   for (const [kind, L] of Object.entries(LAYERS)) {
     const file = variantFile(dir, L.file);
     if (!file) continue;
+    if (off[kind === 'blink' ? 'yeux' : 'bouche'] === false) { report[L.label] = 'désactivé dans planches.json'; continue; }
     try {
       // 1. Détourage de la variante
       const { data: px, info } = await sharp(file).rotate().removeAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -206,13 +210,19 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
         }
         if (any >= 40) {
           // Ce qui change touche le haut ou le bas de la zone (ex. yeux coupés en deux) :
-          // on agrandit la zone de ce côté et on recommence (4 fois au plus).
-          let topN = 0; let botN = 0;
+          // on agrandit la zone de ce côté et on recommence (4 fois au plus). Seulement
+          // pour les yeux : pour la bouche, l'IA redessine parfois le vêtement juste en
+          // dessous, qu'il ne faut pas reprendre.
+          let topN = 0; let botN = 0; let leftN = 0; let rightN = 0;
           for (let y = 0; y < 4; y++) for (let x = 0; x < zw; x++) { topN += mask[y * zw + x]; botN += mask[(zh - 1 - y) * zw + x]; }
-          const add = Math.round(zh * 0.25);
-          if (grow < 4 && ((botN >= 12 && zy1 < H) || (topN >= 12 && zy0 > 0))) {
+          for (let y = 0; y < zh; y++) for (let x = 0; x < 4; x++) { leftN += mask[y * zw + x]; rightN += mask[y * zw + zw - 1 - x]; }
+          const up = topN >= 12 && zy0 > 0; const down = botN >= 12 && zy1 < H;
+          const left = leftN >= 12 && zx0 > 0; const right = rightN >= 12 && zx1 < W;
+          if (kind === 'blink' && grow < 4 && (up || down || left || right)) {
             grow++;
-            zones.splice(zi + 1, 0, [zx0, zx1, topN >= 12 ? Math.max(0, zy0 - add) : zy0, botN >= 12 ? Math.min(H, zy1 + add) : zy1]);
+            const ay = Math.round(zh * 0.25); const ax = Math.round(zw * 0.15);
+            zones.splice(zi + 1, 0, [left ? Math.max(0, zx0 - ax) : zx0, right ? Math.min(W, zx1 + ax) : zx1,
+              up ? Math.max(0, zy0 - ay) : zy0, down ? Math.min(H, zy1 + ay) : zy1]);
             continue;
           }
           break;
