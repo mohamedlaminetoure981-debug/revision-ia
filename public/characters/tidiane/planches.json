@@ -7,5 +7,6 @@
       "celebration": [50.4, 50.8, 49.6, 49.2]
     }
   },
-  "planche-b": { "grille": [2, 2], "cases": { "encouragement": 1, "surprise": 2, "concentration": 3, "clin": 4 } }
+  "planche-b": { "grille": [2, 2], "cases": { "surprise": 2, "concentration": 3, "clin": 4 } },
+  "planche-c": { "expression": "encouragement", "cadrage": { "encouragement": { "zoom": 0.76, "dx": -9, "fondu": false } } }
 }

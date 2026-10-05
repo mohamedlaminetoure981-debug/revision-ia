@@ -60,7 +60,11 @@ function readConfig(dir) {
     // Planche à UN SEUL portrait : "planche-c": "reflexion" (ou { "expression": "reflexion" })
     const c = typeof raw === 'string' ? { expression: raw } : raw || {};
     if (c.expression) Object.assign(c, { grille: [1, 1], cases: { [c.expression]: 1 } });
-    if (file) out[stem] = { file, grille: c.grille || [2, 2], cases: c.cases || {}, zones: c.zones || {}, fond: c.fond };
+    if (file) {
+      out[stem] = { file, grille: c.grille || [2, 2], cases: c.cases || {}, zones: c.zones || {}, fond: c.fond };
+      // Réglage de cadrage optionnel par expression (geste qui dépasse du cadre) : voir README.
+      if (c.cadrage) out[stem].cadrage = c.cadrage;
+    }
   }
   return { sheets: out, error, cfgFile: existsSync(cfgFile) ? cfgFile : null };
 }
@@ -537,7 +541,7 @@ export async function processSheets(sharp) {
         if (!box) { rep[expr] = `${t.label} vide`; continue; }
         const cell = keepMain(cutOut(px, W, zBg, box, kk), box);
         if (!cell) { rep[expr] = `${t.label} vide`; continue; }
-        cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h), hash });
+        cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h), hash, cadrage: (s.cadrage || {})[expr] });
       }
     }
     // Même expression dans plusieurs planches : la dernière remplace les précédentes.
@@ -565,10 +569,21 @@ export async function processSheets(sharp) {
     const G = Math.min(need, (OUT_W * 0.8) / R.head);
     images[id] = {};
     for (const c of cells) {
-      if (c.cutL || c.cutR) fadeSides(c.rgba, c.w, c.h, c.cutL, c.cutR);
+      if ((c.cutL || c.cutR) && !(c.cadrage && c.cadrage.fondu === false)) fadeSides(c.rgba, c.w, c.h, c.cutL, c.cutR);
       if (c.cutT) fadeTop(c.rgba, c.w, c.h); // cheveux coupés par le bord de la case : fondu
-      const s = G * c.sigma;
-      let left = Math.round(OUT_W / 2 + G * (c.tx - R.center)); const top = Math.round(TOP + G * (c.ty - R.top));
+      let s = G * c.sigma;
+      let left = Math.round(OUT_W / 2 + G * (c.tx - R.center)); let top = Math.round(TOP + G * (c.ty - R.top));
+      // Cadrage optionnel de CETTE expression (planches.json → "cadrage") : léger dézoom
+      // autour des yeux (ils restent à la même hauteur) + décalage en % de l'image,
+      // et "fondu": false pour ne pas estomper le bord (main au bord de la planche).
+      // Sans réglage, rien ne change.
+      if (c.cadrage) {
+        const z = Number(c.cadrage.zoom) || 1;
+        const px = OUT_W / 2; const py = TOP + 0.78 * G * R.head; // centre de la tête, ligne des yeux
+        s *= z;
+        left = Math.round(px + z * (left - px) + (Number(c.cadrage.dx) || 0) * OUT_W / 100);
+        top = Math.round(py + z * (top - py) + (Number(c.cadrage.dy) || 0) * OUT_H / 100);
+      }
       // Buste trop court pour atteindre le bas : fondu doux au lieu d'une coupe nette.
       if (top + s * c.h < OUT_H - 2) fadeBottom(c.rgba, c.w, c.h);
       const rw = Math.max(1, Math.round(c.w * s)); const rh = Math.max(1, Math.round(c.h * s));

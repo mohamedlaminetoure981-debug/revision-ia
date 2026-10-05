@@ -44,6 +44,10 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   pour une disposition irrégulière. Expressions : neutre, joie, réflexion, célébration,
   encouragement, surprise, clin, concentration. Une planche peut n'avoir qu'un seul portrait.
   Le build (`scripts/planches.mjs`) découpe et optimise tout seul. Détails : README section 8.
+  **Cadrage par expression (optionnel)** pour un geste qui dépasse du cadre (main levée…) :
+  dans la planche, `"cadrage": { "<expression>": { "zoom": 0.76, "dx": -9, "fondu": false } }`
+  (dézoom autour des yeux, décalage en % de l'image, pas de fondu des bords). Utilisé
+  uniquement s'il est présent ; ex. Tidiane/encouragement. Détails : README section 8.
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
   et BD dans `src/data/comic/chapitres/chNN.js`. Les révisions donnent des points
   (seuils dans `src/core/story.js`) ; chaque matière est un arc avec un boss (`src/views/boss.js`).

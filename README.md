@@ -378,6 +378,24 @@ de la liste qui compte.
 
 Pour changer une expression, il suffit de modifier un numéro de case dans ce fichier.
 
+**Cadrage d'une expression avec un geste (optionnel).** Quand une main ou un bras dépasse
+du cadre (ex. main levée à droite), on peut régler le cadrage de CETTE expression
+seulement, avec `"cadrage"` dans la planche concernée. Sans `"cadrage"`, rien ne change
+(les autres portraits sortent identiques à l'octet près). Exemple (Tidiane, encouragement) :
+```json
+"planche-c": { "expression": "encouragement",
+  "cadrage": { "encouragement": { "zoom": 0.76, "dx": -9, "fondu": false } } }
+```
+- `zoom` : dézoom autour des **yeux** (1 = normal, 0.76 = visage à 76 %). Les yeux restent
+  à la même hauteur que les autres expressions. Prends le plus grand zoom qui laisse
+  la main entière avec une petite marge (≈ 15 px sur 720).
+- `dx` / `dy` : décalage en % de l'image (`dx` négatif = vers la gauche, `dy` négatif = vers
+  le haut). Décaler vers le côté opposé au geste permet de moins dézoomer.
+- `fondu` : `false` pour ne pas estomper le bord de l'image (par défaut, le bord est estompé
+  quand le buste touche le bord de la planche, ce qui effacerait le bout des doigts).
+- Les trois réglages sont facultatifs. Pour vérifier : lancer le build et regarder le
+  portrait (doigts entiers, yeux alignés avec les autres expressions).
+
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
 - il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) : vert,
   ou **magenta** (`#FF00FF`) pour un perso habillé en vert, comme Sora ;
