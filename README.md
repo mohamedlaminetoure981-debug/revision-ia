@@ -56,8 +56,11 @@ jamais dans le code ni sur GitHub, et elle n'est pas incluse dans les sauvegarde
 ⚠️ Ne partage jamais ta clé (capture d'écran, message…). Si elle fuite, supprime-la sur
 AI Studio et crée-en une nouvelle.
 
-L'offre gratuite a des **quotas** (nombre de requêtes par minute et par jour). Si tu les
-dépasses, Tidiane te le dit : attends quelques minutes, ou change de modèle (section 11).
+L'offre gratuite a des **quotas** (nombre de requêtes par minute et par jour, **pour chaque
+modèle**). L'appli passe toute seule au modèle gratuit suivant quand l'un est épuisé, et
+Réglages → **📊 Quota Gemini aujourd'hui** montre les demandes du jour par modèle et l'heure
+de la prochaine recharge (minuit heure du Pacifique, affichée à l'heure de ton téléphone).
+Quand tout est épuisé, Tidiane te donne l'heure de recharge (section 11).
 
 ---
 
@@ -227,11 +230,12 @@ revision-ia/
 1. **Ajouter** : les photos sont réduites et compressées (≈ 150-300 Ko chacune). Un PDF
    qui contient du texte est lu **directement sur l'appareil** (rien n'est envoyé). Un PDF
    scanné est transformé en images.
-2. **Transcription** : les images sont envoyées à Gemini **par lots de 3**, qui les
-   transforme en texte. Chaque lot réussi est enregistré : si la connexion coupe, on
-   **reprend** là où on s'était arrêté.
-3. Ensuite, résumé / fiches / quiz sont créés **à partir du texte** (léger), jamais en
-   renvoyant les photos. Le cours est découpé en morceaux pour ne rien oublier.
+2. **Transcription** : les images sont envoyées à Gemini **par lots de 8** (lot réduit de
+   moitié tout seul s'il est trop lourd ou si la connexion est trop lente). Chaque page
+   reçue est enregistrée aussitôt : si la connexion coupe, on **reprend** là où on s'était arrêté.
+3. Ensuite, **résumé + fiches + quiz arrivent dans UNE SEULE demande** par morceau du cours
+   (morceaux de 20 000 caractères), **à partir du texte** (léger), jamais en renvoyant les
+   photos. Le résumé s'affiche en streaming, les fiches et le quiz arrivent juste après.
 4. Chaque fiche / question cite **le passage source** (page ou photo + citation). L'appli
    vérifie que la citation existe vraiment dans le cours : ✓ vérifiée, ≈ proche,
    ⚠ non retrouvée.
@@ -481,6 +485,7 @@ Tout passe par **`src/core/mathfix.js`** :
 |---|---|
 | `SYSTEM` | rôle général de l'IA (ton, règles, LaTeX, citations) |
 | `transcribePrompt` + `TRANSCRIBE_SCHEMA` | photos → texte |
+| `packPrompt` + `packSchema` | **résumé + fiches + quiz en une seule demande** (préparation d'un cours) |
 | `summaryPrompt` + `SUMMARY_SCHEMA` | résumé partie par partie + blocs « explication » |
 | `cardsPrompt` + `CARDS_SCHEMA` | fiches question/réponse + source |
 | `quizPrompt` + `QUIZ_SCHEMA` | QCM + explications + source |
@@ -542,7 +547,7 @@ Binta fête automatiquement chaque nouveau badge et chaque niveau gagné.
 - **Mode vérification** (Réglages → 🔍) : après chaque génération, un 2e appel à l'IA relit
   les fiches, les QCM et les corrections en les comparant au cours. Il corrige les erreurs
   (badge « 🔍 corrigée par la vérif ») ou signale les fiches fausses (mises dans « À corriger »)
-  et retire les questions ambiguës. ⚠️ Utilise environ 2× plus de quota gratuit.
+  et retire les questions ambiguës. ⚠️ **Double la consommation de quota** : désactivé par défaut.
 - **Examen blanc (Ren)** : Quiz → Examen blanc. Choisis un ou plusieurs cours et une durée.
   Le chrono continue même si tu quittes l'écran, et tes réponses sont enregistrées au fur
   et à mesure (rien n'est perdu si la connexion coupe : bouton « Réessayer » la correction).
@@ -889,10 +894,23 @@ Pour changer la valeur par défaut : `DEFAULT_SETTINGS.model` dans `src/core/db.
   l'appli passe tout de suite au suivant de `MODEL_CHAIN` (attente 1 s puis 3 s max),
   puis revient au modèle principal pour la requête suivante. Le modèle utilisé s'affiche
   discrètement pendant le chargement.
-- **En arrière-plan** : après l'import, résumé d'abord (streaming), puis fiches (2 morceaux
-  à la fois) et quiz se préparent pendant que tu lis (`prepareCourse` dans
-  `src/core/generate.js`, suivi par `src/core/jobs.js`).
+- **En arrière-plan** : après l'import, UNE demande par morceau renvoie le résumé
+  (streaming) puis les fiches et les questions du quiz (`prepareCourse` / `generatePack`
+  dans `src/core/generate.js`, suivi par `src/core/jobs.js`).
 - **Consignes courtes** et texte du cours compacté avant l'envoi.
+
+### Comment l'appli économise le quota gratuit
+- **Résumé + fiches + quiz = 1 demande par morceau** (avant : 1 + 1 + 1, et le texte du
+  cours envoyé 3 fois). Morceaux de 20 000 caractères (avant 12 000).
+- **Photos par lots de 8** (avant 3), compressées en JPEG qualité 0,6.
+- **Tout le reste à la demande** : manga, Explique-moi, exercices, examen blanc, nouveau
+  quiz ne partent que si tu appuies sur le bouton. Ce qui est déjà enregistré (planches,
+  explications, corrections d'une même réponse) n'est **jamais redemandé**.
+- **Plusieurs modèles** (`MODEL_CHAIN` dans `src/core/gemini.js`) : chaque modèle gratuit a
+  son propre quota quotidien. Un modèle qui répond « quota du jour dépassé » (429) est
+  mémorisé jusqu'à la recharge et n'est plus retenté (`src/core/quota.js`).
+- **Compteur** : Réglages → 📊 Quota Gemini aujourd'hui (demandes par modèle, état,
+  heure de la prochaine recharge).
 - **Mesures** : Panneau créateur → ⏱️ Vitesse de l'IA (temps du 1er texte, temps total,
   modèle, réessais) + **banc d'essai avant / après** sur un de tes cours.
 
@@ -914,7 +932,7 @@ La clé API et les photos ne sont pas incluses.
 | Problème | Solution |
 |---|---|
 | « 🔑 Clé API invalide » | Recopie la clé depuis AI Studio (sans espace), puis Tester. |
-| « ⏳ Quota gratuit dépassé » | Attends quelques minutes (ou demain pour le quota du jour), ou change de modèle. |
+| « ⏳ Quota gratuit dépassé » | Quota par minute : attends 1 minute. Quota du jour épuisé sur tous les modèles : Tidiane donne l'heure de recharge (aussi dans Réglages → 📊 Quota). |
 | « 🤖 Modèle introuvable » | Le nom du modèle a changé : mets-en un de la liste officielle. |
 | « 📡 Connexion interrompue » | L'appli réessaie toute seule. Ton travail déjà fait est gardé : bouton « Reprendre / Continuer ». |
 | « 📦 Fichier trop gros » | PDF > 50 Mo ou > 80 pages : découpe-le en plusieurs cours. |
@@ -950,6 +968,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.15** : économie de quota (résumé + fiches + quiz en 1 demande, photos par 8,
+  bascule entre modèles gratuits avec mémoire des modèles épuisés, compteur dans les Réglages).
 
 Bibliothèques utilisées (incluses dans l'appli, rien à télécharger en plus) :
 [Vite](https://vite.dev), [KaTeX](https://katex.org) (formules),

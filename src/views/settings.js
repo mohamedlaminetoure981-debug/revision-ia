@@ -5,7 +5,8 @@
 
 import * as db from '../core/db.js';
 import { esc, toast, showError, confirmBox, progress, mascot } from '../ui/ui.js';
-import { testConnection } from '../core/gemini.js';
+import { testConnection, MODEL_CHAIN } from '../core/gemini.js';
+import { loadQuota, resetTimeText } from '../core/quota.js';
 import { loadFxPrefs, vibrate, sound } from '../ui/fx.js';
 import { applyTheme } from '../main.js';
 import { openInstall, isInstalled } from '../ui/install.js';
@@ -19,6 +20,14 @@ const SUGGESTED_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gem
 export async function render(el) {
   const s = {};
   for (const k of ['apiKey', 'model', 'theme', 'sounds', 'vibration', 'verifyMode', 'council', 'volume']) s[k] = await db.getSetting(k);
+
+  // Compteur du jour : demandes réussies par modèle, modèles épuisés.
+  const quota = await loadQuota();
+  const primary = s.model || db.DEFAULT_SETTINGS.model;
+  const models = [primary, ...MODEL_CHAIN.filter((m) => m !== primary)];
+  for (const m of Object.keys(quota.counts)) if (!models.includes(m)) models.push(m);
+  const totalReq = Object.values(quota.counts).reduce((a, b) => a + b, 0);
+  const allOut = models.every((m) => quota.exhausted[m]);
 
   let usage = '';
   try {
@@ -46,11 +55,24 @@ export async function render(el) {
       <datalist id="models">${SUGGESTED_MODELS.map((m) => `<option value="${m}">`).join('')}</datalist>
       <p class="tiny muted">Par défaut : le modèle « lite », le plus rapide. Si un modèle est surchargé ou à court de quota, l'appli bascule toute seule sur un autre.
         <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Liste des modèles</a></p>
-      ${toggle('verifyMode', '🔍 Mode vérification', s.verifyMode, 'Un 2e appel à l’IA relit les fiches, quiz et corrections en les comparant au cours, et corrige ou signale les erreurs. Plus fiable, mais utilise 2× plus de quota.')}
+      ${toggle('verifyMode', '🔍 Mode vérification', s.verifyMode, '⚠️ <strong>Double la consommation de quota</strong> (moitié moins de cours par jour). Un 2e appel à l’IA relit les fiches, quiz et corrections et corrige ou signale les erreurs. Désactivé par défaut.')}
       <div class="row nowrap" style="margin-top:10px">
         <button class="btn grow" id="save">💾 Enregistrer</button>
         <button class="btn ghost grow" id="test">🧪 Tester</button>
       </div>
+    </div>
+
+    <div class="tile" style="margin-bottom:12px">
+      <h2 style="margin-top:0">📊 Quota Gemini aujourd’hui</h2>
+      <p class="small muted">Chaque modèle gratuit a son propre quota quotidien. Quand l’un est épuisé, l’appli passe tout seule au suivant.</p>
+      <table class="data-table" style="width:100%">
+        <thead><tr><th style="text-align:left">Modèle</th><th>Demandes</th><th>État</th></tr></thead>
+        <tbody>${models.map((m) => `<tr><td class="tiny" style="word-break:break-all">${esc(m)}</td><td class="center"><strong>${quota.counts[m] || 0}</strong></td>
+          <td class="center tiny">${quota.exhausted[m] === 'quota' ? '⛔ épuisé' : quota.exhausted[m] === 'absent' ? '❌ indisponible' : '✅ dispo'}</td></tr>`).join('')}</tbody>
+      </table>
+      <p class="small" style="margin:10px 0 0">Total : <strong>${totalReq}</strong> demande${totalReq > 1 ? 's' : ''} aujourd’hui.
+        🔄 Prochaine recharge : <strong>${resetTimeText()}</strong> (heure de ton téléphone).</p>
+      ${allOut ? `<p class="small" style="color:var(--bad);margin:6px 0 0">Tous les modèles sont épuisés : l’IA revient à ${resetTimeText()}. Tu peux réviser tes fiches et quiz en attendant !</p>` : ''}
     </div>
 
     <div class="tile" style="margin-bottom:12px">
@@ -183,7 +205,7 @@ export async function render(el) {
   });
   $('#verifyMode').onchange = async (e) => {
     await db.setSetting('verifyMode', e.target.checked);
-    toast(e.target.checked ? '🔍 Mode vérification activé' : 'Mode vérification désactivé', 'ok');
+    toast(e.target.checked ? '🔍 Mode vérification activé : il double la consommation de quota' : 'Mode vérification désactivé', 'ok');
   };
   $('#volume').onchange = async (e) => {
     await db.setSetting('volume', Number(e.target.value) / 100);

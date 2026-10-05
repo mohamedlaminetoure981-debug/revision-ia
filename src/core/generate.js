@@ -7,28 +7,47 @@
 //  - si la connexion coupe, les morceaux déjà faits sont gardés et
 //    on reprend au morceau suivant.
 // L'avancement est noté dans course.progress[type] = { done: [indices] }.
+//
+// ÉCONOMIE DE QUOTA : à la préparation d'un cours, résumé + fiches + quiz
+// sont demandés ENSEMBLE, en une seule demande par morceau (generatePack).
+// Le reste (manga, Explique-moi, exercices, examen blanc, nouveau quiz) ne
+// part qu'à la demande de l'élève, et ce qui est déjà enregistré n'est
+// jamais redemandé.
 // =====================================================================
 
 import * as db from './db.js';
 import { generateJSON, blobToBase64 } from './gemini.js';
 import * as P from '../data/prompts.js';
 import { initialState } from './srs.js';
-import { startJob } from './jobs.js';
+import { startJob, getJob } from './jobs.js';
 
-const CHUNK_CHARS = 12000; // taille maximale d'un morceau (en caractères)
+const CHUNK_CHARS = 20000; // taille maximale d'un morceau (en caractères)
+const OLD_CHUNK_CHARS = 12000; // ancienne taille : gardée pour les cours déjà commencés
+const QUIZ_QUESTIONS = 10; // questions du quiz préparé automatiquement
 
 /** "Page" ou "Photo" selon le type de cours. */
 export function unitLabel(course) {
   return course.sourceType === 'photos' ? 'Photo' : 'Page';
 }
 
-/** Découpe les pages du cours en morceaux d'environ CHUNK_CHARS caractères. */
+/**
+ * Taille des morceaux d'un cours. Un cours dont la génération a commencé avec
+ * l'ancienne taille la garde (sinon les parties déjà faites ne correspondraient plus).
+ */
+function chunkSize(course) {
+  if (course.chunkChars) return course.chunkChars;
+  const started = course.summary || Object.keys(course.summaryParts || {}).length || Object.keys(course.progress || {}).length;
+  return started ? OLD_CHUNK_CHARS : CHUNK_CHARS;
+}
+
+/** Découpe les pages du cours en morceaux d'environ chunkSize caractères. */
 export function chunks(course) {
+  const max = chunkSize(course);
   const out = [];
   let cur = [];
   let size = 0;
   for (const p of course.pages) {
-    if (cur.length && size + p.text.length > CHUNK_CHARS) {
+    if (cur.length && size + p.text.length > max) {
       out.push(cur);
       cur = [];
       size = 0;
@@ -98,6 +117,7 @@ async function runChunkedParallel(course, kind, label, onStatus, fn, limit = 2) 
  * @param {Function} [onSection] (section, indexGlobal) appelé à chaque nouvelle partie reçue
  */
 export async function generateSummary(course, onStatus, onSection) {
+  course.chunkChars = chunkSize(course);
   course.summaryParts ||= {};
   const parts = chunks(course);
   // Nombre de parties déjà prêtes avant chaque morceau (pour l'index global).
@@ -131,6 +151,102 @@ export async function generateSummary(course, onStatus, onSection) {
   return course.summary;
 }
 
+// ---------------------------------------------------------------------
+// Résumé + fiches + quiz en UNE demande par morceau (préparation d'un cours)
+// ---------------------------------------------------------------------
+/** Une question de QCM est-elle bien formée ? */
+const goodQuestion = (q) => q && Array.isArray(q.choices) && q.choices.length >= 2 && q.correctIndex >= 0 && q.correctIndex < q.choices.length;
+
+/** Enregistre les fiches d'un morceau (après vérification éventuelle). */
+async function saveCards(course, pages, i, cards, status) {
+  if (await db.getSetting('verifyMode')) cards = await verifyCards(course, pages, cards, status);
+  const now = new Date().toISOString();
+  await db.putMany('cards', cards.map((c) => ({
+    id: db.newId(),
+    courseId: course.id,
+    subject: course.subject,
+    chunk: i,
+    part: c.part,
+    question: c.question,
+    answer: c.answer,
+    source: c.source,
+    check: c.check, // 'ok' | 'corrige' | 'faux' (seulement en mode vérification)
+    checkComment: c.checkComment,
+    flagged: c.check === 'faux', // fiche jugée fausse → à corriger, pas proposée en révision
+    createdAt: now,
+    ...initialState(),
+  })));
+}
+
+/**
+ * Prépare le cours : pour chaque morceau, UNE demande renvoie le résumé
+ * (en streaming), les fiches et les questions du quiz. Seules les parties
+ * qui manquent sont demandées (reprise après coupure, cours déjà préparé…).
+ * @param {Function} [onSection] (section, indexGlobal) à chaque partie du résumé reçue
+ */
+export async function generatePack(course, onStatus, onSection) {
+  course.chunkChars = chunkSize(course); // taille figée pour ce cours
+  course.summaryParts ||= {};
+  course.quizParts ||= {};
+  const parts = chunks(course);
+  const unit = unitLabel(course);
+  const sumP = prog(course, 'summary');
+  const cardsP = prog(course, 'cards');
+  const hasQuiz = (await db.getByIndex('quizzes', 'courseId', course.id)).length > 0;
+  const perChunk = Math.max(2, Math.ceil(QUIZ_QUESTIONS / parts.length));
+  const before = (i) => Object.keys(course.summaryParts).filter((k) => Number(k) < i).reduce((s, k) => s + course.summaryParts[k].length, 0);
+  // Les parties déjà reçues (reprise après coupure) sont renvoyées tout de suite.
+  Object.keys(course.summaryParts).sort((a, b) => a - b).forEach((k) => {
+    course.summaryParts[k].forEach((sec, j) => onSection?.(sec, before(Number(k)) + j));
+  });
+
+  for (let i = 0; i < parts.length; i++) {
+    const want = { sections: !course.summaryParts[i], cards: !cardsP.done.includes(i), questions: !hasQuiz && !course.quizParts[i] };
+    if (!want.sections && !want.cards && !want.questions) continue;
+    const status = (t) => onStatus?.(`${want.sections ? 'Résumé' : want.cards ? 'Fiches' : 'Quiz'} — partie ${i + 1}/${parts.length}${t ? ' : ' + t : '…'}`);
+    status();
+    const res = await generateJSON({
+      parts: [{ text: P.packPrompt(P.courseText(parts[i], unit), unit, want, perChunk) }],
+      schema: P.packSchema(want),
+      system: P.SYSTEM,
+      temperature: 0.5,
+      onStatus: status,
+      label: `cours ${i + 1}/${parts.length}`,
+      streamKey: want.sections ? 'sections' : undefined,
+      // idx = position dans ce morceau : si un autre modèle reprend la réponse,
+      // les parties déjà affichées sont simplement remplacées (pas de doublon).
+      onItem: (sec, idx) => {
+        if (!sec?.title || !Array.isArray(sec.blocks)) return;
+        onSection?.(sec, before(i) + idx);
+      },
+      check: (json) => {
+        if (want.sections && !json.sections.length) return 'résumé vide';
+        if (want.cards && !json.cards.length) return 'aucune fiche';
+        if (want.questions && !json.questions.some(goodQuestion)) return 'aucune question valable';
+        return null;
+      },
+    });
+    if (want.sections) { course.summaryParts[i] = res.sections; sumP.done.push(i); }
+    if (want.questions) course.quizParts[i] = res.questions.filter(goodQuestion);
+    if (want.cards) { await saveCards(course, parts[i], i, res.cards, status); cardsP.done.push(i); }
+    await db.put('courses', course); // sauvegarde après chaque morceau
+  }
+
+  // Toutes les parties sont prêtes : résumé assemblé dans l'ordre.
+  if (parts.every((_, i) => course.summaryParts[i])) {
+    course.summary = Object.keys(course.summaryParts).sort((a, b) => a - b).flatMap((k) => course.summaryParts[k]);
+  }
+  // Quiz : les questions de chaque morceau forment UN quiz.
+  if (!hasQuiz && parts.every((_, i) => course.quizParts[i])) {
+    let questions = parts.flatMap((_, i) => course.quizParts[i]);
+    if (questions.length && (await db.getSetting('verifyMode'))) questions = await verifyQuiz(course, questions, onStatus);
+    if (questions.length) await db.put('quizzes', { id: db.newId(), courseId: course.id, createdAt: new Date().toISOString(), questions });
+    delete course.quizParts;
+  }
+  await db.put('courses', course);
+  return course.summary;
+}
+
 /** Efface le résumé pour le refaire. */
 export async function resetSummary(course) {
   course.summary = null;
@@ -143,6 +259,7 @@ export async function resetSummary(course) {
 // Fiches
 // ---------------------------------------------------------------------
 export async function generateCards(course, onStatus) {
+  course.chunkChars = chunkSize(course);
   await runChunkedParallel(course, 'cards', 'Fiches', onStatus, async (pages, i, status) => {
     const res = await generateJSON({
       parts: [{ text: P.cardsPrompt(P.courseText(pages, unitLabel(course))) }],
@@ -152,25 +269,8 @@ export async function generateCards(course, onStatus) {
       label: `fiches ${i + 1}`,
       check: (json) => (json.cards.length ? null : 'aucune fiche'),
     });
-    let cards = res.cards;
     // Mode vérification : un 2e appel relit les fiches avant affichage.
-    if (await db.getSetting('verifyMode')) cards = await verifyCards(course, pages, cards, status);
-    const now = new Date().toISOString();
-    await db.putMany('cards', cards.map((c) => ({
-      id: db.newId(),
-      courseId: course.id,
-      subject: course.subject,
-      chunk: i,
-      part: c.part,
-      question: c.question,
-      answer: c.answer,
-      source: c.source,
-      check: c.check, // 'ok' | 'corrige' | 'faux' (seulement en mode vérification)
-      checkComment: c.checkComment,
-      flagged: c.check === 'faux', // fiche jugée fausse → à corriger, pas proposée en révision
-      createdAt: now,
-      ...initialState(),
-    })));
+    await saveCards(course, pages, i, res.cards, status);
   });
 }
 
@@ -289,6 +389,9 @@ export async function generateExercises(course, count, onStatus) {
  * @param {Blob} [image] photo compressée de la réponse manuscrite (facultatif)
  */
 export async function correctExercise(course, exercise, answer, image, onStatus) {
+  // Même réponse (sans photo) déjà corrigée : on réutilise la correction, sans redemander.
+  const same = !image && (exercise.attempts || []).find((a) => !a.hasImage && String(a.answer || '').trim() === String(answer || '').trim());
+  if (same) return same;
   const text = P.courseText(course.pages, unitLabel(course));
   const parts = [{ text: P.correctionPrompt(text, exercise.statement, answer, !!image) }];
   if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: await blobToBase64(image) } });
@@ -370,6 +473,9 @@ export async function generateExam(courses, minutes, onStatus) {
 
 /** Corrige une copie d'examen blanc avec le barème. QCM notés automatiquement. */
 export async function correctExam(exam, courses, answers, onStatus) {
+  // Mêmes réponses déjà corrigées : on réutilise la correction, sans redemander.
+  const same = (exam.attempts || []).find((a) => JSON.stringify(a.answers) === JSON.stringify(answers));
+  if (same) return same;
   onStatus?.('Le jury délibère…');
   const res = await generateJSON({
     parts: [{ text: P.examCorrectionPrompt(multiCourseText(courses), exam, answers) }],
@@ -410,33 +516,31 @@ export function verdictOf(note20) {
 // =====================================================================
 // PRÉPARATION AUTOMATIQUE D'UN COURS (en arrière-plan)
 // ---------------------------------------------------------------------
-//  1. résumé en STREAMING (les stories s'affichent au fur et à mesure) ;
-//  2. puis fiches, puis quiz de 10 questions, pendant que tu lis.
-// Les écrans suivent l'avancement grâce à core/jobs.js.
+// UNE demande par morceau : le résumé arrive en STREAMING (les stories
+// s'affichent au fur et à mesure), puis les fiches et les questions du quiz
+// dans la même réponse. Les écrans suivent l'avancement grâce à core/jobs.js
+// (tâche 'summary' ; 'cards' et 'quiz' suivent la même préparation).
 // =====================================================================
 
 /** Lance (ou rejoint) la préparation d'un cours. Renvoie la tâche "résumé". */
 export function prepareCourse(course) {
+  const existing = getJob(course.id, 'summary');
+  if (existing?.status === 'running') return existing;
   const sections = [];
+  const followers = []; // tâches 'cards' et 'quiz' : même avancement
   const job = startJob(course.id, 'summary', async (update) => {
-    await generateSummary(course, (s) => update({ status: s }), (sec, idx) => {
+    const set = (s) => { update({ status: s }); followers.forEach((u) => u({ status: s })); };
+    await generatePack(course, set, (sec, idx) => {
       sections[idx] = sec;
       update({ sections: sections.slice() });
     });
     return course.summary;
   });
-  job.promise.then(() => { if (job.status === 'done') prepareExtras(course); });
+  for (const kind of ['cards', 'quiz']) {
+    startJob(course.id, kind, (update) => {
+      followers.push(update);
+      return job.promise.then(() => { if (job.status === 'error') throw job.error; });
+    });
+  }
   return job;
-}
-
-/** Fiches puis quiz, l'un après l'autre (pour ne pas saturer le quota gratuit). */
-export async function prepareExtras(course) {
-  const cards = await db.getByIndex('cards', 'courseId', course.id);
-  if (!cards.length || isPartial(course, 'cards')) {
-    await startJob(course.id, 'cards', (update) => generateCards(course, (s) => update({ status: s }))).promise;
-  }
-  const quizzes = await db.getByIndex('quizzes', 'courseId', course.id);
-  if (!quizzes.length) {
-    await startJob(course.id, 'quiz', (update) => generateQuiz(course, 10, (s) => update({ status: s }))).promise;
-  }
 }

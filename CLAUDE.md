@@ -34,6 +34,12 @@ Technique : HTML/CSS/JS sans framework + Vite, IA Google Gemini appelée depuis 
 navigateur (clé saisie dans l'appli, stockée dans IndexedDB, jamais dans le dépôt),
 hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/deploy.yml`).
 
+- **Quota Gemini (gratuit)** : résumé + fiches + quiz = UNE demande par morceau (`generatePack`
+  dans `src/core/generate.js`), photos par lots de 8, le reste seulement à la demande, rien
+  de déjà enregistré n'est redemandé. Bascule entre modèles gratuits (`MODEL_CHAIN` dans
+  `src/core/gemini.js`) ; modèles épuisés mémorisés jusqu'à minuit heure du Pacifique et
+  compteur par modèle (`src/core/quota.js`, Réglages → 📊). Mode vérification = 2× le quota.
+
 - **Code** : `src/core` (logique), `src/views` (écrans), `src/ui` (composants),
   `src/comic` (BD/lecteur), `src/data` (personnages, prompts, histoire), `scripts/` (build).
 - **Personnages** (Kaï, Mory, Nia, Sora, Ren, Awa, Tidiane, Binta) : dessinés en SVG par défaut,

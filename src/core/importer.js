@@ -2,12 +2,15 @@
 // importer.js — Import d'un cours (PDF ou photos) et transcription
 // ---------------------------------------------------------------------
 // Pour économiser ta connexion :
-//  - les photos sont réduites (1600 px max) et compressées en JPEG ;
+//  - les photos sont réduites (1600 px max) et compressées en JPEG (qualité 0,6 :
+//    le texte reste net, le fichier est ~20 % plus léger qu'en 0,7) ;
 //  - un PDF qui contient déjà du texte est lu DIRECTEMENT sur l'appareil,
 //    sans rien envoyer à l'IA ;
 //  - un PDF scanné est transformé en images compressées ;
-//  - les images sont transcrites en texte par petits lots (3 par envoi).
-//    Si la connexion coupe, on peut REPRENDRE là où on s'est arrêté.
+//  - les images sont transcrites en texte par lots de 8 par demande (quota :
+//    3 fois moins de demandes qu'avant). Réponse en streaming : chaque page
+//    reçue est enregistrée aussitôt. Lot trop lourd ou connexion coupée → le
+//    lot est réduit de moitié. On peut toujours REPRENDRE là où on s'est arrêté.
 //  - Ensuite, résumé / fiches / quiz utilisent seulement le texte (léger).
 // =====================================================================
 
@@ -18,8 +21,8 @@ import { SYSTEM, TRANSCRIBE_SCHEMA, transcribePrompt } from '../data/prompts.js'
 export const MAX_PDF_MB = 50; // taille maximale d'un PDF
 export const MAX_IMAGES = 80; // nombre maximal de pages/photos par cours
 const MAX_SIDE = 1600; // taille maximale d'une image (en pixels)
-const JPEG_QUALITY = 0.7; // qualité JPEG (0 à 1) : 0.7 = bon compromis
-const BATCH_SIZE = 3; // images envoyées par requête de transcription
+const JPEG_QUALITY = 0.6; // qualité JPEG (0 à 1) : 0.6 = texte encore net, fichier plus léger
+const BATCH_SIZE = 8; // images envoyées par demande de transcription (réduit tout seul si besoin)
 
 /** Dessine une source (image ou page) dans un canvas réduit puis la compresse en JPEG. */
 function canvasToJpeg(canvas) {
@@ -157,14 +160,16 @@ export async function pendingImages(course) {
 
 /**
  * Transcrit les images du cours en texte, par lots de BATCH_SIZE.
- * Chaque lot réussi est enregistré aussitôt : en cas de coupure, un nouvel
- * appel reprend là où on s'était arrêté.
+ * Chaque page reçue est enregistrée aussitôt : en cas de coupure, un nouvel
+ * appel reprend là où on s'était arrêté (seules les pages manquantes partent).
  */
 export async function transcribeCourse(course, onStatus) {
-  const todo = await pendingImages(course);
   const total = course.totalUnits;
-  for (let i = 0; i < todo.length; i += BATCH_SIZE) {
-    const batch = todo.slice(i, i + BATCH_SIZE);
+  let size = BATCH_SIZE;
+  for (;;) {
+    const todo = await pendingImages(course);
+    if (!todo.length) break;
+    const batch = todo.slice(0, size);
     const numbers = batch.map((b) => b.n);
     onStatus?.(`Transcription ${course.pages.length + 1}–${course.pages.length + batch.length} sur ${total} (envoi des images)…`);
 
@@ -173,24 +178,35 @@ export async function transcribeCourse(course, onStatus) {
       parts.push({ text: `Image n°${im.n} :` });
       parts.push({ inlineData: { mimeType: 'image/jpeg', data: await blobToBase64(im.blob) } });
     }
-    const res = await generateJSON({
-      parts,
-      schema: TRANSCRIBE_SCHEMA,
-      system: SYSTEM,
-      temperature: 0.1,
-      onStatus,
-      // Vérifie que chaque image du lot a bien été transcrite.
-      check: (json) => {
-        const got = new Set(json.pages.map((p) => p.n));
-        const missing = numbers.filter((n) => !got.has(n));
-        return missing.length ? `image(s) ${missing.join(', ')} manquante(s)` : null;
-      },
-    });
-    for (const p of res.pages) {
-      if (numbers.includes(p.n) && !course.pages.some((x) => x.n === p.n)) course.pages.push({ n: p.n, text: p.text });
+    const got = course.pages.length;
+    const keep = (p) => {
+      if (!p || typeof p.text !== 'string' || !numbers.includes(p.n) || course.pages.some((x) => x.n === p.n)) return false;
+      course.pages.push({ n: p.n, text: p.text });
+      course.pages.sort((a, b) => a.n - b.n);
+      return true;
+    };
+    try {
+      const res = await generateJSON({
+        parts,
+        schema: TRANSCRIBE_SCHEMA,
+        system: SYSTEM,
+        temperature: 0.1,
+        onStatus,
+        label: `transcription ×${batch.length}`,
+        // Chaque page complète est gardée dès qu'elle arrive.
+        streamKey: 'pages',
+        onItem: (p) => { if (keep(p)) db.put('courses', course); },
+        check: (json) => (json.pages.some((p) => numbers.includes(p.n)) ? null : 'aucune image transcrite'),
+      });
+      res.pages.forEach(keep);
+    } catch (e) {
+      await db.put('courses', course);
+      // Lot trop lourd, réponse coupée ou connexion trop lente : lot réduit de moitié.
+      if (course.pages.length === got && size > 1 && ['TOO_LONG', 'TOO_BIG', 'NETWORK'].includes(e.code)) { size = Math.ceil(size / 2); continue; }
+      if (course.pages.length === got) throw e;
     }
-    course.pages.sort((a, b) => a.n - b.n);
     await db.put('courses', course); // sauvegarde après chaque lot
+    if (course.pages.length === got) throw new AIError('BAD_JSON', 'Transcription impossible : aucune page lue. Réessaie.');
   }
   return course;
 }

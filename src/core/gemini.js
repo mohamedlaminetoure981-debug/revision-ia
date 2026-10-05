@@ -10,6 +10,10 @@
 //  - BASCULE AUTOMATIQUE : si un modèle est surchargé (503) ou à court de
 //    quota (429), on passe tout de suite au suivant de MODEL_CHAIN
 //    (attente 1 s puis 3 s max). La requête suivante repart du modèle principal.
+//  - QUOTA DU JOUR : chaque modèle gratuit a son propre quota quotidien. Un
+//    modèle qui répond "quota du jour dépassé" est mémorisé (core/quota.js)
+//    et n'est plus retenté avant la recharge (minuit, heure du Pacifique).
+//    Chaque demande réussie est comptée (Réglages → Quota Gemini).
 //  - JSON structuré (responseSchema) vérifié ; invalide → nouvel essai.
 //  - LaTeX mal échappé par l'IA (\frac écrit avec une seule barre) réparé avant
 //    lecture du JSON (voir core/mathfix.js).
@@ -19,17 +23,25 @@
 
 import { getSetting, setSetting } from './db.js';
 import { parseJsonLatex } from './mathfix.js';
+import { countRequest, markExhausted, isExhausted, resetTimeText } from './quota.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
 /**
  * Modèles gratuits essayés dans l'ordre en cas de surcharge / quota
- * (doc Google, sept. 2026). Le modèle choisi dans les Réglages passe en premier.
+ * (offre gratuite de Google, oct. 2026 : les « Flash-Lite » ont le plus gros
+ * quota quotidien, les « Flash » beaucoup moins). Chaque modèle a son propre
+ * quota : quand l'un est épuisé, le suivant prend le relais.
+ * Le modèle choisi dans les Réglages passe en premier.
  * 👉 Pour changer l'ordre de secours, modifie cette liste.
  */
-export const MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash-lite'];
+export const MODEL_CHAIN = [
+  'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite',
+  'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash',
+];
 
 const REQUEST_TIMEOUT_MS = 90 * 1000; // pas de réponse du tout en 90 s → modèle suivant
+const UPLOAD_BYTES_PER_MS = 20; // + 1 s par 20 Ko envoyés (photos sur connexion lente)
 const STREAM_IDLE_MS = 45 * 1000; // plus rien reçu pendant 45 s en streaming → modèle suivant
 const MAX_JSON_RETRIES = 1; // JSON invalide : 1 nouvel essai (sur le modèle suivant)
 const SWITCH_DELAYS = [1000, 3000]; // attente avant bascule : 1 s, puis 3 s maximum
@@ -51,8 +63,6 @@ function waitForOnline(onStatus) {
   return new Promise((resolve) => window.addEventListener('online', resolve, { once: true }));
 }
 
-// Modèles épuisés pour la journée (quota quotidien) : on ne les réessaie plus.
-const exhausted = new Set();
 // Modèles qui refusent le réglage de réflexion : on ne l'envoie plus.
 const noThinking = new Set();
 
@@ -76,10 +86,10 @@ function classifyHttpError(status, body) {
     return { error: new AIError('TOO_BIG', '📦 Fichier trop gros pour être envoyé. Réduis le nombre de pages ou de photos.') };
   }
   if (status === 429) {
-    const perDay = /PerDay|per day/i.test(msg + reason);
+    const perDay = /PerDay|per day|daily/i.test(msg + reason);
     return {
       error: new AIError('QUOTA', perDay
-        ? '⏳ Quota gratuit du jour dépassé sur tous les modèles. Réessaie demain.'
+        ? '⏳ Quota gratuit du jour dépassé pour ce modèle.'
         : '⏳ Quota gratuit dépassé. Réessaie dans quelques minutes.'),
       switchModel: true, perDay,
     };
@@ -130,6 +140,7 @@ function toJsonSchema(s) {
   const out = {};
   for (const [k, v] of Object.entries(s)) {
     if (k === 'type' && typeof v === 'string') out[k] = v.toLowerCase();
+    else if (k === 'propertyOrdering') continue; // propre au format "openapi" (l'ordre des clés suffit ici)
     else if (k === 'properties') out[k] = Object.fromEntries(Object.entries(v).map(([p, sub]) => [p, toJsonSchema(sub)]));
     else out[k] = toJsonSchema(v);
   }
@@ -240,14 +251,17 @@ export async function loadTimings() {
 async function callModel(model, apiKey, body, { stream, onText, t }) {
   const url = `${API_BASE}${encodeURIComponent(model)}:${stream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`;
   const ctrl = new AbortController();
-  let timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const payload = JSON.stringify(body);
+  // Le délai compte aussi l'envoi : plus il y a de photos, plus on attend.
+  let timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS + payload.length / UPLOAD_BYTES_PER_MS);
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify(body),
+      body: payload,
       signal: ctrl.signal,
     });
+    if (res.ok) countRequest(model);
     if (!res.ok) {
       let errBody = null;
       try { errBody = await res.json(); } catch { /* corps vide */ }
@@ -332,23 +346,28 @@ export async function generateJSON(opts) {
   if (!apiKey) throw new AIError('NO_KEY', '🔑 Aucune clé API. Va dans Réglages pour coller ta clé Gemini.');
   const primary = (await getSetting('model') || MODEL_CHAIN[0]).trim();
   // opts.model : forcer UN modèle précis (banc d'essai du Panneau créateur).
-  const chain = opts.model ? [opts.model] : [primary, ...MODEL_CHAIN.filter((m) => m !== primary)].filter((m) => !exhausted.has(m));
+  const all = opts.model ? [opts.model] : [primary, ...MODEL_CHAIN.filter((m) => m !== primary)];
+  const chain = [];
+  for (const m of all) if (opts.model || !(await isExhausted(m))) chain.push(m);
+  if (!chain.length) throw quotaDayError();
   const req = { temperature: 0.4, thinking: 'minimal', ...opts };
 
   const t = { label, start: performance.now(), firstText: 0, end: 0, model: '', retries: 0, switches: [], stream: !!streamKey };
   let lastError = null;
   let jsonTries = 0;
   let sameModel = false; // true = on réessaie le même modèle (sans bascule)
+  let quickSwitch = false; // modèle précédent épuisé pour la journée : bascule sans attendre
 
   for (let i = 0; i < chain.length; i++) {
     const model = chain[i];
     await waitForOnline(onStatus);
     if (i > 0 && !sameModel) {
-      const wait = SWITCH_DELAYS[Math.min(i - 1, SWITCH_DELAYS.length - 1)];
-      onStatus?.(`⚡ ${chain[i - 1]} occupé → bascule sur ${model}…`);
+      const wait = quickSwitch ? 0 : SWITCH_DELAYS[Math.min(i - 1, SWITCH_DELAYS.length - 1)];
+      onStatus?.(quickSwitch ? `⏳ ${chain[i - 1]} : quota du jour épuisé → ${model}…` : `⚡ ${chain[i - 1]} occupé → bascule sur ${model}…`);
       t.switches.push(model);
       await sleep(wait);
     }
+    quickSwitch = false;
     sameModel = false;
     t.model = model;
     onStatus?.(`via ${model}`); // modèle utilisé, affiché discrètement
@@ -379,7 +398,9 @@ export async function generateJSON(opts) {
         i--; sameModel = true; t.retries++; continue;
       }
       lastError = h.error;
-      if (h.perDay) exhausted.add(model);
+      // Quota du jour épuisé (ou modèle introuvable) : mémorisé jusqu'à la recharge.
+      if (h.perDay && !opts.model) { await markExhausted(model, 'quota'); quickSwitch = true; }
+      if (h.error.code === 'BAD_MODEL' && !opts.model) { await markExhausted(model, 'absent'); quickSwitch = true; }
       if (!h.switchModel) break; // erreur définitive (clé invalide, fichier trop gros…)
       t.retries++;
       continue;
@@ -410,7 +431,21 @@ export async function generateJSON(opts) {
     t.retries++;
     if (jsonTries++ >= MAX_JSON_RETRIES) break;
   }
+  // Tous les modèles sont épuisés pour la journée : message avec l'heure de recharge.
+  if (lastError?.code === 'QUOTA' || lastError?.code === 'BAD_MODEL') {
+    let left = 0;
+    for (const m of all) if (!(await isExhausted(m))) left++;
+    if (!left && !opts.model) throw quotaDayError();
+  }
   throw lastError || new AIError('SERVER', '🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.');
+}
+
+/** Erreur "plus aucun modèle gratuit disponible aujourd'hui" (Tidiane l'explique). */
+function quotaDayError() {
+  const at = resetTimeText();
+  const e = new AIError('QUOTA_DAY', `⏳ Le quota gratuit du jour est épuisé sur tous les modèles Gemini. Il se recharge à ${at} (heure de ton téléphone).`);
+  e.resetAt = at;
+  return e;
 }
 
 /** Petit appel de test pour vérifier la clé et le nom du modèle. */

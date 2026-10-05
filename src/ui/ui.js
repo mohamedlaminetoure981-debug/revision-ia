@@ -323,7 +323,9 @@ export function showError(e, retry) {
   const m = modal(`
     <div class="center" style="--c:${CHARACTERS.tidiane.color}">
       ${characterHTML('tidiane', { expression: 'encouragement', size: 120 })}
-      <div class="bubble top" style="margin:10px 0 12px;text-align:left"><span class="who">Tidiane</span>${esc(line('tidiane', 'erreur'))}</div>
+      <div class="bubble top" style="margin:10px 0 12px;text-align:left"><span class="who">Tidiane</span>${esc(e?.code === 'QUOTA_DAY'
+        ? `Google offre un nombre limité de demandes gratuites par jour, et on les a toutes utilisées sur chaque modèle. Pas de panique : tout revient à ${e.resetAt} (heure de ton téléphone). En attendant, tes fiches et tes quiz marchent sans l’IA !`
+        : line('tidiane', 'erreur'))}</div>
       <p style="font-weight:700;font-size:1.02rem">${esc(msg)}</p>
       <div class="row" style="justify-content:center;margin-top:14px">
         ${retry ? '<button class="btn" id="err-retry">🔁 Réessayer</button>' : ''}

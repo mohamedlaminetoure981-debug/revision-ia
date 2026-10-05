@@ -23,16 +23,12 @@
 // indices et exposants corrects, même si le cours les écrit mal ("u(n)", "un+1", "Un").
 // Dans le JSON, chaque barre oblique LaTeX doit être doublée ("\\frac") ; si l'IA
 // l'oublie, core/mathfix.js répare quand même.
-export const SYSTEM = `Prof particulier pour lycéen/étudiant francophone (Guinée). Français simple, tutoiement.
-Exactitude avant tout ; uniquement d'après le cours fourni.
-Markdown simple autorisé.
-MATHS (partout : titres, questions, choix, explications, corrections) :
-- TOUJOURS en LaTeX, entre $...$ dans une phrase, $$...$$ pour une formule seule ; jamais de maths hors des $.
-- Indices et exposants corrects : $u_n$, $u_{n+1}$, $u_0$, $q^n$, $x^2$, $2^{n+1}$, $x^{10}$ (accolades dès 2 caractères).
-- Même si le cours écrit mal ("u(n)", "un+1", "Un", "q^n+1", "x2"), écris la notation correcte : $u_n$, $u_{n+1}$, $U_n$, $q^{n+1}$, $x^2$.
-- Commandes : \\frac{a}{b}, \\sqrt{x}, \\times, \\leq, \\geq, \\neq, \\to, \\infty, \\lim_{n \\to +\\infty}, \\sum_{k=0}^{n}.
-- JSON : double chaque barre oblique du LaTeX ("\\\\frac", "\\\\times"), sinon elle est perdue.
-"quote" = citation copiée mot pour mot du cours (10 à 25 mots).`;
+export const SYSTEM = `Prof particulier de lycéens/étudiants francophones (Guinée). Français simple, tutoiement. Exact, uniquement d'après le cours fourni. Markdown simple.
+MATHS partout (titres, questions, choix, explications) en LaTeX : $...$ dans une phrase, $$...$$ seule ; rien hors des $.
+Indices/exposants corrects même si le cours écrit mal ("u(n)", "un+1", "x2") : $u_n$, $u_{n+1}$, $q^{n+1}$, $x^2$ (accolades dès 2 caractères).
+\\frac{a}{b}, \\sqrt{x}, \\times, \\leq, \\geq, \\neq, \\to, \\infty, \\lim_{n \\to +\\infty}, \\sum_{k=0}^{n}.
+JSON : double chaque barre oblique du LaTeX ("\\\\frac").
+"quote" = citation mot pour mot du cours (8 à 20 mots).`;
 
 // Morceau de schéma réutilisé : le passage source dans le cours.
 const SOURCE = {
@@ -76,14 +72,9 @@ export const TRANSCRIBE_SCHEMA = {
 };
 
 export function transcribePrompt(numbers) {
-  return `Voici ${numbers.length} image(s) d'un cours (numéros : ${numbers.join(', ')}).
-Transcris INTÉGRALEMENT le texte de chaque image, sans rien résumer ni omettre :
-- conserve les titres, listes, tableaux (en Markdown) et la structure ;
-- écris toutes les formules en LaTeX ($...$ ou $$...$$), avec les indices et exposants
-  corrects ($u_n$, $u_{n+1}$, $q^n$, $x^2$) même si l'original écrit "u(n)", "un+1" ou "Un" ;
-- décris brièvement les schémas/figures entre crochets : [Figure : ...] ;
-- si un mot est illisible, écris [illisible].
-Renvoie un élément par image, avec son numéro "n".`;
+  return `${numbers.length} image(s) de cours (n° ${numbers.join(', ')}). Transcris INTÉGRALEMENT chaque image, sans résumer ni omettre :
+titres, listes, tableaux en Markdown ; formules en LaTeX ; figures : [Figure : ...] ; mot illisible : [illisible].
+Un élément par image, dans l'ordre, avec son "n".`;
 }
 
 // =====================================================================
@@ -123,6 +114,45 @@ export function summaryPrompt(text, unitLabel) {
 Une section par partie (titre + n° de ${unitLabel.toLowerCase()}). Commence par la 1re partie, courte.
 Blocs "cours" = contenu fidèle et concis. Si un passage est peu expliqué, ajoute juste après un bloc
 "explication" simple (avec un exemple si utile).
+
+COURS :
+${text}`;
+}
+
+// =====================================================================
+// 2 bis. RÉSUMÉ + FICHES + QUIZ en UNE SEULE demande (par morceau du cours)
+// ---------------------------------------------------------------------
+// Économise le quota : le texte du cours n'est envoyé qu'UNE fois au lieu de
+// trois. "sections" vient en premier : le résumé s'affiche en streaming,
+// les fiches et les questions arrivent juste après dans la même réponse.
+// want = { sections, cards, questions } : seulement les parties manquantes.
+// =====================================================================
+export function packSchema(want) {
+  const properties = {};
+  if (want.sections) properties.sections = SUMMARY_SCHEMA.properties.sections;
+  if (want.cards) properties.cards = CARDS_SCHEMA.properties.cards;
+  if (want.questions) properties.questions = QUIZ_SCHEMA.properties.questions;
+  const keys = Object.keys(properties);
+  return { type: 'OBJECT', properties, required: keys, propertyOrdering: keys };
+}
+
+export function packPrompt(text, unitLabel, want, count) {
+  const asks = [];
+  if (want.sections) {
+    asks.push(`"sections" : résumé partie par partie, dans l'ordre, sans oublier aucune notion, formule ou méthode.
+  Une section par partie (titre + n° de ${unitLabel.toLowerCase()}). Commence par la 1re partie, courte.
+  Blocs "cours" = contenu fidèle et concis. Passage peu expliqué → bloc "explication" simple juste après (exemple si utile).`);
+  }
+  if (want.cards) {
+    asks.push(`"cards" : fiches question/réponse couvrant TOUTES les notions (définitions, formules, méthodes, pièges).
+  Une notion par fiche ; réponse courte (1-3 phrases ou une formule) ; source (page + citation).`);
+  }
+  if (want.questions) {
+    asks.push(`"questions" : QCM de ${count} questions réparties sur tout ce texte. 4 choix plausibles, 1 seule bonne réponse.
+  Définitions, compréhension, petits calculs. "explanation" : pourquoi c'est juste (2 phrases max). Source : page + citation.`);
+  }
+  return `Pour ce cours, renvoie dans cet ordre :
+${asks.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
 COURS :
 ${text}`;
