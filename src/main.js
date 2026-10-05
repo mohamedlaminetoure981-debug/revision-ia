@@ -21,6 +21,7 @@ import { playSfx } from './ui/sfx.js';
 import { samsungTip } from './ui/samsung-tip.js';
 import { esc, showError, preloadMath } from './ui/ui.js';
 import { initInstall, onRoute } from './ui/install.js';
+import { trackDrafts, setDraftRoute, restoreDrafts, clearDrafts } from './ui/drafts.js';
 // L'accueil est chargé tout de suite (c'est le premier écran) ; les autres écrans
 // sont téléchargés/lus SEULEMENT quand on les ouvre : démarrage bien plus rapide.
 import * as home from './views/home.js';
@@ -55,6 +56,7 @@ const ROUTES = {
 
 const app = document.getElementById('app');
 const nav = document.getElementById('nav');
+let lastRoute = null; // écran précédent (les brouillons de saisie sont gardés tant qu'on y reste)
 
 /** Lit l'adresse (#/course/123/fiches) → { name: 'course', args: ['123', 'fiches'] } */
 function parseHash() {
@@ -87,7 +89,14 @@ async function route() {
     // empêcherait les écrans plein écran d'occuper tout l'écran).
     if (!fullscreen) box.className = 'view-enter';
     const view = await r.load();
+    // Brouillons de saisie : on quitte un écran → effacés ; page rechargée sur le même
+    // écran → les champs vides retrouvent ce qui avait été tapé.
+    const firstLoad = lastRoute === null;
+    if (!firstLoad && lastRoute !== name) clearDrafts();
+    lastRoute = name;
+    setDraftRoute(name);
     await view.render(box, args);
+    if (firstLoad) restoreDrafts(box, name);
     app.innerHTML = '';
     app.appendChild(box);
     window.scrollTo(0, 0);
@@ -147,17 +156,40 @@ function updateNet() {
 // ---------------------------------------------------------------------
 // Service worker + "nouvelle version disponible"
 // ---------------------------------------------------------------------
+// RÈGLE : la page n'est JAMAIS rechargée toute seule.
+//  - 1re visite : le service worker s'installe puis prend la main (controllerchange) ;
+//    on ne fait RIEN (le site est déjà à jour), surtout pas de rechargement : il effacerait
+//    le prénom que l'élève est en train de taper.
+//  - Mise à jour : le bandeau « Mettre à jour » apparaît ; la page ne se recharge que si
+//    l'élève appuie dessus. Pendant l'écran de bienvenue, le bandeau attend la fin.
+const onWelcome = () => /^#\/bienvenue/.test(location.hash);
+
+/** Affiche le bandeau (en attendant, si l'élève est sur l'écran de bienvenue). */
+function showUpdateBar(label, onClick) {
+  if (document.querySelector('.update-bar')) return;
+  const show = () => {
+    if (document.querySelector('.update-bar')) return;
+    const bar = document.createElement('div');
+    bar.className = 'update-bar tile neon';
+    bar.innerHTML = `<div class="row nowrap"><span class="grow"><strong>✨ Nouvelle version dispo !</strong></span>
+      <button class="btn small green">${label}</button></div>`;
+    bar.querySelector('button').onclick = onClick;
+    document.body.appendChild(bar);
+  };
+  if (!onWelcome()) { show(); return; }
+  const wait = () => { if (!onWelcome()) { window.removeEventListener('hashchange', wait); show(); } };
+  window.addEventListener('hashchange', wait);
+}
+
 function registerSW() {
   if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return;
+  let controlled = !!navigator.serviceWorker.controller; // la page est-elle déjà gérée par un service worker ?
+  let updateRequested = false; // l'élève a-t-il appuyé sur « Mettre à jour » ?
   navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).then((reg) => {
-    const offer = (worker) => {
-      const bar = document.createElement('div');
-      bar.className = 'update-bar tile neon';
-      bar.innerHTML = `<div class="row nowrap"><span class="grow"><strong>✨ Nouvelle version dispo !</strong></span>
-        <button class="btn small green">Mettre à jour</button></div>`;
-      bar.querySelector('button').onclick = () => worker.postMessage('skipWaiting');
-      document.body.appendChild(bar);
-    };
+    const offer = (worker) => showUpdateBar('Mettre à jour', () => {
+      updateRequested = true;
+      worker.postMessage('skipWaiting');
+    });
     if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
     reg.addEventListener('updatefound', () => {
       const w = reg.installing;
@@ -166,10 +198,11 @@ function registerSW() {
       });
     });
   }).catch((e) => console.warn('Service worker :', e));
-  // Quand la nouvelle version prend la main, on recharge la page.
-  let reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!reloaded) { reloaded = true; location.reload(); }
+    if (!controlled) { controlled = true; return; } // 1re installation : pas de rechargement
+    if (updateRequested) { updateRequested = false; location.reload(); return; } // demandé par l'élève
+    // Mise à jour activée ailleurs (autre onglet) : on propose de recharger, sans l'imposer.
+    showUpdateBar('Recharger', () => location.reload());
   });
 }
 
@@ -193,6 +226,7 @@ initInstall();
   window.addEventListener('offline', updateNet);
   updateNet();
   window.addEventListener('hashchange', route);
+  trackDrafts();
   await route();
   setTimeout(samsungTip, 1500); // plan de secours Samsung Internet (une seule fois)
   db.requestPersistence();

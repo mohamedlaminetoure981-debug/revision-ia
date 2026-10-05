@@ -24,9 +24,9 @@ export async function render(el) {
 
     <div class="tile" style="margin-bottom:12px">
       <label class="field" for="title" style="margin-top:0">Titre du cours</label>
-      <input id="title" type="text" placeholder="Ex. : Chapitre 3 – Les graphes" maxlength="120">
+      <input id="title" data-draft="title" type="text" placeholder="Ex. : Chapitre 3 – Les graphes" maxlength="120">
       <label class="field" for="subject">Matière</label>
-      <input id="subject" type="text" list="subjects" placeholder="Ex. : Algorithmique" maxlength="60">
+      <input id="subject" data-draft="subject" type="text" list="subjects" placeholder="Ex. : Algorithmique" maxlength="60">
       <datalist id="subjects">${subjects.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
     </div>
 

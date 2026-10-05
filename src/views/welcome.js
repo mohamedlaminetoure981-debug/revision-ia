@@ -4,6 +4,10 @@
 //   2. Il présente l'équipe (un perso par écran)
 //   3. Tu choisis ton compagnon, affiché ensuite sur l'accueil
 // Accessible aussi depuis Profil → "Revoir la présentation".
+//
+// Le prénom tapé et le compagnon choisi sont enregistrés À CHAQUE FRAPPE / CHOIX
+// (localStorage, clé "welcomeDraft") : si l'écran se recharge malgré tout, tout est
+// restauré tout seul. Le brouillon est effacé quand le profil est créé.
 // =====================================================================
 
 import { CHARACTERS, TEAM } from '../data/characters.js';
@@ -12,11 +16,23 @@ import { esc, line } from '../ui/ui.js';
 import { createProfile, getProfileSync, saveProfile } from '../core/game.js';
 import { confetti, onomatopoeia, vibrate, sound } from '../ui/fx.js';
 
+const DRAFT_KEY = 'welcomeDraft';
+function readDraft() {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null') || {}; } catch { return {}; }
+}
+function saveDraft(part) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...readDraft(), ...part })); } catch { /* navigation privée */ }
+}
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignoré */ }
+}
+
 export async function render(el) {
   const existing = getProfileSync();
-  let name = existing?.name || (() => { try { return localStorage.getItem('duelName') || ''; } catch { return ''; } })();
+  const draft = existing ? {} : readDraft(); // première visite : on reprend ce qui avait été tapé
+  let name = existing?.name || draft.name || (() => { try { return localStorage.getItem('duelName') || ''; } catch { return ''; } })();
   let step = 0; // 0 = prénom, 1..n = équipe, n+1 = choix du compagnon
-  let chosen = existing?.companion || null;
+  let chosen = existing?.companion || (CHARACTERS[draft.companion] ? draft.companion : null);
   const others = TEAM; // toute l'équipe, Kaï compris
 
   function draw() {
@@ -41,6 +57,7 @@ export async function render(el) {
     setTimeout(() => play(ch, 'signature'), 500);
     const go = () => {
       name = el.querySelector('#name').value.trim();
+      saveDraft({ name });
       if (!name) { el.querySelector('#name').focus(); play(ch, 'shake', { expression: 'surprise' }); return; }
       vibrate();
       step = 1;
@@ -48,6 +65,8 @@ export async function render(el) {
     };
     el.querySelector('#go').onclick = go;
     el.querySelector('#name').onkeydown = (e) => { if (e.key === 'Enter') go(); };
+    // Chaque frappe est gardée (variable + brouillon) : le champ n'est jamais "perdu".
+    el.querySelector('#name').oninput = (e) => { name = e.target.value; saveDraft({ name: name.trim() }); };
   }
 
   // --- 2. Présentation d'un membre de l'équipe ---
@@ -97,6 +116,7 @@ export async function render(el) {
     el.querySelectorAll('.pick').forEach((b) => {
       b.onclick = () => {
         chosen = b.dataset.id;
+        saveDraft({ companion: chosen });
         el.querySelectorAll('.pick').forEach((x) => x.classList.toggle('sel', x === b));
         play(b.querySelector('.ch'), 'signature');
         const c = CHARACTERS[chosen];
@@ -116,6 +136,7 @@ export async function render(el) {
       } else {
         await createProfile(name, chosen);
       }
+      clearDraft();
       confetti(150, { color: CHARACTERS[chosen].color });
       onomatopoeia("LET'S GO!", { color: CHARACTERS[chosen].color, big: true });
       vibrate([20, 40, 60]);

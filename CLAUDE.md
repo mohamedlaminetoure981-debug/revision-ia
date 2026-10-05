@@ -40,6 +40,11 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   `src/core/gemini.js`) ; modèles épuisés mémorisés jusqu'à minuit heure du Pacifique et
   compteur par modèle (`src/core/quota.js`, Réglages → 📊). Mode vérification = 2× le quota.
 
+- **Jamais de rechargement automatique de la page** (service worker : `registerSW` dans
+  `src/main.js`) : la page ne se recharge que si l'élève appuie sur « Mettre à jour ». Ne
+  jamais remettre un `location.reload()` sur `controllerchange` (il effaçait le prénom à la
+  1re visite). Brouillons de saisie : `src/ui/drafts.js` (attribut `data-draft`) et
+  `welcomeDraft` (écran de bienvenue).
 - **Code** : `src/core` (logique), `src/views` (écrans), `src/ui` (composants),
   `src/comic` (BD/lecteur), `src/data` (personnages, prompts, histoire), `scripts/` (build).
 - **Personnages** (Kaï, Mory, Nia, Sora, Ren, Awa, Tidiane, Binta) : dessinés en SVG par défaut,

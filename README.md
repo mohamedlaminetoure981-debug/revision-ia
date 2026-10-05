@@ -114,7 +114,14 @@ le fichier `.github/workflows/deploy.yml` donne à Vite `BASE_PATH=/NOM-DU-DEPOT
    tout est gardé en cache : **tu peux réviser sans connexion**.
 
 Quand une nouvelle version est publiée, un bandeau **« ✨ Nouvelle version dispo ! →
-Mettre à jour »** apparaît dans l'appli.
+Mettre à jour »** apparaît dans l'appli. **La page n'est jamais rechargée toute seule** (ni à
+la première visite, ni pendant une mise à jour) : elle ne se recharge que si tu appuies sur
+le bouton, et le bandeau attend la fin de l'écran de bienvenue. Ce que tu tapes n'est donc
+jamais effacé par surprise (code : `registerSW` dans `src/main.js`).
+Filets de sécurité si une page se recharge quand même : le **prénom et le compagnon** de
+l'écran de bienvenue sont gardés à chaque frappe ; les champs marqués `data-draft`
+(`src/ui/drafts.js`, ex. titre et matière d'un nouveau cours) retrouvent leur texte ; les
+exercices, l'examen blanc et « Explique-moi » gardaient déjà leur brouillon.
 
 ---
 
@@ -968,6 +975,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.15.1** : correctif de l'écran de bienvenue (la page ne se recharge plus toute seule
+  à la première visite ni pendant une mise à jour ; saisie sauvegardée au fur et à mesure).
 - ✅ **v1.15** : économie de quota (résumé + fiches + quiz en 1 demande, photos par 8,
   bascule entre modèles gratuits avec mémoire des modèles épuisés, compteur dans les Réglages).
 
