@@ -12,7 +12,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS, TEAM } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, rich, line, mascot, showError, progress, confirmBox, toast } from '../ui/ui.js';
+import { esc, rich, line, mascot, showError, progress, confirmBox, toast, mathText } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { startAmbient, stopAmbient } from '../ui/sfx.js';
@@ -130,7 +130,7 @@ function planView(el, v) {
             const start = t; if (!b.done) t += b.minutes * 6e4;
             return `<div class="vblock ${b.done ? 'done' : ''} ${b === next ? 'next' : ''} t-${b.type}">
               <span class="vtime">${b.done ? '' : hm(start)}</span><span class="vicon">${b.done ? '✅' : ICON[b.type]}</span>
-              <span class="grow"><b>${esc(label(b))}</b><span class="tiny muted">${b.minutes} min${b.notion && b.type === 'focus' ? ` · ${esc(b.notion)}` : ''}</span></span>
+              <span class="grow"><b>${esc(label(b))}</b><span class="tiny muted">${b.minutes} min${b.notion && b.type === 'focus' ? ` · ${mathText(b.notion)}` : ''}</span></span>
               ${b.done ? '' : `<button class="btn small ${b === next ? 'pink' : 'ghost'}" data-go="${b.id}">${b.type === 'pause' ? 'OK' : '▶'}</button>`}
             </div>`;
           }).join('')}

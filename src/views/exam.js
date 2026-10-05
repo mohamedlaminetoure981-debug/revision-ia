@@ -11,7 +11,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, rich, sourceHtml, mascot, line, progress, showError, confirmBox, frDate, toast } from '../ui/ui.js';
+import { esc, rich, sourceHtml, mascot, line, progress, showError, confirmBox, frDate, toast, mathText } from '../ui/ui.js';
 import { isTranscribed } from '../core/importer.js';
 import { generateExam, correctExam } from '../core/generate.js';
 import { addXp, XP_RULES } from '../core/game.js';
@@ -225,7 +225,7 @@ function renderResult(el, exam, courses, attempt, xpResult) {
     </div>
     <div class="tile neon" style="--c:${CHARACTERS.awa.color};margin-bottom:12px">
       <h3 style="margin-top:0">💡 Tes 3 priorités</h3>
-      <ul class="small" style="padding-left:1.2em;margin:0">${attempt.advice.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
+      <ul class="small" style="padding-left:1.2em;margin:0">${attempt.advice.map((a) => `<li>${mathText(a)}</li>`).join('')}</ul>
     </div>
     <h2>Correction détaillée</h2>
     ${exam.questions.map((q, i) => {
@@ -236,7 +236,7 @@ function renderResult(el, exam, courses, attempt, xpResult) {
         <div class="row between tiny muted"><span>Question ${i + 1} · ${KIND[q.kind] || q.kind}</span>
           <span class="chip ${d.points >= q.points ? 'ok' : d.points > 0 ? 'warn' : 'bad'}">${d.points}/${q.points}</span></div>
         <div class="rich" style="margin-top:6px">${rich(q.statement)}</div>
-        <div class="source"><strong>Ta réponse :</strong> ${q.kind === 'qcm' ? (a === null || a === undefined ? '—' : `${'ABCD'[a]}. ${esc(q.choices[a] || '')}`) : `<div class="rich">${rich(a || '—')}</div>`}</div>
+        <div class="source"><strong>Ta réponse :</strong> ${q.kind === 'qcm' ? (a === null || a === undefined ? '—' : `${'ABCD'[a]}. ${mathText(q.choices[a] || '')}`) : `<div class="rich">${rich(a || '—')}</div>`}</div>
         <div class="explain" style="border-color:var(--neon-cyan)"><div class="tag" style="color:var(--neon-cyan)">Correction</div><div class="rich">${rich(d.comment)}</div></div>
         <details><summary class="small" style="cursor:pointer">📋 Corrigé type</summary><div class="rich small">${rich(q.kind === 'qcm' ? `${'ABCD'[q.correctIndex]}. ${q.choices[q.correctIndex]}\n\n${q.expected}` : q.expected)}</div></details>
         ${courseOf(q) ? sourceHtml(courseOf(q), q.source) : ''}

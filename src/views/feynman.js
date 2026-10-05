@@ -11,7 +11,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, rich, line, mascot, sourceHtml, showError, subjectColor } from '../ui/ui.js';
+import { esc, rich, line, mascot, sourceHtml, showError, subjectColor, mathText } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { power } from '../ui/powers.js';
 import { runWithCouncil } from '../ui/council.js';
@@ -19,6 +19,7 @@ import { notionOf } from '../core/manga.js';
 import { askQuestions, gradeExplanation } from '../core/feynman.js';
 import { verdictOf } from '../core/generate.js';
 import { addXp } from '../core/game.js';
+import { latexToText } from '../core/mathfix.js';
 
 const MIN_CHARS = 60; // explication trop courte = Ren refuse
 
@@ -36,13 +37,13 @@ export async function render(el, [courseId, idx]) {
   el.innerHTML = `
     <div class="fs feynman" style="--c:${ren.color};overflow-y:auto">
       <div class="fs-top"><a class="fs-close" href="#/feynman" style="display:grid;place-items:center;text-decoration:none">✕</a>
-        <div class="grow" style="min-width:0"><div class="tiny dim">🧠 Explique-moi comme si j'étais nul</div><div class="manga-notion">${esc(notion.title)}</div></div></div>
+        <div class="grow" style="min-width:0"><div class="tiny dim">🧠 Explique-moi comme si j'étais nul</div><div class="manga-notion">${mathText(notion.title)}</div></div></div>
       <div style="max-width:560px;width:100%;margin:0 auto">
         <div class="mascot" style="--c:${ren.color};margin:10px 0">${characterHTML('ren', { expression: 'surprise', size: 90 })}
-          <div class="bubble"><span class="who">Ren</span><span class="say" id="say">${esc(line('ren', 'feynman_intro').replace('{notion}', notion.title))}</span></div></div>
+          <div class="bubble"><span class="who">Ren</span><span class="say" id="say">${esc(line('ren', 'feynman_intro').replace('{notion}', latexToText(notion.title)))}</span></div></div>
         <div id="chat" class="feynman-chat"></div>
         <div id="zone">
-          <textarea id="exp" rows="8" placeholder="Explique « ${esc(notion.title)} » avec tes mots, comme à un ami qui n'y connaît rien. Donne un exemple si tu peux.">${esc(draft)}</textarea>
+          <textarea id="exp" rows="8" placeholder="Explique « ${esc(latexToText(notion.title))} » avec tes mots, comme à un ami qui n'y connaît rien. Donne un exemple si tu peux.">${esc(draft)}</textarea>
           <div class="row between tiny muted" style="margin:4px 2px 10px"><span id="len"></span><span>Sans regarder le cours, c'est plus efficace 😉</span></div>
           <button class="btn pink block" id="send">📨 Envoyer à Ren</button>
         </div>
@@ -85,7 +86,7 @@ export async function render(el, [courseId, idx]) {
     say(res.reaction || line('ren', 'feynman_attente'), 'clin');
     const ask = (i) => {
       if (i >= res.questions.length) return grade(res.attempt, answers);
-      $('#chat').insertAdjacentHTML('beforeend', `<div class="msg ren"><b>Ren :</b> ${esc(res.questions[i])}</div>`);
+      $('#chat').insertAdjacentHTML('beforeend', `<div class="msg ren"><b>Ren :</b> ${mathText(res.questions[i])}</div>`);
       sound('bubble');
       $('#zone').innerHTML = `
         <textarea id="ans" rows="4" placeholder="Ta réponse à Ren…"></textarea>
@@ -124,7 +125,7 @@ export async function render(el, [courseId, idx]) {
     try { sessionStorage.removeItem(`feynman:${courseId}:${index}`); } catch { /* ignoré */ }
     const good = g.grade >= 14;
     const mid = g.grade >= 10;
-    const list = (title, items, cls) => (items?.length ? `<div class="fb ${cls}"><b>${title}</b><ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '');
+    const list = (title, items, cls) => (items?.length ? `<div class="fb ${cls}"><b>${title}</b><ul>${items.map((x) => `<li>${mathText(x)}</li>`).join('')}</ul></div>` : '');
     $('#zone').innerHTML = `
       <div class="tile center" style="border-color:${good ? 'var(--neon-green)' : mid ? 'var(--neon-yellow)' : 'var(--neon-pink)'};margin-top:10px">
         <div class="label">Compréhension</div>
@@ -162,7 +163,7 @@ async function chooser(el) {
         <summary><strong>${esc(c.title)}</strong> <span class="tiny dim">· ${esc(c.subject)} · ${c.summary.length} notions</span></summary>
         ${c.summary.map((s, i) => {
           const b = bestOf(c.id, i);
-          return `<a class="notion-row" href="#/feynman/${c.id}/${i}"><span class="grow">${esc(s.title)}</span>${b >= 0 ? `<span class="chip ${b >= 14 ? 'ok' : b >= 10 ? 'warn' : 'bad'}">${b}/20</span>` : '<span class="tiny dim">→</span>'}</a>`;
+          return `<a class="notion-row" href="#/feynman/${c.id}/${i}"><span class="grow">${mathText(s.title)}</span>${b >= 0 ? `<span class="chip ${b >= 14 ? 'ok' : b >= 10 ? 'warn' : 'bad'}">${b}/20</span>` : '<span class="tiny dim">→</span>'}</a>`;
         }).join('')}
       </details>`).join('') : `<div class="tile">${mascot('nia', { text: 'Il faut d’abord un résumé de cours : ouvre un cours et crée son résumé avec moi !', size: 70 })}</div>`}`;
   const first = el.querySelector('details');

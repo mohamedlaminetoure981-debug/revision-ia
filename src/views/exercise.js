@@ -7,7 +7,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { play } from '../ui/character.js';
-import { esc, rich, sourceHtml, mascot, line, progress, showError, frDate } from '../ui/ui.js';
+import { esc, rich, sourceHtml, mascot, line, progress, showError, frDate, mathText } from '../ui/ui.js';
 import { compressImage } from '../core/importer.js';
 import { correctExercise, verdictOf } from '../core/generate.js';
 import { addXp, XP_RULES } from '../core/game.js';
@@ -33,12 +33,12 @@ export function correctionHtml(course, correction) {
       <div class="label">Note d'Awa</div>
       <div class="big" style="font-size:3.2rem;color:${color}">${g}<span style="font-size:1.4rem">/20</span></div>
       ${correction.check === 'ok' ? '<span class="chip ok">🔍 correction vérifiée</span>' : ''}
-      ${correction.check === 'corrige' ? `<span class="chip warn">🔍 correction rectifiée par la vérification</span><p class="tiny muted">${esc(correction.checkComment || '')}</p>` : ''}
+      ${correction.check === 'corrige' ? `<span class="chip warn">🔍 correction rectifiée par la vérification</span><p class="tiny muted">${mathText(correction.checkComment || '')}</p>` : ''}
     </div>
     <h2>Étape par étape</h2>
     ${correction.steps.map((s) => `
       <div class="tile" style="margin-bottom:8px">
-        <div class="row nowrap"><span>${STATUS[s.status]?.icon || '•'}</span><strong class="grow">${esc(s.title)}</strong>
+        <div class="row nowrap"><span>${STATUS[s.status]?.icon || '•'}</span><strong class="grow">${mathText(s.title)}</strong>
           <span class="chip ${STATUS[s.status]?.cls || ''}">${STATUS[s.status]?.label || esc(s.status)}</span></div>
         <div class="rich small" style="margin-top:6px">${rich(s.comment)}</div>
       </div>`).join('')}
@@ -63,7 +63,7 @@ export async function render(el, [exoId]) {
 
   el.innerHTML = `
     <div class="screen-head"><a class="back-btn" href="#/course/${course.id}/exercices">←</a>
-      <div class="grow"><div class="tiny muted">${esc(course.title)} · ${DIFF[exo.difficulty] || ''}</div><h1 style="font-size:1.2rem">${esc(exo.title)}</h1></div></div>
+      <div class="grow"><div class="tiny muted">${esc(course.title)} · ${DIFF[exo.difficulty] || ''}</div><h1 style="font-size:1.2rem">${mathText(exo.title)}</h1></div></div>
 
     <div class="tile" style="margin-bottom:12px">
       <div class="rich">${rich(exo.statement)}</div>

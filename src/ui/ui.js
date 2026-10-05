@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------
 //  esc()          : protège un texte avant de l'insérer dans la page
 //  rich()         : Markdown simple + formules KaTeX → HTML
+//  mathText()     : texte court (titre, choix, conseil) avec formules KaTeX
 //  line()         : réplique au hasard d'un personnage (sans répétition)
 //  mascot()       : personnage + bulle de dialogue
 //  toast()        : petit message temporaire
@@ -18,6 +19,7 @@ import { characterHTML, play, setExpression } from './character.js';
 import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { voice, playSfx } from './sfx.js';
+import { normalizeMath } from '../core/mathfix.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
 export function esc(s) {
@@ -79,7 +81,9 @@ export function rich(text) {
   const saved = []; // morceaux mis de côté (formules, code) pour ne pas les abîmer
   const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
 
-  let s = String(text ?? '');
+  // 0. Notation correcte : LaTeX abîmé réparé, u(n) → u_n, maths hors formule entre $…$
+  //    (vaut aussi pour les fiches et résumés enregistrés avant la correction).
+  let s = normalizeMath(text);
   // 1. On met de côté les formules et le code.
   s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(renderMath(t.trim(), true)));
   s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => keep(renderMath(t.trim(), true)));
@@ -131,6 +135,22 @@ export function rich(text) {
 
   // 4. On remet les formules et le code.
   return out.join('\n').replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
+}
+
+/**
+ * Texte COURT (titre de notion, choix, conseil, question manquée…) : formules KaTeX
+ * + gras/italique, sans paragraphes ni listes. À utiliser au lieu de esc() pour tout
+ * texte écrit par l'IA qui peut contenir des maths.
+ */
+export function mathText(text) {
+  const saved = [];
+  const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
+  let s = normalizeMath(text);
+  s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(renderMath(t.trim(), false)));
+  s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => keep(renderMath(t.trim(), false)));
+  s = s.replace(/\\\((.+?)\\\)/g, (_, t) => keep(renderMath(t, false)));
+  s = s.replace(/\$([^$\n]+?)\$/g, (_, t) => keep(renderMath(t, false)));
+  return inline(esc(s)).replace(/\s*\n\s*/g, ' ').replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
 }
 
 // ---------------------------------------------------------------------

@@ -19,9 +19,19 @@
 // Rôle général de l'IA (envoyé avec chaque demande)
 // ---------------------------------------------------------------------
 // ⚡ Consignes volontairement COURTES : moins de texte envoyé = réponse plus rapide.
+// MATHS : toujours en LaTeX entre $...$ (dans la ligne) ou $$...$$ (bloc), avec les
+// indices et exposants corrects, même si le cours les écrit mal ("u(n)", "un+1", "Un").
+// Dans le JSON, chaque barre oblique LaTeX doit être doublée ("\\frac") ; si l'IA
+// l'oublie, core/mathfix.js répare quand même.
 export const SYSTEM = `Prof particulier pour lycéen/étudiant francophone (Guinée). Français simple, tutoiement.
 Exactitude avant tout ; uniquement d'après le cours fourni.
-Formules en LaTeX $...$ ou $$...$$. Markdown simple autorisé.
+Markdown simple autorisé.
+MATHS (partout : titres, questions, choix, explications, corrections) :
+- TOUJOURS en LaTeX, entre $...$ dans une phrase, $$...$$ pour une formule seule ; jamais de maths hors des $.
+- Indices et exposants corrects : $u_n$, $u_{n+1}$, $u_0$, $q^n$, $x^2$, $2^{n+1}$, $x^{10}$ (accolades dès 2 caractères).
+- Même si le cours écrit mal ("u(n)", "un+1", "Un", "q^n+1", "x2"), écris la notation correcte : $u_n$, $u_{n+1}$, $U_n$, $q^{n+1}$, $x^2$.
+- Commandes : \\frac{a}{b}, \\sqrt{x}, \\times, \\leq, \\geq, \\neq, \\to, \\infty, \\lim_{n \\to +\\infty}, \\sum_{k=0}^{n}.
+- JSON : double chaque barre oblique du LaTeX ("\\\\frac", "\\\\times"), sinon elle est perdue.
 "quote" = citation copiée mot pour mot du cours (10 à 25 mots).`;
 
 // Morceau de schéma réutilisé : le passage source dans le cours.
@@ -69,7 +79,8 @@ export function transcribePrompt(numbers) {
   return `Voici ${numbers.length} image(s) d'un cours (numéros : ${numbers.join(', ')}).
 Transcris INTÉGRALEMENT le texte de chaque image, sans rien résumer ni omettre :
 - conserve les titres, listes, tableaux (en Markdown) et la structure ;
-- écris les formules en LaTeX ($...$) ;
+- écris toutes les formules en LaTeX ($...$ ou $$...$$), avec les indices et exposants
+  corrects ($u_n$, $u_{n+1}$, $q^n$, $x^2$) même si l'original écrit "u(n)", "un+1" ou "Un" ;
 - décris brièvement les schémas/figures entre crochets : [Figure : ...] ;
 - si un mot est illisible, écris [illisible].
 Renvoie un élément par image, avec son numéro "n".`;

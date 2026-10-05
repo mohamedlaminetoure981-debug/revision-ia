@@ -186,6 +186,7 @@ revision-ia/
     ├── core/                  « Moteur » (pas d'affichage)
     │   ├── db.js              Base de données locale (IndexedDB), réglages, sauvegarde
     │   ├── gemini.js          Appels à Gemini : erreurs, réessais, vérification du JSON
+    │   ├── mathfix.js         Notation maths correcte : LaTeX réparé, u(n) → uₙ, texte Unicode
     │   ├── importer.js        Photos (compression), PDF (lecture), transcription
     │   ├── generate.js        Création du résumé, des fiches, des quiz
     │   ├── srs.js             Répétition espacée (algorithme SM-2)
@@ -401,7 +402,7 @@ et mets `signature: 'monnom'` dans le perso.
   canvas par `src/ui/particles.js` (étincelles en traînées néon, petites étoiles, onde de
   choc ; pluie d'éclats en plus à partir de 140). `color` = couleur du perso concerné
   (sinon celle du compagnon choisi).
-- `onomatopoeia('LET'S GO!', { color, big })` : grand texte néon (dégradé, lueur, zoom
+- `onomatopoeia("LET'S GO!", { color, big })` : grand texte néon (dégradé, lueur, zoom
   avec rebond, flash, aberration chromatique), sortie en éclat de particules. `big` ajoute
   une secousse discrète de l'écran (automatique pour NIVEAU, LÉGENDAIRE, K.O.…).
 - Styles : bloc « Célébrations » de `src/styles/main.css`. Onomatopées de la BD (BAM,
@@ -409,6 +410,26 @@ et mets `signature: 'monnom'` dans le perso.
 - Léger sur petit Android : pas de `shadowBlur`, lueurs pré-calculées, 320 particules
   au plus, salves allégées si le téléphone ralentit ; rien ne bouge si « réduire les
   animations » est activé sur le téléphone.
+
+---
+
+## 8 bis. Formules mathématiques (KaTeX)
+
+Tout passe par **`src/core/mathfix.js`** :
+- **À la réception** (`core/gemini.js`) : `parseJsonLatex` répare le LaTeX mal échappé
+  par l'IA. En JSON, `\f`, `\t`, `\n`, `\b`, `\r` sont des caractères spéciaux : un
+  `\frac` écrit avec une seule barre devenait « saut de page + rac », `\times`
+  « tabulation + imes », `\neq` « retour à la ligne + eq »…
+- **À l'affichage** (`rich()` et `mathText()` dans `ui/ui.js`) : `normalizeMath` répare
+  aussi les fiches et résumés **déjà enregistrés** (sans rien regénérer), corrige les
+  écritures mal formées (`u(n)` → $u_n$, `un+1` → $u_{n+1}$, `x^10` → $x^{10}$) et met
+  entre `$…$` les maths écrites hors formule.
+- **Dans les images** (cartes, planches manga, statuts) : `latexToText` écrit les maths
+  en symboles Unicode (uₙ₊₁, x², ½, √2, ≤, →), car KaTeX ne peut pas y aller.
+- Pour un texte court écrit par l'IA (titre, choix, conseil), utilise `mathText(texte)`
+  au lieu de `esc(texte)`.
+- Les consignes à Gemini (`SYSTEM` dans `prompts.js`) exigent le LaTeX entre `$…$` avec
+  les bons indices et exposants.
 
 ---
 

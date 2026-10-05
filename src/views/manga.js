@@ -12,7 +12,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, line, sourceHtml, showError, toast } from '../ui/ui.js';
+import { esc, line, sourceHtml, showError, toast, mathText } from '../ui/ui.js';
 import { sound, vibrate, onomatopoeia, celebrate } from '../ui/fx.js';
 import { stripSVG, stripToPng } from '../ui/manga.js';
 import { shareImage, fileName } from '../ui/share.js';
@@ -33,7 +33,7 @@ export async function render(el, [courseId, idx = '0']) {
         <button class="fs-close" id="close" aria-label="Fermer">✕</button>
         <div class="grow" style="min-width:0">
           <div class="tiny dim">📖 Version manga · ${index + 1}/${total}</div>
-          <div class="manga-notion">${esc(notion.title)}</div>
+          <div class="manga-notion">${mathText(notion.title)}</div>
         </div>
       </div>
       <div class="manga-scroll">

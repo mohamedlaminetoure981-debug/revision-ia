@@ -19,6 +19,7 @@ import { reportQuestion } from './report.js';
 import { runWithCouncil } from '../ui/council.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { verdictOf } from '../core/generate.js';
+import { latexToText } from '../core/mathfix.js';
 
 const SECONDS_PER_QUESTION = 30; // durée du minuteur
 
@@ -178,7 +179,7 @@ export async function render(el, [quizId]) {
       { cls: 'w2', html: `<div class="kicker">Ta meilleure série</div><div class="huge">🔥 ${r.bestRun}</div><div class="mid">bonne${r.bestRun > 1 ? 's' : ''} réponse${r.bestRun > 1 ? 's' : ''} d'affilée</div>` },
       { cls: 'w3', html: `<div class="kicker">Temps moyen par question</div><div class="huge">${Math.round(r.avg)} s</div><div class="mid">${r.avg < 10 ? 'Rapide comme l’éclair ⚡' : r.avg < 25 ? 'Réfléchi(e) et efficace' : 'Tu prends ton temps. Respect.'}</div>` },
       { cls: 'w4', html: r.missed.length
-        ? `<div class="kicker">La notion à revoir</div><div class="mid" style="font-size:1.2rem;max-width:420px">« ${esc(r.missed[0].question.slice(0, 140))} »</div><div class="small">+ ${r.missed.length - 1} autre(s) dans la correction</div>`
+        ? `<div class="kicker">La notion à revoir</div><div class="mid" style="font-size:1.2rem;max-width:420px">« ${esc(latexToText(r.missed[0].question).slice(0, 140))} »</div><div class="small">+ ${r.missed.length - 1} autre(s) dans la correction</div>`
         : '<div class="kicker">Notions à revoir</div><div class="huge">0</div><div class="mid">Ren est vexé. Parfait.</div>' },
       { cls: 'w5', html: `${characterHTML('ren', { expression: pct >= 70 ? 'surprise' : 'joie', size: 170 })}
           <div class="bubble top" style="max-width:340px;margin:12px auto;text-align:left;--c:${ren.color}"><span class="who">Ren</span>${esc(line('ren', 'fin'))}</div>

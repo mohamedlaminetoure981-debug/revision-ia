@@ -16,7 +16,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, rich, line, showError } from '../ui/ui.js';
+import { esc, rich, line, showError, mathText } from '../ui/ui.js';
 import { vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { rewardSummary } from './course.js';
 import { unitLabel, prepareCourse } from '../core/generate.js';
@@ -100,7 +100,7 @@ export async function render(el, [courseId]) {
     const isExplain = s.kind === 'explication';
     stage.innerHTML = `
       <div class="story-card ${isExplain ? 'explain-card' : ''} ${dir < 0 ? 'rev' : ''}">
-        <span class="sec">${esc(s.section)}${s.pages?.length ? ` · ${label} ${s.pages.join(', ')}` : ''}</span>
+        <span class="sec">${mathText(s.section)}${s.pages?.length ? ` · ${label} ${s.pages.join(', ')}` : ''}</span>
         ${isExplain ? '<h2 style="color:var(--neon-pink)">💡 Explication ajoutée</h2>' : ''}
         <div class="rich">${rich(s.text)}</div>
       </div>

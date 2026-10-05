@@ -14,6 +14,7 @@
 
 import * as db from './db.js';
 import { TEAM } from '../data/characters.js';
+import { latexToText } from './mathfix.js';
 
 export const RARITIES = [
   { id: 'commune', name: 'Commune', stars: 1, color: '#9AA3B5', min: 1 },
@@ -46,16 +47,9 @@ export function subjectHex(subject) {
   return v || '#8B5CF6';
 }
 
-/** Retire le LaTeX et le markdown pour un texte court de carte. */
+/** Texte court de carte : LaTeX et Markdown → texte simple avec symboles (uₙ, x², ½, ≤, →). */
 export function plain(s, max = 140) {
-  const t = String(s || '')
-    .replace(/\$+([^$]*)\$+/g, '$1')
-    .replace(/\\(frac|dfrac)\{([^}]*)\}\{([^}]*)\}/g, '($2)/($3)')
-    .replace(/\\sqrt\{([^}]*)\}/g, '√($1)')
-    .replace(/\\(times|cdot)/g, '×').replace(/\\(leq|le)/g, '≤').replace(/\\(geq|ge)/g, '≥').replace(/\\neq/g, '≠')
-    .replace(/\\(infty)/g, '∞').replace(/\\(pi)/g, 'π').replace(/\\(sum)/g, 'Σ').replace(/\\(in)\b/g, '∈').replace(/\\(to|rightarrow)/g, '→')
-    .replace(/\^\{?2\}?/g, '²').replace(/\^\{?3\}?/g, '³').replace(/\^\{?n\}?/g, 'ⁿ')
-    .replace(/\\[a-zA-Z]+/g, '').replace(/[{}*_#`]/g, '').replace(/\s+/g, ' ').trim();
+  const t = latexToText(s || '').replace(/\\[a-zA-Z]+/g, '').replace(/[{}*#`]/g, '').replace(/\s+/g, ' ').trim();
   return t.length > max ? `${t.slice(0, max - 1)}…` : t;
 }
 

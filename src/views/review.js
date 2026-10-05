@@ -13,7 +13,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play, setExpression } from '../ui/character.js';
-import { esc, rich, sourceHtml, line } from '../ui/ui.js';
+import { esc, rich, sourceHtml, line, mathText } from '../ui/ui.js';
 import { schedule, isDue, today } from '../core/srs.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { celebrate, vibrate, sound, confetti, onomatopoeia, hypeWord } from '../ui/fx.js';
@@ -121,7 +121,7 @@ export async function render(el, [courseId, blockId]) {
         <span class="stamp up">FACILE</span><span class="stamp down">DIFFICILE</span>
         <div class="flip" id="flip">
           <div class="face recto">
-            <div class="part">${esc(course.title)} · ${esc(card.part || '')}</div>
+            <div class="part">${esc(course.title)} · ${mathText(card.part || '')}</div>
             <div class="q rich">${rich(card.question)}</div>
             <div class="hint">👆 Tape pour retourner</div>
           </div>

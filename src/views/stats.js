@@ -19,6 +19,7 @@ import { today, addDays } from '../core/srs.js';
 import { BADGES } from '../core/badges.js';
 import { confetti, onomatopoeia, vibrate } from '../ui/fx.js';
 import { offerStatus } from '../ui/status.js';
+import { latexToText } from '../core/mathfix.js';
 
 const DAY_NAMES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 
@@ -116,7 +117,7 @@ export async function render(el) {
           <a class="missed" href="#/course/${x.card.courseId}/fiches">
             <span class="chip bad">✗ ${x.n}</span><span class="grow small">${esc(x.card.question.slice(0, 120))}</span></a>`).join('')}
         ${topQuiz.map(([q, n]) => `
-          <div class="missed"><span class="chip warn">🎯 ${n}</span><span class="grow small">${esc(q.slice(0, 120))}</span></div>`).join('')}`
+          <div class="missed"><span class="chip warn">🎯 ${n}</span><span class="grow small">${esc(latexToText(q).slice(0, 120))}</span></div>`).join('')}`
       : '<p class="small muted">Rien pour l’instant. Soit t’es un génie, soit faut réviser 😏</p>'}
     </div>
 

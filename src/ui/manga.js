@@ -12,6 +12,7 @@
 
 import { CHARACTERS } from '../data/characters.js';
 import { characterSVG } from './character.js';
+import { latexToText } from '../core/mathfix.js';
 
 const W = 600; // largeur de la planche
 const PH = 300; // hauteur d'une case
@@ -62,7 +63,7 @@ function panel(p, i, uid) {
   const charSvg = characterSVG(p.character in CHARACTERS ? p.character : 'kai', p.expression || 'neutre')
     .replace('<svg ', `<svg x="${cx}" y="${cy}" width="${charW}" height="${charH}" `);
   // Bulle de dialogue
-  const lines = wrap(p.line, 24);
+  const lines = wrap(latexToText(p.line), 24);
   const lh = 24;
   const bw = 300;
   const bh = lines.length * lh + 26;
@@ -80,7 +81,7 @@ function panel(p, i, uid) {
     <text x="${bx + 16}" y="${by - 6}" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="13" font-weight="800" fill="${ch.color}" stroke="${INK}" stroke-width=".6">${x(ch.name)}</text>`;
   const narration = p.narration ? `
     <rect x="${left ? W - 30 - 240 : 30}" y="${y + 10}" width="240" height="30" fill="#FFF3B0" stroke="${INK}" stroke-width="2.5"/>
-    <text x="${left ? W - 30 - 230 : 40}" y="${y + 30}" font-family="Arial, sans-serif" font-size="14" font-style="italic" font-weight="700" fill="${INK}">${x(String(p.narration).slice(0, 34))}</text>` : '';
+    <text x="${left ? W - 30 - 230 : 40}" y="${y + 30}" font-family="Arial, sans-serif" font-size="14" font-style="italic" font-weight="700" fill="${INK}">${x(latexToText(p.narration).slice(0, 34))}</text>` : '';
   const sfx = p.sfx ? `
     <text x="${left ? cx + charW - 10 : cx - 10}" y="${y + PH - 30}" transform="rotate(-12 ${left ? cx + charW - 10 : cx - 10} ${y + PH - 30})"
       font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="40" font-weight="900" fill="${ch.color}" stroke="${INK}" stroke-width="3" paint-order="stroke">${x(String(p.sfx).slice(0, 12))}</text>` : '';
@@ -108,7 +109,7 @@ export function stripSVG(strip, o = {}) {
   const uid = ++counter;
   const panels = (strip.panels || []).slice(0, 4);
   const H = TOP + panels.length * (PH + GAP) - GAP + FOOT;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="manga-strip" role="img" aria-label="${x(strip.title)}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="manga-strip" role="img" aria-label="${x(latexToText(strip.title))}">
     <defs>
       <pattern id="tone${uid}" width="9" height="9" patternUnits="userSpaceOnUse">
         <rect width="9" height="9" fill="#fff"/><circle cx="4.5" cy="4.5" r="1.4" fill="#d9d9e3"/>
@@ -116,7 +117,7 @@ export function stripSVG(strip, o = {}) {
     </defs>
     <rect width="${W}" height="${H}" fill="#fbfaf7"/>
     <rect x="20" y="14" width="${W - 40}" height="46" fill="${INK}"/>
-    <text x="36" y="45" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="20" font-weight="800" fill="#fff">${x(String(strip.title || '').slice(0, 34))}</text>
+    <text x="36" y="45" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="20" font-weight="800" fill="#fff">${x(latexToText(strip.title || '').slice(0, 34))}</text>
     ${o.subtitle ? `<text x="${W - 36}" y="45" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#C6FF3D">${x(String(o.subtitle).slice(0, 30))}</text>` : ''}
     ${panels.map((p, i) => panel(p, i, uid)).join('')}
     <text x="${W - 24}" y="${H - 12}" text-anchor="end" font-family="'Unbounded Variable', 'Arial Black', sans-serif" font-size="12" font-weight="800" fill="#8B5CF6">Révision IA ✦</text>

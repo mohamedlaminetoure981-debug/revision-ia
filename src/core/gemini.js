@@ -11,11 +11,14 @@
 //    quota (429), on passe tout de suite au suivant de MODEL_CHAIN
 //    (attente 1 s puis 3 s max). La requête suivante repart du modèle principal.
 //  - JSON structuré (responseSchema) vérifié ; invalide → nouvel essai.
+//  - LaTeX mal échappé par l'IA (\frac écrit avec une seule barre) réparé avant
+//    lecture du JSON (voir core/mathfix.js).
 //  - MESURE : chaque appel note ses temps (voir getTimings / Panneau créateur).
 //  - La clé API est lue dans IndexedDB (Réglages), jamais dans le code.
 // =====================================================================
 
 import { getSetting, setSetting } from './db.js';
+import { parseJsonLatex } from './mathfix.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
@@ -203,7 +206,7 @@ export function completeItems(text, key) {
     else if (c === '{' || c === '[') { if (depth === 0 && c === '{') objStart = i; depth++; } else if (c === '}' || c === ']') {
       depth--;
       if (depth === 0 && c === '}' && objStart >= 0) {
-        try { items.push(JSON.parse(text.slice(objStart, i + 1))); } catch { /* objet pas encore lisible */ }
+        try { items.push(parseJsonLatex(text.slice(objStart, i + 1))); } catch { /* objet pas encore lisible */ }
         objStart = -1;
       }
       if (depth < 0) break; // fin de la liste
@@ -384,7 +387,8 @@ export async function generateJSON(opts) {
 
     // Réponse reçue : on vérifie le JSON.
     let json;
-    try { json = JSON.parse(result.text); } catch { json = null; }
+    // parseJsonLatex : répare le LaTeX mal échappé (\frac, \times, \neq… abîmés ou illisibles en JSON).
+    try { json = parseJsonLatex(result.text); } catch { json = null; }
     const problems = json ? validate(json, schema) : ['JSON illisible'];
     const extra = json && !problems.length && check ? check(json) : null;
     if (json && !problems.length && !extra) {

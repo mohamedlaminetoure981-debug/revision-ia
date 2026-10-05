@@ -10,6 +10,7 @@
 import { CHARACTERS } from '../data/characters.js';
 import { characterSVG } from './character.js';
 import { svgToPng } from './manga.js';
+import { latexToText } from '../core/mathfix.js';
 import { shareImage, fileName } from './share.js';
 import { getProfileSync, currentStreak, levelFromXp } from '../core/game.js';
 import { modal, line, esc } from './ui.js';
@@ -38,7 +39,7 @@ export function statusSVG(o) {
     rays += `<path d="M540,900 L${(540 + 1500 * Math.cos(a - 0.04)).toFixed(0)},${(900 + 1500 * Math.sin(a - 0.04)).toFixed(0)} L${(540 + 1500 * Math.cos(a + 0.04)).toFixed(0)},${(900 + 1500 * Math.sin(a + 0.04)).toFixed(0)} Z" fill="${c}" opacity="${i % 2 ? 0.1 : 0.2}"/>`;
   }
   const charSvg = characterSVG(id, 'celebration', { aura: 3 }).replace('<svg ', '<svg x="190" y="420" width="700" height="812" ');
-  const big = x(o.big);
+  const big = x(latexToText(o.big));
   const bigSize = big.length > 6 ? 150 : 210;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
     <defs>
@@ -49,12 +50,12 @@ export function statusSVG(o) {
     <rect width="${W}" height="${H}" fill="url(#sbg)"/>
     ${rays}
     <rect width="${W}" height="${H}" fill="url(#sdots)"/>
-    <text x="540" y="250" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="54" font-weight="900" fill="#fff" letter-spacing="6">${x(o.kicker || '').toUpperCase()}</text>
+    <text x="540" y="250" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="54" font-weight="900" fill="#fff" letter-spacing="6">${x(latexToText(o.kicker || '')).toUpperCase()}</text>
     <text x="540" y="${250 + bigSize}" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="${bigSize}" font-weight="900" fill="#fff" stroke="#000" stroke-width="10" paint-order="stroke">${big}</text>
     ${charSvg}
     <rect x="70" y="1290" width="940" height="${o.sub ? 120 : 0}" rx="20" fill="#fff" stroke="#000" stroke-width="8" transform="rotate(-2 540 1350)"/>
-    ${o.sub ? `<text x="540" y="1372" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="${o.sub.length > 26 ? 40 : 54}" font-weight="900" fill="#111" transform="rotate(-2 540 1350)">${x(o.sub)}</text>` : ''}
-    ${(o.lines || []).slice(0, 2).map((l, k) => `<text x="540" y="${1490 + k * 62}" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="#fff">${x(l)}</text>`).join('')}
+    ${o.sub ? `<text x="540" y="1372" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="${o.sub.length > 26 ? 40 : 54}" font-weight="900" fill="#111" transform="rotate(-2 540 1350)">${x(latexToText(o.sub))}</text>` : ''}
+    ${(o.lines || []).slice(0, 2).map((l, k) => `<text x="540" y="${1490 + k * 62}" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="#fff">${x(latexToText(l))}</text>`).join('')}
     <g transform="translate(140 1630)">
       <rect width="380" height="120" rx="60" fill="url(#sfire)" stroke="#000" stroke-width="6"/>
       <text x="190" y="80" text-anchor="middle" font-family="'Unbounded Variable','Arial Black',sans-serif" font-size="54" font-weight="900" fill="#fff">🔥 ${streak} j</text>
