@@ -6,7 +6,7 @@
 
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
-import { play } from '../ui/character.js';
+import { play, speak } from '../ui/character.js';
 import { esc, rich, sourceHtml, mascot, line, progress, showError, frDate, mathText } from '../ui/ui.js';
 import { compressImage } from '../core/importer.js';
 import { correctExercise, verdictOf } from '../core/generate.js';
@@ -110,7 +110,7 @@ export async function render(el, [exoId]) {
     const answer = $('#ans').value.trim();
     if (!answer && !photo) {
       play(el.querySelector('.mascot .ch'), 'shake', { expression: 'surprise' });
-      el.querySelector('.mascot .say').textContent = 'Il me faut ta réponse (texte ou photo) pour corriger !';
+      speak(el.querySelector('.mascot .ch'), el.querySelector('.mascot .say'), 'Il me faut ta réponse (texte ou photo) pour corriger !');
       return;
     }
     let attempt;
@@ -132,7 +132,7 @@ export async function render(el, [exoId]) {
       $('#result').innerHTML = `<h2>Correction</h2>${correctionHtml(course, attempt.correction)}`;
       $('#result').scrollIntoView({ behavior: 'smooth' });
       const awa = el.querySelector('.mascot');
-      awa.querySelector('.say').textContent = line('awa', grade >= 10 ? 'reussite' : 'echec');
+      speak(awa.querySelector('.ch'), awa.querySelector('.say'), line('awa', grade >= 10 ? 'reussite' : 'echec'));
       play(awa.querySelector('.ch'), grade >= 10 ? 'signature' : 'bounce', { expression: grade >= 14 ? 'celebration' : grade >= 10 ? 'joie' : 'encouragement' });
       if (grade >= 16) { confetti(); onomatopoeia('YOSH!'); sound('level'); } else { sound(grade >= 10 ? 'good' : 'bad'); }
       vibrate(grade >= 10 ? [20, 30, 20] : 30);

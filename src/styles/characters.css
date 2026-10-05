@@ -158,10 +158,48 @@
    au conteneur .ch : elles marchent telles quelles. Le dessin animait aussi
    ses morceaux (tête, buste, lunettes) : l'image a ses équivalents ci-dessous. */
 .ch .ch-aura-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.ch .ch-img { position: relative; object-fit: contain; object-position: 50% 100%; user-select: none; -webkit-user-select: none;
-  transform-origin: 50% 100%; animation: img-breathe 3.2s ease-in-out infinite; }
-@keyframes img-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.014) translateY(-0.5px); } }
+.ch .ch-img { object-fit: contain; object-position: 50% 100%; user-select: none; -webkit-user-select: none; }
+
+/* ---------- PERSOS VIVANTS (portraits en images) ----------
+   Un calque par mouvement (voir src/ui/character.js) ; transform et opacity
+   seulement → fluide sur un petit Android. Tout s'arrête si le téléphone
+   demande moins d'animations (règle "Réduction des animations" plus haut). */
+.ch .ch-sway, .ch .ch-react, .ch .ch-talk, .ch .ch-breath, .ch .ch-stack {
+  position: relative; width: 100%; height: 100%; transform-origin: 50% 100%;
+}
+.ch .ch-sway { will-change: transform; animation: live-sway var(--sw-dur, 7s) ease-in-out var(--sw-delay, 0s) infinite; }
+.ch .ch-breath { animation: live-breathe var(--br-dur, 3.5s) ease-in-out var(--br-delay, 0s) infinite; }
+.ch .ch-stack > .ch-img { position: absolute; inset: 0; }
+/* Respiration quasi imperceptible ; balancement très léger. */
+@keyframes live-breathe { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-0.6px) scaleY(1.012); } }
+@keyframes live-sway { 0%, 100% { transform: rotate(-0.5deg) translateX(-0.4px); } 50% { transform: rotate(0.5deg) translateX(0.4px); } }
+
+/* Fondu enchaîné entre deux expressions (≈ 260 ms) + petit rebond d'échelle. */
+.ch .ch-img.ch-in { animation: live-in .26s ease-out both; }
+.ch .ch-img.ch-out { animation: live-out .2s ease-in .1s both; } /* part un peu après : jamais de trou */
+@keyframes live-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes live-out { from { opacity: 1; } to { opacity: 0; } }
+.ch .ch-react.ch-hop { animation: live-hop .34s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes live-hop { 0% { transform: none; } 40% { transform: translateY(-3px) scale(1.035); } 75% { transform: scale(.993); } 100% { transform: none; } }
+
+/* Petits mouvements de tête, de temps en temps (déclenchés au hasard). */
+.ch .ch-react.ch-glance-l { animation: live-glance-l 1.1s ease-in-out; }
+.ch .ch-react.ch-glance-r { animation: live-glance-r 1.1s ease-in-out; }
+.ch .ch-react.ch-nod { animation: live-nod .9s ease-in-out; }
+@keyframes live-glance-l { 0%, 100% { transform: none; } 30%, 70% { transform: rotate(-1.6deg) translateX(-1px); } }
+@keyframes live-glance-r { 0%, 100% { transform: none; } 30%, 70% { transform: rotate(1.6deg) translateX(1px); } }
+@keyframes live-nod { 0%, 100% { transform: none; } 35% { transform: translateY(1.6px) rotate(.4deg); } 65% { transform: translateY(-.6px); } }
+
+/* Il parle : un petit mouvement à chaque mot (deux noms pour relancer l'animation). */
+.ch .ch-talk.ch-say1 { animation: live-say1 .22s ease-out; }
+.ch .ch-talk.ch-say2 { animation: live-say2 .22s ease-out; }
+@keyframes live-say1 { 0%, 100% { transform: none; } 45% { transform: translateY(-1.6px) scaleY(1.012); } }
+@keyframes live-say2 { 0%, 100% { transform: none; } 45% { transform: translateY(-1.6px) scaleY(1.012); } }
+
+/* Bulle qui s'écrit : le texte à venir garde sa place, invisible. */
+.tw-off { visibility: hidden; }
+
 /* Animations signature qui bougeaient l'intérieur du dessin → la tête "hoche" l'image entière. */
-.ch[data-img].sig-salut .ch-img, .ch[data-img].sig-lunettes .ch-img, .ch[data-img].sig-reflexion .ch-img,
-.ch[data-img].sig-bras-croises .ch-img, .ch[data-img].sig-haussement .ch-img { animation: img-nod 1.2s ease-in-out; }
+.ch[data-img].sig-salut .ch-react, .ch[data-img].sig-lunettes .ch-react, .ch[data-img].sig-reflexion .ch-react,
+.ch[data-img].sig-bras-croises .ch-react, .ch[data-img].sig-haussement .ch-react { animation: img-nod 1.2s ease-in-out; }
 @keyframes img-nod { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-3deg) translateY(-2px); } 65% { transform: rotate(2deg); } }

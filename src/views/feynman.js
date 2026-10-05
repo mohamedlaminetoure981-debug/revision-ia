@@ -10,7 +10,7 @@
 
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
-import { characterHTML, play, setExpression } from '../ui/character.js';
+import { characterHTML, play, setExpression, speak } from '../ui/character.js';
 import { esc, rich, line, mascot, sourceHtml, showError, subjectColor, mathText } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { power } from '../ui/powers.js';
@@ -51,7 +51,7 @@ export async function render(el, [courseId, idx]) {
     </div>`;
   const $ = (s) => el.querySelector(s);
   const renEl = $('.mascot .ch');
-  const say = (t, expr, anim = 'bounce') => { $('#say').textContent = t; if (expr) setExpression(renEl, expr); play(renEl, anim); sound('bubble'); };
+  const say = (t, expr, anim = 'bounce') => { if (expr) setExpression(renEl, expr); speak(renEl, $('#say'), t); play(renEl, anim); sound('bubble'); };
   const ta = $('#exp');
   const count = () => { $('#len').textContent = `${ta.value.trim().length} caractères${ta.value.trim().length < MIN_CHARS ? ` (min. ${MIN_CHARS})` : ''}`; };
   ta.oninput = () => { count(); try { sessionStorage.setItem(`feynman:${courseId}:${index}`, ta.value); } catch { /* ignoré */ } };

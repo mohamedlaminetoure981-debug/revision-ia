@@ -11,6 +11,7 @@
 
 import { CHARACTERS } from '../data/characters.js';
 import { esc } from './ui.js';
+import { speak } from './character.js';
 import { playSfx, voice } from './sfx.js';
 
 const MARGIN = 10; // marge minimale avec les bords de l'écran (px)
@@ -28,7 +29,9 @@ export function groupBubble(scene, seat, id, text, minTop = 70) {
   const b = document.createElement('div');
   b.className = 'bubble group-say';
   b.style.setProperty('--c', CHARACTERS[id]?.color || 'var(--neon-violet)');
-  b.innerHTML = `<span class="who">${esc(CHARACTERS[id]?.name || '')}</span>${esc(text)}`;
+  b.innerHTML = `<span class="who">${esc(CHARACTERS[id]?.name || '')}</span><span class="say"></span>`;
+  // La bulle s'écrit mot par mot (sa taille finale est réservée tout de suite).
+  speak(seat.querySelector('.ch'), b.querySelector('.say'), text);
   scene.appendChild(b);
   place(scene, seat, b, minTop);
   playSfx('bubble');

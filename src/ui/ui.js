@@ -15,7 +15,7 @@
 // =====================================================================
 
 import { CHARACTERS } from '../data/characters.js';
-import { characterHTML, play, setExpression } from './character.js';
+import { characterHTML, play, setExpression, speak } from './character.js';
 import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { voice, playSfx } from './sfx.js';
@@ -207,7 +207,7 @@ export function say(container, situation, { expression, anim = 'bounce', text } 
   const bubble = box.querySelector('.bubble');
   const id = chEl?.dataset.ch;
   if (bubble && id) {
-    bubble.querySelector('.say').textContent = text ?? line(id, situation);
+    speak(chEl, bubble.querySelector('.say'), text ?? line(id, situation)); // la bulle s'écrit, le perso parle
     playSfx('bubble');
     voice(id);
     bubble.style.animation = 'none';
@@ -289,7 +289,7 @@ export function progress(title, charId = 'kai') {
   let who = charId;
   const bubble = m.el.querySelector('.bubble');
   const rotate = setInterval(() => {
-    bubble.querySelector('.say').textContent = line(who, 'attente');
+    speak(m.el.querySelector('.ld-char .ch'), bubble.querySelector('.say'), line(who, 'attente'));
   }, 4000);
 
   /** Change le personnage affiché (ex. Tidiane pendant un souci réseau). */
@@ -300,7 +300,7 @@ export function progress(title, charId = 'kai') {
     m.el.querySelector('.loader').style.setProperty('--c', c.color);
     m.el.querySelector('.ld-char').innerHTML = characterHTML(id, { expression, size: 130 });
     bubble.querySelector('.who').textContent = c.name;
-    bubble.querySelector('.say').textContent = line(id, 'arrivee');
+    speak(m.el.querySelector('.ld-char .ch'), bubble.querySelector('.say'), line(id, 'arrivee'));
   };
   const status = m.el.querySelector('#pg-status');
   return {

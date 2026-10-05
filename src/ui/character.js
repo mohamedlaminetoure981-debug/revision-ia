@@ -24,6 +24,17 @@
 // (apparition, sauts, respiration, téléportation…), l'aura et les pouvoirs
 // restent autour de l'image. Sans planche : le dessin SVG reste affiché.
 // (Le champ `images` d'un perso dans characters.js reste possible et a la priorité.)
+//
+// PERSOS VIVANTS (portraits en images) : l'image est posée dans des calques
+// imbriqués, chacun pour UN mouvement (transform/opacity seulement) :
+//   .ch-sway   balancement lent         .ch-react  sursaut, coups de tête
+//   .ch-talk   petits mouvements quand il parle (au rythme des mots)
+//   .ch-breath respiration (cycle 3-4 s, phase différente par perso)
+//   .ch-stack  les images (fondu enchaîné entre deux expressions)
+// Le conteneur .ch reste libre pour les animations existantes (apparition,
+// signatures, auras, pouvoirs, téléportation).
+// Une seule petite boucle (lifeTick) déclenche les coups de tête aléatoires.
+// speak() écrit une bulle mot par mot et fait parler le perso.
 // =====================================================================
 
 import { CHARACTERS } from '../data/characters.js';
@@ -741,10 +752,15 @@ function imageInner(id, img, o = {}) {
   const ch = CHARACTERS[id];
   const level = Number(o.aura) || 0;
   const halo = level ? `<svg class="ch-aura-svg" viewBox="0 0 200 232" aria-hidden="true"><g class="ch-aura">${aura(level, { color: ch.color }, `i${++uid}`)}</g></svg>` : '';
+  return `${halo}<div class="ch-sway"><div class="ch-react"><div class="ch-talk"><div class="ch-breath"><div class="ch-stack">${imgTag(id, img, o.size)}</div></div></div></div></div>`;
+}
+
+/** Balise <img> d'un portrait (plusieurs tailles). */
+function imgTag(id, img, size, cls = '') {
   const srcset = img.srcset
-    ? ` srcset="${img.srcset.split(', ').map((p) => { const [u, w] = p.split(' '); return `${assetUrl(u)} ${w}`; }).join(', ')}" sizes="${Math.round(o.size || 140)}px"`
+    ? ` srcset="${img.srcset.split(', ').map((p) => { const [u, w] = p.split(' '); return `${assetUrl(u)} ${w}`; }).join(', ')}" sizes="${Math.round(size || 140)}px"`
     : '';
-  return `${halo}<img src="${assetUrl(img.src)}"${srcset} alt="${ch.name}" class="ch-img" decoding="async" draggable="false">`;
+  return `<img src="${assetUrl(img.src)}"${srcset} alt="${CHARACTERS[id].name}" class="ch-img${cls ? ` ${cls}` : ''}" decoding="async" draggable="false">`;
 }
 
 /**
@@ -760,21 +776,161 @@ export function characterHTML(id, o = {}) {
   const inner = img ? imageInner(id, img, { aura: o.aura, size: o.size }) : characterSVG(id, expression, { aura: o.aura });
   // Délai de clignement aléatoire : chaque perso cligne à son rythme.
   const blink = (Math.random() * 3).toFixed(2);
+  // Respiration et balancement : durée et phase au hasard (ils ne bougent pas en même temps).
+  const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+  const breathe = r(3, 4);
+  const sway = r(6, 9);
+  const live = `;--br-dur:${breathe}s;--br-delay:-${r(0, breathe)}s;--sw-dur:${sway}s;--sw-delay:-${r(0, sway)}s`;
+  if (img) startLife();
   return `<div class="ch ch-${id} ${o.enter === false ? '' : 'ch-enter'} ${o.cls || ''}" data-ch="${id}" data-expr="${expression}" data-aura="${o.aura || 0}"
-    style="--c:${ch.color};--size:${o.size || 140}px;--blink-delay:${blink}s"${img ? ' data-img="1"' : ''} role="img" aria-label="${ch.name}">${inner}</div>`;
+    style="--c:${ch.color};--size:${o.size || 140}px;--blink-delay:${blink}s${img ? live : ''}"${img ? ' data-img="1"' : ''} role="img" aria-label="${ch.name}">${inner}</div>`;
 }
 
 /** Change l'expression d'un personnage déjà affiché. */
 export function setExpression(el, expression) {
   if (!el) return;
   const id = el.dataset.ch;
-  const ch = CHARACTERS[id];
   const img = characterImage(id, expression);
+  const stack = el.querySelector('.ch-stack');
+  if (img && stack) { crossfade(el, stack, img, expression); return; }
   el.dataset.expr = expression;
   el.innerHTML = img
     ? imageInner(id, img, { aura: el.dataset.aura, size: parseFloat(el.style.getPropertyValue('--size')) || 140 })
     : characterSVG(id, expression, { aura: Number(el.dataset.aura) || 0 });
 }
+
+/**
+ * Portrait en image : fondu enchaîné doux (≈ 260 ms) vers la nouvelle expression,
+ * avec un petit sursaut. La nouvelle image n'apparaît qu'une fois prête (jamais de
+ * trou ni de saut brutal) ; l'aura n'est pas recréée.
+ */
+function crossfade(el, stack, img, expression) {
+  const prev = el.dataset.expr;
+  el.dataset.expr = expression;
+  const cur = stack.querySelector('.ch-img:not(.ch-out)');
+  const url = assetUrl(img.src);
+  if (cur && cur.getAttribute('src') === url) { if (prev !== expression) hop(el); return; }
+  const token = (el._xf = (el._xf || 0) + 1);
+  stack.querySelectorAll('.ch-out').forEach((x) => x.remove()); // fondu précédent pas fini : on le termine
+  const tmp = document.createElement('div');
+  tmp.innerHTML = imgTag(el.dataset.ch, img, parseFloat(el.style.getPropertyValue('--size')) || 140, 'ch-in');
+  const next = tmp.firstChild;
+  const swap = () => {
+    if (token !== el._xf || !el.isConnected) return;
+    stack.appendChild(next);
+    syncLayers(el);
+    if (cur) {
+      cur.classList.add('ch-out');
+      setTimeout(() => cur.remove(), reducedMotion() ? 0 : 340);
+    }
+    setTimeout(() => next.classList.remove('ch-in'), 320);
+    hop(el);
+  };
+  // Image déjà en cache : immédiat ; sinon on attend qu'elle soit décodée (600 ms max).
+  let done = false;
+  const go = () => { if (!done) { done = true; swap(); } };
+  if (next.decode) next.decode().then(go, go); else next.onload = go;
+  setTimeout(go, 600);
+}
+
+/** Petit sursaut (changement d'expression, réaction). */
+export function hop(el) {
+  const r = el?.querySelector?.('.ch-react');
+  if (!r || reducedMotion()) return;
+  r.classList.remove('ch-hop', 'ch-glance-l', 'ch-glance-r', 'ch-nod');
+  void r.offsetWidth;
+  r.classList.add('ch-hop');
+  clearTimeout(r._t);
+  r._t = setTimeout(() => r.classList.remove('ch-hop'), 400);
+}
+
+/** Animations réduites demandées (téléphone ou réglage de l'appli) ? */
+function reducedMotion() {
+  return document.documentElement.dataset.motion === 'off' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+}
+
+// ---------------------------------------------------------------------
+// Vie au repos : coups de tête à intervalles aléatoires (une seule boucle)
+// ---------------------------------------------------------------------
+let lifeTimer = 0;
+const GLANCES = ['ch-glance-l', 'ch-glance-r', 'ch-nod'];
+function startLife() {
+  if (!lifeTimer) lifeTimer = setInterval(lifeTick, 250);
+}
+function lifeTick() {
+  if (document.hidden || reducedMotion()) return;
+  const now = performance.now();
+  for (const el of document.querySelectorAll('.ch[data-img]')) {
+    if (!el._life) { el._life = { glance: now + 2500 + Math.random() * 6000 }; continue; }
+    const L = el._life;
+    if (now >= L.glance) {
+      L.glance = now + 4000 + Math.random() * 7000;
+      const r = el.querySelector('.ch-react');
+      if (r && !el.classList.contains('ch-talking') && !r.className.includes('ch-hop')) {
+        const g = GLANCES[Math.floor(Math.random() * GLANCES.length)];
+        r.classList.add(g);
+        setTimeout(() => r.classList.remove(g), 1200);
+      }
+    }
+    lifeExtra(el, L, now);
+  }
+}
+// Calques "yeux fermés / bouche ouverte" (partie 2) : rien tant qu'ils n'existent pas.
+function lifeExtra() {}
+function syncLayers() {}
+
+// ---------------------------------------------------------------------
+// Parole : la bulle s'écrit mot par mot, le perso bouge au rythme des mots
+// ---------------------------------------------------------------------
+/**
+ * Écrit `text` dans `sayEl` mot par mot et fait parler le perso `chEl`.
+ * La place de la bulle est réservée dès le début (le texte à venir est
+ * invisible) : rien ne bouge autour.
+ */
+export function speak(chEl, sayEl, text) {
+  text = String(text ?? '');
+  if (!sayEl) return;
+  clearTimeout(sayEl._tw);
+  chEl?.classList?.remove('ch-talking');
+  if (reducedMotion() || !text) { sayEl.textContent = text; return; }
+  const on = document.createElement('span');
+  const off = document.createElement('span');
+  off.className = 'tw-off';
+  off.textContent = text;
+  sayEl.replaceChildren(on, off);
+  // Durée : ~30 ms par caractère, entre 0,4 s et 2,2 s.
+  const total = Math.min(2200, Math.max(400, text.length * 30));
+  const parts = text.split(/(\s+)/).filter(Boolean);
+  let i = 0; let shown = 0;
+  const talking = chEl?.dataset?.img ? chEl : null;
+  talking?.classList.add('ch-talking');
+  const step = () => {
+    if (!sayEl.isConnected) { talking?.classList.remove('ch-talking'); return; }
+    const w = parts[i++];
+    shown += w.length;
+    on.textContent = text.slice(0, shown);
+    off.textContent = text.slice(shown);
+    if (talking && w.trim()) wordPulse(talking, w);
+    if (i >= parts.length) {
+      sayEl._tw = setTimeout(() => { sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); }, 180);
+      return;
+    }
+    sayEl._tw = setTimeout(step, Math.max(40, (total * w.length) / text.length));
+  };
+  sayEl._tw = setTimeout(step, 0); // la bulle est peut-être pas encore dans la page
+}
+
+/** Un mot prononcé : petit mouvement (alterné, pour relancer l'animation à chaque mot). */
+function wordPulse(el, word) {
+  const t = el.querySelector('.ch-talk');
+  if (!t) return;
+  const a = t.classList.contains('ch-say1');
+  t.classList.toggle('ch-say1', !a);
+  t.classList.toggle('ch-say2', a);
+  mouthWord(el, word);
+}
+function mouthWord() {}
+function mouthShut() {}
 
 /**
  * Joue une animation sur le personnage.

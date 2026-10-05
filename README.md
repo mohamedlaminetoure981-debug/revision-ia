@@ -442,6 +442,20 @@ voice: { arrivee: ['voices/kai-arrivee-1.mp3', 'voices/kai-arrivee-2.mp3'] },
 ```
 La fonction `playVoice()` de `src/ui/fx.js` les joue (si les sons sont activés).
 
+### Persos vivants (portraits en images)
+Sans nouvelle image, les portraits paraissent vivants (`src/ui/character.js` + bloc
+« PERSOS VIVANTS » de `src/styles/characters.css`) :
+- **fondu enchaîné** (~260 ms) avec un petit rebond quand l'expression change
+  (`setExpression`), la nouvelle image n'apparaît qu'une fois prête ;
+- **respiration** quasi invisible (cycle de 3 à 4 s) et **balancement** lent, avec une
+  phase au hasard pour chaque perso ;
+- **coups de tête** de temps en temps (une seule petite boucle pour toute l'appli) ;
+- **parole** : `speak(perso, bulle, texte)` écrit la bulle mot par mot (sa taille est
+  réservée d'avance : rien ne saute) et le perso bouge légèrement à chaque mot.
+Uniquement `transform` et `opacity`, dans des calques imbriqués à l'intérieur du perso :
+les apparitions, signatures, auras, pouvoirs et téléportations ne sont pas touchés.
+Tout s'arrête si le téléphone demande de réduire les animations.
+
 ### Animations
 Dans `src/styles/characters.css` : animations de base (respiration, clignement, cheveux),
 réactions (`anim-bounce`, `anim-jump`, `anim-shake`) et animations **signature**
@@ -975,6 +989,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.16** : persos vivants (fondu entre expressions, respiration, micro-mouvements,
+  bulles qui s'écrivent).
 - ✅ **v1.15.1** : correctif de l'écran de bienvenue (la page ne se recharge plus toute seule
   à la première visite ni pendant une mise à jour ; saisie sauvegardée au fur et à mesure).
 - ✅ **v1.15** : économie de quota (résumé + fiches + quiz en 1 demande, photos par 8,

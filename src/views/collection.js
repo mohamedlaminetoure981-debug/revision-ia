@@ -7,7 +7,7 @@
 // =====================================================================
 
 import { CHARACTERS } from '../data/characters.js';
-import { characterHTML, play } from '../ui/character.js';
+import { characterHTML, play, speak } from '../ui/character.js';
 import { esc, line, mascot, modal, subjectEmoji, toast } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia } from '../ui/fx.js';
 import { loadCollection, markRevealed, RARITIES } from '../core/collection.js';
@@ -129,7 +129,7 @@ function openPack(el, pending) {
       setTimeout(() => flash.remove(), 900);
       if (it.rarity.stars >= 3) { confetti(it.rarity.stars === 4 ? 180 : 90, { color: it.rarity.color }); sound('badge'); onomatopoeia(it.rarity.stars === 4 ? 'LÉGENDAIRE!' : 'ÉPIQUE!', { color: it.rarity.color }); }
       else sound('sparkle');
-      el.querySelector('#say').textContent = line('sora', it.rarity.stars >= 3 ? 'carte_rare' : 'carte_obtenue');
+      speak(el.querySelector('.mascot .ch'), el.querySelector('#say'), line('sora', it.rarity.stars >= 3 ? 'carte_rare' : 'carte_obtenue'));
       play(el.querySelector('.mascot .ch'), it.rarity.stars >= 3 ? 'jump' : 'bounce');
       tilt(stage.querySelector('.tcg'));
     }, 450);

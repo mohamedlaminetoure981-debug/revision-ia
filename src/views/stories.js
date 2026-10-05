@@ -15,7 +15,7 @@
 
 import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
-import { characterHTML, play, setExpression } from '../ui/character.js';
+import { characterHTML, play, setExpression, speak } from '../ui/character.js';
 import { esc, rich, line, showError, mathText } from '../ui/ui.js';
 import { vibrate, sound, confetti, onomatopoeia } from '../ui/fx.js';
 import { rewardSummary } from './course.js';
@@ -113,10 +113,10 @@ export async function render(el, [courseId]) {
     // Nia réagit : elle "explique" sur les écrans 💡, sinon parfois une réplique.
     if (isExplain) {
       setExpression(niaEl, 'reflexion');
-      bubble.textContent = 'Ce passage était peu expliqué dans le cours, alors je t’ai ajouté ça.';
+      speak(niaEl, bubble, 'Ce passage était peu expliqué dans le cours, alors je t’ai ajouté ça.');
     } else if (i % 4 === 0 && i > 0) {
       setExpression(niaEl, 'joie');
-      bubble.textContent = line('nia', 'encouragement');
+      speak(niaEl, bubble, line('nia', 'encouragement'));
     } else {
       setExpression(niaEl, 'neutre');
     }
@@ -146,8 +146,8 @@ export async function render(el, [courseId]) {
         <button class="linkbtn" id="again">↺ Revoir depuis le début</button>
       </div>`;
     stage.querySelector('#again').onclick = () => { i = 0; show(); };
-    bubble.textContent = line('nia', 'fin');
     setExpression(niaEl, 'joie');
+    speak(niaEl, bubble, line('nia', 'fin'));
     if (!rewarded) {
       rewarded = true;
       confetti(110, { color: CHARACTERS.nia.color });
