@@ -116,8 +116,8 @@ export async function render(el) {
       } else {
         await createProfile(name, chosen);
       }
-      confetti();
-      onomatopoeia("LET'S GO!");
+      confetti(150, { color: CHARACTERS[chosen].color });
+      onomatopoeia("LET'S GO!", { color: CHARACTERS[chosen].color, big: true });
       vibrate([20, 40, 60]);
       sound('level');
       setTimeout(() => { location.hash = '#/'; }, 900);

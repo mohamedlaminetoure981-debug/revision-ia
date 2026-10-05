@@ -127,7 +127,7 @@ function openPack(el, pending) {
       flash.style.setProperty('--rc', it.rarity.color);
       document.body.appendChild(flash);
       setTimeout(() => flash.remove(), 900);
-      if (it.rarity.stars >= 3) { confetti(it.rarity.stars === 4 ? 180 : 90); sound('badge'); onomatopoeia(it.rarity.stars === 4 ? 'LÉGENDAIRE!' : 'ÉPIQUE!'); }
+      if (it.rarity.stars >= 3) { confetti(it.rarity.stars === 4 ? 180 : 90, { color: it.rarity.color }); sound('badge'); onomatopoeia(it.rarity.stars === 4 ? 'LÉGENDAIRE!' : 'ÉPIQUE!', { color: it.rarity.color }); }
       else sound('sparkle');
       el.querySelector('#say').textContent = line('sora', it.rarity.stars >= 3 ? 'carte_rare' : 'carte_obtenue');
       play(el.querySelector('.mascot .ch'), it.rarity.stars >= 3 ? 'jump' : 'bounce');

@@ -26,6 +26,7 @@ import * as db from '../core/db.js';
 import { CHARACTERS } from '../data/characters.js';
 import { characterHTML, play } from './character.js';
 import { onomatopoeia, vibrate, sound, confetti } from './fx.js';
+import { rise } from './particles.js';
 
 const RANK = { light: 1, strong: 2, ultimate: 3 };
 let suspended = 0;
@@ -116,6 +117,8 @@ function strong(charId, target) {
     `<span class="pw-flame" style="left:${8 + i * 13}%;animation-delay:${(i % 3) * 0.18 + i * 0.05}s"></span>`).join('');
   document.body.appendChild(layer);
   setTimeout(() => layer.remove(), 1900);
+  // Étincelles qui montent autour du perso
+  rise(r, { colors: [color, '#ffffff', color] });
 }
 
 // ---------------------------------------------------------------------
@@ -139,11 +142,8 @@ const ULTIMATE_FX = {
   check: () => '<svg class="fx-check" viewBox="0 0 200 200"><path d="M30 105 L82 155 L172 45"/></svg>',
   // TIDIANE : bouclier zen, onde calme
   shield: () => `<div class="fx-shield"></div>${[0, 0.6, 1.2].map((d) => `<div class="fx-wave" style="animation-delay:${d}s"></div>`).join('')}`,
-  // BINTA : explosion de hype, étoiles dans tous les sens
-  hype: () => Array.from({ length: 16 }, (_, i) => {
-    const a = (i / 16) * Math.PI * 2;
-    return `<span class="fx-star" style="--dx:${Math.round(Math.cos(a) * 170)}px;--dy:${Math.round(Math.sin(a) * 220)}px;animation-delay:${(i % 4) * 0.08}s">${i % 2 ? '⭐' : '✨'}</span>`;
-  }).join(''),
+  // BINTA : explosion de hype (anneaux ; étincelles et étoiles par ui/particles.js)
+  hype: () => [0, 0.35, 0.7].map((d) => `<div class="fx-hype" style="animation-delay:${d}s"></div>`).join(''),
 };
 
 function ultimate(charId, { text, sub, short = false } = {}) {
@@ -163,8 +163,8 @@ function ultimate(charId, { text, sub, short = false } = {}) {
     document.body.appendChild(el);
     if (!reduced()) {
       if (ch.power?.effect === 'lightning') el.querySelector('.ult-fx').classList.add('shake'); // secousse limitée au pouvoir (pas à la page)
-      setTimeout(() => onomatopoeia(text || 'POUVOIR ULTIME!'), 250);
-      if (ch.power?.effect === 'hype') confetti(140);
+      setTimeout(() => onomatopoeia(text || 'POUVOIR ULTIME!', { color: ch.color, big: true }), 250);
+      confetti(ch.power?.effect === 'hype' ? 160 : 90, { color: ch.color, y: innerHeight * 0.45 });
     }
     vibrate([40, 30, 60, 30, 90]);
     sound('energy', 3);

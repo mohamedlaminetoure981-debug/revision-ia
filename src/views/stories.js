@@ -150,8 +150,8 @@ export async function render(el, [courseId]) {
     setExpression(niaEl, 'joie');
     if (!rewarded) {
       rewarded = true;
-      confetti();
-      onomatopoeia('YOSH!');
+      confetti(110, { color: CHARACTERS.nia.color });
+      onomatopoeia('YOSH!', { color: CHARACTERS.nia.color });
       sound('level');
       vibrate([20, 40, 20]);
       await rewardSummary(stage.querySelector('.ch'));

@@ -117,6 +117,11 @@ export async function openReader(el, chapter, meta, onEnd) {
     veil.setAttribute('d', `M-50,-50 H${PAGE_W + 50} V${PAGE_H + 50} H-50 Z M${poly} Z`);
     veil.setAttribute('opacity', '0.82');
     dots();
+    // Les onomatopées de la case cadrée "claquent" à nouveau (elles ont joué hors champ)
+    holder.querySelectorAll(`[data-edit^="${panelIdx}:sfx:"] .bd-sfx`).forEach((g) => {
+      g.classList.remove('bd-sfx'); void g.getBoundingClientRect(); g.classList.add('bd-sfx');
+      g.style.animationDelay = animate ? '.3s' : '0s';
+    });
     const panelData = chapter.pages[pageIdx].panels[panelIdx];
     if (soundOn && panelData?.sound) setTimeout(() => playSfx(panelData.sound), animate ? 260 : 0);
   }

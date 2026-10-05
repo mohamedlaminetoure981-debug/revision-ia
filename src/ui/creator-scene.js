@@ -66,8 +66,8 @@ export function creatorWelcome() {
       // 3. Tout le monde fête l'arrivée du créateur.
       clearBubbles(el);
       seats.forEach(({ seat }) => setExpression(seat.querySelector('.ch'), 'celebration'));
-      confetti(160);
-      onomatopoeia('👑 CRÉATEUR!');
+      confetti(160, { color: '#FFD23F' });
+      onomatopoeia('👑 CRÉATEUR!', { color: '#FFD23F' });
       const btn = document.createElement('button');
       btn.className = 'btn block creator-hello';
       btn.textContent = 'Salut la team 👑';

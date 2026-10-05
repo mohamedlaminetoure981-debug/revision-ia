@@ -98,7 +98,7 @@ export async function render(el, [courseId, idx = '0']) {
   if (!strip.read) {
     strip.read = true;
     await db.put('mangas', strip);
-    onomatopoeia('MANGA!');
+    onomatopoeia('MANGA!', { color: CHARACTERS.nia.color });
     celebrate(await addXp(XP_RULES.manga, 'mangas'), frame);
   }
 

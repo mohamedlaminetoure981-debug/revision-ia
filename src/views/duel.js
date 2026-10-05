@@ -178,9 +178,9 @@ export async function render(el, [code]) {
         </div>
       </div>`;
     const sides = el.querySelectorAll('.duel-face .ch');
-    if (win) { sound('victory'); confetti(140); onomatopoeia('VICTOIRE!'); vibrate([30, 40, 30, 40, 80]); setTimeout(() => power(meChar, 'strong', { target: sides[0] }), 700); }
+    if (win) { sound('victory'); confetti(140, { color: CHARACTERS[meChar].color }); onomatopoeia('VICTOIRE!', { color: CHARACTERS[meChar].color }); vibrate([30, 40, 30, 40, 80]); setTimeout(() => power(meChar, 'strong', { target: sides[0] }), 700); }
     else if (draw) { sound('good'); onomatopoeia('ÉGALITÉ!'); }
-    else { sound('boss'); onomatopoeia('ARGH!'); play(sides[0], 'shake'); }
+    else { sound('boss'); onomatopoeia('ARGH!', { color: '#FF5A3D', big: false }); play(sides[0], 'shake'); }
     if (xpResult) celebrate(xpResult, el.querySelector('h1'));
     el.querySelector('#back')?.addEventListener('click', async () => {
       const r = await shareDuel(makeDuel({

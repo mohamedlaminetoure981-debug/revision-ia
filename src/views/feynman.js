@@ -141,7 +141,7 @@ export async function render(el, [courseId, idx]) {
       </div>`;
     say(line('ren', good ? 'feynman_bonne' : mid ? 'feynman_moyenne' : 'feynman_faible'), good ? 'surprise' : mid ? 'clin' : 'encouragement', good ? 'shake' : 'bounce');
     $('#again').onclick = () => render(el, [courseId, idx]);
-    if (good) { confetti(); onomatopoeia(g.grade >= 18 ? 'SUGOI!' : 'COMPRIS!'); power('ren', g.grade >= 18 ? 'strong' : 'light', { target: renEl }); }
+    if (good) { confetti(110, { color: CHARACTERS.ren.color }); onomatopoeia(g.grade >= 18 ? 'SUGOI!' : 'COMPRIS!', { color: CHARACTERS.ren.color }); power('ren', g.grade >= 18 ? 'strong' : 'light', { target: renEl }); }
     celebrate(await addXp(15 + g.grade, 'feynman'), $('#zone .big'));
   }
 }

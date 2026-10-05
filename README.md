@@ -195,7 +195,8 @@ revision-ia/
     ├── ui/                    Outils d'affichage
     │   ├── character.js       Dessin SVG des persos en calques + animations
     │   ├── ui.js              Markdown + formules (KaTeX), bulles, fenêtres, erreurs
-    │   ├── fx.js              Confettis, onomatopées, vibrations, fête de Binta
+    │   ├── fx.js              Célébrations lumineuses, textes d'effet néon, vibrations, fête de Binta
+    │   ├── particles.js       Moteur de particules (canvas) : étincelles, étoiles, ondes de choc
     │   ├── sfx.js             Effets sonores style anime générés par le code + voix des persos
     │   ├── bubble.js          Bulle unique des scènes de groupe (toujours dans l'écran)
     │   ├── install.js         Bandeau « Installe l'appli » (Android + guide iPhone)
@@ -394,6 +395,20 @@ Dans `src/styles/characters.css` : animations de base (respiration, clignement, 
 réactions (`anim-bounce`, `anim-jump`, `anim-shake`) et animations **signature**
 (`.sig-salut`, `.sig-lunettes`, …). Pour en créer une : ajoute une classe `.sig-monnom`
 et mets `signature: 'monnom'` dans le perso.
+
+### Célébrations et textes d'effet
+- `confetti(intensité, { color })` (`src/ui/fx.js`) : explosion de **lumière** dessinée en
+  canvas par `src/ui/particles.js` (étincelles en traînées néon, petites étoiles, onde de
+  choc ; pluie d'éclats en plus à partir de 140). `color` = couleur du perso concerné
+  (sinon celle du compagnon choisi).
+- `onomatopoeia('LET'S GO!', { color, big })` : grand texte néon (dégradé, lueur, zoom
+  avec rebond, flash, aberration chromatique), sortie en éclat de particules. `big` ajoute
+  une secousse discrète de l'écran (automatique pour NIVEAU, LÉGENDAIRE, K.O.…).
+- Styles : bloc « Célébrations » de `src/styles/main.css`. Onomatopées de la BD (BAM,
+  TUUUT…) : fonction `sfx()` de `src/comic/comic.js` + `.bd-sfx` dans `views.css`.
+- Léger sur petit Android : pas de `shadowBlur`, lueurs pré-calculées, 320 particules
+  au plus, salves allégées si le téléphone ralentit ; rien ne bouge si « réduire les
+  animations » est activé sur le téléphone.
 
 ---
 

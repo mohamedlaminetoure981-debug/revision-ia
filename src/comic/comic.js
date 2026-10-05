@@ -469,19 +469,50 @@ export function sfxGeom(o, box) {
   return { x, y, size, rot, corners, cover: (hw * 2 * (top + bot)) / (box.area || box.w * box.h) };
 }
 
-/** Onomatopée dessinée : { text, x, y, size, rot, color, skew } */
+/** Mélange deux couleurs hex (k = part de la seconde). */
+function mixHex(a, b, k) {
+  const pa = parseInt(a.slice(1), 16); const pb = parseInt(b.slice(1), 16);
+  const ch = (n, sh) => Math.round(((n >> sh) & 255) * (1 - k) + ((pb >> sh) & 255) * k);
+  return `#${[16, 8, 0].map((sh) => ch(pa, sh).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * Onomatopée dessinée : { text, x, y, size, rot, color, skew }
+ * Style BD net : ombre portée dure, double contour (encre + blanc) à angles vifs,
+ * remplissage en dégradé avec un reflet ; à l'écran, elle "claque" en apparaissant
+ * (.bd-sfx, voir views.css).
+ */
 function sfx(o, box) {
   const { x, y, size, rot } = sfxGeom(o, box);
-  const col = o.color || '#ffd23f';
+  const col = /^#[0-9a-f]{6}$/i.test(o.color || '') ? o.color : '#ffd23f';
   const t = `translate(${f(x)},${f(y)}) rotate(${rot}) skewX(${o.skew ?? -8})`;
   const letters = [...String(o.text)];
   let tx = '';
   // Lettres de tailles légèrement différentes : plus vivant qu'un texte plat
   letters.forEach((ch, i) => { const k = 1 + ((i * 37) % 7) / 30 - 0.08; tx += `<tspan font-size="${f(size * k)}">${esc(ch)}</tspan>`; });
-  return `<g transform="${t}">
-    <text text-anchor="middle" font-family="${DISPLAY}" font-weight="900" fill="#fff" stroke="#fff" stroke-width="${f(size * 0.32)}" stroke-linejoin="round">${tx}</text>
-    <text text-anchor="middle" font-family="${DISPLAY}" font-weight="900" fill="${INK}" stroke="${INK}" stroke-width="${f(size * 0.2)}" stroke-linejoin="round">${tx}</text>
-    <text text-anchor="middle" font-family="${DISPLAY}" font-weight="900" fill="${col}">${tx}</text></g>`;
+  const id = uid('sx');
+  const txt = (attrs) => `<text text-anchor="middle" font-family="${DISPLAY}" font-weight="900" ${attrs}>${tx}</text>`;
+  const sh = size * 0.07;
+  // Traits d'impact autour du mot (style manga) : fins, effilés, à l'encre
+  const hw = (letters.length * size * 0.74) / 2;
+  let accents = '';
+  for (let k = 0; k < 6; k++) {
+    const side = k < 3 ? -1 : 1; const j = k % 3;
+    const ax = side * (hw + size * (0.1 + j * 0.04)); const ay = -size * (0.75 - j * 0.42);
+    const a = Math.atan2(ay + size * 0.3, ax); const L = size * (0.42 - j * 0.07);
+    const bx = ax + Math.cos(a) * L; const by = ay + Math.sin(a) * L;
+    const nx = -Math.sin(a) * size * 0.05; const ny = Math.cos(a) * size * 0.05;
+    accents += `<path d="M${f(ax + nx)},${f(ay + ny)} L${f(bx)},${f(by)} L${f(ax - nx)},${f(ay - ny)} Z" fill="${INK}" stroke="#fff" stroke-width="${f(size * 0.04)}" stroke-linejoin="round" paint-order="stroke"/>`;
+  }
+  return `<g transform="${t}"><g class="bd-sfx">
+    <defs><linearGradient id="${id}" x1="0" y1="${f(-size * 0.9)}" x2="0" y2="${f(size * 0.2)}" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="${mixHex(col, '#ffffff', 0.6)}"/><stop offset=".44" stop-color="${mixHex(col, '#ffffff', 0.35)}"/><stop offset=".46" stop-color="${col}"/><stop offset="1" stop-color="${mixHex(col, '#000000', 0.4)}"/></linearGradient></defs>
+    ${accents}
+    ${txt(`transform="translate(${f(sh)},${f(sh)})" fill="${INK}" stroke="${INK}" stroke-width="${f(size * 0.3)}" stroke-linejoin="miter" stroke-miterlimit="3"`)}
+    ${txt(`fill="#fff" stroke="#fff" stroke-width="${f(size * 0.3)}" stroke-linejoin="miter" stroke-miterlimit="3"`)}
+    ${txt(`fill="${INK}" stroke="${INK}" stroke-width="${f(size * 0.17)}" stroke-linejoin="miter" stroke-miterlimit="3"`)}
+    ${txt(`fill="url(#${id})"`)}
+  </g></g>`;
 }
 
 /** Dégradé d'éclairage par-dessus la case (donne de la profondeur, ton plus mature). */

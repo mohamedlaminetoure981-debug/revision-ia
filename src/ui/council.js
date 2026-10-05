@@ -175,14 +175,14 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
     sound('reveal');
     const rv = document.createElement('div');
     rv.innerHTML = `
-      ${res.level === 'excellent' ? `<div class="shockwave" style="--c:${color}"></div><div class="burst"></div>` : ''}
+      ${res.level === 'excellent' ? `<div class="shockwave" style="--c:${color}"></div><div class="burst" style="--c:${color}"></div>` : ''}
       ${res.level === 'a_retravailler' || res.level === 'moyen' ? '<div class="warm-glow"></div>' : ''}
       <div class="reveal" style="--c:${color}"><div class="note">${esc(res.label)}</div><div class="lbl">${LEVEL_LABEL[res.level]}</div>
         <div class="bubble" style="--c:${rc.color}"><span class="who">${esc(rc.name)}</span>${esc(councilLine(revealer, res.level))}</div></div>`;
     el.appendChild(rv);
     if (res.level === 'excellent') { // explosion d'énergie
       Object.values(seats).forEach((s) => setExpression(s.querySelector('.ch'), 'celebration'));
-      setTimeout(() => { confetti(140); onomatopoeia("LET'S GO!"); sound('level'); }, 450); vibrate([30, 40, 60]);
+      setTimeout(() => { confetti(140, { color }); onomatopoeia("LET'S GO!", { color, big: true }); sound('level'); }, 450); vibrate([30, 40, 60]);
     } else if (res.level === 'bon') {
       sound('good'); vibrate([20, 30]);
     } else { // encouragement chaleureux, jamais moqueur

@@ -1,14 +1,21 @@
 // =====================================================================
-// fx.js — Sensations : confettis, onomatopées anime, vibrations, sons
+// fx.js — Sensations : célébrations lumineuses, textes d'effet, vibrations, sons
 // ---------------------------------------------------------------------
 // Tout est léger (pas de bibliothèque) pour rester fluide sur un
-// téléphone d'entrée de gamme. Les sons (style anime, générés par le code
-// dans ui/sfx.js) sont ACTIVÉS par défaut, volume modéré : bouton 🔊/🔇
-// en haut de l'écran et curseur de volume dans Réglages.
+// téléphone d'entrée de gamme : les particules sont dessinées par
+// ui/particles.js (canvas), les textes d'effet en CSS (styles/main.css).
+// Les sons (style anime, générés par le code dans ui/sfx.js) sont ACTIVÉS
+// par défaut, volume modéré : bouton 🔊/🔇 en haut de l'écran et curseur
+// de volume dans Réglages.
 // =====================================================================
 
 import * as db from '../core/db.js';
 import { playSfx, setSfxPrefs } from './sfx.js';
+import { burst, rain, shatter, sparkle, reducedMotion } from './particles.js';
+import { getProfileSync } from '../core/game.js';
+import { CHARACTERS } from '../data/characters.js';
+
+const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const prefs = { sounds: true, vibration: true, motion: true };
 
@@ -42,86 +49,112 @@ export function playVoice(url) {
 }
 
 // ---------------------------------------------------------------------
-// Confettis
+// Couleurs d'une célébration : celles de l'appli + celle du personnage
 // ---------------------------------------------------------------------
-const CONFETTI_COLORS = ['#8B5CF6', '#C6FF3D', '#FF3D9A', '#22D3EE', '#FFD23F'];
+const APP_COLORS = ['#C6FF3D', '#FF3D9A', '#22D3EE', '#8B5CF6', '#FFD23F'];
+/** Couleur principale : celle demandée, sinon celle du compagnon choisi. */
+function mainColor(color) {
+  if (color) return color;
+  const id = getProfileSync()?.companion;
+  return CHARACTERS[id]?.color || '#8B5CF6';
+}
+/** Couleur d'accent qui contraste avec la principale (rose ou cyan). */
+function accentOf(c) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+  return r > b && r > 150 && g < 160 ? '#22D3EE' : '#FF3D9A';
+}
+function palette(color) {
+  const c1 = mainColor(color);
+  const c2 = accentOf(c1);
+  return { c1, c2, particles: [c1, c1, c2, '#ffffff', ...APP_COLORS.filter((x) => x !== c1).slice(0, 2)] };
+}
 
-/** Lance des confettis pendant ~2,2 s. */
-export function confetti(count = 110) {
+// ---------------------------------------------------------------------
+// Célébration lumineuse (remplace les anciens confettis de papier)
+// ---------------------------------------------------------------------
+let lastBurst = 0;
+
+/**
+ * Explosion de lumière : onde de choc, étincelles en traînées néon, étoiles qui
+ * retombent ; pluie d'éclats en plus pour les grands moments (count ≥ 140).
+ * @param {number} [count]  intensité (ancien nombre de confettis : 60 → 200)
+ * @param {object} [o]      { color: couleur du perso concerné, x, y }
+ */
+export function confetti(count = 110, o = {}) {
   playSfx('sparkle');
-  if (!prefs.motion) return;
-  const canvas = document.createElement('canvas');
-  canvas.className = 'confetti';
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  canvas.width = innerWidth * dpr;
-  canvas.height = innerHeight * dpr;
-  document.body.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const parts = Array.from({ length: count }, () => ({
-    x: innerWidth / 2 + (Math.random() - 0.5) * 80,
-    y: innerHeight * 0.38,
-    vx: (Math.random() - 0.5) * 13,
-    vy: -Math.random() * 13 - 4,
-    r: Math.random() * 6 + 4,
-    a: Math.random() * Math.PI,
-    va: (Math.random() - 0.5) * 0.3,
-    c: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-    star: Math.random() < 0.25,
-  }));
-  const start = performance.now();
-  (function frame(now) {
-    const t = now - start;
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    for (const p of parts) {
-      p.vy += 0.35;
-      p.vx *= 0.99;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.a += p.va;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.a);
-      ctx.globalAlpha = Math.max(0, 1 - t / 2200);
-      ctx.fillStyle = p.c;
-      if (p.star) { // petite étincelle à 4 branches
-        ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-          const rr = i % 2 ? p.r * 0.35 : p.r;
-          ctx.lineTo(Math.cos((i * Math.PI) / 4) * rr, Math.sin((i * Math.PI) / 4) * rr);
-        }
-        ctx.fill();
-      } else {
-        ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2);
-      }
-      ctx.restore();
-    }
-    if (t < 2200) requestAnimationFrame(frame);
-    else canvas.remove();
-  })(start);
+  if (!prefs.motion || reducedMotion()) return;
+  const { particles } = palette(o.color);
+  lastBurst = performance.now();
+  burst({ x: o.x ?? innerWidth / 2, y: o.y ?? innerHeight * 0.38, colors: particles, power: count >= 150 ? 1.25 : count < 80 ? 0.8 : 1, count: Math.round(Math.min(150, count * 0.8)) });
+  if (count >= 140) rain({ colors: particles, count: Math.round(count / 4) });
 }
 
-/** Grosse onomatopée anime au centre de l'écran ("YOSH!", "LET'S GO!"…). */
-export function onomatopoeia(text) {
-  const burst = document.createElement('div');
-  burst.className = 'burst';
+/** Petite secousse de l'écran (grands moments seulement). */
+export function shakeScreen() {
+  if (!prefs.motion || reducedMotion()) return;
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.classList.remove('fx-shake');
+  void app.offsetWidth;
+  app.classList.add('fx-shake');
+  setTimeout(() => app.classList.remove('fx-shake'), 420);
+}
+
+/**
+ * Grand texte d'effet au centre de l'écran ("LET'S GO!", "NIVEAU 5!"…) :
+ * typo épaisse en dégradé néon, lueur, zoom avec rebond et flou de mouvement,
+ * flash, légère aberration chromatique, puis sortie en éclat de particules.
+ * @param {string} text
+ * @param {object} [o]  { color: couleur du perso, big: grand moment (secousse), duration }
+ */
+export function onomatopoeia(text, o = {}) {
+  const { c1, c2, particles } = palette(o.color);
+  const big = o.big ?? /^(NIVEAU|NIV\.|LÉGENDAIRE|ULTIME|K\.O|VICTOIRE|FIN DE SAISON|AURA|👑|POUVOIR|PARFAIT)/i.test(text);
+  const calm = !prefs.motion || reducedMotion();
   const el = document.createElement('div');
-  el.className = 'onomatopoeia';
-  el.textContent = text;
-  document.body.append(burst, el);
-  setTimeout(() => { el.remove(); burst.remove(); }, 1400);
+  el.className = `fx-title${big ? ' big' : ''}${calm ? ' calm' : ''}`;
+  el.setAttribute('aria-hidden', 'true');
+  el.style.setProperty('--c1', c1);
+  el.style.setProperty('--c2', c2);
+  // Texte long : police plus petite pour tenir sur l'écran (voir .fx-word)
+  el.style.setProperty('--len', String(Math.max(4, [...String(text)].length)));
+  // Les emojis (🔥, 👑…) sont posés à côté du texte : un dégradé ou une lueur les abîmerait.
+  const emo = /\p{Extended_Pictographic}/u;
+  const parts = String(text).split(/(\p{Extended_Pictographic}️?)/u).filter((p) => p.trim());
+  el.innerHTML = `<div class="fx-rays"></div><div class="fx-flash"></div>
+    <div class="fx-word">${parts.map((p) => {
+      if (emo.test(p)) return `<span class="fx-emo">${p}</span>`;
+      const t = esc(p.trim());
+      return `<span class="fx-stack"><span class="g">${t}</span><span class="ca a">${t}</span><span class="ca b">${t}</span><span class="f">${t}</span></span>`;
+    }).join('')}</div>`;
+  document.body.appendChild(el);
+  if (!calm) {
+    // Petite gerbe si aucune explosion n'accompagne le texte
+    if (performance.now() - lastBurst > 200) setTimeout(() => burst({ y: innerHeight * 0.38, colors: particles, power: 0.6, count: big ? 50 : 26 }), 90);
+    if (big) setTimeout(shakeScreen, 110);
+  }
+  const dur = o.duration || (big ? 1650 : 1250);
+  setTimeout(() => {
+    const word = el.querySelector('.fx-word');
+    if (!calm) shatter(word.getBoundingClientRect(), { colors: particles, count: big ? 70 : 40 });
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 360);
+  }, dur);
 }
 
-/** "+15 XP" qui s'envole depuis un élément (ou le centre de l'écran). */
+/** "+15 XP" lumineux qui s'envole depuis un élément (ou le centre de l'écran). */
 export function xpFloat(amount, fromEl) {
   if (!amount) return;
   const el = document.createElement('div');
   el.className = 'xp-float';
   el.textContent = `+${amount} XP`;
   const r = fromEl?.getBoundingClientRect?.();
-  el.style.left = `${r ? r.left + r.width / 2 - 30 : innerWidth / 2 - 30}px`;
-  el.style.top = `${r ? r.top : innerHeight / 2}px`;
+  const x = r ? r.left + r.width / 2 : innerWidth / 2;
+  const y = r ? r.top : innerHeight / 2;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
   document.body.appendChild(el);
+  if (prefs.motion) sparkle(x, y, { colors: ['#C6FF3D', '#ffffff', '#22D3EE'], count: 10 });
   setTimeout(() => el.remove(), 1300);
 }
 
@@ -190,7 +223,7 @@ async function bintaParty(result) {
     const { offerStatus } = await import('./status.js');
     offerStatus({ kicker: 'Nouveau niveau', big: `NIV. ${result.level}`, sub: 'Level up !', lines: [] });
   });
-  confetti(120);
+  confetti(120, { color: '#FF3D9A' });
   sound(result.newBadges?.length ? 'badge' : 'level');
   vibrate([20, 30, 20, 30, 50]);
   setTimeout(() => play(m.el.querySelector('.ch'), 'signature'), 300);
