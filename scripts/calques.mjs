@@ -120,13 +120,18 @@ function boxBlur(src, w, h, r) {
  */
 export async function buildLayers(sharp, dir, id, neutre, head) {
   const files = {}; const calques = {}; const report = {};
-  // planches.json peut désactiver un calque : "calques": { "bouche": false } (retouche ratée).
+  // planches.json peut régler un calque : "calques": { "bouche": false } (désactivé), ou
+  // "calques": { "bouche": { "zone": [x, y, largeur, hauteur] } } : le calque est limité à
+  // cette zone FIXE (en % du portrait), sans agrandissement ; tout ce qui change en dehors
+  // (sweat, sourcils redessinés par l'IA) est ignoré.
   let off = {};
   try { off = JSON.parse(readFileSync(join(dir, 'planches.json'), 'utf8')).calques || {}; } catch { /* pas de réglage */ }
   for (const [kind, L] of Object.entries(LAYERS)) {
     const file = variantFile(dir, L.file);
     if (!file) continue;
-    if (off[kind === 'blink' ? 'yeux' : 'bouche'] === false) { report[L.label] = 'désactivé dans planches.json'; continue; }
+    const opt = off[kind === 'blink' ? 'yeux' : 'bouche'];
+    if (opt === false) { report[L.label] = 'désactivé dans planches.json'; continue; }
+    const fixed = Array.isArray(opt?.zone) && opt.zone.length === 4 ? opt.zone.map(Number) : null; // zone fixe
     try {
       // 1. Détourage de la variante
       const { data: px, info } = await sharp(file).rotate().removeAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -150,7 +155,17 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
           Math.max(0, Math.round(head.top + head.w * L.y[0])), Math.min(H, Math.round(head.top + head.w * L.y[1]))],
         [Math.round(W * L.fx[0]), Math.round(W * L.fx[1]), Math.round(H * L.fy[0]), Math.round(H * L.fy[1])],
       ];
+      if (fixed) { // zone fixe imposée : la seule zone essayée (pas de zone de secours, pas d'agrandissement)
+        const [fx, fy, fw, fh] = fixed;
+        zones.length = 0;
+        zones.push([Math.max(0, Math.round((W * fx) / 100)), Math.min(W, Math.round((W * (fx + fw)) / 100)),
+          Math.max(0, Math.round((H * fy) / 100)), Math.min(H, Math.round((H * (fy + fh)) / 100))]);
+      }
       let zx0; let zx1; let zy0; let zy1; let zw; let zh; let fix; let mask; let any = 0; let soft;
+      const winFinal = (x, y) => { // même fenêtre elliptique, pour adoucir le bord du calque fini
+        const r = Math.hypot((x + 0.5 - zw / 2) / (zw / 2), (y + 0.5 - zh / 2) / (zh / 2));
+        return r >= 1 ? 0 : r <= 0.8 ? 1 : (() => { const t = (1 - r) / 0.2; return t * t * (3 - 2 * t); })();
+      };
       let grow = 0;
       for (let zi = 0; zi < zones.length; zi++) {
         [zx0, zx1, zy0, zy1] = zones[zi];
@@ -189,7 +204,15 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
         soft = boxBlur(diff, zw, zh, 2);
         mask = new Float32Array(zw * zh);
         any = 0;
-        for (let k = 0; k < zw * zh; k++) if (soft[k] > 34) { mask[k] = 1; any++; }
+        // Zone fixe : fenêtre ELLIPTIQUE inscrite dans le cadre (pas de coupure rectiligne, qui
+        // se verrait si elle croise un trait décalé par l'IA, comme le contour du menton).
+        // win = 1 au centre, adouci sur les 20 % extérieurs, 0 au bord.
+        const win = (x, y) => {
+          if (!fixed) return 1;
+          const r = Math.hypot((x + 0.5 - zw / 2) / (zw / 2), (y + 0.5 - zh / 2) / (zh / 2));
+          return r >= 1 ? 0 : r <= 0.8 ? 1 : (() => { const t = (1 - r) / 0.2; return t * t * (3 - 2 * t); })();
+        };
+        for (let k = 0; k < zw * zh; k++) if (soft[k] > 34 && win(k % zw, Math.floor(k / zw)) > 0.5) { mask[k] = 1; any++; }
         // Traits fins du portrait qui DISPARAISSENT près de ce qui change (pli du sourire,
         // coin de l'œil) : la différence tolérante les ignore, ils resteraient en fantôme
         // sous le calque. On les ajoute en comparant pixel à pixel (trait sombre → clair).
@@ -218,7 +241,7 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
           for (let y = 0; y < zh; y++) for (let x = 0; x < 4; x++) { leftN += mask[y * zw + x]; rightN += mask[y * zw + zw - 1 - x]; }
           const up = topN >= 12 && zy0 > 0; const down = botN >= 12 && zy1 < H;
           const left = leftN >= 12 && zx0 > 0; const right = rightN >= 12 && zx1 < W;
-          if (kind === 'blink' && grow < 4 && (up || down || left || right)) {
+          if (!fixed && kind === 'blink' && grow < 4 && (up || down || left || right)) {
             grow++;
             const ay = Math.round(zh * 0.25); const ax = Math.round(zw * 0.15);
             zones.splice(zi + 1, 0, [left ? Math.max(0, zx0 - ax) : zx0, right ? Math.min(W, zx1 + ax) : zx1,
@@ -233,6 +256,7 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
       const grown = boxBlur(mask, zw, zh, 4);
       for (let k = 0; k < zw * zh; k++) grown[k] = grown[k] > 0.02 ? 1 : 0;
       const feather = boxBlur(grown, zw, zh, 3);
+      if (fixed) for (let k = 0; k < zw * zh; k++) feather[k] *= winFinal(k % zw, Math.floor(k / zw));
       let bx0 = zw; let by0 = zh; let bx1 = -1; let by1 = -1;
       for (let y = 0; y < zh; y++) for (let x = 0; x < zw; x++) if (feather[y * zw + x] > 0.01) { bx0 = Math.min(bx0, x); by0 = Math.min(by0, y); bx1 = Math.max(bx1, x); by1 = Math.max(by1, y); }
       const lw = bx1 - bx0 + 1; const lh = by1 - by0 + 1;

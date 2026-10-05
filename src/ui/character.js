@@ -909,7 +909,7 @@ function lifeExtra(el, L, now) {
  * La place de la bulle est réservée dès le début (le texte à venir est
  * invisible) : rien ne bouge autour.
  */
-export function speak(chEl, sayEl, text, { perChar = 30, max = 2200 } = {}) {
+export function speak(chEl, sayEl, text, { perChar = 30, max = 2200, min = 400 } = {}) {
   text = String(text ?? '');
   if (!sayEl) return 0;
   clearTimeout(sayEl._tw);
@@ -921,8 +921,8 @@ export function speak(chEl, sayEl, text, { perChar = 30, max = 2200 } = {}) {
   off.textContent = text;
   sayEl.replaceChildren(on, off);
   // Durée : ~30 ms par caractère, entre 0,4 s et 2,2 s (réglable : perChar, max).
-  const total = Math.min(max, Math.max(Math.min(400, max), text.length * perChar));
-  const parts = text.split(/(\s+)/).filter(Boolean);
+  const total = Math.min(max, Math.max(Math.min(min, max), text.length * perChar));
+  const parts = text.match(/\S+\s*/g) || [text]; // un mot + son espace : une seule étape
   let i = 0; let shown = 0;
   const talking = chEl?.dataset?.img ? chEl : null;
   talking?.classList.add('ch-talking');
@@ -932,10 +932,10 @@ export function speak(chEl, sayEl, text, { perChar = 30, max = 2200 } = {}) {
     shown += w.length;
     on.textContent = text.slice(0, shown);
     off.textContent = text.slice(shown);
-    const ms = Math.max(40, (total * w.length) / text.length);
+    const ms = Math.max(20, (total * w.length) / text.length);
     if (talking && w.trim()) wordPulse(talking, w, ms);
     if (i >= parts.length) {
-      sayEl._tw = setTimeout(() => { sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); }, 180);
+      sayEl._tw = setTimeout(() => { sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); }, 60);
       return;
     }
     sayEl._tw = setTimeout(step, ms);
@@ -943,7 +943,7 @@ export function speak(chEl, sayEl, text, { perChar = 30, max = 2200 } = {}) {
   sayEl._tw = setTimeout(step, 0); // la bulle est peut-être pas encore dans la page
   // Pour finir d'écrire tout de suite (ex. l'élève touche l'écran).
   sayEl._finish = () => { clearTimeout(sayEl._tw); sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); };
-  return total + 180; // durée de l'écriture (ms)
+  return total + 60; // durée de l'écriture (ms)
 }
 
 /** Un mot prononcé : petit mouvement (alterné, pour relancer l'animation à chaque mot). */

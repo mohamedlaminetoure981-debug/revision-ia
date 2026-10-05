@@ -50,7 +50,7 @@ export function creatorWelcome() {
     setTimeout(() => sound('teleport'), 90);
 
     (async () => {
-      await sleep(900);
+      await sleep(600);
       if (done) return;
       el.querySelector('.council-title').innerHTML = `C’est… LE CRÉATEUR ?!<small>Bienvenue, ${esc(creatorName())} 👑</small>`;
       onomatopoeia('SENSEI?!');

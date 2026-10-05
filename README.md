@@ -465,8 +465,8 @@ Sans nouvelle image, les portraits paraissent vivants (`src/ui/character.js` + b
 - **parole** : `speak(perso, bulle, texte)` écrit la bulle mot par mot (sa taille est
   réservée d'avance : rien ne saute) et le perso bouge légèrement à chaque mot.
 - **Scènes de groupe** (conseil de correction, accueil du créateur) : chaque bulle s'écrit
-  vite puis reste 1 s + le temps de lire (≈ 15 caractères/s), entre 2 et 5 s ; toucher
-  l'écran passe à la suivante (`groupSay` dans `src/ui/bubble.js`). Peu de répliques par
+  vite (0,3 à 0,6 s) puis reste 0,6 s + le temps de lire (≈ 20 caractères/s), entre 1,5 et
+  3,5 s ; toucher l'écran passe à la suivante (`groupSay` dans `src/ui/bubble.js`). Peu de répliques par
   scène (3 pour l'accueil du créateur), chacune de 8 mots au plus.
 Uniquement `transform` et `opacity`, dans des calques imbriqués à l'intérieur du perso :
 les apparitions, signatures, auras, pouvoirs et téléportations ne sont pas touchés.
@@ -494,10 +494,17 @@ différences de couleur de l'IA sont corrigées. L'appli fait alors **cligner** 
 (toutes les 2 à 6 s, parfois deux fois) et **bouger sa bouche** à chaque syllabe quand
 sa bulle s'écrit (sur l'expression neutre). Le Panneau créateur indique ✅ quand c'est actif.
 Sans ces fichiers, rien ne change. Les retouches elles-mêmes ne sont pas publiées.
-Retouche ratée (l'IA a changé plus que les yeux ou la bouche : sourcils, vêtements…) :
-la refaire, ou désactiver ce calque dans le `planches.json` du perso :
-`"calques": { "bouche": false }` (ou `"yeux": false`). Ex. Sora : sa bouche ouverte
-changeait aussi ses sourcils et son sweat.
+Retouche imparfaite (l'IA a changé plus que les yeux ou la bouche : sourcils, vêtements,
+contour du menton…), dans le `planches.json` du perso :
+- `"calques": { "bouche": { "zone": [x, y, largeur, hauteur] } }` : le calque est limité à
+  cette zone FIXE (en % du portrait), sans agrandissement automatique ; tout ce qui change
+  en dehors est ignoré. La zone est une **ellipse** à bord adouci inscrite dans ce cadre
+  (une coupe rectiligne se verrait si elle croisait un trait décalé par l'IA, comme le
+  menton). Ex. Sora : `"zone": [39.6, 55.1, 21.4, 11.5]`. Pour la trouver : repérer la
+  bouche sur le portrait (elle doit tenir dans l'ellipse, y compris le bout du sourire
+  du portrait neutre), en évitant le contour du menton et le col.
+- `"calques": { "bouche": false }` (ou `"yeux": false`) : désactive le calque
+  (retouche inutilisable ; mieux vaut la refaire).
 
 ### Animations
 Dans `src/styles/characters.css` : animations de base (respiration, clignement, cheveux),
@@ -1032,6 +1039,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.17.4** : bouche de Sora réactivée (zone fixe elliptique) ; bulles des scènes de
+  groupe ~30 % plus rapides (accueil du créateur 13,4 → 8,7 s, conseil 6,2 → 3,9 s).
 - ✅ **v1.17.2** : clignement actif pour les 8 persos, bouche pour 7 (Sora : à refaire) ;
   zone de recherche plus robuste dans `scripts/calques.mjs`.
 - ✅ **v1.17.1** : cadrage de Sora (puffs entiers), bord d'Awa nettoyé, Panneau créateur

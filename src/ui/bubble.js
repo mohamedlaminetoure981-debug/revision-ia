@@ -8,7 +8,7 @@
 //  - si elle ne tient pas au-dessus, elle passe en dessous du perso ;
 //  - la pointe de la bulle vise toujours le perso qui parle ;
 //  - TEMPS DE LECTURE : la bulle s'écrit vite, puis reste affichée
-//    1 s + le temps de lire (≈ 15 caractères/s), entre 2 et 5 s (groupSay).
+//    0,6 s + le temps de lire (≈ 20 caractères/s), entre 1,5 et 3,5 s (groupSay).
 //    Toucher l'écran passe tout de suite à la bulle suivante.
 // =====================================================================
 
@@ -35,7 +35,7 @@ export function groupBubble(scene, seat, id, text, minTop = 70) {
   b.innerHTML = `<span class="who">${esc(CHARACTERS[id]?.name || '')}</span><span class="say"></span>`;
   // La bulle s'écrit mot par mot, assez vite (sa taille finale est réservée tout de suite) :
   // l'attente se fait ensuite sur le texte complet.
-  b._writeMs = speak(seat.querySelector('.ch'), b.querySelector('.say'), text, { perChar: 18, max: 1100 });
+  b._writeMs = speak(seat.querySelector('.ch'), b.querySelector('.say'), text, { perChar: 9, min: 300, max: 600 });
   scene.appendChild(b);
   place(scene, seat, b, minTop);
   playSfx('bubble');
@@ -43,9 +43,9 @@ export function groupBubble(scene, seat, id, text, minTop = 70) {
   return b;
 }
 
-/** Temps de lecture d'une réplique : 1 s + ≈ 15 caractères par seconde, entre 2 et 5 s. */
+/** Temps de lecture d'une réplique : 0,6 s + ≈ 20 caractères par seconde, entre 1,5 et 3,5 s. */
 export function readTime(text) {
-  return Math.min(5000, Math.max(2000, 1000 + (String(text || '').length / 15) * 1000));
+  return Math.min(3500, Math.max(1500, 600 + (String(text || '').length / 20) * 1000));
 }
 
 /**

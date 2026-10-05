@@ -194,7 +194,7 @@ export async function runWithCouncil({ owner, title, task, toResult }) {
       vibrate(20);
     }
     // La note et la réplique restent le temps d'être lues (toucher = continuer).
-    await waitRead(el, null, short ? 300 : 700, revealLine);
+    await waitRead(el, null, short ? 150 : 400, revealLine);
   }
   el.remove();
   return value;

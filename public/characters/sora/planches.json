@@ -1,7 +1,4 @@
 {
-  "calques": {
-    "bouche": false
-  },
   "planche-a": {
     "traits": "clairs",
     "tete": [
@@ -106,6 +103,16 @@
         "dy": -4,
         "fondu": false
       }
+    }
+  },
+  "calques": {
+    "bouche": {
+      "zone": [
+        39.6,
+        55.1,
+        21.4,
+        11.5
+      ]
     }
   }
 }
