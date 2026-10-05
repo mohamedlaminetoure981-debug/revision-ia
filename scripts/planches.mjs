@@ -14,6 +14,9 @@
 //     "grille" = [rangées, colonnes] ; cases numérotées de gauche à droite,
 //     rangée du haut puis rangée suivante (1 = en haut à gauche).
 //     Option : "fond": "#2fd52a" pour imposer la couleur du fond.
+//     Autant de planches qu'on veut (planche-c, planche-d…), y compris à UN SEUL
+//     portrait : "planche-c": "reflexion" (= grille 1 × 1). Une expression présente
+//     dans plusieurs planches : c'est la DERNIÈRE de la liste qui compte.
 //   Sans planches.json : planche-a et planche-b en 2 × 2, dans l'ordre
 //     A = neutre, joie, réflexion, célébration ; B = encouragement, surprise, concentration, clin.
 // Étapes (appelées par vite.config.js, en local comme au build) :
@@ -52,8 +55,11 @@ function readConfig(dir) {
     try { config = JSON.parse(readFileSync(cfgFile, 'utf8')); } catch (e) { error = `planches.json illisible (${e.message}) : configuration par défaut utilisée`; }
   }
   const out = {};
-  for (const [stem, c] of Object.entries(config)) {
+  for (const [stem, raw] of Object.entries(config)) {
     const file = images[stem.toLowerCase().replace(/\.(jpe?g|png|webp)$/i, '')];
+    // Planche à UN SEUL portrait : "planche-c": "reflexion" (ou { "expression": "reflexion" })
+    const c = typeof raw === 'string' ? { expression: raw } : raw || {};
+    if (c.expression) Object.assign(c, { grille: [1, 1], cases: { [c.expression]: 1 } });
     if (file) out[stem] = { file, grille: c.grille || [2, 2], cases: c.cases || {}, zones: c.zones || {}, fond: c.fond };
   }
   return { sheets: out, error, cfgFile: existsSync(cfgFile) ? cfgFile : null };
@@ -521,6 +527,8 @@ export async function processSheets(sharp) {
         cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h), hash });
       }
     }
+    // Même expression dans plusieurs planches : la dernière remplace les précédentes.
+    for (let k = cells.length - 1; k >= 0; k--) if (cells.findIndex((c) => c.expr === cells[k].expr) !== k) cells.splice(cells.findIndex((c) => c.expr === cells[k].expr), 1);
     if (!cells.length) continue;
     // RÉFÉRENCE : l'expression "neutre" (tête entière, de face). Chaque autre portrait
     // est RECALÉ sur elle (agrandissement + décalage qui font coïncider le visage) :

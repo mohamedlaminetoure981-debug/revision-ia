@@ -314,17 +314,17 @@ export async function render(el) {
     const base = import.meta.env.BASE_URL;
     const rows = TEAM.map((id) => {
       const imgs = characterImages(id);
-      const sheet = (k) => SHEETS[k].some((e) => imgs[e]);
+      const done = Object.values(SHEETS).flat().filter((e) => imgs[e]).length;
       const cells = Object.values(SHEETS).flat().map((e) => `<figure class="pt-cell">${imgs[e]
         ? `<img src="${base}${imgs[e].src}" alt="${e}" loading="lazy">`
         : '<span class="tiny dim">dessin SVG</span>'}<figcaption>${e}</figcaption></figure>`).join('');
       return `<h3 style="color:${CHARACTERS[id].color};margin:14px 0 4px">${esc(CHARACTERS[id].name)}</h3>
-        <p class="tiny" style="margin:0 0 6px">${sheet('a') ? '✅' : '⬜'} <code style="user-select:all">public/characters/${id}/planche-a.jpg</code><br>
-        ${sheet('b') ? '✅' : '⬜'} <code style="user-select:all">public/characters/${id}/planche-b.jpg</code></p>
+        <p class="tiny" style="margin:0 0 6px">${done === 8 ? '✅' : done ? '🟨' : '⬜'} ${done}/8 expressions en images ·
+        <code style="user-select:all">public/characters/${id}/</code></p>
         <div class="pt-grid">${cells}</div>`;
     }).join('');
     modal(`<h3>🧑 Personnages en images</h3>
-      <p class="tiny muted">Par défaut : grille 2 × 2 (A : neutre, joie, réflexion, célébration · B : encouragement, surprise, concentration, clin). Autre grille ou choix de cases : fichier planches.json dans le dossier du perso. Fond uni (vert de préférence), détecté automatiquement. Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
+      <p class="tiny muted">Par défaut : grille 2 × 2 (A : neutre, joie, réflexion, célébration · B : encouragement, surprise, concentration, clin). Autre grille, choix de cases, planches en plus (planche-c, planche-d…) ou planche à un seul portrait : fichier planches.json dans le dossier du perso. Fond uni (vert de préférence), détecté automatiquement. Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
       <div style="max-height:62vh;overflow-y:auto">${rows}</div>
       <button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };

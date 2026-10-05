@@ -360,6 +360,22 @@ traverse qu'une rangée). Conseil : arrête quand même la zone juste avant un t
 que dessus (ex. `24.5` plutôt que `25` si le trait est à 25 %). On peut mélanger
 `"cases"` et `"zones"` dans une même planche.
 
+**Autant de planches que tu veux, même à un seul portrait.** Une image qui ne contient
+qu'UN portrait (centré, avec des marges) se déclare en une ligne. Exemple (Mory : 3
+expressions refaites, chacune dans son fichier) :
+```json
+{
+  "planche-a": { "zones": { "neutre": [0, 0, 25, 50], "joie": [75, 0, 25, 50] } },
+  "planche-b": { "zones": { "encouragement": [0, 0, 25, 50], "surprise": [50, 0, 25, 50], "clin": [75, 0, 25, 50] } },
+  "planche-c": "reflexion",
+  "planche-d": "celebration",
+  "planche-e": "concentration"
+}
+```
+Le portrait est recadré tout seul à la même taille de visage et à la même hauteur
+d'yeux que les autres. Si une expression figure dans deux planches, c'est la dernière
+de la liste qui compte.
+
 Pour changer une expression, il suffit de modifier un numéro de case dans ce fichier.
 
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
