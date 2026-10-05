@@ -26,9 +26,10 @@ import { createHash } from 'node:crypto';
 import { detectKey, keyer, cutOut, measure, gray, shrink, bestMatch } from './planches.mjs';
 
 // kind → fichier, nom du calque, zone attendue (en largeurs de tête, depuis le haut des cheveux)
+// et zone de secours (fx, fy : en proportions du cadre)
 export const LAYERS = {
-  blink: { file: 'yeux-fermes', out: 'calque-yeux', label: 'clignement', y: [0.42, 1.05], x: 0.62 },
-  mouth: { file: 'bouche-ouverte', out: 'calque-bouche', label: 'bouche', y: [0.9, 1.55], x: 0.45 },
+  blink: { file: 'yeux-fermes', out: 'calque-yeux', label: 'clignement', y: [0.42, 1.05], x: 0.62, fx: [0.15, 0.85], fy: [0.35, 0.68] },
+  mouth: { file: 'bouche-ouverte', out: 'calque-bouche', label: 'bouche', y: [0.9, 1.55], x: 0.45, fx: [0.25, 0.75], fy: [0.55, 0.88] },
 };
 
 /** Fichier de variante présent pour ce perso (png, jpg ou webp), ou null. */
@@ -137,45 +138,86 @@ export async function buildLayers(sharp, dir, id, neutre, head) {
       const ox = Math.round(t.tx); const oy = Math.round(t.ty);
       const W = neutre.w; const H = neutre.h;
       const at = (x, y) => { const vx = x - ox; const vy = y - oy; return vx >= 0 && vy >= 0 && vx < rw && vy < rh ? (vy * rw + vx) * 4 : -1; };
-      // 3. Zone attendue et différences (après correction de la teinte moyenne)
-      const zx0 = Math.max(0, Math.round(head.cx - head.w * L.x)); const zx1 = Math.min(W, Math.round(head.cx + head.w * L.x));
-      const zy0 = Math.max(0, Math.round(head.top + head.w * L.y[0])); const zy1 = Math.min(H, Math.round(head.top + head.w * L.y[1]));
-      const zw = zx1 - zx0; const zh = zy1 - zy0;
-      // Teinte : l'IA éclaircit ou assombrit parfois toute l'image → correction linéaire
-      // par canal (gain + décalage) calculée sur la zone.
-      const fit = [0, 1, 2].map(() => ({ sx: 0, sy: 0, sxx: 0, sxy: 0 })); let n = 0;
-      for (let y = zy0; y < zy1; y += 2) for (let x = zx0; x < zx1; x += 2) {
-        const i = (y * W + x) * 4; const j = at(x, y);
-        if (j < 0 || neutre.rgba[i + 3] < 250 || big[j + 3] < 250) continue;
-        for (let c = 0; c < 3; c++) { const X = big[j + c]; const Y = neutre.rgba[i + c]; const F = fit[c]; F.sx += X; F.sy += Y; F.sxx += X * X; F.sxy += X * Y; }
-        n++;
-      }
-      const gain = fit.map((F) => { const d = n * F.sxx - F.sx * F.sx; return n > 50 && d > 0 ? Math.max(0.7, Math.min(1.4, (n * F.sxy - F.sx * F.sy) / d)) : 1; });
-      const bias = fit.map((F, c) => (n ? (F.sy - gain[c] * F.sx) / n : 0));
-      const fix = (j, c) => big[j + c] * gain[c] + bias[c];
-      // Différence TOLÉRANTE : chaque pixel de la variante est comparé aux pixels du
-      // portrait à ±2 px ; un trait simplement décalé d'un pixel ne compte pas.
-      const diff = new Float32Array(zw * zh);
-      for (let y = 0; y < zh; y++) for (let x = 0; x < zw; x++) {
-        const j = at(zx0 + x, zy0 + y);
-        if (j < 0) continue;
-        let best = Infinity;
-        for (let dy = -2; dy <= 2 && best > 0; dy++) for (let dx = -2; dx <= 2; dx++) {
-          const fx = zx0 + x + dx; const fy = zy0 + y + dy;
-          if (fx < 0 || fy < 0 || fx >= W || fy >= H) continue;
-          const i = (fy * W + fx) * 4;
-          let d = Math.abs(big[j + 3] - neutre.rgba[i + 3]);
-          for (let c = 0; c < 3; c++) d = Math.max(d, Math.abs(fix(j, c) - neutre.rgba[i + c]));
-          if (d < best) best = d;
+      // 3. Zone attendue et différences (après correction de la teinte moyenne).
+      // D'abord la zone calculée d'après la tête ; si rien n'y change (tête mal mesurée,
+      // ex. chignon d'Awa), une zone plus large du visage, en proportions du cadre.
+      const zones = [
+        [Math.max(0, Math.round(head.cx - head.w * L.x)), Math.min(W, Math.round(head.cx + head.w * L.x)),
+          Math.max(0, Math.round(head.top + head.w * L.y[0])), Math.min(H, Math.round(head.top + head.w * L.y[1]))],
+        [Math.round(W * L.fx[0]), Math.round(W * L.fx[1]), Math.round(H * L.fy[0]), Math.round(H * L.fy[1])],
+      ];
+      let zx0; let zx1; let zy0; let zy1; let zw; let zh; let fix; let mask; let any = 0; let soft;
+      let grow = 0;
+      for (let zi = 0; zi < zones.length; zi++) {
+        [zx0, zx1, zy0, zy1] = zones[zi];
+        zw = zx1 - zx0; zh = zy1 - zy0;
+        // Teinte : l'IA éclaircit ou assombrit parfois toute l'image → correction linéaire
+        // par canal (gain + décalage) calculée sur la zone.
+        const fit = [0, 1, 2].map(() => ({ sx: 0, sy: 0, sxx: 0, sxy: 0 })); let n = 0;
+        for (let y = zy0; y < zy1; y += 2) for (let x = zx0; x < zx1; x += 2) {
+          const i = (y * W + x) * 4; const j = at(x, y);
+          if (j < 0 || neutre.rgba[i + 3] < 250 || big[j + 3] < 250) continue;
+          for (let c = 0; c < 3; c++) { const X = big[j + c]; const Y = neutre.rgba[i + c]; const F = fit[c]; F.sx += X; F.sy += Y; F.sxx += X * X; F.sxy += X * Y; }
+          n++;
         }
-        diff[y * zw + x] = best;
+        const gain = fit.map((F) => { const d = n * F.sxx - F.sx * F.sx; return n > 50 && d > 0 ? Math.max(0.7, Math.min(1.4, (n * F.sxy - F.sx * F.sy) / d)) : 1; });
+        const bias = fit.map((F, c) => (n ? (F.sy - gain[c] * F.sx) / n : 0));
+        fix = (j, c) => big[j + c] * gain[c] + bias[c];
+        // Différence TOLÉRANTE : chaque pixel de la variante est comparé aux pixels du
+        // portrait à ±2 px ; un trait simplement décalé d'un pixel ne compte pas.
+        const diff = new Float32Array(zw * zh);
+        for (let y = 0; y < zh; y++) for (let x = 0; x < zw; x++) {
+          const j = at(zx0 + x, zy0 + y);
+          if (j < 0) continue;
+          let best = Infinity;
+          for (let dy = -2; dy <= 2 && best > 0; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const fx = zx0 + x + dx; const fy = zy0 + y + dy;
+            if (fx < 0 || fy < 0 || fx >= W || fy >= H) continue;
+            const i = (fy * W + fx) * 4;
+            let d = Math.abs(big[j + 3] - neutre.rgba[i + 3]);
+            for (let c = 0; c < 3; c++) d = Math.max(d, Math.abs(fix(j, c) - neutre.rgba[i + c]));
+            if (d < best) best = d;
+          }
+          diff[y * zw + x] = best;
+        }
+        // Les vraies différences (yeux qui se ferment, bouche qui s'ouvre) forment des taches
+        // nettes ; le léger "bruit" de l'IA (traits redessinés au pixel près) est effacé.
+        soft = boxBlur(diff, zw, zh, 2);
+        mask = new Float32Array(zw * zh);
+        any = 0;
+        for (let k = 0; k < zw * zh; k++) if (soft[k] > 34) { mask[k] = 1; any++; }
+        // Traits fins du portrait qui DISPARAISSENT près de ce qui change (pli du sourire,
+        // coin de l'œil) : la différence tolérante les ignore, ils resteraient en fantôme
+        // sous le calque. On les ajoute en comparant pixel à pixel (trait sombre → clair).
+        if (any >= 40) {
+          for (let pass = 0; pass < 3; pass++) {
+            const near = boxBlur(mask, zw, zh, 10);
+            for (let y = 0; y < zh; y++) for (let x = 0; x < zw; x++) {
+              const k = y * zw + x;
+              if (mask[k] || near[k] <= 0.001) continue;
+              const j = at(zx0 + x, zy0 + y);
+              if (j < 0) continue;
+              const i = ((zy0 + y) * W + zx0 + x) * 4;
+              const lumN = neutre.rgba[i] + neutre.rgba[i + 1] + neutre.rgba[i + 2];
+              const lumV = fix(j, 0) + fix(j, 1) + fix(j, 2);
+              if (lumV - lumN > 150 && neutre.rgba[i + 3] > 200) { mask[k] = 1; any++; }
+            }
+          }
+        }
+        if (any >= 40) {
+          // Ce qui change touche le haut ou le bas de la zone (ex. yeux coupés en deux) :
+          // on agrandit la zone de ce côté et on recommence (4 fois au plus).
+          let topN = 0; let botN = 0;
+          for (let y = 0; y < 4; y++) for (let x = 0; x < zw; x++) { topN += mask[y * zw + x]; botN += mask[(zh - 1 - y) * zw + x]; }
+          const add = Math.round(zh * 0.25);
+          if (grow < 4 && ((botN >= 12 && zy1 < H) || (topN >= 12 && zy0 > 0))) {
+            grow++;
+            zones.splice(zi + 1, 0, [zx0, zx1, topN >= 12 ? Math.max(0, zy0 - add) : zy0, botN >= 12 ? Math.min(H, zy1 + add) : zy1]);
+            continue;
+          }
+          break;
+        }
       }
-      // Les vraies différences (yeux qui se ferment, bouche qui s'ouvre) forment des taches
-      // nettes ; le léger "bruit" de l'IA (traits redessinés au pixel près) est effacé.
-      const soft = boxBlur(diff, zw, zh, 2);
-      const mask = new Float32Array(zw * zh);
-      let any = 0;
-      for (let k = 0; k < zw * zh; k++) if (soft[k] > 34) { mask[k] = 1; any++; }
       if (any < 40) { report[L.label] = 'aucune différence trouvée avec le portrait neutre'; continue; }
       // Bords adoucis : masque élargi (≈ 6 px) puis flouté.
       const grown = boxBlur(mask, zw, zh, 4);

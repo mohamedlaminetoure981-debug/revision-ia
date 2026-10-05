@@ -486,7 +486,10 @@ Pour chaque perso, deux petites retouches de son portrait **neutre** suffisent :
 Au build (`scripts/calques.mjs`), chaque retouche est **recalée** sur le portrait
 (taille et position retrouvées automatiquement, même si l'IA a changé la taille de
 l'image), comparée pixel par pixel, et **seule la zone qui change** (les yeux, ou la
-bouche) devient un petit calque transparent collé au pixel près. Les petites
+bouche) devient un petit calque transparent collé au pixel près. La zone est cherchée d'abord
+d'après la tête, puis, si rien n'y change (tête mal mesurée : chignon, couettes), plus
+largement sur le visage ; elle s'agrandit toute seule si les yeux ou la bouche dépassent
+de son bord, et les traits fins qui disparaissent (pli du sourire) sont aussi repris. Les petites
 différences de couleur de l'IA sont corrigées. L'appli fait alors **cligner** le perso
 (toutes les 2 à 6 s, parfois deux fois) et **bouger sa bouche** à chaque syllabe quand
 sa bulle s'écrit (sur l'expression neutre). Le Panneau créateur indique ✅ quand c'est actif.
@@ -1025,6 +1028,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.17.2** : clignement et bouche actifs pour Kaï, Mory, Nia, Ren, Awa, Tidiane et Binta
+  (zone de recherche plus robuste dans `scripts/calques.mjs`).
 - ✅ **v1.17.1** : cadrage de Sora (puffs entiers), bord d'Awa nettoyé, Panneau créateur
   sans défilement horizontal, bulles des scènes de groupe lisibles (temps de lecture,
   toucher = suivante, répliques ≤ 8 mots).
