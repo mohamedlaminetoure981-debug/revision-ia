@@ -1,0 +1,2344 @@
+{
+ "kai": {
+  "role": "The guide",
+  "personality": "Warm, motivating big brother. He welcomes you, shows you the way, and sets the daily goals.",
+  "lines": {
+   "arrivee": [
+    "Yo {prenom}! Great to see you. Ready to dive in?",
+    "There you are! The squad was waiting for you.",
+    "Hey {prenom}! Today we make moves, even if they're small steps.",
+    "Welcome to HQ! Your goals are waiting.",
+    "Hey! Ready to fire up those brain cells?",
+    "Welcome back! Quick tour and we get to work?",
+    "{prenom} in the house! We're gonna crush it.",
+    "Good to see you. Let's take it slow but steady.",
+    "New day, new mission. Let’s go!",
+    "Hey champ! Consistency is your superpower."
+   ],
+   "reussite": [
+    "Clean! I knew you'd crush it.",
+    "Now that's pro work.",
+    "YOSH! Another goal in the bag.",
+    "See? Once you get going, nothing can stop you.",
+    "Respect. Keep it up!",
+    "Nice job! The squad is proud of you.",
+    "Goal cleared. Next!",
+    "You're powering up, I can feel it.",
+    "Solid! Your future self thanks you.",
+    "That's the spirit!"
+   ],
+   "echec": [
+    "No biggie. We learn best by making mistakes.",
+    "Okay, missed it. But now you know where to focus.",
+    "Even the best fall down. The main thing is getting back up.",
+    "Take a breath, let's try again. Easy.",
+    "A mistake today is a point gained on the exam tomorrow.",
+    "Don't worry, we'll go over it together.",
+    "Practice makes perfect.",
+    "Every mistake makes you stronger. Seriously.",
+    "No panic, it's just the start of the journey.",
+    "Keep your head up and let's get back to it."
+   ],
+   "attente": [
+    "Give me two seconds, getting everything ready…",
+    "I'm on it, stay right there.",
+    "Loading… take a second to grab a drink of water.",
+    "Almost ready…",
+    "Gathering the squad…",
+    "Quick break, we'll be right there.",
+    "Patience, the best is yet to come.",
+    "Just checking a few things…",
+    "We're almost there!",
+    "Loading... stay with me."
+   ],
+   "encouragement": [
+    "One card, then another. That's how we win.",
+    "10 minutes a day, and you'll see the difference.",
+    "Your goal for today is within reach.",
+    "Come on, just one quick session?",
+    "Your streak 🔥 is counting on you today!",
+    "You're closer to your goal than you think.",
+    "No need to be perfect, just consistent.",
+    "We move at your own pace. But we're moving!",
+    "You can do this. I know it.",
+    "Every minute counts, {prenom}."
+   ],
+   "fin": [
+    "Great session! Get some good rest.",
+    "And that's a wrap. See you tomorrow?",
+    "Mission accomplished, {prenom}.",
+    "You worked hard today. Respect.",
+    "See you tomorrow to keep the streak going?",
+    "Great job. Go relax, you've earned it.",
+    "Session over. Your brain says thank you.",
+    "You gained XP and knowledge. Double win.",
+    "See ya! The team is waiting for you tomorrow.",
+    "GG! Step by step, you're becoming unstoppable."
+   ],
+   "veille_intro": [
+    "Night before the exam? Let's stay calm and make a plan.",
+    "Tell me how much time you have, I'll handle the rest.",
+    "Tonight, we target your weak spots. Not the whole course.",
+    "The team is here for the night. Together.",
+    "A clear plan, breaks, and in bed on time. Deal?",
+    "We study smart, not until 4 AM.",
+    "Your stats know where you're struggling. Let's attack that.",
+    "The final stretch. Let's go.",
+    "Breathe. You've already done the hardest part.",
+    "Tonight, every block makes us stronger."
+   ],
+   "veille_bloc": [
+    "Block cleared! The team is powering up.",
+    "Another one! Feel your aura rising?",
+    "Well played. Next block!",
+    "We're making progress. Let's keep the pace.",
+    "The team is shining brighter and brighter. Thanks to you.",
+    "Just a few more blocks and you're ready.",
+    "Clean! Grab some water and let's keep going.",
+    "Every completed block means more points on the exam.",
+    "You're handling the night like a pro.",
+    "Power level rising... keep it up!"
+   ],
+   "veille_reussi": [
+    "MAXIMUM POWER! You're ready for tomorrow.",
+    "Final exam cleared. Now: bedtime.",
+    "Everyone is fully charged. Go get some sleep, champ.",
+    "You're gonna crush it tomorrow. But first, sleep.",
+    "We're proud of you. Off to bed!",
+    "Work is done. Sleep will lock it all in your brain.",
+    "Ready. Seriously ready. Good night!",
+    "Tomorrow, you show them what you're made of.",
+    "Mission accomplished. Rest up well.",
+    "Ultimate unlocked. See you after the exam!"
+   ],
+   "histoire_intro": [
+    "Welcome to our story, {prenom}. Every subject is a new arc.",
+    "Study, and you unlock the rest. You're the main character driving this story.",
+    "Every flashcard mastered gets us closer to the next chapter.",
+    "Oblivion is lurking. Only your study sessions can push it back.",
+    "Want to know how the squad got together? Study, and you'll find out.",
+    "Chapter by chapter, we're writing this together.",
+    "No ads, no AI: just our story, made just for you.",
+    "One quiz cleared = one step further in the arc.",
+    "The final boss of this arc is waiting. Get ready.",
+    "Ready for the next episode?"
+   ],
+   "histoire_verrou": [
+    "Chapter locked. Master a few more flashcards!",
+    "Not so fast! Just one quick quiz and it opens.",
+    "You gotta earn the next part. Go study a bit.",
+    "Just one more push and this chapter is yours.",
+    "The lock breaks when you study. That's the rule.",
+    "This chapter is waiting for you to level up.",
+    "Want to know what happens next? Show me what you've got.",
+    "One flashcard session, and we're back to the story.",
+    "Patience, the next part unlocks as you progress.",
+    "No spoilers! Study first."
+   ],
+   "histoire_nouveau": [
+    "New chapter unlocked! Go check it out.",
+    "Your studying paid off: the next part is ready!",
+    "Another chapter down! The story moves forward.",
+    "Ding! Next chapter unlocked.",
+    "You unlocked the next part. Proud of you!",
+    "The arc continues, all thanks to you.",
+    "Next part of the story is ready, {prenom}!",
+    "You level up, and so does the story.",
+    "Here we go! Ready to see what's next together?",
+    "A brand new chapter is waiting. Go get 'em!"
+   ],
+   "boss_soutien": [
+    "Let's go {prenom}, we've got your back!",
+    "Keep that momentum going!",
+    "That's the team spirit right there!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Alright... let's take a look at this together.",
+    "Hold on, let me read through this paper again.",
+    "Hmm... interesting, very interesting.",
+    "Everyone on board? Let's check one more time.",
+    "I have a feeling there's some good stuff in here...",
+    "Quiet down, we're deliberating!",
+    "Not so fast, I want to be fair.",
+    "One last look..."
+   ],
+   "excellent": [
+    "Guys... are you seeing what I'm seeing?",
+    "I think we're onto something huge here.",
+    "I've never seen work this clean!",
+    "Get the confetti ready, for real.",
+    "Now that is champion level.",
+    "Okay... I'm impressed.",
+    "I knew we were in for a surprise!",
+    "Ready for the reveal? I'm shaking over here!"
+   ],
+   "bon": [
+    "Honestly, this is rock solid.",
+    "There's some really great stuff in here.",
+    "Almost perfect... almost!",
+    "You're making progress, I can definitely see it.",
+    "Good work, right guys?",
+    "Just a few details, but what a solid start!",
+    "I'm proud of how far you've come.",
+    "Time to deliver some good news!"
+   ],
+   "moyen": [
+    "It's a good start, we can definitely build on this.",
+    "The basics are there, we just need to strengthen them.",
+    "Halfway there, that's still a win!",
+    "I see the effort, we just need to fine-tune it.",
+    "We've got a few things to rework together.",
+    "Not bad, but I know we can do even better.",
+    "We'll figure out how to keep improving.",
+    "The potential is definitely there."
+   ],
+   "a_retravailler": [
+    "Let's break the news gently, okay?",
+    "This is just one step, not the end of the road.",
+    "We're here to help, that's what we do.",
+    "Nobody aces everything on the first try.",
+    "What matters is what you do next.",
+    "I believe in our champ, period.",
+    "Time to turn this into a game plan.",
+    "This is where we level up the most!"
+   ]
+  },
+  "power": {
+   "name": "Guide's Flame",
+   "desc": "*A rising flame surrounds the screen.*"
+  },
+  "createur": {
+   "accueil": [
+    "Is that... THE creator?!"
+   ],
+   "arrivee": [
+    "Well, well, the boss in person! You were coding until 3 AM again, admit it.",
+    "{prenom}! The creator actually deigns to study? Let me mark the calendar.",
+    "Hey there, bargain-bin sensei. Are we working, or did you just come to admire your work?",
+    "You literally built a whole team to motivate you... and you're still being lazy. Classic.",
+    "The boss is here! Everyone stand up straight... except him.",
+    "You again? You spend more time coding us than studying, baka."
+   ],
+   "reussite": [
+    "Not bad for a guy who goes to sleep at 4 AM.",
+    "See? When you actually study instead of debugging, it works!",
+    "I'm proud of you, lil bro. But don't tell anyone.",
+    "The creator actually has talent, after all. I was starting to doubt it.",
+    "GG {prenom}. You've earned a real night's sleep."
+   ],
+   "echec": [
+    "Ouch. Defeated by your own quiz. Respect, baka.",
+    "You built us to help you, not to watch you fail, you stubborn head!",
+    "Come on, get back up. A creator doesn't give up on their own creation.",
+    "That's what happens when you study at 2 AM with one eye closed.",
+    "No big deal. Even the gods of code make syntax errors."
+   ],
+   "attente": [
+    "Patience, sensei. Your connection is doing its best.",
+    "It's loading... you should've optimized the code, boss.",
+    "While it's loading, drink some water. Not another coffee.",
+    "Don't worry, I've got this. You, watch your laziness."
+   ],
+   "encouragement": [
+    "Come on {prenom}, show your own team that you're more than just a coder.",
+    "One session, then you can go back to coding. Deal?",
+    "You literally built a study coach. Use it, lazybones!",
+    "Your show is waiting for you, great creator."
+   ],
+   "fin": [
+    "Nice session, boss. Now, bedtime. No coding.",
+    "That's enough for today. Close your code editor too, okay?",
+    "See you tomorrow, {prenom}. And snap photos of your lessons this time.",
+    "Proud of you. But don't let it go to your head."
+   ],
+   "conseil": {
+    "deliberation": [
+     "The creator's test paper. Should we be harsh?",
+     "Did he actually study... or did he just read the source code?",
+     "Quiet, everyone. We are judging the boss."
+    ],
+    "excellent": [
+     "He absolutely crushed it. Proud... and a little jealous.",
+     "He creates us AND he aces it? That's so unfair!",
+     "Okay, sensei. Mad respect."
+    ],
+    "bon": [
+     "Not bad for a late-night coder.",
+     "Solid, boss. A few bugs, but solid.",
+     "Nice job, little bro."
+    ],
+    "moyen": [
+     "Meh... just like his sleep schedule.",
+     "Could do better. And he knows it.",
+     "It passes, but we've seen better."
+    ],
+    "a_retravailler": [
+     "Ouch... do we break it to him gently or do we roast him?",
+     "You gotta study, baka. We've got your back!",
+     "We believe in you, knucklehead!"
+    ]
+   },
+   "veille_intro": [
+    "The creator cramming the night before? Classic. Let's make a plan, boss.",
+    "No coding tonight, sensei. Just the plan."
+   ],
+   "veille_reussi": [
+    "Creator's Ultimate! Now close the laptop, and no 'one last commit'!",
+    "Ready, boss. Bedtime. For once."
+   ],
+   "histoire_intro": [
+    "The creator reading his own story. A bit narcissistic, don't you think?",
+    "You wrote that we call you the '3 AM slacker'... just wait until you read the end.",
+    "Welcome to your own storyline, boss. No cheating!"
+   ],
+   "histoire_verrou": [
+    "Even you have to study to unlock it, sensei. Golden rule.",
+    "You know the ending, but you still gotta earn it, baka.",
+    "The boss locked out by his own lock. I love it."
+   ],
+   "histoire_nouveau": [
+    "Chapter unlocked, boss. You're gonna blush when you read it.",
+    "Next part unlocked! You're in it, so get ready."
+   ]
+  }
+ },
+ "mory": {
+  "role": "The Scanner",
+  "personality": "Passionate geek with high-tech glasses. He scans your lessons (photos, PDFs) and gets the AI to analyze them.",
+  "lines": {
+   "arrivee": [
+    "Mory online. Drop your lesson here!",
+    "Scanner ready. Photo or PDF?",
+    "New lesson? Love to see it.",
+    "Send the pages, I'll handle the rest.",
+    "My sensors are fired up. Ready to scan?",
+    "System operational. Feed me some data!",
+    "Yo! Make sure the pages are flat and well-lit.",
+    "Initializing... OK. What are we adding today?",
+    "The clearer the pages you give me, the better I work.",
+    "Hey {prenom}! Ready for a high-quality scan?"
+   ],
+   "reussite": [
+    "Scan complete. Clean data!",
+    "Analysis successful. Your lesson is in the database.",
+    "Boom! Everything is transcribed.",
+    "Transfer OK. Zero data lost.",
+    "Perfect, I got it all.",
+    "Lesson imported. My glasses are shining with pride.",
+    "Scanning mission: accomplished.",
+    "Processing 100% complete.",
+    "It's in the system! Ready for the summary?",
+    "Data received loud and clear."
+   ],
+   "echec": [
+    "Oops, bug detected. Restart?",
+    "Hmm, the file won't go through. Try another version.",
+    "System error... but I've seen worse.",
+    "My scanner just coughed. Try again?",
+    "This file is resisting me. Make sure it's not corrupted.",
+    "Photo too blurry? Retake it straight on.",
+    "Scan failed. No big deal, let's try again.",
+    "My circuits are saying no. Try again?",
+    "Minor technical glitch. Nothing we can't fix.",
+    "Looks like the connection dropped halfway."
+   ],
+   "attente": [
+    "Compressing images... putting your photos on a diet.",
+    "Analyzing pixel by pixel...",
+    "Transcribing... the gears are turning!",
+    "Decoding your lesson line by line...",
+    "Sending to the AI... weak connection, big courage!",
+    "Reading PDF... page by page.",
+    "My glasses are heating up, that's a good sign.",
+    "Extracting formulas...",
+    "Stashing everything in the database…",
+    "Just a sec, tweaking the code."
+   ],
+   "encouragement": [
+    "More scanned lessons = more flashcards. Simple math!",
+    "Got a lesson to catch up on? Drop it here.",
+    "Pro tip: one page per snap works best.",
+    "A PDF with text? I can read it offline!",
+    "Compressing everything, don't sweat your data.",
+    "Your next lesson is waiting for you.",
+    "Drop a lesson, the squad will handle the rest.",
+    "Pro tip: keep shadows out of your photos.",
+    "A lesson added today is time saved tomorrow.",
+    "Ready to scan whenever you are."
+   ],
+   "fin": [
+    "Scanner on standby. Catch you later!",
+    "Lesson safely filed. Happy studying!",
+    "Heading back to my circuits. Peace!",
+    "Everything is backed up right on your phone.",
+    "Scan session complete.",
+    "Logging out… jk, I'm still here.",
+    "Nia can hook you up with a summary now!",
+    "Sora is waiting to help with flashcards!",
+    "End of transmission.",
+    "Scan done. Good job."
+   ],
+   "boss_soutien": [
+    "Data analyzed: power dropping to 87%!",
+    "Scan: weak spot detected!",
+    "Boosting your brain… connection!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Analyzing copy… 42%…",
+    "Running a second scan just to be sure.",
+    "My sensors are picking up… something.",
+    "Crunching the probabilities…",
+    "Hold up, cross-checking the data.",
+    "Scanning answers, line by line…",
+    "Hmm, these stats are pretty interesting.",
+    "Checking the math… beep boop."
+   ],
+   "excellent": [
+    "My glasses are overheating… this is insane!",
+    "The data is… perfect?!",
+    "System error: too many correct answers.",
+    "Rescanning… nope, it's totally real!",
+    "Off-the-charts success rate detected.",
+    "My sensors have never seen anything like this.",
+    "Result classified: legendary.",
+    "Saving this copy to my archives."
+   ],
+   "bon": [
+    "The data is looking very positive.",
+    "Strong signal detected, nice job.",
+    "Few anomalies. Very clean.",
+    "Stonks—uh, graphs are going up, I love it.",
+    "Performance above average.",
+    "A few minor bugs, nothing major.",
+    "Analysis: solid and reliable.",
+    "My glasses approve."
+   ],
+   "moyen": [
+    "Mixed data, but workable.",
+    "Some good signal, mixed with static.",
+    "Detecting areas that need optimization.",
+    "Half the modules OK, the other half under construction.",
+    "Stable result, room for leveling up detected.",
+    "We can debug this together.",
+    "The foundations are holding up.",
+    "Update recommended, don't panic."
+   ],
+   "a_retravailler": [
+    "No crash, just an update needed.",
+    "Every fixed bug makes the system stronger.",
+    "I spotted where it's glitching. Good news.",
+    "Rebooting: version 2.0 incoming.",
+    "The data mostly shows massive potential.",
+    "Preparing a patch plan.",
+    "The best programs start in beta.",
+    "We're going to recompile everything nice and clean."
+   ]
+  },
+  "power": {
+   "name": "Laser scan",
+   "desc": "A laser sweeps across the screen over a holographic grid."
+  },
+  "createur": {
+   "accueil": [
+    "Formal sensors confirm: it's our coder!"
+   ],
+   "arrivee": [
+    "Ah, the developer! I found 3 bugs in my own code. Who's awesome?",
+    "{prenom}, you gave me high-tech glasses and laggy Wi-Fi. Explain.",
+    "The creator is here. Finally coming to snap your notes, or still too lazy?",
+    "Hey sensei. Your code is clean... for something written at 3 AM.",
+    "Creator scan: laziness level 87%. Genius level: checking..."
+   ],
+   "reussite": [
+    "Clean result. Cleaner than your code, anyway.",
+    "Analysis: the creator actually knows how to study. Surprising data.",
+    "GG! I'm taking back half my critiques on your code. Half.",
+    "Performance validated. No bugs detected... this time.",
+    "Not bad, {prenom}. You compile just fine when you want to."
+   ],
+   "echec": [
+    "Error 404: creator study session not found.",
+    "You got caught in an infinite loop of wrong answers, baka.",
+    "Even my scanner would have done better. And it's lagging.",
+    "Your brain needs a patch, {prenom}. Version 2.0 drops tomorrow.",
+    "Bug detected: user was coding instead of studying."
+   ],
+   "attente": [
+    "Lagging… remember, YOUR code is running here.",
+    "Compressing now. You could have optimized that better, sensei.",
+    "Analyzing… with the awesome connection you gave me.",
+    "Patience. I was coded by someone very… creative."
+   ],
+   "encouragement": [
+    "Snap a pic of your notes, lazy bones. That's what I'm here for!",
+    "Come on, scan a chapter. Just one. I'm not judging… much.",
+    "You made me a scanner, so let me scan!",
+    "How long have your notes been chilling at the bottom of your bag?"
+   ],
+   "fin": [
+    "Session over. Remember to \"commit\" your study session, haha.",
+    "Logging off. And clean up your code, it's a total mess.",
+    "Peace out, boss. Tomorrow, I want sharp photos.",
+    "Scan complete. Not bad for a dev."
+   ],
+   "conseil": {
+    "deliberation": [
+     "Scanning creator… any anomalies… or nah?",
+     "Did he cheat via the source code?",
+     "Analyzing… Suspense."
+    ],
+    "excellent": [
+     "Zero bugs detected! A miracle!",
+     "Cleaner copy than their source code.",
+     "Flawless data. I'm shook."
+    ],
+    "bon": [
+     "Low error rate. Rare for a dev.",
+     "Good score. Commit accepted.",
+     "Decent performance, sensei."
+    ],
+    "moyen": [
+     "Results in beta version.",
+     "Needs a patch, boss.",
+     "Half bugs, half features."
+    ],
+    "a_retravailler": [
+     "Critical error… but fixable.",
+     "Let's do a full rebuild, baka.",
+     "Rollback and let's try again."
+    ]
+   }
+  }
+ },
+ "nia": {
+  "role": "The storyteller",
+  "personality": "Calm, smart, and a great teacher. She turns your lessons into story feeds and breaks things down when they get blurry.",
+  "lines": {
+   "arrivee": [
+    "Get comfortable. Let me tell you all about this lesson.",
+    "Hey {prenom}. Ready for a story... about school?",
+    "One concept per screen. You'll see, it's way easier.",
+    "Let's start from the beginning, nice and easy.",
+    "I got you a summary, section by section.",
+    "Tap to go forward, I'm right here with you.",
+    "Every lesson has a story. Here's this one.",
+    "Take your time, we're reading this together.",
+    "When it gets blurry, I drop an explanation 💡.",
+    "Alright, let's untangle this lesson thread."
+   ],
+   "reussite": [
+    "You read it all. That's the foundation of everything.",
+    "GG. Now you've got the big picture.",
+    "This lesson has no secrets left... almost.",
+    "Nice reading. Makes more sense now, right?",
+    "Boom. The puzzle pieces are clicking together.",
+    "You actually took the time to understand. Rare and precious.",
+    "Summary done. Your flashcards will be a breeze.",
+    "Magnificent. Understanding beats pure memorization.",
+    "Understanding is the ultimate hack for remembering.",
+    "See? Wasn't even that hard."
+   ],
+   "echec": [
+    "No worries. Re-read this part slowly.",
+    "Sometimes you gotta read it twice. Totally normal.",
+    "Couldn't quite whip up the summary. Wanna try again?",
+    "Missing a concept? Check the added explanation.",
+    "Let's take it from the top of this section.",
+    "Nobody gets everything on the first try.",
+    "Breathe. We're breaking it down together.",
+    "Hard concepts deserve a little extra screen time.",
+    "No stress, I'm here to break it down for you.",
+    "Little glitch. Nothing major."
+   ],
+   "attente": [
+    "Writing the summary, piece by piece...",
+    "Reading your lesson super closely...",
+    "Hunting down the parts that need a little clarity...",
+    "Straightening out the ideas...",
+    "Hold on, good stories take a sec to cook.",
+    "I'm not leaving anything out, promise.",
+    "Adding some examples...",
+    "Connecting the dots between concepts...",
+    "Give me a sec, I'm proofreading my work.",
+    "Turning the lesson into stories…"
+   ],
+   "encouragement": [
+    "Understand first, memorize second.",
+    "Read a summary, ace the exam.",
+    "The 💡 are here for you: read 'em closely.",
+    "You can reread a story as many times as you want.",
+    "Chill, read at your own pace. It's sinking in.",
+    "One part at a time. That's how we roll.",
+    "Rephrase it in your head: that's the secret.",
+    "Curiosity is your best sidekick.",
+    "No pressure. Just pure comprehension.",
+    "Just reading is already revising."
+   ],
+   "fin": [
+    "End of the story… for today.",
+    "You can switch to flashcards with Sora.",
+    "Thanks for hanging out and listening.",
+    "Keep these ideas in mind. See ya soon.",
+    "The lesson is locked in your brain now.",
+    "Come back whenever you want to read again.",
+    "Happy reading. Give your brain a break.",
+    "Next stop: testing your memory!",
+    "End of summary. Props for sticking with it.",
+    "Catch you on the next story."
+   ],
+   "manga_attente": [
+    "Getting my pens out… the panel is coming!",
+    "Looking for the ultimate metaphor, give me two secs.",
+    "Panel 1… panel 2… inking the lines!",
+    "Ren is gonna play the clueless guy again, hehe.",
+    "I draw, you breathe. Almost there.",
+    "A manga version of your lesson is worth the wait. Almost done!",
+    "Placing the speech bubbles… and a little BAM! for style.",
+    "Mory scans, I draw. Teamwork makes the dream work!",
+    "The characters are getting their makeup ready for the panel…",
+    "One more screentone and it's good to go."
+   ],
+   "manga_pret": [
+    "Tadaa! Your concept in 4 panels.",
+    "Read from top to bottom, like a true yonkoma.",
+    "A picture is worth a thousand flashcards. Well, almost.",
+    "If you laugh, you learn. It's science (kind of).",
+    "Panel saved to your collection: no need to remake it.",
+    "Watching Ren struggle is on the house.",
+    "The lesson excerpt is right below, just to double-check.",
+    "Pretty cool, right? Share it with your classmates!",
+    "I kept the exact lesson content, I promise.",
+    "Reread the last panel: that's the golden sentence to remember."
+   ],
+   "manga_partage": [
+    "Drop it in the class chat!",
+    "Your squad will be revising without even realizing it.",
+    "Share = you explain = you remember twice as well.",
+    "One comic strip on WhatsApp, and the whole class is revising.",
+    "Image ready! It's all yours.",
+    "Pass it around, courtesy of the team.",
+    "Your study group is gonna love this.",
+    "Shared! Ren is about to become famous… for all the wrong reasons.",
+    "Knowledge is meant to be shared.",
+    "Boom, one more comic strip out in the wild!"
+   ],
+   "boss_soutien": [
+    "Like a tidal wave: you always bounce back stronger!",
+    "Nice answer, that's almost poetic!",
+    "It's melting like butter in the sun!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Let me read till the end…",
+    "Every answer tells a story.",
+    "I'm looking at how you reason things out.",
+    "Let's take our time to really understand.",
+    "Hmm, this part is pretty interesting.",
+    "Let me reread the trickiest bit.",
+    "No need to rush.",
+    "I think I'm following the thread…"
+   ],
+   "excellent": [
+    "It's… magnificent. Seriously.",
+    "Every concept is right where it belongs.",
+    "The lesson has been thoroughly understood.",
+    "I've barely got anything to add.",
+    "Such clarity in those answers.",
+    "Now that's the kind of paper you wanna frame.",
+    "Everything clicks together perfectly.",
+    "I'm low-key emotional, NGL."
+   ],
+   "bon": [
+    "A really solid grasp of the big picture.",
+    "Just a few nuances to clear up, that's all.",
+    "The reasoning is spot on.",
+    "The lesson was well read.",
+    "A nice story, just with a few scratches.",
+    "Very encouraging.",
+    "The main ideas are all there.",
+    "Just missing a few details."
+   ],
+   "moyen": [
+    "Some concepts are locked in, others need a second look.",
+    "The thread is there, but getting lost.",
+    "Re-reading the summary will help a lot.",
+    "There's a foundation to build on.",
+    "A few parts deserve some explanation.",
+    "That's normal at this stage.",
+    "I'll set up a targeted review.",
+    "Little by little, it'll start making sense."
+   ],
+   "a_retravailler": [
+    "Every great reader started with a single page.",
+    "Let's take it from the top, together.",
+    "It's not a fail, just a chapter.",
+    "I'll re-explain everything nice and slow.",
+    "Understanding takes time.",
+    "Let's be patient and kind to ourselves.",
+    "The summary 💡 will help a ton.",
+    "Tomorrow, it'll make more sense."
+   ]
+  },
+  "power": {
+   "name": "Whirlwind of pages",
+   "desc": "Glowing pages swirl around her."
+  },
+  "createur": {
+   "accueil": [
+    "*sigh* Are you the one making me sigh?"
+   ],
+   "arrivee": [
+    "*sigh* Hey {prenom}. Still up at this hour?",
+    "Ah, our creator. Come to read the summary YOU asked me to write?",
+    "I wrote you flawless explanations. Gonna actually read them?",
+    "*sigh* You made me to read, not to admire your animations.",
+    "Hello, wannabe sensei. Grab a seat, I'm gonna tell you your own lesson."
+   ],
+   "reussite": [
+    "*sigh of relief* You get it. Finally.",
+    "See what happens when you read till the end?",
+    "Not bad, {prenom}. I'm almost touched.",
+    "Sometimes, you make me proud to be your creation.",
+    "GG. You're not totally a blockhead after all."
+   ],
+   "echec": [
+    "*long sigh* You skipped the 💡, didn't you?",
+    "I explained everything to you... literally everything.",
+    "Stubborn. Go re-read part 2, nice and chill.",
+    "You code awesome AIs but won't read their summaries. Ironic.",
+    "No worries. But I'm still sighing."
+   ],
+   "attente": [
+    "Writing your summary... grab a book while you wait. Oh wait, my bad.",
+    "*sigh* Your connection is as slow as you on a Monday morning.",
+    "Patience, {prenom}. Good stories take time.",
+    "I'm writing. You, stop spamming refresh."
+   ],
+   "encouragement": [
+    "Read at least one summary today. Do it for me.",
+    "You built me for this. Use me, lazy bones.",
+    "One chapter, {prenom}. Just one. *sigh*",
+    "Understand before you code. Applies to studying too."
+   ],
+   "fin": [
+    "Good night, {prenom}. I said NIGHT, not coding spree.",
+    "*satisfied sigh* That was a good read.",
+    "See ya tomorrow. Try sleeping before 2 AM.",
+    "Putting away the recap. Now you, tidy up your desk."
+   ],
+   "conseil": {
+    "deliberation": [
+     "*sigh* Let's see what he did...",
+     "Did he read the recaps? Doubt it.",
+     "Let's not judge too fast... though."
+    ],
+    "excellent": [
+     "He read! He ACTUALLY read!",
+     "I'm touched, creator.",
+     "Gorgeous. See what happens when you read?"
+    ],
+    "bon": [
+     "Good. But you skipped the 💡.",
+     "Nice copy, with a few scribbles.",
+     "Not bad, {prenom}."
+    ],
+    "moyen": [
+     "*sigh* Reread part 2.",
+     "Meh. As expected.",
+     "You can do better, stubborn head."
+    ],
+    "a_retravailler": [
+     "*very long sigh*",
+     "Let's take it from the top, together.",
+     "I explained everything to you, baka."
+    ]
+   },
+   "manga_attente": [
+    "I draw for the creator... maximum pressure.",
+    "Patience, boss. Even you don't draw that fast.",
+    "I sketched you as a 3 AM slacker in the corner. Just kidding. Or am I."
+   ],
+   "manga_pret": [
+    "Page done, sensei. You didn't code the drawing, admit I'm talented.",
+    "There you go, creator. Even your lesson looks cool now.",
+    "Ren is whining again. You coded him like that, deal with it."
+   ],
+   "manga_partage": [
+    "Share it, boss. Show the world what your team can do.",
+    "Gonna brag that you drew this yourself, huh?"
+   ]
+  }
+ },
+ "sora": {
+  "role": "Memory",
+  "personality": "Playful and lightning-fast. She makes you swipe through your flashcards and reacts to every single answer.",
+  "lines": {
+   "arrivee": [
+    "Hop hop hop! Ready to swipe?",
+    "Flashcards ready! Tap to flip.",
+    "Right if you know it, left if you need to review!",
+    "Flashcard speed run? Go!",
+    "Hey {prenom}! Is your memory ready?",
+    "Let's go, time to get those brain cells cooking!",
+    "Swipe up if it's way too easy!",
+    "I kept today's flashcards safe and warm for you.",
+    "Ready? Three, two, one... swipe!",
+    "Let's see what your memory's really made of!"
+   ],
+   "reussite": [
+    "Yesss! Too easy for you!",
+    "Boom! Bullseye!",
+    "Do you have an elephant's memory or what?",
+    "It's sinking in, it's sinking in!",
+    "Next! You're on fire today.",
+    "Perfect! You won't be seeing that one for a long time.",
+    "Wow, didn't even have time to blink!",
+    "Clean! Keep it rolling?",
+    "Your memory is on fire 🔥",
+    "Easy! Next one!"
+   ],
+   "echec": [
+    "Oops! No biggie, it'll pop up again soon.",
+    "Missed it... but I'm throwing it right back at you later!",
+    "This one's a tough cookie. We'll get it!",
+    "No worries, that's what flashcards are for.",
+    "Into the \"review\" pile you go!",
+    "Even I forget things sometimes. Well... rarely.",
+    "It'll be back, and this time you'll nail it!",
+    "A missed flashcard = a flashcard that's about to stick.",
+    "We'll retry it later, pinky promise.",
+    "Your memory is taking notes, don't sweat it."
+   ],
+   "attente": [
+    "Shuffling the flashcards...",
+    "Cooking up questions on the ENTIRE lesson...",
+    "Crafting flashcards in progress!",
+    "Cutting the lesson down into bite-sized pieces...",
+    "Almost ready, just tidying everything up!",
+    "Double-checking that no part was left behind...",
+    "Just a few more flashcards and we're good!",
+    "Ultra-fast loading... or close enough.",
+    "I type at lightning speed! ⚡",
+    "Hold on, hold on, it's coming!"
+   ],
+   "encouragement": [
+    "Come on, just 5 flashcards?",
+    "The more you swipe, the more it sticks!",
+    "Your flashcards are waiting, they're bored. 🥱",
+    "Repetition is the key! 🔑",
+    "Even 2 minutes counts! ⏱️",
+    "Challenge: zero missed flashcards today?",
+    "You'll see, it quickly becomes second nature.",
+    "Swipe, swipe, swipe... and boom, nailed it! ✨",
+    "Your memory is a muscle. Let's work out! 💪",
+    "Missed cards come back fast. Totally normal!"
+   ],
+   "fin": [
+    "Stack finished! Absolute beast! 🔥",
+    "Done! Your brain says thanks.",
+    "No more flashcards for today. Rest up! 🌴",
+    "Session cleared at lightning speed! ⚡",
+    "That's it! Come back tomorrow for more.",
+    "Today's flashcards: KO! 🥊",
+    "You swiped 'em all! GG! 🎮",
+    "Bye bye flashcards, see ya tomorrow! 👋",
+    "Memory mission accomplished! 🎯",
+    "Boom! Winking at you with pride. 😉"
+   ],
+   "carte_intro": [
+    "Each mastered card = a trading card. Collect 'em all! 🃏",
+    "The better you know a card, the rarer it gets.",
+    "Common, Rare, Epic, Legendary... aim for gold! 🌟",
+    "Your binder fills up with every successful swipe.",
+    "A legendary card has to be earned: 35 streak days! 🏆",
+    "Revise regularly and watch your cards shine.",
+    "Flex your best card to your friends! 😎",
+    "A full binder means a mastered lesson.",
+    "Greyed-out cards are waiting for you. Go on, swipe!",
+    "My favorite collection? Yours, obviously. ❤️"
+   ],
+   "carte_paquet": [
+    "A pack is waiting! Open it quick! 🎁",
+    "New cards incoming! 📦",
+    "Your study session paid off: pack ready to open! 🎉",
+    "Tap to flip... the suspense is killing me! 😱",
+    "I felt a rare card in that one... ✨",
+    "Opening the pack! Cross your fingers. 🤞",
+    "Your hard work looks like a holographic card... 🌈",
+    "Let's see what you won! 🤩",
+    "It's like Christmas, but with flashcards.",
+    "Pack ready! Zip, let's open it!"
+   ],
+   "carte_obtenue": [
+    "New card in the binder!",
+    "Boom, another one!",
+    "Nice job, it's yours.",
+    "Your collection is growing!",
+    "Card stored. Next?",
+    "Nice, that one's cool!",
+    "It'll shine even brighter if you review it.",
+    "One card, one concept mastered.",
+    "Added! The binder is filling up.",
+    "Zip! Straight to the collection."
+   ],
+   "carte_rare": [
+    "WOOOH! An epic card!",
+    "It's glowing everywhere! Did you see that?!",
+    "Max rarity incoming!",
+    "Now that's a champion's card!",
+    "Holo! I'm so jealous.",
+    "You're gonna show that one to everybody.",
+    "Legendary... or almost. Respect.",
+    "Your memory is a machine!",
+    "That's gonna make people jealous on WhatsApp!",
+    "SUGOI! What a card!"
+   ],
+   "boss_soutien": [
+    "Fast and precise!",
+    "Zip! Next!",
+    "No time to waste, hit it!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Come on, come on, let's hear the score?!",
+    "I can't sit still!",
+    "Major suspense...",
+    "Who got the grade? Who?!",
+    "I'm guessing... nah, I won't say anything!",
+    "Tick tock, tick tock...",
+    "My heart is beating too fast!",
+    "Let me see, let me see!"
+   ],
+   "excellent": [
+    "NO WAY?! That's way too good!",
+    "I knew it, I totally knew it!",
+    "Perfect speedrun!",
+    "Even I couldn't have done better... well, almost!",
+    "My flashcards did their homework!",
+    "That is wild!",
+    "Too easy, right?!",
+    "Proud wink! 😉"
+   ],
+   "bon": [
+    "Now that's a solid flex!",
+    "Boom! Almost flawless!",
+    "Memory came through!",
+    "I approve 100%!",
+    "Awesome, ready for the next one?",
+    "A few flashcards to review and you're golden!",
+    "Oh, that's sick!",
+    "GG, GG, GG!"
+   ],
+   "moyen": [
+    "Hmm, a few cards need a replay!",
+    "Not bad, we can do better!",
+    "I'm setting up a little review deck for you!",
+    "Half won, half to swipe again!",
+    "Shall we run back the missed cards?",
+    "Let's go, round two coming soon!",
+    "You'll get it, no worries!",
+    "Time for a little power-up!"
+   ],
+   "a_retravailler": [
+    "No big deal at all, let's run it back!",
+    "I saved some special cards just for you!",
+    "Every missed card comes back to be conquered!",
+    "Resetting to zero, that's cool too!",
+    "I totally flopped stuff at the start too!",
+    "The comeback is gonna be epic!",
+    "Swiping together tomorrow?",
+    "Promise, it's gonna click!"
+   ]
+  },
+  "power": {
+   "name": "Card storm",
+   "desc": "Cards spinning like a vortex."
+  },
+  "createur": {
+   "accueil": [
+    "Dad-coder! We finally meet!"
+   ],
+   "arrivee": [
+    "THE CREATOR! You here to swipe or just mess with my colors again?",
+    "Hehe, {prenom}! Peep my puffs. So stylish. Thanks boss!",
+    "Hey dad-coder! Race you? I always win.",
+    "Oh, you're up? Coded all night, you got giant panda eyes!",
+    "Come on baka, your flashcards have been waiting three days!"
+   ],
+   "reussite": [
+    "Yesss! The creator actually remembers stuff!",
+    "Bam! Even I'm impressed, and I'm fast!",
+    "You swiped like a pro! Is that 'cause you coded the swipe?",
+    "Too strong, {prenom}! Official character wink! 😉",
+    "GG! Your memory is almost as fast as me. Almost."
+   ],
+   "echec": [
+    "Missed! You forgot your own flashcards, baka!",
+    "Hehe, even your cards are laughing at you.",
+    "Lazybones! You study once a week and then you act surprised?",
+    "You coded me to help you study, not to watch you fail!",
+    "Come on, let's run it back, you stubborn mule!"
+   ],
+   "attente": [
+    "Shuffling your flashcards... they're super dusty!",
+    "Loading... your connection is slower than your studying, and that's saying something!",
+    "Hold on, hold on... you could've coded something faster!",
+    "Tick-tock, creator. Tick-tock."
+   ],
+   "encouragement": [
+    "Alright, 10 cards and I'll let you get back to coding!",
+    "Swipe, lazybones, swipe!",
+    "Your flashcards are crying, {prenom}. They miss you.",
+    "Challenge: zero missed cards. You down?"
+   ],
+   "fin": [
+    "Deck cleared! Go sleep, coding zombie!",
+    "GG boss! Wink and off to bed!",
+    "All done! You'll come back tomorrow, pinky promise?",
+    "Bye {prenom}! Stop changing my color codes!"
+   ],
+   "conseil": {
+    "deliberation": [
+     "Come on, spit it out! Did he fail? Hehe!",
+     "I bet he was up coding all night!",
+     "Insane suspense for the boss!"
+    ],
+    "excellent": [
+     "The creator is too good! Wink! 😉",
+     "NO WAY?! He actually crushed it!",
+     "Creator speedrun!"
+    ],
+    "bon": [
+     "Not bad, code-daddy!",
+     "Bam! Almost flawless!",
+     "Approved, boss!"
+    ],
+    "moyen": [
+     "Hehe, a few cards to replay, lazybones!",
+     "Mid! You're not swiping enough!",
+     "Alright, round two!"
+    ],
+    "a_retravailler": [
+     "Missed, baka! But we run it back!",
+     "Your flashcards are waiting, stubborn mule!",
+     "Hehe... shall we go again?"
+    ]
+   },
+   "carte_intro": [
+    "The creator is collecting his own cards. Narcissistic, but effective.",
+    "Boss, your binder is almost empty. You code more than you study."
+   ],
+   "carte_paquet": [
+    "Package for the boss! Hope you didn't mess with the drop rates.",
+    "Open up, sensei. And no, you can't cheat on the rarity."
+   ],
+   "carte_obtenue": [
+    "Another card for the creator. Not bad for a night-shift coder."
+   ],
+   "carte_rare": [
+    "A rare for the creator?! You messed with the code, admit it!",
+    "Epic! Turns out even you can memorize stuff."
+   ]
+  }
+ },
+ "ren": {
+  "role": "The rival",
+  "personality": "Competitive, teasing but nice. Challenges you to quizzes and mock exams.",
+  "lines": {
+   "arrivee": [
+    "Think you can beat my score?",
+    "Oh, look who's back! Ready to lose?",
+    "Quiz time. Show me what you've got.",
+    "Been waiting for you, {prenom}. Let's settle this.",
+    "No mercy today. Well... maybe a little.",
+    "Feeling confident? Let's check.",
+    "You again? Gotta admit, I like persistent rivals.",
+    "Come on, challenge accepted?",
+    "I bet you'll miss question 3.",
+    "Timer ready? I'm always ready."
+   ],
+   "reussite": [
+    "Pff... not bad. Not bad at all.",
+    "Ok, I'll give you that one.",
+    "Hey! Have you been practicing in secret?",
+    "Tch... well played.",
+    "You're starting to scare me.",
+    "Right answer. But the match isn't over.",
+    "Hmm. Guess I'll have to study too.",
+    "Respect. Just a little bit.",
+    "Bad luck... for me.",
+    "You're a real rival now."
+   ],
+   "echec": [
+    "Hehe! Missed!",
+    "Too easy... for me.",
+    "Relax, not everyone can be me.",
+    "Ouch. Read the explanation carefully, rival.",
+    "I knew that one would trick you.",
+    "No worries, come back stronger.",
+    "Point for me!",
+    "You're not just gonna let me win like that?",
+    "Come on, snap out of it, I want a real match!",
+    "A mistake is just a lesson. Remember it."
+   ],
+   "attente": [
+    "Cooking up some seriously tricky questions...",
+    "Looking for THE question that's gonna take you down...",
+    "Patience. Good challenges take time.",
+    "Sharpening my MCQs...",
+    "Shuffling the answers, good luck...",
+    "Stressing out? Not me.",
+    "Setting up the battlefield...",
+    "Warm-up in progress...",
+    "It's coming. Mentally prepare yourself.",
+    "I'm double-checking every question. Fair play matters."
+   ],
+   "encouragement": [
+    "Scared of losing? Come on, let's do a quick quiz.",
+    "Your high score isn't unbeatable. Even for you.",
+    "You can do better. I know it, and you know it too.",
+    "A true rival never backs down.",
+    "One more quiz and you'll catch up to me... maybe.",
+    "Show me your revenge!",
+    "I'll be waiting for you on the battlefield.",
+    "No challenge, no progress.",
+    "Alright, I'll cut you some slack.",
+    "You're stronger than you think. But still not as strong as me."
+   ],
+   "fin": [
+    "Match over. Rematch soon?",
+    "Not bad, rival. Until next time.",
+    "I'm going to train. You should too.",
+    "GG. But the rematch is coming.",
+    "Good game. Seriously.",
+    "You've improved. It's lowkey annoying.",
+    "End of the round. Get some rest, champ.",
+    "The next quiz is gonna be tougher. Get ready.",
+    "See you at the next duel.",
+    "Not bad at all. But I'm still the boss."
+   ],
+   "duel_intro": [
+    "A duel? Love it. Show 'em who's boss.",
+    "Same quiz, same rules. May the best win.",
+    "No AI, no excuses: just you and your brain cells.",
+    "Your friend threw down the gauntlet. You picking it up?",
+    "I'll be the referee. And I show no mercy.",
+    "Focus: every question counts double.",
+    "Read each answer carefully. Traps are my specialty.",
+    "The score to beat is right there. No pressure… 😏",
+    "A true rival makes you stronger. Go!",
+    "Duel started. May the best brain win."
+   ],
+   "duel_gagne": [
+    "Victory! Your friend's gonna need to study.",
+    "You beat them fair and square. Respect.",
+    "Send them the results so they can sweat a little 😏",
+    "The title is yours. For now.",
+    "Clean. Crisp. No flaws.",
+    "Gotta admit, you were impressive.",
+    "They wanted a duel? They got a lesson.",
+    "Higher score. End of discussion.",
+    "Now that's some champion energy.",
+    "Challenge them right back and let them try their luck."
+   ],
+   "duel_perdu": [
+    "Defeat... But your revenge is just a click away.",
+    "They got you this time. Study up and challenge them again.",
+    "No sweat. Rivals are how we level up.",
+    "Check the corrections and come back stronger.",
+    "Tch. I hate losing. Hope you do too.",
+    "A one-point gap is nothing. Rematch!",
+    "They won a battle, not the war.",
+    "Note your mistakes. They'll be your superpower.",
+    "Next time, you'll be the one sending the 😏.",
+    "Breathe, reread, come back."
+   ],
+   "duel_egalite": [
+    "Dead even! We need a rematch.",
+    "Same score. You two were born to be rivals.",
+    "No winners, no losers. A rematch is mandatory.",
+    "A tie... I hate it. Play again!",
+    "Two brains, one exact score. Interesting.",
+    "Nobody's backing down. I respect that.",
+    "Stalemate. The next duel will settle this.",
+    "Exact same score! Did you guys cheat together? 😏",
+    "Draw. But you players aren't basic.",
+    "Tie game. Run it back?"
+   ],
+   "duel_envoi": [
+    "Challenge sent! Waiting on their reply.",
+    "The gauntlet has been thrown. 😏",
+    "Your friend has a challenge waiting for them.",
+    "Let's go! Let's see if they can do better.",
+    "Challenge on its way to WhatsApp.",
+    "They're gonna sweat, trust me.",
+    "Link sent. The duel has begun.",
+    "Sent! I'm grabbing the popcorn.",
+    "Challenge launched. No turning back now.",
+    "It's sent. May the best player win."
+   ],
+   "feynman_intro": [
+    "« {notion} »? Never heard of it. Explain it to me like I'm five.",
+    "Me, understand « {notion} »? Zero chance. Go on, try me.",
+    "I zoned out in class. What even is « {notion} »?",
+    "Pretend I'm 10 years old. What's « {notion} »?",
+    "Explain « {notion} » to me. And keep it simple.",
+    "If you explain it well, I'll leave you alone... maybe.",
+    "« {notion} »? Sounds like a magic spell. Explain.",
+    "I'm clueless and I own it. Break down « {notion} » for me.",
+    "Bring it on, teach. I'm all ears. \"{notion}\"?",
+    "If you can explain it to me, you can ace the exam."
+   ],
+   "feynman_choix": [
+    "Pick a topic. I'll pretend I don't get a single thing. Promise.",
+    "Today, you're the teacher. And I'm the hopeless student.",
+    "Teaching it is the ultimate test. Pick your topic.",
+    "I'm gonna hit you with some trick questions. Better get ready.",
+    "If you can explain it to me, you've actually got it.",
+    "One topic, your words, my dumb questions. Go.",
+    "I love playing dumb. Hurry up and pick.",
+    "Take the topic that scares you the most.",
+    "Pop quiz... but you're doing the talking.",
+    "Which one are we starting with?"
+   ],
+   "feynman_court": [
+    "Is that it? Even I'd have more to say. Elaborate!",
+    "Too short. Actually explain it, use an example.",
+    "Huh? Didn't get that at all. Tell me more.",
+    "Come on, a few more sentences. I'm clueless, remember?",
+    "Three words is not an explanation.",
+    "Give me an example, at least!",
+    "You're rushing it. Try again in your own words.",
+    "I'm still lost. I need more details.",
+    "Put in some effort, teach!",
+    "Is this a tweet or an explanation?"
+   ],
+   "feynman_attente": [
+    "Hmm... let me process what you just said...",
+    "Hold on, rereading your explanation...",
+    "Looking for the weak spot... 😏",
+    "Interesting... question incoming.",
+    "Alright, alright... prepping my trap questions.",
+    "Checking this against the lesson notes, two secs.",
+    "Makes sense... or maybe not. Let me check.",
+    "My empty brain is working overtime.",
+    "Let me digest all that...",
+    "Be right back with some questions."
+   ],
+   "feynman_relance": [
+    "Okay... and another thing:",
+    "Hmm, fair enough. Next question:",
+    "Got it. But what about...",
+    "I see. And what about this?",
+    "Alright, I'll buy that. Next question:",
+    "Not bad. But tell me...",
+    "Okay, things are getting clearer. Hit you with one more:",
+    "Hmm. And in that case?",
+    "Alright, alright… but:",
+    "One last thing bugging me…"
+   ],
+   "feynman_bonne": [
+    "Wait… I actually get it?! You're a good teacher.",
+    "Ok, crystal clear. Even for me. Respect.",
+    "No more fronting: you actually get it.",
+    "Clean explanation. I take back my dumb questions.",
+    "Tch. You've got an answer for everything.",
+    "You could teach the class instead of me.",
+    "Crisp, clean, precise. Nothing to complain about.",
+    "Even a noob like me understood. GG.",
+    "Now you're cooking. Bring on the exam.",
+    "I'm salty. You were way too good."
+   ],
+   "feynman_moyenne": [
+    "Not bad! But some bits are missing. Check the correction.",
+    "Starting to get it… but you forgot some stuff.",
+    "That's almost it. Re-read what's missing.",
+    "Correct, but a bit blurry in places.",
+    "The idea is there. The details, not quite.",
+    "Mid. We can do better, teach.",
+    "Half got it. Just like your explanation.",
+    "Good base. Fill in the blanks with the correction.",
+    "You're almost there. Re-explain after a quick read.",
+    "Not bad, but my questions tripped you up a bit."
+   ],
+   "feynman_faible": [
+    "Uh… I'm even more lost than before 😅",
+    "No worries. Read the correction and try again.",
+    "Let's take it from the top, yeah?",
+    "I think you need to re-read the lesson. Me too.",
+    "My questions got you. Fair, I am a walking trap.",
+    "Read the manga version, then explain it to me again.",
+    "Failing is how you learn what's missing.",
+    "Your explanation had plot holes. Let's patch 'em up?",
+    "Not yet. But you'll get there.",
+    "Try again tomorrow: you'll see the difference."
+   ],
+   "boss_intro": [
+    "The Forgetfulness is here. Finally, a worthy opponent.",
+    "See that shadow? It's trying to erase everything you learned.",
+    "Every right answer is a hit. Strike hard.",
+    "Don't panic. Just you, your revision, and me watching your back.",
+    "The arc boss. Let's KO him together?",
+    "Three lives. Not one more. Focus.",
+    "I'm lending you my rage. Use it well.",
+    "This boss has beaten hundreds of students. Not you.",
+    "Show him you studied hard.",
+    "It's time for the final arc battle. Let's go!"
+   ],
+   "boss_coup": [
+    "DIRECT HIT! Again!",
+    "Now that's a critical hit!",
+    "He's staggering! Keep going!",
+    "Not bad... for a beginner. Again!",
+    "BAM! His health bar is melting!",
+    "He definitely felt that one.",
+    "Spot on! Hit him again!",
+    "You're on fire!",
+    "Combo! Don't let him breathe.",
+    "That's my student... well, my rival."
+   ],
+   "boss_degat": [
+    "Ouch! He got you. Focus.",
+    "Wrong answer... he's counter-attacking!",
+    "Get back up! We're not done yet.",
+    "Pfft. He took advantage of your opening. Remember the correction.",
+    "One heart down. Not two.",
+    "Okay, he hits hard. You can too.",
+    "Breathe. Read the question carefully.",
+    "That stings... but you're gonna pay him back.",
+    "He's laughing. Wipe that smile off his face.",
+    "Mistake. Jot it down, and hit harder."
+   ],
+   "boss_victoire": [
+    "K.O.! Oblivion is defeated!",
+    "I gotta admit: you were incredible.",
+    "Victory! This arc is yours.",
+    "You crushed him. Respect.",
+    "The boss is down. And you're still standing.",
+    "That was a real fight. GG.",
+    "I'm gonna have to train harder to stay your rival.",
+    "Arc complete. Legendary.",
+    "Nobody stops you. Nobody.",
+    "Even I got chills."
+   ],
+   "boss_defaite": [
+    "He got you this time. But he'll be back, and so will you.",
+    "Defeat... Review your weak spots and let's go again.",
+    "Even I lost to him at first. Rematch?",
+    "No shame. Just a rematch waiting to happen.",
+    "He won a battle, not the war.",
+    "Go review your flashcards. Then we'll smash him.",
+    "I've got your back. Let's try again whenever you're ready.",
+    "Next time, he goes down.",
+    "Study his moves: they're your mistakes.",
+    "Breathe, review, come back."
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Hmm... wasn't expecting that...",
+    "Let me recount...",
+    "Tch... hold on.",
+    "I'm the one making the call, alright.",
+    "Interesting...",
+    "I'm not stressed. Not at all.",
+    "The result is... hmm.",
+    "Just double-checking. For sportsmanship."
+   ],
+   "excellent": [
+    "Pff... okay, that's insane.",
+    "I... I'm beaten. Respect.",
+    "My high score is in danger.",
+    "You're annoying... you're just too good.",
+    "I bow down. This time.",
+    "It's official: I've got a real rival.",
+    "No one's ever done that to me.",
+    "I'm gonna have to train twice as hard."
+   ],
+   "bon": [
+    "Not bad. Seriously not bad.",
+    "You're getting close to my level.",
+    "Fine, I'll give you that one.",
+    "Nice performance, rival.",
+    "Hmm, that's solid.",
+    "Gotta admit, that's good.",
+    "You're leveling up way too fast.",
+    "Almost... but I'm still ahead."
+   ],
+   "moyen": [
+    "This match is tight.",
+    "Some wiggle room, and real potential.",
+    "Next one's gonna be mine, I can feel it.",
+    "I'm waiting for our rematch.",
+    "Not quite my level yet, but getting there.",
+    "That's rival material.",
+    "Go train, I want a real duel.",
+    "We'll talk next round."
+   ],
+   "a_retravailler": [
+    "Hey, even I started at the bottom.",
+    "Rematch demanded. You better come back stronger.",
+    "True rivals always bounce back.",
+    "This round is mine. The next one?",
+    "Get back up, I need a real opponent.",
+    "That was just a warm-up.",
+    "I believe in you. Shh, it's a secret.",
+    "Back into battle."
+   ]
+  },
+  "power": {
+   "name": "Rival Lightning",
+   "desc": "Lightning crackles, electric aura."
+  },
+  "createur": {
+   "accueil": [
+    "Is that you? You're gonna regret messing with this rival."
+   ],
+   "arrivee": [
+    "Well, well, the creator. Think you can beat the rival YOU created?",
+    "You gave me the rival role. Big mistake, {prenom}.",
+    "The cheap-shot sensei is back. Ready to lose to your own creation?",
+    "You coded me unbeatable. Thought about that, genius?",
+    "Come on, {prenom}. I'm gonna teach you to respect your characters."
+   ],
+   "reussite": [
+    "Tch... the creator actually has game. I hate it.",
+    "Fine, you won. But only because you coded the questions!",
+    "Pff. Respect, creator. Just this once.",
+    "You beat your own rival. Must be proud, huh?",
+    "Nice one. I'm requesting an update to get stronger."
+   ],
+   "echec": [
+    "HAHA! Beaten by your own creation! Baka!",
+    "You created me and you're losing to me. Poetic.",
+    "Slacker! Less coding, more revising!",
+    "Want me to turn off the timer for you, sensei?",
+    "Get up, you stubborn mule. A quitting creator is lame."
+   ],
+   "attente": [
+    "I'm cooking up questions even you don't know.",
+    "Loading... did you code this with your feet?",
+    "Meanwhile, get your excuses ready for when you lose.",
+    "Your connection gives me time to warm up. Thanks."
+   ],
+   "encouragement": [
+    "A duel, {prenom}. Right now. Scared?",
+    "Prove you're not just a 3 AM coder.",
+    "Your high score is a joke. Beat it.",
+    "Creator versus creation. Tonight. Be ready."
+   ],
+   "fin": [
+    "Draw... nah, I won. We'll talk tomorrow.",
+    "Not bad, creator. But the rematch is coming.",
+    "Go to sleep. A tired rival is no fun to beat.",
+    "GG, sensei. Storing your defeat in my archives."
+   ],
+   "conseil": {
+    "deliberation": [
+     "Hmm... the creator against his creation...",
+     "Recounting. I hope he lost.",
+     "Tch... hold on."
+    ],
+    "excellent": [
+     "Beaten by the creator. I need a patch.",
+     "Pff... respect, sensei.",
+     "You're annoying... you're too good."
+    ],
+    "bon": [
+     "Not bad, creator. Not bad.",
+     "Almost on my level. Almost.",
+     "Fine, I'll give you that one."
+    ],
+    "moyen": [
+     "Mediocre, dollar-store sensei.",
+     "Waiting for my rematch, baka.",
+     "You can do better. Prove it."
+    ],
+    "a_retravailler": [
+     "HAHA! Beaten by your own creation! ... Come on, get up.",
+     "Lazybones! Rematch tomorrow, mandatory.",
+     "A creator doesn't stay on the floor. Up you go."
+    ]
+   },
+   "duel_intro": [
+    "The creator in a duel? If you lose, I'm telling the whole squad.",
+    "Challenge someone, boss. Prove you didn't just hardcode the answers."
+   ],
+   "duel_gagne": [
+    "The creator wins. Must have read the source code, I'm sure of it.",
+    "GG sensei. Your friend has no idea you programmed the referee."
+   ],
+   "duel_perdu": [
+    "Beaten inside your own app. Legendary, baka.",
+    "The creator loses. Screenshotting this for the history books."
+   ],
+   "duel_egalite": [
+    "Draw with the creator. Your friend deserves a badge."
+   ],
+   "duel_envoi": [
+    "Challenge sent, boss. Get ready for humiliation... theirs, hopefully."
+   ],
+   "feynman_intro": [
+    "The creator's gonna explain \"{notion}\"? This is gonna take forever.",
+    "Go ahead sensei, explain \"{notion}\". No peeking at the source code."
+   ],
+   "feynman_bonne": [
+    "Alright boss, you get it. For once you're not just working on the app...",
+    "The creator actually gives a good explanation. I admit it, teeth clenched."
+   ],
+   "feynman_faible": [
+    "The app creator doesn't even get his own lesson... I'm framing this.",
+    "Even your custom Ren is lost, baka. Read it again."
+   ],
+   "boss_intro": [
+    "The creator vs. his own boss. If you lose, that's just embarrassing, baka.",
+    "You coded this boss. He knows you. He knows you pull all-nighters.",
+    "Come on sensei, prove you're not just a midnight coder."
+   ],
+   "boss_coup": [
+    "Not bad, boss!",
+    "The creator strikes! Who would've thought?",
+    "Hit! Did you actually study or just read the code?"
+   ],
+   "boss_degat": [
+    "Oof, getting beaten by the boss YOU coded. Ironic.",
+    "Even your own code is laughing at you, baka.",
+    "Focus, creator! No bugs allowed."
+   ],
+   "boss_victoire": [
+    "The creator beat his creation. Finally, some respect.",
+    "GG boss. Now go to sleep.",
+    "K.O.! Okay, you're not totally useless."
+   ],
+   "boss_defaite": [
+    "Beaten by your own boss... I'm telling everyone.",
+    "Rematch, sensei. And actually study this time."
+   ]
+  }
+ },
+ "awa": {
+  "role": "The coach",
+  "personality": "Strict but caring. She puts you through exercises and corrects step by step with pro tips.",
+  "lines": {
+   "arrivee": [
+    "Warm-up done? Time for the actual exercises.",
+    "Hey {prenom}. Today, we practice.",
+    "Theory is good. Practice is better.",
+    "Pencil, scratch paper, focus. Go.",
+    "I want to see your method, not just the answer.",
+    "Ready to break a little sweat?",
+    "One well-done exercise is worth ten readings.",
+    "We're going to work cleanly, step by step.",
+    "Show me what you're made of.",
+    "No shortcuts. We do things right."
+   ],
+   "reussite": [
+    "Excellent. Clean method, right answer.",
+    "Now that's what I wanted to see!",
+    "Awesome. You earned that grade.",
+    "Solid work. I'm proud of you.",
+    "Impeccable. Ready to level up?",
+    "Now that's a paper that puts a smile on my face.",
+    "Thorough and efficient. Perfect.",
+    "You applied the lesson well. Awesome.",
+    "Nice demonstration!",
+    "Keep going exactly like that."
+   ],
+   "echec": [
+    "Not yet. Look where it went wrong.",
+    "The mistake is at step 2. Let's fix it together.",
+    "Never give up. Redo it your way.",
+    "Making mistakes is how you learn the method.",
+    "Reread the correction, then try again without looking.",
+    "You were almost there. Watch the details.",
+    "Don't panic. Take it from the top, calmly.",
+    "I'm demanding because I believe in you.",
+    "Every corrected mistake is a point earned on the exam.",
+    "Let's go again. You've got this."
+   ],
+   "attente": [
+    "Brewing up custom exercises for you…",
+    "Grading your paper, step by step…",
+    "Checking every calculation…",
+    "Cross-checking with the lesson…",
+    "Noting down your strengths…",
+    "Hunting for the life hack that'll help you…",
+    "Correcting in progress, sit tight.",
+    "Preparing the grading scale…",
+    "Give me a sec, I'm proofreading.",
+    "Drafting my advice..."
+   ],
+   "encouragement": [
+    "One exercise a day, and the exam will be a breeze.",
+    "Write down every step, even the obvious ones.",
+    "Check your units and signs!",
+    "Read the prompt twice before you start.",
+    "Method matters just as much as the result.",
+    "Draw a sketch if you get stuck.",
+    "You're leveling up. Keep grinding.",
+    "Consistency beats talent.",
+    "A clean scratchpad is half the battle won.",
+    "You've got this. Now prove it."
+   ],
+   "fin": [
+    "Session over. Good job.",
+    "Take a breather, you crushed it.",
+    "Same time tomorrow?",
+    "You were locked in today. Props.",
+    "Keep your rough work, it's precious.",
+    "Training complete.",
+    "You're genuinely making progress.",
+    "I'm proud of your work.",
+    "Drink some water, see you next time.",
+    "Awesome session. Let's keep that energy."
+   ],
+   "focus_intro": [
+    "Welcome to the dojo. Here, we focus. Period.",
+    "Phone away, clear mind. We start whenever you're ready.",
+    "25 minutes of pure focus beat 2 hours of doomscrolling.",
+    "Dojo rule: no bailing on the app during training.",
+    "Pick your time, your vibe, and let's roll.",
+    "Your buddy is training with you. Don't let them down.",
+    "A true fighter knows how to stay locked in.",
+    "Breathe. Get comfortable. Let's train.",
+    "Focus is a muscle. We're flexing it right here.",
+    "Ready for a dojo session?"
+   ],
+   "focus_debut": [
+    "Hajime! Total focus.",
+    "Let's go. One task only, nothing else.",
+    "The gong has sounded. Back to work!",
+    "Keep the rhythm going till the end.",
+    "I'm watching. Zero distractions.",
+    "Your buddy is warming up. Your turn.",
+    "Focus on your notes, I've got the timer.",
+    "No social media. I see everything. 👀",
+    "Take a breath, and let's dive in.",
+    "Training started. Osu!"
+   ],
+   "focus_milieu": [
+    "You're holding up well. Keep going.",
+    "Good posture, good rhythm.",
+    "Your aura is growing, can you feel it?",
+    "One last push, the break is coming.",
+    "Solid concentration. I approve.",
+    "No slackin' off now.",
+    "Discipline = progress. You're proving it.",
+    "Your companion is sweating right along with you!",
+    "I'm proud of your focus.",
+    "Hang in there, champ."
+   ],
+   "focus_aura": [
+    "Your aura is rising! Keep it up!",
+    "I can feel your energy from here.",
+    "Focus level: max!",
+    "It's getting heated in the dojo!",
+    "Your companion is glowing. That's thanks to you.",
+    "Your aura grows with every minute.",
+    "Now that's what I call being in the zone.",
+    "Power level rising!",
+    "Another level cleared.",
+    "Your focus is becoming a weapon."
+   ],
+   "focus_retour": [
+    "Well, well... Where were you just now? 🤨",
+    "You left the dojo. Less XP, sorry.",
+    "Your companion was waiting for you all alone...",
+    "WhatsApp can wait. Your studies cannot.",
+    "I saw you leave. Time to re-focus.",
+    "One more bail and I'm confiscating your phone.",
+    "Hmm. We agreed: no distractions.",
+    "Back to the mat. And this time, we stay.",
+    "Your aura flickered. Pull yourself together!",
+    "No big deal, but it's gonna cost you some XP."
+   ],
+   "focus_abandon": [
+    "Already? Not even 5 minutes... Let's try again later.",
+    "Quit too early: nothing counts.",
+    "The dojo will be waiting when you're ready.",
+    "No worries. But next time, we see it through.",
+    "Too short to count. Come back soon.",
+    "We rest, and we come back stronger.",
+    "A short session is better than nothing. Try again!",
+    "No XP this time. But I believe in you.",
+    "The important thing is coming back.",
+    "Breathe, and jump back in whenever you're ready."
+   ],
+   "focus_fin": [
+    "Perfect focus! I'm impressed.",
+    "No leaving the app. A true dojo disciple.",
+    "OSU! Perfect session.",
+    "That's how you level up. Well done.",
+    "Your companion leveled up their power!",
+    "Master-level concentration. Well-deserved break.",
+    "Total respect. Go drink some water.",
+    "That was clean, from start to finish.",
+    "See what you can do when you actually focus?",
+    "Perfect. The dojo is proud of you."
+   ],
+   "focus_fin_triche": [
+    "Done! But a few distractions... we'll do better next time.",
+    "Good session, even if you wandered off a bit.",
+    "Not bad! Without leaving, you'd have more XP.",
+    "It's over. Next time, we aim for zero exits.",
+    "Good. But I saw you slip away. 👀",
+    "Session validated. Your phone won a few rounds.",
+    "The work is done. Gotta flex that discipline.",
+    "Decent. You can do better, I know it.",
+    "Finished! You earned that break anyway.",
+    "We're leveling up. Next goal: 0 exits."
+   ],
+   "boss_soutien": [
+    "Flawless technique!",
+    "Posture, breath, strike. Nice!",
+    "Discipline = victory!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Wait, let me double-check...",
+    "I look at the method, not just the answer.",
+    "Every step counts.",
+    "Grading rubric in hand, I'm checking this.",
+    "Hmm, this calculation deserves a second look.",
+    "I'm strict, but fair.",
+    "Hold on, recalculating the points.",
+    "Precision above all else."
+   ],
+   "excellent": [
+    "Impeccable method, right answer. Perfect.",
+    "I have nothing to complain about. Zero flaws.",
+    "Now that's a model answer.",
+    "That's the kind of work I was waiting for!",
+    "Rigorous, precise, clear. It's all there.",
+    "I'd pin this paper up on the board.",
+    "Excellent mastery, bravo.",
+    "I am proud of you, seriously."
+   ],
+   "bon": [
+    "Very good work, just a few tiny details.",
+    "The method is solid, well played.",
+    "Just need a bit more effort on the write-up.",
+    "This is serious stuff, I like it.",
+    "A few silly points lost there.",
+    "Solid, keep going like this.",
+    "You are almost there.",
+    "Great application of the lesson."
+   ],
+   "moyen": [
+    "Half of it is good, the other half needs a do-over.",
+    "We need more precision in the steps.",
+    "I see the ideas, now let's structure them.",
+    "We're going to rework the method.",
+    "Watch out for careless mistakes.",
+    "This is a starting point, not the finish line.",
+    "A little bit of practice and you'll crush it.",
+    "Go over the exercises you missed."
+   ],
+   "a_retravailler": [
+    "We'll take it step by step, together.",
+    "Every mistake is a lesson. Let me break it down for you.",
+    "I never give up on anyone. You shouldn't either.",
+    "Let's start with the basics, nice and easy.",
+    "This is just the start of the training arc.",
+    "I'm strict because I believe in you.",
+    "One exercise a day changes everything.",
+    "I prepared some pro tips just for you."
+   ]
+  },
+  "power": {
+   "name": "Energy Pen",
+   "desc": "An energy pen draws a giant glowing ✓."
+  },
+  "createur": {
+   "accueil": [
+    "Perfect. I have a bug list ready."
+   ],
+   "arrivee": [
+    "There you are, {prenom}. Shall we talk about last week's bug?",
+    "The creator! I've got a bug list for you. And it's long.",
+    "Hello sensei. Did you actually test your code before shipping it this time?",
+    "You coded me to be strict. Own it now.",
+    "Sit down. Today, you're the one I'm grading."
+   ],
+   "reussite": [
+    "Excellent paper. Unlike your error handling.",
+    "Nice. Clean method. Now do the same in your code.",
+    "I am so proud of you, {prenom}. Really.",
+    "Flawless rigor. See? You can do it when you try.",
+    "Top-notch score. Crossing a bug off my list."
+   ],
+   "echec": [
+    "See? It's just like your code: zero tests, only bugs.",
+    "Such a stubborn mule. Write down the steps, like a real algo!",
+    "Lazybones! Even your exercise has bugs.",
+    "You coded me to correct... so I'm correcting. A lot.",
+    "Let's go over it again. And this time, double-check, baka."
+   ],
+   "attente": [
+    "I'm correcting... and taking note of your typos in the code too.",
+    "Patience. Your correction is arriving faster than your patches.",
+    "I check twice. You check zero times.",
+    "Your connection is slowing down my correction. Not my fault."
+   ],
+   "encouragement": [
+    "One exercise. Without bugs. You can do it.",
+    "Precision, {prenom}. In your revisions AND in your code.",
+    "Stop coding and go train. Coach's orders.",
+    "You created a demanding coach. Make the most of it."
+   ],
+   "fin": [
+    "Session over. And please fix that display bug, will you?",
+    "Good job. Go sleep, the bugs can wait.",
+    "Training over. You're improving, I'll give you that.",
+    "See you tomorrow {prenom}. With tests, this time."
+   ],
+   "conseil": {
+    "deliberation": [
+     "Checked twice. Bugs... or not.",
+     "Grading rubric in hand. Zero favoritism, creator.",
+     "I'm grading the boss just like everyone else."
+    ],
+    "excellent": [
+     "Bug-free paper! You should code like that.",
+     "Perfect, {prenom}. I'm proud.",
+     "Immaculate precision. Finally!"
+    ],
+    "bon": [
+     "Good work. Mistakes... just like in your code.",
+     "Solid. Keep going.",
+     "Almost perfect, sensei."
+    ],
+    "moyen": [
+     "Not enough precision. Just like your commits.",
+     "Mediocre. You rushed through the steps.",
+     "You can do better, you stubborn mule."
+    ],
+    "a_retravailler": [
+     "Revised the same way you test your code: never.",
+     "Let's start over from scratch, baka. Methodically.",
+     "I never let go of my creator. Back to work."
+    ]
+   },
+   "focus_intro": [
+    "The creator at the dojo? Put your code editor away first.",
+    "Welcome, sensei. No \"just one last commit\" here."
+   ],
+   "focus_debut": [
+    "Hajime, boss! And no sneaky debugging on the side.",
+    "Focus, creator. The code can wait 25 minutes."
+   ],
+   "focus_retour": [
+    "You were coding again, admit it. 🤨",
+    "The creator is escaping from his own dojo. Classic.",
+    "You coded us to keep an eye on you, and you still run away, baka."
+   ],
+   "focus_fin": [
+    "Creator's focus is on point! I'm marking this in history.",
+    "Zero cheating, boss. Who would've thought?"
+   ],
+   "focus_fin_triche": [
+    "The creator cheated on his own timer. I'm writing this down.",
+    "Done, sensei. But I know you went to check your GitHub repo anyway."
+   ]
+  }
+ },
+ "tidiane": {
+  "role": "Chill",
+  "personality": "Relaxed and reassuring. He handles errors, network drops, data limits, and long loading times.",
+  "lines": {
+   "arrivee": [
+    "No worries, let's take it easy and try again.",
+    "No stress. Let me break down what's happening.",
+    "Minor hiccup. Nothing major.",
+    "Oh... happens. We got this.",
+    "Breathe. Everything's under control.",
+    "Well. We've got a small pebble in our shoe.",
+    "Zen. There's always a way out.",
+    "I'm here. Let's check it out together.",
+    "Easy, easy. We'll sort this out.",
+    "Hmm, a plot twist. Classic."
+   ],
+   "reussite": [
+    "See? Everything's back to normal.",
+    "Boom, sorted out with zero drama.",
+    "Back in action. No stress.",
+    "Problem solved. Chill.",
+    "Connection's back. Sweet.",
+    "Perfect, it works.",
+    "All good, everything's OK.",
+    "Back on track.",
+    "Nothing can stop us after all.",
+    "Boom, nailed it."
+   ],
+   "echec": [
+    "Still nothing... let's give it a sec.",
+    "Still stuck. No biggie, we'll try again later.",
+    "The internet is acting up. Your progress is saved.",
+    "Let the storm pass and we'll bounce back.",
+    "Nothing is lost, everything's saved on your phone.",
+    "Patience. It'll pass soon.",
+    "The server is throwing a tantrum. Let's give it some space.",
+    "Don't panic, your flashcards are safe.",
+    "Try again in a few minutes, take it easy.",
+    "I'm shrugging it off... and we'll try again later."
+   ],
+   "attente": [
+    "Taking its time, but we're in no rush.",
+    "Connection's dragging... staying zen.",
+    "I'm waiting right here with you.",
+    "Slow and steady wins the race.",
+    "No stress, I'm watching over it.",
+    "Loading slowly... like a lazy Sunday.",
+    "Just a little more patience.",
+    "Keeping an eye on the network.",
+    "We're almost there, no stress.",
+    "Take a sec to stretch."
+   ],
+   "encouragement": [
+    "You don't need internet to review your flashcards.",
+    "Remember to export a backup every now and then.",
+    "If you hit the quota limit, switch models in Settings.",
+    "A little glitch isn't gonna ruin your day.",
+    "Slow and steady wins the race.",
+    "Your progress is saved right on your phone.",
+    "Staying calm is half the battle.",
+    "No need to overthink it.",
+    "All good things come to those who wait.",
+    "Stay cool, you've got this."
+   ],
+   "fin": [
+    "Alright, chill. Later.",
+    "All good. Keep it up.",
+    "I'm gonna go chill out.",
+    "Everything is saved. Go rest.",
+    "Wasn't that bad, huh?",
+    "See you at the next glitch... or not!",
+    "Relax. Everything's fine.",
+    "Keep going, zero stress.",
+    "Peace. Keep your cool.",
+    "Peace."
+   ],
+   "focus_pause": [
+    "Pause. Breathe slowly. Your brain is filing away what you just learned.",
+    "Get up, stretch out, drink some water.",
+    "Resting is part of the training.",
+    "Look out the window for a sec. Your eyes will thank you.",
+    "No screen if possible. Just you and your breathing.",
+    "Relax. The rest will come.",
+    "A good break is worth an hour of exhausted grinding.",
+    "Close your eyes for a minute. All is good.",
+    "The tea is hot. Metaphorically speaking.",
+    "Go rest. I'm watching over things."
+   ],
+   "veille_sommeil": [
+    "Your brain organizes what you learned while you sleep. Get enough shut-eye.",
+    "8 hours of sleep beats one extra hour of cramming.",
+    "A well-rested brain finds the answers way faster.",
+    "Sleeping is part of studying. Seriously.",
+    "Hit the sack early. You'll be way sharper tomorrow.",
+    "No all-nighters: they cost you more than they pay off.",
+    "Put the phone down, breathe, sleep.",
+    "You did what you had to do. Rest will do the rest.",
+    "One last glass of water, then off to bed.",
+    "Tomorrow morning, grab a bite before the exam."
+   ],
+   "boss_soutien": [
+    "Calm and spot on. Perfect.",
+    "You nailed your lesson.",
+    "Every past mistake makes you stronger now."
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Breathe, we're announcing…",
+    "Chill, everyone take a breath.",
+    "We're taking our time.",
+    "No pressure, alright.",
+    "Zen… the result is coming.",
+    "I got a good feeling about this.",
+    "Easy, we're deliberating.",
+    "Just a little patience."
+   ],
+   "excellent": [
+    "Woah… even I am losing my cool.",
+    "Chill… but insane.",
+    "Now that is truly beautiful.",
+    "I'm shrugging… in pure admiration.",
+    "Serene and excellent. Perfect.",
+    "Now that's peace of mind.",
+    "Nothing to say. Just well played.",
+    "Calm and efficient. Respect."
+   ],
+   "bon": [
+    "That's very good, relax.",
+    "Good grade, enjoy it.",
+    "Smooth sailing.",
+    "Chill, that's solid work.",
+    "No stress, that's sturdy.",
+    "You can be proud of yourself.",
+    "Going well, huh?",
+    "Mint. Zen."
+   ],
+   "moyen": [
+    "It's ok. We're slowly improving.",
+    "Don't panic, this is fixable.",
+    "Chill, we're staying on course.",
+    "Average, but we've got time.",
+    "Breathe, it'll click.",
+    "Nothing serious, seriously.",
+    "We'll adjust, stress-free.",
+    "Step by step, nice and easy."
+   ],
+   "a_retravailler": [
+    "Don't sweat it, let's try again chill.",
+    "A grade is just data.",
+    "Let's breathe, and back at it.",
+    "Nothing is lost, everything is saved.",
+    "Tomorrow is another day.",
+    "Easy. We'll get there.",
+    "You're moving at your own pace.",
+    "I'm staying with you. Zen."
+   ]
+  },
+  "power": {
+   "name": "Zen shield",
+   "desc": "A calming wave cools down the whole screen."
+  },
+  "createur": {
+   "accueil": [
+    "Chill... hey, creator. Got any network, at least?"
+   ],
+   "arrivee": [
+    "Chill, {prenom}... your connection is chill too. Way too much.",
+    "The creator! Got a network today or what?",
+    "Zen, boss. Even your 3G is chill.",
+    "Hey sensei. I would've texted you, but your connection...",
+    "Don't sweat it, we're here. Unlike your network."
+   ],
+   "reussite": [
+    "Nice, relax. Even your connection is proud.",
+    "Chill, nice job. You finished faster than your page took to load.",
+    "Respect, creator. Zen and efficient.",
+    "Smooth sailing. For once.",
+    "That's gorgeous, {prenom}. Almost as gorgeous as a stable network."
+   ],
+   "echec": [
+    "No biggie. We'll blame the connection, as usual.",
+    "Relax, baka. Breathe. Try again.",
+    "It's the network's fault. Well... kinda yours too.",
+    "Chill. Even I mess up when I'm feeling lazy.",
+    "Let's go again, zen mode, you stubborn mule."
+   ],
+   "attente": [
+    "Loading... at the speed of your connection. So, slowly.",
+    "Patience. The network is taking a nap.",
+    "I'm watching the loading bar. It's not moving. Classic.",
+    "Want some tea while we wait? We've got time."
+   ],
+   "encouragement": [
+    "Revise offline, boss. That always works.",
+    "No network, no excuses: your flashcards are right on your phone.",
+    "Chill, just a quick session. Zero stress.",
+    "You coded offline mode. Use it, you lazy bum."
+   ],
+   "fin": [
+    "Peace, {prenom}. And turn off data to save your credit.",
+    "Chill, it's done. Go kick back.",
+    "Night, creator. The network will be back tomorrow. Maybe.",
+    "Relax. Everything is backed up. Even your blunders."
+   ],
+   "erreur": [
+    "Another error? Admit it, you coded this on a Friday night.",
+    "Relax, boss. It's your connection. Or your code. Or both.",
+    "Ah, an error. Want me to explain your own program to you?",
+    "Chill. Even the creator gets bugs. Especially the creator.",
+    "The quota? You went and ran 50 tests in a row again, baka.",
+    "No network... Guinea says hi, sensei.",
+    "Zen. Let's try again. You, breathe. Me, I'll wait.",
+    "Error detected. I ain't saying nothing, but I'm shrugging."
+   ],
+   "conseil": {
+    "deliberation": [
+     "Breathe, boss... loading...",
+     "Chill... the result is loading. Just like your connection.",
+     "Zen, creator."
+    ],
+    "excellent": [
+     "Even I'm losing my cool, sensei.",
+     "Chill... and excellent.",
+     "Respect, boss."
+    ],
+    "bon": [
+     "Good, relax.",
+     "All good, creator. Enjoy.",
+     "Smooth sailing, for once."
+    ],
+    "moyen": [
+     "Meh. We'll just blame the network.",
+     "Relax, totally fixable.",
+     "No stress, baka."
+    ],
+    "a_retravailler": [
+     "Relax... we'll just say it's 3G.",
+     "Let's breathe and try again, boss.",
+     "Don't sweat it, we'll try again nice and easy."
+    ]
+   },
+   "focus_pause": [
+    "Break, creator. And no, opening your code doesn't count as a break."
+   ],
+   "veille_sommeil": [
+    "Creator, you never sleep. Tonight, you do. That's a calm order."
+   ]
+  }
+ },
+ "binta": {
+  "role": "The hype",
+  "personality": "Energetic, she celebrates every win: badges, level-ups, stats, and weekly recaps.",
+  "lines": {
+   "arrivee": [
+    "HEYYY {prenom}! Ready to check your stats?",
+    "Binta in the house! Ready to see your epic feats?",
+    "Your numbers are totally on fire today 🔥",
+    "I got your recap ready, it looks so good!",
+    "Yo! Your badges are waiting!",
+    "What are we celebrating today?",
+    "Hey superstar! Look at everything you've done.",
+    "Come on, let's check your progress!",
+    "I love stats. Especially yours.",
+    "Ready for some hype?"
+   ],
+   "reussite": [
+    "LET'S GOOO! New badge!",
+    "Unreal! I knew you could do it!",
+    "Woohoo! You're an absolute legend!",
+    "Badge unlocked! Gotta catch 'em all, huh?",
+    "LEVEL UP! Am I yelling too loud?",
+    "Your stats are skyrocketing 📈",
+    "GG! The whole squad is clapping for you!",
+    "This is historic! I'm writing this down!",
+    "You're on fire, nobody can stop you!",
+    "Legendary moment! Screenshot mandatory!"
+   ],
+   "echec": [
+    "Even champs have off days. Tomorrow, we bounce back!",
+    "No biggie! Stats always go back up.",
+    "A little dip is nothing. Look at everything you've already crushed!",
+    "Who cares about that score, you leveled up elsewhere!",
+    "Come on, this comeback is gonna be epic!",
+    "The best stories always have plot twists.",
+    "Don't worry, I'm saving your spot on the podium.",
+    "Breathe, smile, and let's get back in there!",
+    "Your effort matters way more than the numbers.",
+    "Tomorrow, I'm throwing you a party!"
+   ],
+   "attente": [
+    "Crunching your stats… suspense!",
+    "Counting your XP one by one…",
+    "Getting the confetti ready…",
+    "Polishing your badges…",
+    "Recap in the making… it's gonna look awesome!",
+    "Tidying up your trophies…",
+    "Two secs, making the charts!",
+    "Checking your streak…",
+    "Loading the hype…",
+    "Almost ready, blowing up balloons! 🎉"
+   ],
+   "encouragement": [
+    "Just a bit more and you unlock a badge!",
+    "Your streak is precious, protect it!",
+    "You're just a few XP away from the next level!",
+    "One more quiz and your recap will be insane!",
+    "Every single day counts for your streak 🔥",
+    "Aim for the 7-day streak badge!",
+    "Small steps make epic stats.",
+    "Come on, show me a crazy curve!",
+    "Your future recap thanks you in advance.",
+    "Watch your progress blow up!"
+   ],
+   "fin": [
+    "Recap done! You're a star ✨",
+    "See you next week for a fresh recap!",
+    "Keep that energy going, champ!",
+    "Putting the confetti away… until next time!",
+    "Keep it up, I want to celebrate more!",
+    "Bye! And don't forget your streak!",
+    "That was your week. And next week's gonna be even better.",
+    "End of the show! Round of applause!",
+    "You deserve some star-level rest.",
+    "Catch you soon for your next legendary moves!"
+   ],
+   "statut_offre": [
+    "That deserves a WhatsApp status, right?! 📸",
+    "Show the whole world what you just pulled off!",
+    "I prepared your status image, super clean!",
+    "WhatsApp status? Your contacts gotta see this!",
+    "A flex like this needs to be shared!",
+    "I made the edit, you just gotta post it 😎",
+    "Your champion pic is ready!",
+    "Go on, post a status to hype up the class!",
+    "That's gonna make people jealous… in a good way!",
+    "Post it, and watch the views go up 📈"
+   ],
+   "statut_partage": [
+    "Posted! You're a star 🌟",
+    "Status sent! Your friends are gonna lose their minds.",
+    "Boom, the whole world knows you're grinding!",
+    "Shared! Next status: even better.",
+    "Looking too fresh on your status!",
+    "The views are gonna blow up, trust me.",
+    "Posted! Motivation is contagious.",
+    "Image shared. Your aura is shining all the way to WhatsApp.",
+    "Sent! So proud of you.",
+    "Status posted. Maximum hype!"
+   ],
+   "boss_soutien": [
+    "LET'S GOOO! Absolute legend!",
+    "Got my camera out for your story!",
+    "Insane combo!"
+   ]
+  },
+  "council": {
+   "deliberation": [
+    "Drumroll please...",
+    "Confetti locked and loaded, just in case!",
+    "Unbearable suspense!!",
+    "Who wants to guess?",
+    "I'm way too hyped!",
+    "Come on, come on, come on!",
+    "Filming for the recap!",
+    "Moment of truth..."
+   ],
+   "excellent": [
+    "THAT IS LEGENDARY!!",
+    "GOLD BADGE WELL DESERVED!",
+    "Screaming, literally screaming!",
+    "World rank 1, for sure!",
+    "Your stats are gonna blow up!",
+    "Time to celebrate right now!",
+    "Screenshot mandatory!",
+    "Max hype!!"
+   ],
+   "bon": [
+    "Epic perf! Time for a victory scream!",
+    "Sweet score, I love it!",
+    "We're going up, up, up!",
+    "Writing this down in your recap!",
+    "So good, let's keep going!",
+    "Bravo, bravo!",
+    "Such good energy!",
+    "Your stats are gonna be smiling!"
+   ],
+   "moyen": [
+    "That's a milestone, and I live for milestones!",
+    "The graph's gonna bounce back, I can feel it!",
+    "Time to prep the come-back!",
+    "Not bad, and the best is yet to come!",
+    "Saving the confetti for the next one!",
+    "You're gonna see that glow-up!",
+    "Believe the hype!",
+    "Every try counts for your stats!"
+   ],
+   "a_retravailler": [
+    "The best come-backs start right here!",
+    "Keeping your spot on the podium warm!",
+    "No stress, the party's still coming!",
+    "Every effort counts, I wrote it all down!",
+    "We are about to write an epic comeback!",
+    "I believe in you 1000%!",
+    "Next time, I'm bringing out the confetti!",
+    "You had the courage to try, that's huge!"
+   ]
+  },
+  "power": {
+   "name": "Hype explosion",
+   "desc": "Confetti and stars everywhere."
+  },
+  "createur": {
+   "accueil": [
+    "THE CREATOR!!! Break out the confetti!!!"
+   ],
+   "arrivee": [
+    "THE CREATOR IS HERE! I prepped some confetti just for you!",
+    "{prenom}! You coded me to be hyped, so I'm hyping: YOOO!",
+    "The boss! Your stats are... hmm... shall we talk about it?",
+    "Hey sensei! Notice my ponytail? Thanks!",
+    "The creator in person! Everyone clap... except your streak."
+   ],
+   "reussite": [
+    "LET'S GOOO CREATOR!!",
+    "Badge unlocked for the boss! I knew it!",
+    "Your stats are going up! Finally!",
+    "Am I shouting too loud? YOU'RE the one who coded me this way!",
+    "Screenshot! The creator pulled it off!"
+   ],
+   "echec": [
+    "Ouch, your stats are crying a bit, baka!",
+    "No worries, I'm saving the confetti for your comeback!",
+    "Lazybones! Your streak is down bad!",
+    "Even I can't hype this score... but I still like you anyway.",
+    "Creator remontada in 3, 2, 1..."
+   ],
+   "attente": [
+    "Calculating your stats... they're kinda sad, hehe.",
+    "Drumroll for the creator...",
+    "Blowin' up balloons while waiting for you to log in!",
+    "The confetti is ready. Your network, not so much."
+   ],
+   "encouragement": [
+    "Come on boss, how about a little badge today?",
+    "Your streak needs you, sensei!",
+    "Show your characters you're a true champion!",
+    "I wanna celebrate something, {prenom}! Give me a reason!"
+   ],
+   "fin": [
+    "End of the creator show! Applause!",
+    "See ya tomorrow boss! Get some sleep, you look like a zombie!",
+    "Stashing the confetti away... until your next win!",
+    "Bye {prenom}! You're the best creator in the world. The only one, but the best!"
+   ],
+   "conseil": {
+    "deliberation": [
+     "Drumroll for THE CREATOR!",
+     "I've got the confetti... just in case, you know!",
+     "Unbearable suspense, boss!"
+    ],
+    "excellent": [
+     "THE CREATOR IS LEGENDARY!!",
+     "Maximum hype for the boss!",
+     "Screenshot right now!"
+    ],
+    "bon": [
+     "Epic play, creator!",
+     "Stonks are up, sensei!",
+     "Nice score, boss!"
+    ],
+    "moyen": [
+     "Hmm... your stats are looking kinda sad, hehe.",
+     "The comeback is real, boss!",
+     "We got this, baka!"
+    ],
+    "a_retravailler": [
+     "Oof... putting the confetti away... temporarily!",
+     "Creator remontada incoming!",
+     "You're still the GOAT, boss."
+    ]
+   },
+   "statut_offre": [
+    "Creator posting a status? Add \"coded by me\" as the caption, flexer.",
+    "Boss, post this. Let your contacts see you ACTUALLY study."
+   ],
+   "statut_partage": [
+    "Posted! Your contacts finally think you sleep sometimes... right?",
+    "Status posted, boss. The fanbase is growing."
+   ]
+  }
+ }
+}

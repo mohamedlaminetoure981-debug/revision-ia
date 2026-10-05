@@ -1,0 +1,508 @@
+{
+ "STORY_TITLE": "Season 1 — Youth vs. Oblivion",
+ "CHAPTERS": [
+  {
+   "title": "3:12 AM",
+   "teaser": "Conakry, night before the first day of school. A message drops at 3:12 AM…",
+   "strips": [
+    {
+     "title": "Ch. 1 — Wake-up at HQ",
+     "panels": [
+      {
+       "line": "Huh?! Where am I? Why is everything glowing purple and neon?!",
+       "narration": "Somewhere inside a phone…"
+      },
+      {
+       "line": "A message on the wall: \"Kaï, you are the guide. Assemble the team. — The Creator\""
+      },
+      {
+       "line": "The Creator? Written at 3:12 in the morning… Does this guy ever sleep?"
+      },
+      {
+       "line": "Alright. A team, a mission. And I never fail a mission!"
+      }
+     ]
+    },
+    {
+     "title": "Ch. 1 — The Shadow",
+     "panels": [
+      {
+       "line": "Wait… the walls are fading? Formulas are disappearing!",
+       "narration": "Suddenly…"
+      },
+      {
+       "line": "A shadow eating up unstudied lessons… so this is \"Oblivion\"."
+      },
+      {
+       "line": "I won't last alone. I need a geek, a poet, a sprinter, a coach…"
+      },
+      {
+       "line": "And you, {prenom}. Every time you review, you make us stronger. Deal?"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "The Signal",
+   "teaser": "A Kaloum geek hunting down Oblivion with a rigged antenna.",
+   "strips": [
+    {
+     "title": "Ch. 2 — Mory",
+     "panels": [
+      {
+       "line": "Just 3 more MB… come on… this connection won't stop me!",
+       "narration": "Server Room"
+      },
+      {
+       "line": "Uh… hey? What are you downloading there?"
+      },
+      {
+       "line": "EVERYTHING. Every lesson, every formula. I'm gonna scan all the knowledge in the world!"
+      },
+      {
+       "line": "With two bars of signal? You're brave, bro."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 2 — Backup",
+     "panels": [
+      {
+       "line": "My files! He's wiping my data!",
+       "narration": "Oblivion is attacking!"
+      },
+      {
+       "line": "Mory! A lesson locked in your head, Oblivion can't delete!"
+      },
+      {
+       "line": "… Brain-powered backup. Offline. No network. That's… genius."
+      },
+      {
+       "line": "I'm joining your squad. But I'm keeping my charger."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "The Voice of the Library",
+   "teaser": "On a rainy morning, a voice breaks down lessons using vivid imagery.",
+   "strips": [
+    {
+     "title": "Ch. 3 — Nia",
+     "panels": [
+      {
+       "line": "A derivative is basically the speed of a dugout canoe at a precise second…",
+       "narration": "Infinite Library"
+      },
+      {
+       "line": "Is she talking to the books out loud?"
+      },
+      {
+       "line": "I translate lessons into pictures. A lesson you can picture, you never forget."
+      },
+      {
+       "line": "That's exactly what we need. You coming with us?"
+      }
+     ]
+    },
+    {
+     "title": "Ch. 3 — Patience",
+     "panels": [
+      {
+       "line": "Back then, people said my explanations made everything too complicated."
+      },
+      {
+       "line": "And what did you think about that?"
+      },
+      {
+       "line": "Everyone deserves a patient explanation. Even at 3 AM."
+      },
+      {
+       "line": "I'm in. But I'm the one writing the summaries."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Lightning on the Corniche",
+   "teaser": "5:40 AM, on the Corniche: someone is running faster than Oblivion.",
+   "strips": [
+    {
+     "title": "Ch. 4 — Sora",
+     "panels": [
+      {
+       "line": "Question! Answer! Next! Too slow, everyone!",
+       "narration": "In a flash…"
+      },
+      {
+       "line": "She reviewed 200 flashcards while I was just saying hi."
+      },
+      {
+       "line": "Spaced repetition, my friend. A little bit every day, and your brain locks it in."
+      },
+      {
+       "line": "Could you help {prenom} remember their flashcards?"
+      }
+     ]
+    },
+    {
+     "title": "Ch. 4 — Guardian",
+     "panels": [
+      {
+       "line": "Depends. Does {prenom} swipe fast?"
+      },
+      {
+       "line": "You could say you're the guardian of memory."
+      },
+      {
+       "line": "Guardian of memory… I like it. Has a nice ring to it."
+      },
+      {
+       "line": "OK, I'm down! But nobody slows me down."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "The Rival",
+   "teaser": "In the quiz arena, someone always wins alone.",
+   "strips": [
+    {
+     "title": "Ch. 5 — Ren",
+     "panels": [
+      {
+       "line": "Just another team of rookies. You're wasting your time.",
+       "narration": "Quiz Arena"
+      },
+      {
+       "line": "We're looking for strong players. You look strong."
+      },
+      {
+       "line": "I am strong. That's why I work alone."
+      },
+      {
+       "line": "He just got 10/10 in 40 seconds…"
+      }
+     ]
+    },
+    {
+     "title": "Ch. 5 — Alone",
+     "panels": [
+      {
+       "line": "A quiz is a fight. And in a fight, you only rely on yourself."
+      },
+      {
+       "line": "Even the best fighters have a coach, you know."
+      },
+      {
+       "line": "Tch. Come back when you actually know how to win."
+      },
+      {
+       "line": "He'll be back. Rivals always come back.",
+       "narration": "Ren walks away. For now."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "The Kaloum Dojo",
+   "teaser": "A whistle, a courtyard, worn-out mats. And a battle.",
+   "strips": [
+    {
+     "title": "Ch. 6 — Awa",
+     "panels": [
+      {
+       "line": "Exercise 4! Show your steps! No results without method!",
+       "narration": "Exercise Dojo"
+      },
+      {
+       "line": "She has a whistle. Why does she have a whistle?"
+      },
+      {
+       "line": "Because here, we train for real. Welcome to the dojo!"
+      },
+      {
+       "line": "Awa, we're putting a team together. We need a coach."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 6 — Rivalry",
+     "panels": [
+      {
+       "line": "A coach? What for? I've never needed a method.",
+       "narration": "A voice from behind them…"
+      },
+      {
+       "line": "Ren. Always as fast... and still not showing your steps."
+      },
+      {
+       "line": "I get the right answer, that's all that matters!"
+      },
+      {
+       "line": "On the exam, an answer without a method is worth zero. We'll talk later."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "The Oblivion attacks",
+   "teaser": "Midnight. The flashcards are vanishing one by one.",
+   "strips": [
+    {
+     "title": "Ch. 7 — Alert",
+     "panels": [
+      {
+       "line": "The Oblivion is back! It's wiping out {prenom}'s flashcards!",
+       "narration": "Midnight. HQ alert."
+      },
+      {
+       "line": "Flashcards left unrevised for days... it feeds on that!"
+      },
+      {
+       "line": "It's attacking the chapter {prenom} never really understood!"
+      },
+      {
+       "line": "Don't run. Look at the mistake first.",
+       "narration": "A calm voice..."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 7 — Tidiane",
+     "panels": [
+      {
+       "line": "The Oblivion loves ignored mistakes. It hates the ones we understand."
+      },
+      {
+       "line": "You... who are you?"
+      },
+      {
+       "line": "Tidiane. I read error messages. The ones everyone closes without reading."
+      },
+      {
+       "line": "An explained mistake becomes a lesson. And the Oblivion backs down."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Tidiane's past",
+   "teaser": "Before having a name, Tidiane was... a bug.",
+   "strips": [
+    {
+     "title": "Ch. 8 — Before",
+     "panels": [
+      {
+       "line": "I was an error message. The very first one in the app.",
+       "narration": "A long time ago..."
+      },
+      {
+       "line": "An... error message?"
+      },
+      {
+       "line": "The Creator was testing at 3 AM. He kept closing me without reading. A hundred times."
+      },
+      {
+       "line": "Classic. I close error messages without reading them too..."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 8 — A name",
+     "panels": [
+      {
+       "line": "So I learned to speak softly. To explain, instead of screaming ERROR."
+      },
+      {
+       "line": "One night, he finally read me. He smiled, fixed the bug... and gave me a name."
+      },
+      {
+       "line": "Ever since, you help everyone understand their mistakes."
+      },
+      {
+       "line": "Making mistakes isn't bad. Not looking for why, that is."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Mory's passion",
+   "teaser": "On the HQ roof, Mory confesses why he scans everything.",
+   "strips": [
+    {
+     "title": "Ch. 9 — The roof",
+     "panels": [
+      {
+       "line": "You know why I want to scan everything, Kaï?",
+       "narration": "HQ roof, 2 AM"
+      },
+      {
+       "line": "Because you're an obsessed geek?"
+      },
+      {
+       "line": "Also. But mostly because a ton of students don't have books or a good connection."
+      },
+      {
+       "line": "If knowledge fits in a phone, offline, no one gets left behind."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 9 — For everyone",
+     "panels": [
+      {
+       "line": "... Mory, that was deep. I'm gonna cry."
+      },
+      {
+       "line": "Save your tears. The page is already taking 40 seconds to load."
+      },
+      {
+       "line": "That's why the Creator made a lightweight app. For Guinea, for everyone."
+      },
+      {
+       "line": "One day, the whole country will study with us. Even on 3G!"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Ren's downfall",
+   "teaser": "The strongest guy in the arena just lost.",
+   "strips": [
+    {
+     "title": "Ch. 10 — 3/10",
+     "panels": [
+      {
+       "line": "No way… 3/10? Me?!",
+       "narration": "Quiz Arena"
+      },
+      {
+       "line": "The Void trapped me… I never took the time to study properly."
+      },
+      {
+       "line": "Get up, Ren. Speed without a method always ends like this.",
+       "narration": "A helping hand"
+      },
+      {
+       "line": "Why are you helping me? I've been making fun of your whistle for months."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 10 — Rivals",
+     "panels": [
+      {
+       "line": "Because a rival pushes you to level up. I need you."
+      },
+      {
+       "line": "… You need me?"
+      },
+      {
+       "line": "Exercise 1. Let's break it down step by step. Together."
+      },
+      {
+       "line": "Tch. Fine, I'll join the squad. But I'm still the quiz champ.",
+       "narration": "Later…"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Binta and the return of the shadow",
+   "teaser": "Confetti… then the sky turns dark.",
+   "strips": [
+    {
+     "title": "Ch. 11 — Binta",
+     "panels": [
+      {
+       "line": "LET'S GOOO! 7-day streak! Confetti for EVERYONE!",
+       "narration": "HQ, stats night"
+      },
+      {
+       "line": "She tracks everything. XP, badges, days… even my swipes."
+      },
+      {
+       "line": "Guardian of stats. And hype queen, obviously."
+      },
+      {
+       "line": "Welcome, Binta. This time, the squad is complete."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 11 — He's back",
+     "panels": [
+      {
+       "line": "He's back. Stronger. He devoured all the forgotten flashcards.",
+       "narration": "The sky is darkening…"
+      },
+      {
+       "line": "Finally. A worthy opponent."
+      },
+      {
+       "line": "{prenom}, we need you for the final showdown!"
+      },
+      {
+       "line": "Every study session counts. Get ready: we fight together."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Final battle",
+   "teaser": "The whole squad… and you. Against the Void.",
+   "strips": [
+    {
+     "title": "Ch. 12 — Final Battle",
+     "panels": [
+      {
+       "line": "All together! Unleash your powers, NOW!",
+       "narration": "Final battle!"
+      },
+      {
+       "line": "Awa's method! Sora's memory! Nia's metaphors! Mory's scan!"
+      },
+      {
+       "line": "And {prenom}'s strength… ULTIMATE REVISION SMASH!",
+       "narration": "The finishing blow"
+      },
+      {
+       "line": "WE WON! I knew this would end in confetti!",
+       "narration": "The Oblivion is fading away..."
+      }
+     ]
+    },
+    {
+     "title": "Ch. 12 — The Message",
+     "panels": [
+      {
+       "line": "The wall lights up: a message from the Creator, MLT.",
+       "narration": "One last message..."
+      },
+      {
+       "line": "\"Thanks for studying with them. I created them so nobody has to study alone.\""
+      },
+      {
+       "line": "\"PS: Just because I code at 3 AM doesn't mean you should study at 3 AM.\""
+      },
+      {
+       "line": "A 3 AM slacker... but a genius nonetheless. Shall we keep going, {prenom}?"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

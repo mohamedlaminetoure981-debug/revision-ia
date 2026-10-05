@@ -1,0 +1,960 @@
+{
+ "ch01": {
+  "title": "3:12 AM",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Conakry. September 2026."
+       },
+       {
+        "text": "The night before back-to-school. The sun dips into the ocean… and says bye to my vacation."
+       }
+      ]
+     },
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "Sophomore in CS. Another year of pretending I've got my life together."
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "BEEP!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Yo, kid! Wake up, you walking zombie?!"
+       },
+       {
+        "text": "My bad, old man!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "3:12 AM."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "I ain't sleeping. I never sleep before day one."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "Kaï. You're the guide. Bring them together before the Void wipes everything out.",
+       "from": "THE CREATOR"
+      },
+      "sfx": [
+       {
+        "text": "BZZZT"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8be9ff"
+      },
+      "bubbles": [
+       {
+        "text": "…Wait, how does he know my name?"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "At the same time, over Kaloum, the lights blink out one by one."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What is… that thing?"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Next day. Madina Market."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "My prices… I can't remember a single price!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "The signs… are they going blank?!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "WHOOOM"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "MOVE IT!!"
+       },
+       {
+        "text": "MY NOTEBOOK! It's all wiped clean!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#120b09"
+      },
+      "sfx": [
+       {
+        "text": "BAM!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "…Knowledge… unrevised… MINE…"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "text": "Review one concept. Just one. Right now.",
+       "from": "Révision IA"
+      }
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "Last night… geometric sequences."
+       },
+       {
+        "text": "u(n+1) = q × u(n). I REMEMBER!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "sfx": [
+       {
+        "text": "CRACK!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Is he… backing off? Is he running?!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A second one… finally."
+       }
+      ],
+      "captions": [
+       {
+        "text": "To be continued…"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch02": {
+  "title": "The Signal",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "University of Conakry. First class."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Graphs are the absolute core of algorithms. Take good notes."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Nobody talking about yesterday? The Shadow, the blank signs... nothing?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You. The guy from Madina. You punched the Oblivion barehanded."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "You SAW it?!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "!?"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "OBLIVION · ATTACKS · 7 DAYS"
+      },
+      "bubbles": [
+       {
+        "text": "I've been tracking it for a month. It strikes where nobody revises."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Evening. Mory's roof, Kaloum."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "My antenna picks up its energy spikes. Two bars of signal, but it works."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "LOADING... (40 s)"
+      },
+      "bubbles": [
+       {
+        "text": "40 seconds loading time. That's my mental training."
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "VRRRMM"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#22d3ee"
+      },
+      "bubbles": [
+       {
+        "text": "Analyzing... Weak spot: left shoulder. Certainty: 87%."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "I'm counting on you, tech guy!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#22d3ee"
+      },
+      "sfx": [
+       {
+        "text": "CRACK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "fshhh..."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "I'm no fighter. I'm just the guy who knows WHERE to hit."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "NEW ENERGY SPIKE",
+       "label": "LIBRARY · 10 AM"
+      },
+      "bubbles": [
+       {
+        "text": "It's planning something big. Tomorrow... where the books are kept."
+       }
+      ],
+      "captions": [
+       {
+        "text": "To be continued..."
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch03": {
+  "title": "The Voice of the Library",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Library. 9:58 AM. It's raining."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "A derivative is the speed of the canoe at an exact moment. Not the whole trip: RIGHT NOW."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Whoaaa... okay, I get it now!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "✦"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It's her. My antennas go crazy when she speaks."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "No surprise: she's the only one who actually explains things well."
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "10:00 AM."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "CRRRK"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "FWOOOSH"
+       }
+      ],
+      "captions": [
+       {
+        "text": "The pages of the books are turning blank, one by one."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Nobody move. Just breathe."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "bubbles": [
+       {
+        "text": "He's too fast!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#e879f9"
+      },
+      "bubbles": [
+       {
+        "text": "The Oblivion is like a tide: it only takes what isn't anchored. ANCHOR YOURSELVES!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "♪"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "BAM!"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "Later."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Before, people said I made everything complicated."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You, you make things simple. Join us."
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "“Fine. But I'm the one writing the summaries.” — Nia"
+       },
+       {
+        "text": "The next day, 5:40 AM. The corniche."
+       },
+       {
+        "text": "To be continued..."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "ZIIIP"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch04": {
+  "title": "Lightning on the Corniche",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Corniche, 5:40 AM. Team training (Kaï's brilliant idea)."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Why... are we running... before the sun is even up?!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "ZOOM!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Too slow!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#c6ff3d"
+      },
+      "bubbles": [
+       {
+        "text": "What was THAT?!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Sora. 10k before class. Plus 200 flashcards in the taxi."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "200 flashcards?!"
+       },
+       {
+        "text": "A little bit every day: your brain locks it in."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "SHHRAAA"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#c6ff3d"
+      },
+      "bubbles": [
+       {
+        "text": "He's targeting that girl over there!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Way too far! We'll never make it!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "ZZZIIIIP"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#26330f"
+      },
+      "bubbles": [
+       {
+        "text": "Left! Right! Left! It's all about rhythm, just like my flashcards."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#22d3ee"
+      },
+      "bubbles": [
+       {
+        "text": "NOW! Together!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "sfx": [
+       {
+        "text": "BADABOOM!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You'd make a legendary memory guardian."
+       },
+       {
+        "text": "That sounds epic. I'm in!"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "QUIZ TOURNAMENT — Undefeated Champion: REN"
+       },
+       {
+        "text": "To be continued..."
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch05": {
+  "title": "The Rival",
+  "pages": [
+   {
+    "panels": [
+     {
+      "bg": {
+       "text": "FINALS"
+      },
+      "captions": [
+       {
+        "text": "Lecture Hall B. Quiz Tournament. The finals."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "LET'S GOOO!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Another win in the bag. Next."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "We're looking for top players. Join our squad."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "I'm strong BECAUSE I work alone."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "Then challenge me to a duel. If I win, you listen to us!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "text": "DUEL"
+      }
+     },
+     {
+      "bubbles": [
+       {
+        "text": "10 to 7. Go home, \"sensei\"."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "ERROR"
+      },
+      "sfx": [
+       {
+        "text": "VRRRMM"
+       }
+      ],
+      "captions": [
+       {
+        "text": "The crowd clears out. But Ren doesn't budge."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#ff5a3d"
+      },
+      "bubbles": [
+       {
+        "text": "I DO NOT need help!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "sfx": [
+       {
+        "text": "SKRATCH"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Even the greatest fighters have a coach, you know."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Tch. Come back when you actually know how to win."
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "That night. Alone."
+       },
+       {
+        "text": "To be continued..."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "It's nothing. It'll fade. No one can know."
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch06": {
+  "title": "The Kaloum Dojo",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "A courtyard in Kaloum turned into a dojo. Late afternoon."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "PRRRT !"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Exercise 4 ! Show your work step by step !"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "She's got a whistle. Why does she have a whistle ?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Because here, we train for real. Welcome to the dojo !"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "We're putting together a squad against the Void. We need a coach."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A coach ? I've never needed a method in my life."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#ffc53d"
+      },
+      "bubbles": [
+       {
+        "text": "Ren. Fast... and still skipping your steps."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#ff5a3d"
+      },
+      "bubbles": [
+       {
+        "text": "I get the right answer, that's all that matters !"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "GRR"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "Sparring match. First to three hits."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "SWISH"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#3a2a0a"
+      },
+      "sfx": [
+       {
+        "text": "CLACK !"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "On the exam, an answer with no steps is a zero."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "... Tch."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "That scar on her arm..."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "So, coach ?"
+       },
+       {
+        "text": "Tomorrow, 6 AM. Late = 20 push-ups."
+       },
+       {
+        "text": "6 AM ?!"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "9:07 PM. The whole city of Conakry plunges into darkness."
+       },
+       {
+        "text": "To be continued..."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "CLICK."
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -283,6 +283,7 @@
  "500 fiches révisées": "500 cards reviewed",
  "7 jours": "7 days",
  "7 jours de suite": "7 days in a row",
+ "à": "at",
  "à faire": "to do",
  "a fait": "scored",
  "À finir": "To finish",
@@ -459,6 +460,7 @@
  "de l’oxygène": "oxygen",
  "Débloqué à": "Unlocked at",
  "DÉFAITE…": "DEFEAT…",
+ "demain": "tomorrow",
  "demande": "request",
  "Demandes": "Requests",
  "Démo": "Demo",
@@ -938,7 +940,5 @@
  "XP gagnés par jour sur les 14 derniers jours": "XP earned per day over the last 14 days",
  "XP gagnés par jour. Touche une barre pour voir le détail.": "XP earned per day. Tap a bar to see the details.",
  "Yo ! Moi c'est": "Yo! I'm",
- "YOSH!": "YOSH!",
- "demain": "tomorrow",
- "à": "at"
+ "YOSH!": "YOSH!"
 }
