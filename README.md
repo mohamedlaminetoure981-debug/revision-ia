@@ -353,14 +353,18 @@ Exemple (Mory : en haut 4 petits portraits, en bas 2 grands) :
                             "clin": [75, 0, 25, 50], "concentration": [0, 50, 50, 50] } }
 }
 ```
-Une zone n'a pas besoin d'être précise : le script se recentre tout seul sur le portrait
-et efface les morceaux d'un portrait voisin qui dépassent dans la zone (une main, une
-mèche…). On peut mélanger `"cases"` et `"zones"` dans une même planche.
+Une zone n'a pas besoin d'être précise : le script se recentre tout seul sur le portrait,
+efface les morceaux d'un portrait voisin qui dépassent dans la zone (une main, une
+mèche…) et ignore les traits de séparation blancs qui y entrent (même un trait qui ne
+traverse qu'une rangée). Conseil : arrête quand même la zone juste avant un trait plutôt
+que dessus (ex. `24.5` plutôt que `25` si le trait est à 25 %). On peut mélanger
+`"cases"` et `"zones"` dans une même planche.
 
 Pour changer une expression, il suffit de modifier un numéro de case dans ce fichier.
 
 **Ce que le build fait tout seul** (`scripts/planches.mjs`) :
-- il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) ;
+- il **détecte la couleur du fond** (pas besoin d'un vert exactement `#00FF00`) : vert,
+  ou **magenta** (`#FF00FF`) pour un perso habillé en vert, comme Sora ;
 - il trouve la grille même s'il y a des **marges** ou des **traits de séparation** ;
 - il retire le fond avec des bords adoucis, **sans liseré vert** ;
 - il **cadre les portraits à l'identique** (même taille de visage, yeux à la même place),
@@ -380,6 +384,8 @@ expressions manquantes prennent l'image « neutre » (ou le dessin s'il n'y a pa
 **Conseils pour la génération :** fond vert vraiment uni, personnage bien détaché du
 fond, **pas de vert dans les vêtements ni les effets** (il deviendrait transparent),
 même cadrage en buste sur les 8 cases (épaules coupées en bas de chaque case).
+Perso qui porte du **vert** (Sora) : fond **magenta** uni à la place ; ses roses et
+violets restent intacts, mais évite un magenta pur dans les vêtements.
 
 (Avancé : le champ `images` d'un perso dans `characters.js` permet encore d'indiquer
 des fichiers à la main ; il a la priorité sur les planches.)

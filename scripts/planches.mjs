@@ -3,7 +3,8 @@
 // ---------------------------------------------------------------------
 // Pour chaque personnage, dans public/characters/<id>/ :
 //   - une ou plusieurs planches (images) : grille de portraits sur fond uni
-//     (vert en général ; la couleur est DÉTECTÉE automatiquement) ;
+//     (vert, ou MAGENTA pour un perso habillé en vert ; la couleur est DÉTECTÉE
+//     automatiquement) ;
 //   - facultatif : planches.json, qui dit pour chaque planche la taille de la
 //     grille et quelle case utiliser pour chaque expression. Exemple :
 //       {
@@ -113,23 +114,45 @@ function detectKey(px, W, H, rows, forced) {
 }
 
 /**
- * Outils de détourage pour une couleur de fond K : le canal dominant de K (vert pour
- * un fond vert) et de combien il dépasse les deux autres ("dominance").
+ * Outils de détourage pour une couleur de fond K. Les canaux "forts" de K (vert pour
+ * un fond vert ; rouge ET bleu pour un fond MAGENTA, utile quand le perso porte du
+ * vert, comme Sora) et de combien le plus faible d'entre eux dépasse les canaux
+ * "faibles" ("dominance").
  */
 function keyer(K) {
-  const dom = K.indexOf(Math.max(...K));
-  const others = [0, 1, 2].filter((c) => c !== dom);
-  const DK = Math.max(30, K[dom] - Math.max(K[others[0]], K[others[1]]));
-  const dominance = (p, i) => p[i + dom] - Math.max(p[i + others[0]], p[i + others[1]]);
+  const top = Math.max(...K);
+  const hi = [0, 1, 2].filter((c) => K[c] >= top * 0.6);
+  const lo = [0, 1, 2].filter((c) => !hi.includes(c));
+  const level = (p, i) => Math.min(...hi.map((c) => p[i + c]));
+  const low = (p, i) => (lo.length ? Math.max(...lo.map((c) => p[i + c])) : 0);
+  const KL = Math.min(...hi.map((c) => K[c]));
+  const DK = Math.max(30, KL - (lo.length ? Math.max(...lo.map((c) => K[c])) : 0));
+  const dominance = (p, i) => level(p, i) - low(p, i);
   return {
-    dom, others,
+    multi: hi.length > 1, // fond à 2 canaux forts (magenta…)
     // Pixel de fond (pour trouver la grille et le personnage)
-    isKey: (p, i) => p[i + dom] > K[dom] * 0.45 && dominance(p, i) > DK * 0.45,
+    isKey: (p, i) => level(p, i) > KL * 0.45 && dominance(p, i) > DK * 0.45,
     // Opacité : 1 = personnage, 0 = fond ; bord adouci entre les deux
+    // (fond magenta : seuil plus haut, pour qu'un rose ou un violet reste bien opaque)
     alpha: (p, i) => {
-      if (p[i + dom] < K[dom] * 0.3) return 1;
-      const a = 1 - (dominance(p, i) - DK * 0.15) / (DK * 0.55 - DK * 0.15);
+      if (level(p, i) < KL * 0.3) return 1;
+      const lo0 = hi.length > 1 ? 0.32 : 0.15;
+      const a = 1 - (dominance(p, i) - DK * lo0) / (DK * 0.55 - DK * lo0);
       return a >= 1 ? 1 : a <= 0 ? 0 : a;
+    },
+    // Même teinte que le fond (magenta : rouge ≈ bleu, nettement au-dessus du vert) ;
+    // un rose (rouge ≫ bleu) ou un violet (bleu ≫ rouge) n'en fait pas partie.
+    sameHue: (c) => {
+      const v = hi.map((k) => c[k]); const mn = Math.min(...v); const mx = Math.max(...v);
+      const ratio = (K0) => Math.min(...hi.map((k) => K[k])) / Math.max(...hi.map((k) => K[k])) * K0;
+      return mx > 0 && mn / mx > ratio(0.88) && mn - (lo.length ? Math.max(...lo.map((k) => c[k])) : 0) > DK * 0.12;
+    },
+    // Despill : les canaux du fond ne dépassent jamais les autres → pas de liseré coloré.
+    despill: (c) => {
+      if (!lo.length) return;
+      const lim = Math.max(...lo.map((k) => c[k]));
+      const ex = Math.min(...hi.map((k) => c[k])) - lim;
+      if (ex > 0) for (const k of hi) c[k] -= ex * 0.85;
     },
   };
 }
@@ -172,6 +195,23 @@ function analyseGrid(px, W, H, rows, cols, kk) {
   return { isBg, xs: splits(cols, W, lineCol, colD), ys: splits(rows, H, lineRow, rowD) };
 }
 
+/**
+ * Traits de séparation (blancs/gris clairs) DANS une zone : colonnes ou lignes presque
+ * entièrement claires et neutres. Renvoie un isBg qui les compte comme du fond.
+ */
+function zoneLines(px, W, isBg, x0, y0, x1, y1) {
+  const w = x1 - x0; const h = y1 - y0;
+  if (w <= 0 || h <= 0) return isBg;
+  const col = new Float64Array(w); const row = new Float64Array(h);
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+    const i = (y * W + x) * 3; const mx = Math.max(px[i], px[i + 1], px[i + 2]); const mn = Math.min(px[i], px[i + 1], px[i + 2]);
+    if (mn > 150 && mx - mn < 45) { col[x - x0]++; row[y - y0]++; }
+  }
+  const lc = Array.from(col, (v) => v / h > 0.85); const lr = Array.from(row, (v) => v / w > 0.85);
+  if (!lc.some(Boolean) && !lr.some(Boolean)) return isBg;
+  return (x, y) => isBg(x, y) || (x >= x0 && x < x1 && lc[x - x0]) || (y >= y0 && y < y1 && lr[y - y0]);
+}
+
 /** Cadre du personnage dans une cellule (ignore les petites taches isolées). */
 function subjectBox(isBg, x0, y0, x1, y1) {
   const W = x1 - x0; const H = y1 - y0;
@@ -197,15 +237,31 @@ function subjectBox(isBg, x0, y0, x1, y1) {
 // ---------------------------------------------------------------------
 function cutOut(px, W, isBg, box, kk) {
   const out = Buffer.alloc(box.w * box.h * 4);
+  // Fond magenta (2 canaux forts) : le despill ne touche que le BORD du perso (≤ 3 px du
+  // fond, ou pixel semi-transparent), sinon les roses et violets des vêtements seraient
+  // délavés. Fond vert : partout (comportement d'origine).
+  let nearKey = null;
+  if (kk.multi) {
+    const R = 3; const key = new Uint8Array(box.w * box.h);
+    for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) if (kk.isKey(px, ((box.y + y) * W + box.x + x) * 3)) key[y * box.w + x] = 1;
+    // Dilatation séparable (lignes puis colonnes) : "un pixel de fond à moins de R px"
+    const rowD = new Uint8Array(box.w * box.h); nearKey = new Uint8Array(box.w * box.h);
+    for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) {
+      for (let k = -R; k <= R; k++) { const xx = x + k; if (xx >= 0 && xx < box.w && key[y * box.w + xx]) { rowD[y * box.w + x] = 1; break; } }
+    }
+    for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) {
+      for (let k = -R; k <= R; k++) { const yy = y + k; if (yy >= 0 && yy < box.h && rowD[yy * box.w + x]) { nearKey[y * box.w + x] = 1; break; } }
+    }
+  }
   for (let y = 0; y < box.h; y++) {
     for (let x = 0; x < box.w; x++) {
       const sx = box.x + x; const sy = box.y + y;
       const i = (sy * W + sx) * 3; const o = (y * box.w + x) * 4;
       const c = [px[i], px[i + 1], px[i + 2]];
       let a = isBg(sx, sy) && !kk.isKey(px, i) ? 0 : kk.alpha(px, i); // traits de séparation → transparents
-      // Despill : le canal du fond ne dépasse jamais les deux autres → pas de liseré coloré.
-      const lim = Math.max(c[kk.others[0]], c[kk.others[1]]);
-      if (c[kk.dom] > lim) c[kk.dom] = lim + (c[kk.dom] - lim) * 0.15;
+      // (pixels semi-transparents ou de la teinte exacte du fond compris : fins
+      // interstices entre des mèches)
+      if (!nearKey || nearKey[y * box.w + x] || a < 0.98 || kk.sameHue(c)) kk.despill(c);
       a = Math.max(0, Math.min(1, (a - 0.12) / 0.88)); // halo semi-transparent resserré
       out[o] = c[0]; out[o + 1] = c[1]; out[o + 2] = c[2]; out[o + 3] = Math.round(a * 255);
     }
@@ -455,9 +511,12 @@ export async function processSheets(sharp) {
         if (!EXPRESSIONS.includes(expr)) { rep[expr] = `expression inconnue (${EXPRESSIONS.join(', ')})`; continue; }
         // Bords légèrement rentrés : restes de bordure (JPEG) exclus.
         const inX = Math.max(3, Math.round((t.x1 - t.x0) * 0.012)); const inY = Math.max(3, Math.round((t.y1 - t.y0) * 0.012));
-        const box = subjectBox(isBg, t.x0 + inX, t.y0 + inY, t.x1 - inX, t.y1 - inY);
+        // Traits de séparation qui ne traversent qu'une partie de la planche (ex. trait
+        // vertical de la rangée du haut seulement) : repérés DANS la zone, puis ignorés.
+        const zBg = zoneLines(px, W, isBg, t.x0 + inX, t.y0 + inY, t.x1 - inX, t.y1 - inY);
+        const box = subjectBox(zBg, t.x0 + inX, t.y0 + inY, t.x1 - inX, t.y1 - inY);
         if (!box) { rep[expr] = `${t.label} vide`; continue; }
-        const cell = keepMain(cutOut(px, W, isBg, box, kk), box);
+        const cell = keepMain(cutOut(px, W, zBg, box, kk), box);
         if (!cell) { rep[expr] = `${t.label} vide`; continue; }
         cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h), hash });
       }
