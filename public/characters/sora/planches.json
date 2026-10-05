@@ -1,0 +1,4 @@
+{
+  "planche-a": { "grille": [2, 4], "cases": { "neutre": 1, "joie": 3, "reflexion": 5, "celebration": 7 } },
+  "planche-b": { "grille": [2, 4], "cases": { "encouragement": 1, "surprise": 3, "concentration": 5, "clin": 7 } }
+}
