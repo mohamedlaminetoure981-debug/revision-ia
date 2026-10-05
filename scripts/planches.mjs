@@ -328,7 +328,9 @@ function keepMain(rgba, box) {
     while (stack.length) {
       const p = stack.pop(); n++;
       const x = p % w; const y = (p - x) / w;
-      if (x === 0 || x === w - 1 || y === 0) edge = true;
+      // Bord de la ZONE seulement (pas un simple bord du cadrage) : un morceau qui reste
+      // entièrement dans la zone de l'expression n'est jamais étranger.
+      if ((x === 0 && box.cutL) || (x === w - 1 && box.cutR) || (y === 0 && box.cutT)) edge = true;
       for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
         const nx = x + dx; const ny = y + dy;
         if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
@@ -340,7 +342,18 @@ function keepMain(rgba, box) {
   }
   if (!sizes.length) return null;
   const main = sizes.indexOf(Math.max(...sizes));
-  const drop = sizes.map((n, i) => i !== main && touch[i] && n < sizes[main] * 0.35);
+  // Morceaux qui touchent (presque) le portrait principal : une main levée, un bras
+  // séparé du buste par un mince trait de fond… → gardés.
+  const R = 4; const near = new Uint8Array(sizes.length);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const l = lab[y * w + x];
+    if (l < 0 || l === main || near[l]) continue;
+    for (let dy = -R; dy <= R && !near[l]; dy++) for (let dx = -R; dx <= R; dx++) {
+      const nx = x + dx; const ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < w && ny < h && lab[ny * w + nx] === main) { near[l] = 1; break; }
+    }
+  }
+  const drop = sizes.map((n, i) => i !== main && touch[i] && !near[i] && n < sizes[main] * 0.35);
   // Effacer les morceaux étrangers (et leur bord semi-transparent).
   for (let p = 0; p < w * h; p++) if (lab[p] >= 0 && drop[lab[p]]) rgba[p * 4 + 3] = 0;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {

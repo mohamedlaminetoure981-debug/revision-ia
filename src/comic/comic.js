@@ -135,9 +135,9 @@ function figure(c, w, h, time) {
     // Gros plans et plans poitrine : le PORTRAIT original (le plus réussi).
     // Rotation du cou limitée (±0,35) : la tête reste cohérente avec le buste.
     const turn = Math.max(-0.35, Math.min(0.35, c.turn || 0));
-    const g = grade;
-    let bust = characterBust(c.id, c.expr || 'neutre', { turn });
-    if (g) bust = bust.replace(/#[0-9a-fA-F]{6}/g, (col) => (col.toLowerCase() === INK ? col : g(col)));
+    // Pas d'étalonnage de couleur sur les portraits : essayé (contre-jour, éclairage
+    // d'ambiance), il ternissait et grisait les visages. Les couleurs d'origine restent.
+    const bust = characterBust(c.id, c.expr || 'neutre', { turn });
     r = { svg: `<g transform="scale(1.16) translate(-100,-103)">${bust}</g>`, head: [0, 0], top: -90 };
   } else if (CHARACTERS[c.id] || EXTRA_LOOKS[c.id]) {
     // Corps entier : une POSE DESSINÉE d'un bloc si elle existe ; sinon (action)
