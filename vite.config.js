@@ -48,9 +48,10 @@ function serviceWorker() {
       // sont mises en cache la première fois qu'on lit le chapitre.
       const files = [...Object.keys(bundle), ...listPublic()]
         .filter((f) => !SKIP.test(f) && f !== 'sw.js' && !f.startsWith('story/') && !f.endsWith('.gitkeep'))
-        // Personnages : portraits 300 px pré-téléchargés (affichage instantané, hors ligne) ;
-        // ni les planches d'origine, ni les grands formats (720 px, chargés à la demande).
-        .filter((f) => !f.startsWith('characters/') || /^characters\/[\w-]+\/[a-z]+\.webp$/.test(f));
+        // Personnages : portraits 300 px et calques (yeux fermés, bouche ouverte) pré-téléchargés
+        // (affichage instantané, hors ligne) ; ni les planches d'origine, ni les variantes
+        // déposées, ni les grands formats (720 px, chargés à la demande).
+        .filter((f) => !f.startsWith('characters/') || /^characters\/[\w-]+\/([a-z]+|calque-[a-z]+)\.webp$/.test(f));
       const list = ['./', ...files.map((f) => `./${f}`)];
       // Le nom du cache change à chaque nouvelle version du site.
       const version = createHash('md5').update(list.join()).digest('hex').slice(0, 8);

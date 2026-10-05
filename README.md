@@ -456,6 +456,26 @@ Uniquement `transform` et `opacity`, dans des calques imbriqués à l'intérieur
 les apparitions, signatures, auras, pouvoirs et téléportations ne sont pas touchés.
 Tout s'arrête si le téléphone demande de réduire les animations.
 
+### 😉 Clignement des yeux et 👄 bouche qui parle (facultatif)
+Pour chaque perso, deux petites retouches de son portrait **neutre** suffisent :
+1. **Panneau créateur → 🧑 Personnages en images → ⬇️ Télécharger** sous le portrait
+   *neutre* : tu obtiens `kai-neutre.png` (portrait découpé sur fond vert uni).
+2. Donne cette image à Gemini et demande, en deux fois :
+   - « Garde exactement la même image (cadrage, couleurs, fond vert), ferme seulement les yeux » ;
+   - « Garde exactement la même image, ouvre seulement un peu la bouche, comme s'il parlait ».
+3. Dépose les deux résultats (sur github.com : **Add file → Upload files**) dans
+   `public/characters/<perso>/` avec ces noms exacts : **`yeux-fermes.png`** et
+   **`bouche-ouverte.png`** (`.jpg` ou `.webp` acceptés aussi).
+
+Au build (`scripts/calques.mjs`), chaque retouche est **recalée** sur le portrait
+(taille et position retrouvées automatiquement, même si l'IA a changé la taille de
+l'image), comparée pixel par pixel, et **seule la zone qui change** (les yeux, ou la
+bouche) devient un petit calque transparent collé au pixel près. Les petites
+différences de couleur de l'IA sont corrigées. L'appli fait alors **cligner** le perso
+(toutes les 2 à 6 s, parfois deux fois) et **bouger sa bouche** à chaque syllabe quand
+sa bulle s'écrit (sur l'expression neutre). Le Panneau créateur indique ✅ quand c'est actif.
+Sans ces fichiers, rien ne change. Les retouches elles-mêmes ne sont pas publiées.
+
 ### Animations
 Dans `src/styles/characters.css` : animations de base (respiration, clignement, cheveux),
 réactions (`anim-bounce`, `anim-jump`, `anim-shake`) et animations **signature**
@@ -990,7 +1010,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
 - ✅ **v1.16** : persos vivants (fondu entre expressions, respiration, micro-mouvements,
-  bulles qui s'écrivent).
+  bulles qui s'écrivent). **v1.17** : clignement et bouche (calques tirés de
+  `yeux-fermes.png` / `bouche-ouverte.png`), bouton « Télécharger » des portraits.
 - ✅ **v1.15.1** : correctif de l'écran de bienvenue (la page ne se recharge plus toute seule
   à la première visite ni pendant une mise à jour ; saisie sauvegardée au fur et à mesure).
 - ✅ **v1.15** : économie de quota (résumé + fiches + quiz en 1 demande, photos par 8,

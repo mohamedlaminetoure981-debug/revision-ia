@@ -752,7 +752,19 @@ function imageInner(id, img, o = {}) {
   const ch = CHARACTERS[id];
   const level = Number(o.aura) || 0;
   const halo = level ? `<svg class="ch-aura-svg" viewBox="0 0 200 232" aria-hidden="true"><g class="ch-aura">${aura(level, { color: ch.color }, `i${++uid}`)}</g></svg>` : '';
-  return `${halo}<div class="ch-sway"><div class="ch-react"><div class="ch-talk"><div class="ch-breath"><div class="ch-stack">${imgTag(id, img, o.size)}</div></div></div></div></div>`;
+  return `${halo}<div class="ch-sway"><div class="ch-react"><div class="ch-talk"><div class="ch-breath"><div class="ch-stack">${imgTag(id, img, o.size)}${layersHTML(id)}</div></div></div></div></div>`;
+}
+
+/**
+ * Calques "yeux fermés" et "bouche ouverte" (s'ils existent : voir scripts/calques.mjs),
+ * posés au pixel près sur le portrait NEUTRE. Invisibles sauf pendant un clignement
+ * ou quand le perso parle (et seulement si l'expression affichée est "neutre").
+ */
+function layersHTML(id) {
+  const c = CHAR_IMAGES[id]?.calques;
+  if (!c) return '';
+  const one = (k, cls) => (c[k] ? `<img class="ch-layer ${cls}" src="${assetUrl(c[k].src)}" alt="" aria-hidden="true" draggable="false" style="left:${c[k].x}%;top:${c[k].y}%;width:${c[k].w}%;height:${c[k].h}%">` : '');
+  return one('blink', 'ch-lid') + one('mouth', 'ch-lips');
 }
 
 /** Balise <img> d'un portrait (plusieurs tailles). */
@@ -817,8 +829,7 @@ function crossfade(el, stack, img, expression) {
   const next = tmp.firstChild;
   const swap = () => {
     if (token !== el._xf || !el.isConnected) return;
-    stack.appendChild(next);
-    syncLayers(el);
+    stack.insertBefore(next, stack.querySelector('.ch-layer')); // sous les calques yeux/bouche
     if (cur) {
       cur.classList.add('ch-out');
       setTimeout(() => cur.remove(), reducedMotion() ? 0 : 340);
@@ -875,9 +886,20 @@ function lifeTick() {
     lifeExtra(el, L, now);
   }
 }
-// Calques "yeux fermés / bouche ouverte" (partie 2) : rien tant qu'ils n'existent pas.
-function lifeExtra() {}
-function syncLayers() {}
+// Clignement : toutes les 2 à 6 s, 120 à 180 ms, parfois double (calque "yeux fermés").
+function lifeExtra(el, L, now) {
+  if (!el.querySelector('.ch-lid')) return;
+  if (!L.blink) { L.blink = now + 1000 + Math.random() * 4000; return; }
+  if (now < L.blink) return;
+  L.blink = now + 2000 + Math.random() * 4000;
+  if (el.dataset.expr !== 'neutre') return;
+  const blink = (after) => setTimeout(() => {
+    el.classList.add('ch-blinking');
+    setTimeout(() => el.classList.remove('ch-blinking'), 120 + Math.random() * 60);
+  }, after);
+  blink(0);
+  if (Math.random() < 0.2) blink(300); // double clignement
+}
 
 // ---------------------------------------------------------------------
 // Parole : la bulle s'écrit mot par mot, le perso bouge au rythme des mots
@@ -910,27 +932,50 @@ export function speak(chEl, sayEl, text) {
     shown += w.length;
     on.textContent = text.slice(0, shown);
     off.textContent = text.slice(shown);
-    if (talking && w.trim()) wordPulse(talking, w);
+    const ms = Math.max(40, (total * w.length) / text.length);
+    if (talking && w.trim()) wordPulse(talking, w, ms);
     if (i >= parts.length) {
       sayEl._tw = setTimeout(() => { sayEl.textContent = text; talking?.classList.remove('ch-talking'); mouthShut(talking); }, 180);
       return;
     }
-    sayEl._tw = setTimeout(step, Math.max(40, (total * w.length) / text.length));
+    sayEl._tw = setTimeout(step, ms);
   };
   sayEl._tw = setTimeout(step, 0); // la bulle est peut-être pas encore dans la page
 }
 
 /** Un mot prononcé : petit mouvement (alterné, pour relancer l'animation à chaque mot). */
-function wordPulse(el, word) {
+function wordPulse(el, word, ms) {
   const t = el.querySelector('.ch-talk');
   if (!t) return;
   const a = t.classList.contains('ch-say1');
   t.classList.toggle('ch-say1', !a);
   t.classList.toggle('ch-say2', a);
-  mouthWord(el, word);
+  mouthWord(el, word, ms);
 }
-function mouthWord() {}
-function mouthShut() {}
+/**
+ * Bouche (calque "bouche ouverte") : elle s'ouvre et se ferme pour chaque syllabe du mot,
+ * pendant le temps où le mot s'écrit.
+ */
+function mouthWord(el, word, ms) {
+  if (!el.querySelector('.ch-lips')) return;
+  const syl = Math.max(1, Math.min(4, (word.match(/[aeiouyàâäéèêëîïôöùûü]+/gi) || []).length));
+  const slot = Math.max(90, ms / syl);
+  clearTimeout(el._mouth);
+  let k = 0;
+  const flap = () => {
+    el.classList.add('ch-mouth-open');
+    el._mouth = setTimeout(() => {
+      el.classList.remove('ch-mouth-open');
+      if (++k < syl) el._mouth = setTimeout(flap, slot * 0.4);
+    }, slot * 0.6);
+  };
+  flap();
+}
+function mouthShut(el) {
+  if (!el) return;
+  clearTimeout(el._mouth);
+  el.classList.remove('ch-mouth-open');
+}
 
 /**
  * Joue une animation sur le personnage.

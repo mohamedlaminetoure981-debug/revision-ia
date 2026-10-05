@@ -31,6 +31,7 @@
 import { existsSync, readdirSync, statSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { buildLayers, variantFiles } from './calques.mjs';
 
 export const CHAR_DIR = 'public/characters';
 export const EXPRESSIONS = ['neutre', 'joie', 'reflexion', 'celebration', 'encouragement', 'surprise', 'concentration', 'clin'];
@@ -82,9 +83,15 @@ export function findSheets() {
   return out;
 }
 
-/** Fichiers à surveiller (planches + planches.json) : pour savoir quand tout refaire. */
+/**
+ * Fichiers à surveiller (planches + planches.json + variantes yeux fermés / bouche
+ * ouverte) : pour savoir quand tout refaire. Aucun n'est publié tel quel.
+ */
 export function sheetFiles() {
-  return Object.values(findSheets()).flatMap((r) => [...Object.values(r.sheets).map((s) => s.file), ...(r.cfgFile ? [r.cfgFile] : [])]);
+  return [
+    ...Object.values(findSheets()).flatMap((r) => [...Object.values(r.sheets).map((s) => s.file), ...(r.cfgFile ? [r.cfgFile] : [])]),
+    ...variantFiles(CHAR_DIR),
+  ];
 }
 
 // ---------------------------------------------------------------------
@@ -568,6 +575,7 @@ export async function processSheets(sharp) {
     const need = Math.max(...cells.map((c) => (OUT_H - TOP) / Math.max(1, c.ty + c.sigma * c.h - R.top)));
     const G = Math.min(need, (OUT_W * 0.8) / R.head);
     images[id] = {};
+    let neutreCanvas = null;
     for (const c of cells) {
       if ((c.cutL || c.cutR) && !(c.cadrage && c.cadrage.fondu === false)) fadeSides(c.rgba, c.w, c.h, c.cutL, c.cutR);
       if (c.cutT) fadeTop(c.rgba, c.w, c.h); // cheveux coupés par le bord de la case : fondu
@@ -596,6 +604,7 @@ export async function processSheets(sharp) {
       left = Math.max(0, left);
       const canvas = await sharp({ create: { width: OUT_W, height: OUT_H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
         .composite([{ input: layer, left, top: Math.max(0, top) }]).png().toBuffer();
+      if (c.expr === 'neutre' && !c.cadrage) neutreCanvas = canvas;
       const v = `?v=${c.hash}`;
       const base = `characters/${id}/${c.expr}`;
       files[`${base}.webp`] = await sharp(canvas).resize(...SIZES.small).webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();
@@ -603,6 +612,17 @@ export async function processSheets(sharp) {
       images[id][c.expr] = { src: `${base}.webp${v}`, srcset: `${base}.webp${v} 300w, ${base}-720.webp${v} 720w`, large: `${base}-720.webp${v}` };
       rep[c.expr] = `${Math.round(files[`${base}.webp`].length / 1024)} Ko`;
     }
+    // Clignement / bouche : calques tirés des variantes du portrait neutre (calques.mjs).
+    if (neutreCanvas) {
+      const { data, info } = await sharp(neutreCanvas).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const L = await buildLayers(sharp, join(CHAR_DIR, id), id, { rgba: data, w: info.width, h: info.height }, { cx: OUT_W / 2, top: TOP, w: G * R.head });
+      Object.assign(files, L.files);
+      if (Object.keys(L.calques).length) images[id].calques = L.calques;
+      for (const [k, v] of Object.entries(L.report)) rep[k] = v;
+    }
   }
   return { files, images, report };
 }
+
+// Outils partagés avec calques.mjs (clignement des yeux, bouche).
+export { detectKey, keyer, cutOut, measure, gray, shrink, bestMatch };

@@ -316,17 +316,51 @@ export async function render(el) {
       const imgs = characterImages(id);
       const done = Object.values(SHEETS).flat().filter((e) => imgs[e]).length;
       const cells = Object.values(SHEETS).flat().map((e) => `<figure class="pt-cell">${imgs[e]
-        ? `<img src="${base}${imgs[e].src}" alt="${e}" loading="lazy">`
+        ? `<img src="${base}${imgs[e].src}" alt="${e}" loading="lazy"><button class="btn ghost small" data-dl="${id}:${e}" style="margin-top:4px;padding:2px 6px;font-size:.7rem">⬇️ Télécharger</button>`
         : '<span class="tiny dim">dessin SVG</span>'}<figcaption>${e}</figcaption></figure>`).join('');
+      const cal = imgs.calques || {};
       return `<h3 style="color:${CHARACTERS[id].color};margin:14px 0 4px">${esc(CHARACTERS[id].name)}</h3>
         <p class="tiny" style="margin:0 0 6px">${done === 8 ? '✅' : done ? '🟨' : '⬜'} ${done}/8 expressions en images ·
-        <code style="user-select:all">public/characters/${id}/</code></p>
+        <code style="user-select:all">public/characters/${id}/</code><br>
+        😉 Clignement : ${cal.blink ? '✅ actif' : '⬜ <code>yeux-fermes.png</code> à déposer'} · 👄 Bouche : ${cal.mouth ? '✅ active' : '⬜ <code>bouche-ouverte.png</code> à déposer'}</p>
         <div class="pt-grid">${cells}</div>`;
     }).join('');
-    modal(`<h3>🧑 Personnages en images</h3>
+    const m = modal(`<h3>🧑 Personnages en images</h3>
+      <p class="tiny muted">⬇️ <strong>Télécharger</strong> : le portrait découpé, en PNG sur fond vert uni (à donner à Gemini). Pour le clignement et la bouche : télécharge le portrait <strong>neutre</strong>, fais-le retoucher (yeux fermés / bouche ouverte, rien d'autre ne change), puis dépose <code>yeux-fermes.png</code> et <code>bouche-ouverte.png</code> dans le dossier du perso. Voir le README.</p>
       <p class="tiny muted">Par défaut : grille 2 × 2 (A : neutre, joie, réflexion, célébration · B : encouragement, surprise, concentration, clin). Autre grille, choix de cases, planches en plus (planche-c, planche-d…) ou planche à un seul portrait : fichier planches.json dans le dossier du perso. Fond uni (vert de préférence), détecté automatiquement. Le damier montre la transparence : aucun vert ne doit rester. Voir le README.</p>
       <div style="max-height:62vh;overflow-y:auto">${rows}</div>
       <button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+    // Téléchargement : portrait grand format (720 × 835) posé sur un fond vert uni, en PNG.
+    m.el.querySelectorAll('[data-dl]').forEach((b) => {
+      b.onclick = async () => {
+        const [id, e] = b.dataset.dl.split(':');
+        const img = characterImages(id)[e];
+        b.disabled = true;
+        try {
+          const blob = await (await fetch(`${base}${img.large || img.src}`)).blob();
+          const bmp = await createImageBitmap(blob);
+          const cv = document.createElement('canvas');
+          cv.width = bmp.width; cv.height = bmp.height;
+          const ctx = cv.getContext('2d');
+          ctx.fillStyle = '#00FF00';
+          ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.drawImage(bmp, 0, 0);
+          const png = await new Promise((r) => cv.toBlob(r, 'image/png'));
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(png);
+          a.download = `${id}-${e}.png`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+          toast(`⬇️ ${id}-${e}.png téléchargé`, 'ok');
+        } catch (err) {
+          toast(`Téléchargement impossible : ${err.message}`, 'error');
+        } finally {
+          b.disabled = false;
+        }
+      };
+    });
   };
   $('#t-bd-bubbles').onclick = async () => {
     const { openBubbleEditor } = await import('./bubble-editor.js');

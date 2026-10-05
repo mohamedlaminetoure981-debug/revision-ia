@@ -196,6 +196,11 @@
 @keyframes live-say1 { 0%, 100% { transform: none; } 45% { transform: translateY(-1.6px) scaleY(1.012); } }
 @keyframes live-say2 { 0%, 100% { transform: none; } 45% { transform: translateY(-1.6px) scaleY(1.012); } }
 
+/* Clignement et bouche : petits calques posés sur le portrait neutre (scripts/calques.mjs),
+   visibles seulement le temps d'un clignement / d'une syllabe. */
+.ch .ch-stack > .ch-layer { position: absolute; display: block; opacity: 0; pointer-events: none; user-select: none; }
+.ch[data-expr="neutre"].ch-blinking .ch-lid, .ch[data-expr="neutre"].ch-mouth-open .ch-lips { opacity: 1; }
+
 /* Bulle qui s'écrit : le texte à venir garde sa place, invisible. */
 .tw-off { visibility: hidden; }
 

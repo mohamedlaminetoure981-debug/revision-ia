@@ -59,6 +59,10 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   dans la planche, `"cadrage": { "<expression>": { "zoom": 0.76, "dx": -9, "fondu": false } }`
   (dézoom autour des yeux, décalage en % de l'image, pas de fondu des bords). Utilisé
   uniquement s'il est présent ; ex. Tidiane/encouragement. Détails : README section 8.
+  **Clignement / bouche (optionnel)** : `yeux-fermes.png` et `bouche-ouverte.png` dans le
+  dossier du perso (portrait neutre retouché, téléchargé depuis le Panneau créateur) ;
+  `scripts/calques.mjs` recale et extrait la zone qui change. Persos vivants (fondu,
+  respiration, parole mot par mot) : `src/ui/character.js` (`speak`, `setExpression`).
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
   et BD dans `src/data/comic/chapitres/chNN.js`. Les révisions donnent des points
   (seuils dans `src/core/story.js`) ; chaque matière est un arc avec un boss (`src/views/boss.js`).
