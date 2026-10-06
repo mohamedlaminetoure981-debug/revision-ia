@@ -756,5 +756,574 @@
     ]
    }
   ]
+ },
+ "ch01": {
+  "title": "3:12 AM",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Conakry. September 2026. The night before the big day."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Sophomore year. Time to pretend I'm ready, again."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "5 mins of study?",
+       "from": "RÉVISION IA"
+      },
+      "sfx": [
+       {
+        "text": "bzz"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Tomorrow."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "BEEP!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "VROOOM"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Hey kid! You sleepwalking?!"
+       },
+       {
+        "text": "My bad, old man!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "bzzt"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "… I seriously need some sleep."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Later."
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "2:47 AM."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "I never sleep before a new term."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Fine. One concept. Just one."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": [
+        "S = u₀ / (1 − q)",
+        "8 + 4 + 2 + 1 + … = 16"
+       ]
+      },
+      "bubbles": [
+       {
+        "text": "Infinite terms… yet a finite sum."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Boom… I get it now."
+       }
+      ],
+      "sfx": [
+       {
+        "text": "BZZZT"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "text": "Kaï. You are the guide. Gather them before the Void erases everything.",
+       "from": "THE CREATOR"
+      }
+     },
+     {
+      "bg": {
+       "lines": "#8be9ff"
+      },
+      "bubbles": [
+       {
+        "text": "… How does he know my name?"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "At that exact moment, over Kaloum, the lights go out. One by one."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What the… is that?"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "KSSSHHH"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "My notes… !"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "… Was that a dream?"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "Next day. 7:40 AM. Madina Market."
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Late on day one… way to go, Kaï."
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "bzzt"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Huh…?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Wait… what did that even say?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "My prices… I don't remember a single one!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Just like last night…"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "KRRRAAACK !"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "RUN !!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "My notebook…!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "sfx": [
+       {
+        "text": "WHOOSH"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Move… MOVE!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "TAP TAP TAP"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "BOOM!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "MOVE!!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "My notebook! It's all wiped out!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#120b09"
+      },
+      "sfx": [
+       {
+        "text": "WHAM!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "CRASH"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "It… hurts…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "My mom's first name… it's… it's…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "…Knowledge… unrevised… MINE…"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "Revise a concept. Just one. Right now.",
+       "from": "RÉVISION IA"
+      }
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "One concept… Tonight…"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "VMMMM"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "00:08,0",
+       "from": "STOPWATCH"
+      },
+      "bubbles": [
+       {
+        "text": "Eight seconds between the first two waves."
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "VMMM… VMM… VM"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Then four… then two… then one…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It's speeding up! It's gonna devour everything, it'll never stop!!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "No. It's gonna stop."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": [
+        "Sum of a geometric sequence",
+        "S = u₀ / (1 − q)",
+        "8 + 4 + 2 + 1 + … = 16"
+       ]
+      },
+      "bubbles": [
+       {
+        "text": "First term: eight. Common ratio: one half."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "8 + 4 + 2 + 1 + … An infinite number of waves… but in a FINITE time."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Sixteen seconds. It's gonna condense at the sixteenth second."
+       },
+       {
+        "text": "Right where it ate the most… in front of the sign!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Are you nuts?! Get back here!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "WHOOSH"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Eleven…"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "CRACK!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Thirteen… fourteen…"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#c4b5fd"
+      },
+      "bubbles": [
+       {
+        "text": "Fifteen…"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "bubbles": [
+       {
+        "text": "SIXTEEN !!!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "CRACK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "SHRZZZAA"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "The mango, five grand! I remember!!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Ouch… ouch ouch ouch… Smashin' glass, never again."
+       },
+       {
+        "text": "Mom's name is… Mariama. … Phew."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Bro… what'd you just do?"
+       },
+       {
+        "text": "Math… I think."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "1 of 8. Find the rest.",
+       "from": "THE CREATOR"
+      }
+     },
+     {
+      "bubbles": [
+       {
+        "text": "He found the limit… all by himself. A second one. Finally."
+       }
+      ],
+      "captions": [
+       {
+        "text": "To be continued…"
+       }
+      ]
+     }
+    ]
+   }
+  ]
  }
 }
