@@ -963,8 +963,9 @@ protégées sont alors les visages des persos dessinés.
 - Les 17 images de l'ancien chapitre 1 sont rangées dans `public/story/chapitre-1/ancien/`
   (archives : un sous-dossier de `public/story/chapitre-N/` n'est jamais lu ni publié).
 - Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js`.
-- Traduction anglaise : l'ancienne entrée `ch01` de `src/i18n/contenu/en/bd.json` a été retirée
-  (le chapitre 1 s'affiche en français en anglais aussi) ; pour la refaire : `npm run traduire -- en bd`.
+- Traduction anglaise : les traductions de `src/i18n/contenu/en/bd.json` sont rangées par position ;
+  la page 2 du chapitre 1 a changé (6 cases) : son entrée est vidée (elle reste en français en
+  anglais) ; pour la refaire : `npm run traduire -- en bd` (ne traduit que ce qui manque).
 - Panneau créateur → 🖼️ Illustrations des cases : les 61 cases, avec le nom de fichier
   (`page-P-case-C.jpg`) et la description ; les écrans de l'appli sont marqués 📱 (pas d'image).
 

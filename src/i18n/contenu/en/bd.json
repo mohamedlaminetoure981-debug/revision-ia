@@ -796,48 +796,7 @@
      }
     ]
    },
-   {
-    "panels": [
-     {
-      "sfx": [
-       {
-        "text": "BEEP!"
-       }
-      ]
-     },
-     {
-      "sfx": [
-       {
-        "text": "VROOOM"
-       }
-      ]
-     },
-     {
-      "bubbles": [
-       {
-        "text": "Hey kid! You sleepwalking?!"
-       },
-       {
-        "text": "My bad, old man!"
-       }
-      ]
-     },
-     {
-      "sfx": [
-       {
-        "text": "bzzt"
-       }
-      ]
-     },
-     {
-      "bubbles": [
-       {
-        "text": "… I seriously need some sleep."
-       }
-      ]
-     }
-    ]
-   },
+   {},
    {
     "panels": [
      {
