@@ -962,7 +962,17 @@ protégées sont alors les visages des persos dessinés.
   page 8 case 4, page 9 case 2, page 12 case 4) sont dessinées par l'appli : pas d'image à faire.
 - Les 17 images de l'ancien chapitre 1 sont rangées dans `public/story/chapitre-1/ancien/`
   (archives : un sous-dossier de `public/story/chapitre-N/` n'est jamais lu ni publié).
-- Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js`.
+- Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js` :
+  page 3 case 4 et page 10 case 1 sont des **dessins de l'appli** (comme les écrans de téléphone),
+  marqués 📓 dans le Panneau créateur : pas d'illustration à faire.
+- **Formule écrite à la main sur une illustration** : `formules: [{ tex, x, y, size, rot, color }]`
+  dans une case (rendu KaTeX, légèrement lumineux ; x, y en fractions de l'image). Utilisée page 4
+  case 5 pour la seule ligne du cahier qui reste intacte.
+- **Typographie** : une espace insécable est mise automatiquement avant `? ! : ;` dans tous les
+  textes affichés de la BD (`src/data/comic/index.js`) : le signe ne reste jamais seul en début de ligne.
+- Pages 3 et 4 : à la maison, Kaï porte un t-shirt gris foncé ; son sweat violet est sur le dossier
+  de la chaise (renversée page 4 case 5), son casque sur le bureau, son sac accroché au mur ; plus de
+  « lampadaire orange » : la chambre n'est éclairée que par les lumières de la ville rallumées.
 - Traduction anglaise : les traductions de `src/i18n/contenu/en/bd.json` sont rangées par position ;
   la page 2 du chapitre 1 a changé (6 cases) : son entrée est vidée (elle reste en français en
   anglais) ; pour la refaire : `npm run traduire -- en bd` (ne traduit que ce qui manque).
@@ -1117,6 +1127,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.2** : 9 illustrations de plus (pages 3 et 4 du chapitre 1) ; onomatopées « vvvvv… » et
+  « CLAC ! » ; formule KaTeX écrite à la main sur le cahier (page 4 case 5) ; cases dessinées par
+  l'appli marquées dans le Panneau créateur ; espace insécable avant ? ! : ; dans la BD.
 - ✅ **v1.19.1** : premières illustrations du chapitre 1 (pages 1 et 2, images paysage 16:9) ;
   la page 2 passe à 6 cases (dont 3 cases égales « ralenti ») ; cadrage et bulles ajustés ;
   `verifier-bulles` n'expire plus au premier chargement sur un petit PC.

@@ -869,6 +869,11 @@
        {
         "text": "I never sleep before a new term."
        }
+      ],
+      "sfx": [
+       {
+        "text": "whirrr…"
+       }
       ]
      },
      {
@@ -934,6 +939,11 @@
       "bubbles": [
        {
         "text": "What the… is that?"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "CLACK!"
        }
       ]
      },

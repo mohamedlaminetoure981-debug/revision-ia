@@ -68,7 +68,9 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
   et BD dans `src/data/comic/chapitres/chNN.js`. Chapitre 1 = version 2 (12 pages, 61 cases),
   script et bible de continuité dans `docs/scenario-ch01-v2.md` ; reprise de lecture
-  (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées. Les révisions donnent des points
+  (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées.
+  Cases dessinées par l'appli (écrans de téléphone `ecran`, cahier `cahier`) : jamais d'illustration.
+  Formule à la main sur une image : `formules` dans la case (KaTeX). Espace insécable avant ? ! : ; automatique. Les révisions donnent des points
   (seuils dans `src/core/story.js`) ; chaque matière est un arc avec un boss (`src/views/boss.js`).
 - **Convention de nommage des cases** (illustrations de la BD) :
   `public/story/chapitre-N/page-P-case-C.(webp|png|jpg)` — N = chapitre, P = page,
