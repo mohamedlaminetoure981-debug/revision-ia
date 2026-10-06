@@ -1,5 +1,8 @@
 # Scénario actuel du Mode Histoire (BD) — Saison 1 « La Jeunesse contre l’Oubli »
 
+> ⚠️ Le chapitre 1 décrit ici est l’ANCIENNE version : il a été remplacé le 6 octobre 2026
+> par la version 2 (12 pages, 60 cases) — voir `docs/scenario-ch01-v2.md`.
+>
 > Document de référence avant réécriture. Il décrit l’état du code au 6 octobre 2026
 > (version 1.18.0). **Rien n’a été modifié dans l’appli** : c’est un simple relevé.
 >

@@ -16,9 +16,9 @@ import { IMAGES, LAYOUTS } from 'virtual:story-images';
 export const caseKey = (pageIdx, panelIdx) => `page-${pageIdx + 1}-case-${panelIdx + 1}`;
 const keyOf = (chapter, pageIdx, panelIdx) => `chapitre-${chapter}/${caseKey(pageIdx, panelIdx)}`;
 
-/** Nom de fichier attendu (pageIdx et panelIdx commencent à 0). */
+/** Nom de fichier attendu (pageIdx et panelIdx commencent à 0) ; .png et .webp marchent aussi. */
 export function storyFileName(chapter, pageIdx, panelIdx) {
-  return `public/story/${keyOf(chapter, pageIdx, panelIdx)}.webp`;
+  return `public/story/${keyOf(chapter, pageIdx, panelIdx)}.jpg`;
 }
 
 /** Illustration de cette case : { src, w, h, lqip, srcs } (chemins relatifs au site), ou null. */

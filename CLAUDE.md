@@ -66,7 +66,9 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   Options rares d'une planche : `"traits": "clairs"`, `"tete": [a, b]`, et `"bord"` dans
   un cadrage (Sora, Awa). Toujours vérifier que les autres persos restent identiques à l'octet.
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
-  et BD dans `src/data/comic/chapitres/chNN.js`. Les révisions donnent des points
+  et BD dans `src/data/comic/chapitres/chNN.js`. Chapitre 1 = version 2 (12 pages, 60 cases),
+  script et bible de continuité dans `docs/scenario-ch01-v2.md` ; reprise de lecture
+  (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées. Les révisions donnent des points
   (seuils dans `src/core/story.js`) ; chaque matière est un arc avec un boss (`src/views/boss.js`).
 - **Convention de nommage des cases** (illustrations de la BD) :
   `public/story/chapitre-N/page-P-case-C.(webp|png|jpg)` — N = chapitre, P = page,
