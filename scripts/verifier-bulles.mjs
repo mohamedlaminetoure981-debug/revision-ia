@@ -11,6 +11,9 @@
 //   ✗ un texte déborde de la case ;
 //   ✗ une zone protégée est coupée par le recadrage (panel.illus.focus) ;
 //   ⚠ l'ordre des bulles ne suit pas la lecture (haut → bas, gauche → droite).
+// Les cases SANS illustration (dessin de l'appli) sont vérifiées aussi : les
+// zones protégées sont alors les visages des persos dessinés (position de la
+// tête calculée par l'appli, taille selon le plan : pied, buste, gros…).
 // Les positions de bulles-chapitre-N.json (éditeur) sont prises en compte.
 // =====================================================================
 
@@ -18,7 +21,7 @@ import { createServer } from 'vite';
 
 const chapterId = +(process.argv[2] || 1);
 const server = await createServer({ server: { middlewareMode: true }, logLevel: 'error', appType: 'custom' });
-const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom } = await server.ssrLoadModule('/src/comic/comic.js');
+const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom, renderPage } = await server.ssrLoadModule('/src/comic/comic.js');
 const { loadComic } = await server.ssrLoadModule('/src/data/comic/index.js');
 const ch = await loadComic(chapterId);
 if (!ch) { console.log(`Chapitre ${chapterId} introuvable.`); process.exit(1); }
@@ -36,25 +39,44 @@ const ellipse = (g, k = 1) => Array.from({ length: 32 }, (_, i) => { const a = (
 const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
 const pct = (v) => `${Math.round(v * 100)} %`;
 
+// Taille d'un visage dessiné selon le plan (rayon, en part de la hauteur cadrée).
+const FACE = { pied: 0.06, americain: 0.1, taille: 0.13, buste: 0.2, gros: 0.3 };
 let problems = 0;
 let checked = 0;
+let drawn = 0;
 ch.pages.forEach((page, p) => {
   const grid = layoutPage(page);
+  const rendered = renderPage(page, p, chapterId).panels;
   (page.panels || []).forEach((panel, c) => {
     const poly = panel.r ? rect(...panel.r) : grid[c];
     const info = panelInfo(panel, poly, c, p, chapterId);
-    if (!info.src) return;
-    checked++;
-    const { box, crop, illus } = info;
     const name = `page ${p + 1}, case ${c + 1}`;
     const out = [];
-    // Zone visible de l'image (fractions de l'image)
-    const u0 = -crop.x / crop.dw; const v0 = -crop.y / crop.dh;
-    const u1 = u0 + box.w / crop.dw; const v1 = v0 + box.h / crop.dh;
-    const toPage = ([u, v]) => { const [x, y] = crop.toPanel([u, v]); return [box.x + x * box.w, box.y + y * box.h]; };
-    const keeps = (illus.keep || []).map(([a, b, cc, d, label]) => ({ label, poly: [toPage([a, b]), toPage([cc, b]), toPage([cc, d]), toPage([a, d])], raw: [a, b, cc, d] }));
-    if (!illus.keep) out.push('⚠ aucune zone protégée notée (panel.illus.keep)');
-    for (const k of keeps) {
+    const { box, crop, illus } = info;
+    let keeps = [];
+    let u0 = 0; let v0 = 0; let u1 = 1; let v1 = 1;
+    if (info.src) {
+      checked++;
+      // Zone visible de l'image (fractions de l'image)
+      u0 = -crop.x / crop.dw; v0 = -crop.y / crop.dh;
+      u1 = u0 + box.w / crop.dw; v1 = v0 + box.h / crop.dh;
+      const toPage = ([u, v]) => { const [x, y] = crop.toPanel([u, v]); return [box.x + x * box.w, box.y + y * box.h]; };
+      keeps = (illus.keep || []).map(([a, b, cc, d, label]) => ({ label, poly: [toPage([a, b]), toPage([cc, b]), toPage([cc, d]), toPage([a, d])], raw: [a, b, cc, d] }));
+      if (!illus.keep) out.push('⚠ aucune zone protégée notée (panel.illus.keep)');
+    } else {
+      // Dessin de l'appli : visages des persos dessinés.
+      drawn++;
+      const heads = rendered[c]?.heads || [];
+      (panel.chars || []).forEach((ch0, i) => {
+        const hd = heads[i];
+        if (!hd || ch0.id === 'poing' || ch0.id === 'pieds' || ch0.light === 'contre' || ['course', 'saut', 'plongeon', 'esquive', 'chute', 'au_sol', 'genou', 'coup_de_pied'].includes(ch0.pose)) return;
+        const label = `visage de ${ch0.id}`;
+        if (ch0.shot === 'yeux') { keeps.push({ label, poly: rect(box.x + box.w * 0.12, box.y + box.h * ((ch0.y ?? 0.5) - 0.14), box.w * 0.76, box.h * 0.26) }); return; }
+        const R = (FACE[ch0.shot] || 0.06) * (ch0.fill ?? 0.92) * box.h;
+        keeps.push({ label, poly: ellipse({ cx: box.x + hd[0], cy: box.y + hd[1], rx: R * 0.85, ry: R }) });
+      });
+    }
+    for (const k of keeps.filter((q) => q.raw)) {
       const [a, b, cc, d] = k.raw;
       const vis = (Math.max(0, Math.min(cc, u1) - Math.max(a, u0)) * Math.max(0, Math.min(d, v1) - Math.max(b, v0))) / ((cc - a) * (d - b));
       if (vis < 0.9) { out.push(`✗ « ${k.label} » coupé par le recadrage (visible à ${pct(vis)})`); problems++; }
@@ -94,11 +116,12 @@ ch.pages.forEach((page, p) => {
       if (by < ay - box.h * 0.12 || (Math.abs(by - ay) <= box.h * 0.12 && bx < ax - box.w * 0.1)) out.push(`⚠ ordre de lecture : ${bubbles[i].kind} devrait venir avant ${bubbles[i - 1].kind}`);
     }
     const sizes = items.map((it) => `${it.kind.split(' ')[0]} ${Math.round(it.size)}`).join(', ');
-    console.log(`${out.some((l) => l.startsWith('✗')) ? '✗' : '✓'} ${name}  [case ${Math.round(box.w)}×${Math.round(box.h)}, image visible x ${u0.toFixed(2)}→${u1.toFixed(2)}, y ${v0.toFixed(2)}→${v1.toFixed(2)}]  ${sizes}`);
+    const where = info.src ? `image visible x ${u0.toFixed(2)}→${u1.toFixed(2)}, y ${v0.toFixed(2)}→${v1.toFixed(2)}` : 'dessin';
+    console.log(`${out.some((l) => l.startsWith('✗')) ? '✗' : '✓'} ${name}  [case ${Math.round(box.w)}×${Math.round(box.h)}, ${where}]  ${sizes}`);
     for (const l of out) console.log(`    ${l}`);
   });
 });
 function k2area(poly) { return poly.reduce((s, q, i) => { const r = poly[(i + 1) % poly.length]; return s + q[0] * r[1] - r[0] * q[1]; }, 0) / 2; }
-console.log(`\n${checked} case(s) illustrée(s) vérifiée(s) — ${problems ? `${problems} problème(s)` : 'aucun problème'}.`);
+console.log(`\n${checked} case(s) illustrée(s) et ${drawn} case(s) dessinée(s) vérifiées — ${problems ? `${problems} problème(s)` : 'aucun problème'}.`);
 await server.close();
 process.exit(problems ? 1 : 0);

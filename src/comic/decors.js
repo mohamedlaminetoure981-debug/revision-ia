@@ -580,7 +580,31 @@ function arene(w, h, o) {
 // ---------------------------------------------------------------------
 // Catalogue des décors (nom utilisé dans les chapitres → fonction)
 // ---------------------------------------------------------------------
-export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene };
+/**
+ * Gros plan sur un cahier d'étudiant (feuille lignée, marge rouge, spirale).
+ *   lines : lignes écrites à la main, ex. ['S = u₀ / (1 − q)', '8 + 4 + 2 + 1 + … = 16']
+ *   keep  : numéros des lignes qui restent nettes quand fade est vrai
+ *   fade  : true = l'encre s'efface (les autres lignes pâlissent, pixels violets)
+ */
+function cahier(w, h, o) {
+  const r = rng(o.seed || 61);
+  const lines = o.lines || [];
+  const step = Math.max(18, h / 9);
+  let s = `<rect width="${w}" height="${h}" fill="#f4f1e8"/>`;
+  for (let y = step; y < h; y += step) s += `<path d="M0,${f(y)} H${f(w)}" stroke="#9cc3e6" stroke-width="1.6"/>`;
+  s += `<path d="M${f(w * 0.14)},0 V${f(h)}" stroke="#e8442e" stroke-width="2" opacity=".75"/>`;
+  for (let y = step * 0.5; y < h; y += step) s += `<circle cx="${f(w * 0.05)}" cy="${f(y)}" r="${f(Math.min(9, step * 0.18))}" fill="#2a2440"/>`;
+  const size = Math.min(step * 0.78, (w * 0.78) / Math.max(10, ...lines.map((l) => l.length * 0.55)));
+  lines.forEach((l, i) => {
+    const sharp = !o.fade || (o.keep || []).includes(i);
+    const y = step * (i + (o.top ?? 2)) - step * 0.18;
+    s += `<text x="${f(w * 0.2)}" y="${f(y)}" font-family="'Comic Sans MS','Segoe Print',cursive" font-size="${f(size)}" fill="#1d3a8a" opacity="${sharp ? 1 : 0.16}" transform="rotate(-1.5 ${f(w * 0.2)} ${f(y)})">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`;
+    if (!sharp) for (let k = 0; k < 14; k++) s += `<rect x="${f(w * 0.2 + r() * l.length * size * 0.5)}" y="${f(y - size * (0.2 + r() * 0.8))}" width="${f(3 + r() * 8)}" height="${f(3 + r() * 6)}" fill="${r() < 0.5 ? '#7c3aed' : '#c4b5fd'}" opacity=".7"/>`;
+  });
+  return s;
+}
+
+export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene, cahier };
 
 /** Dessine un décor (inconnu → aplat). */
 export function decorSVG(name, w, h, o = {}) {

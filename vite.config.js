@@ -306,6 +306,16 @@ export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
     },
     async closeBundle() {
       if (!isBuild) return;
+      // Sous-dossiers d'archives (ex. public/story/chapitre-1/ancien/) : jamais publiés.
+      const published = join(outDir, 'story');
+      if (existsSync(published)) {
+        for (const dir of readdirSync(published)) {
+          if (!statSync(join(published, dir)).isDirectory()) continue;
+          for (const sub of readdirSync(join(published, dir))) {
+            if (statSync(join(published, dir, sub)).isDirectory()) rmSync(join(published, dir, sub), { recursive: true, force: true });
+          }
+        }
+      }
       const list = Object.entries(scanStory());
       if (!list.length) return;
       if (!sharp) {

@@ -953,6 +953,16 @@ npm run verifier-bulles -- 2   # chapitre 2
 Le script signale un texte posé sur une zone protégée, une bulle de plus de 25 % de
 la case, un texte qui déborde, deux textes qui se touchent, un sujet coupé par le
 recadrage et un ordre de lecture douteux (de haut en bas, de gauche à droite).
+Les cases **sans illustration** (dessin de l'appli) sont vérifiées aussi : les zones
+protégées sont alors les visages des persos dessinés.
+
+### Chapitre 1 (version 2, 12 pages, 60 cases)
+- Script et bible de continuité : `docs/scenario-ch01-v2.md` ; données : `src/data/comic/chapitres/ch01.js`.
+- Les cases marquées **[ÉCRAN APPLI]** (écrans de téléphone : page 1 case 3, page 4 case 1,
+  page 8 case 4, page 9 case 2, page 12 case 4) sont dessinées par l'appli : pas d'image à faire.
+- Les 17 images de l'ancien chapitre 1 sont rangées dans `public/story/chapitre-1/ancien/`
+  (archives : un sous-dossier de `public/story/chapitre-N/` n'est jamais lu ni publié).
+- Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js`.
 
 ## 10 octies. Langues de l'appli
 
@@ -1096,6 +1106,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.0** : chapitre 1 réécrit (12 pages, 60 cases, bible de continuité) ;
+  anciennes images archivées ; contrôle des bulles étendu aux cases dessinées.
 - ✅ **v1.18.0** : appli multilingue (étape 1) — système de langues, interface en anglais,
   choix de la langue (bienvenue + Réglages), langue du contenu créé par l'IA, script
   `npm run traduire` prêt pour les répliques et la BD (étape 2, à lancer sur le PC).
