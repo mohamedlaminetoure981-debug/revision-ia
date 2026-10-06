@@ -379,6 +379,9 @@ details > summary .rich p { display: inline; margin: 0; }
 .bd-view.case .bd-page { max-width: none; margin: 0; }
 .bd-page svg { display: block; width: 100%; height: 100%; }
 .bd-view:not(.case) .bd-page svg { height: auto; }
+.bd-formule { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; white-space: nowrap; font-weight: 700; color: var(--ink, #e9d5ff);
+  text-shadow: 0 0 3px var(--ink, #e9d5ff), 0 0 10px #8b5cf6, 0 0 22px #8b5cf6; }
+.bd-formule .katex { font-size: 1em; }
 .bd-page.bd-turn { animation: bd-turn .45s cubic-bezier(.2, .9, .3, 1); }
 .bd-page.bd-turn-back { animation: bd-turn-back .45s cubic-bezier(.2, .9, .3, 1); }
 .bd-view.case .bd-page.bd-turn, .bd-view.case .bd-page.bd-turn-back { animation-name: bd-fade; }

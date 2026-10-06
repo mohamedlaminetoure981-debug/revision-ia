@@ -297,10 +297,11 @@ export async function render(el) {
       let n = 0;
       let screens = 0;
       ch.pages.forEach((page, p) => (page.panels || []).forEach((panel, c) => {
-        // Écran de téléphone dessiné par l'appli : aucune illustration à faire.
-        if (panel.bg?.id === 'ecran') {
+        // Écran de téléphone ou cahier dessiné par l'appli : aucune illustration à faire.
+        const own = { ecran: '📱 écran de l\'appli', cahier: '📓 cahier dessiné par l\'appli' }[panel.bg?.id];
+        if (own) {
           screens++;
-          rows += `<li style="margin:6px 0">📱 écran de l'appli (pas d'image) · <b>page ${p + 1}, case ${c + 1}</b>
+          rows += `<li style="margin:6px 0">${own} (pas d'image) · <b>page ${p + 1}, case ${c + 1}</b>
             ${panel.action ? `<div class="tiny dim">${esc(panel.action)}</div>` : ''}</li>`;
           return;
         }
@@ -311,7 +312,7 @@ export async function render(el) {
           ${panel.action ? `<div class="tiny dim">${esc(panel.action)}</div>` : ''}</li>`;
       }));
       const count = ch.pages.reduce((s, pg) => s + (pg.panels || []).length, 0);
-      html += `<details style="margin:8px 0"><summary><b>Chapitre ${id} — ${esc(ch.title)}</b> · ${count} cases · ${n}/${count - screens} illustrées${screens ? ` · ${screens} écrans` : ''}</summary><ul style="list-style:none;padding:0">${rows}</ul></details>`;
+      html += `<details style="margin:8px 0"><summary><b>Chapitre ${id} — ${esc(ch.title)}</b> · ${count} cases · ${n}/${count - screens} illustrées${screens ? ` · ${screens} dessinées par l'appli` : ''}</summary><ul style="list-style:none;padding:0">${rows}</ul></details>`;
     }
     modal(`<h3>🖼️ Illustrations des cases (${done}/${total})</h3>
       <p class="tiny muted">Dépose l'image sur github.com dans le dossier indiqué (.webp, .png ou .jpg), avec ce nom exact. Elle remplace le dessin au prochain déploiement. Voir le README.</p>

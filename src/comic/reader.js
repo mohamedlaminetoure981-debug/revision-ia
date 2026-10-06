@@ -12,13 +12,15 @@
 // (localStorage "bdReprise") ; effacée à la fin du chapitre (voir savedPage).
 // =====================================================================
 
-import { renderPage, revealImages, pageBoxes, assetUrl, PAGE_W, PAGE_H } from './comic.js';
+import { renderPage, revealImages, pageBoxes, assetUrl, setMathRenderer, PAGE_W, PAGE_H } from './comic.js';
+import { mathInline } from '../ui/ui.js';
 import { setDisplayWidth, preloadPage } from './story-images.js';
 import { playSfx, startAmbient, stopAmbient } from '../ui/sfx.js';
 import { vibrate } from '../ui/fx.js';
 import * as db from '../core/db.js';
 import { t } from '../i18n/index.js';
 
+setMathRenderer(mathInline); // formules écrites à la main sur certaines cases
 const MODE_KEY = 'bdMode';
 const RESUME_KEY = 'bdReprise';
 

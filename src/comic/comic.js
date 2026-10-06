@@ -283,6 +283,11 @@ function effect(fx, w, h, r, avoid = []) {
 // BULLES, CARTOUCHES, ONOMATOPÉES (au niveau de la page)
 // ---------------------------------------------------------------------
 // Variables remplacées dans les textes : {prenom} → prénom du lecteur.
+// Rendu des formules (KaTeX) : branché par le lecteur (ui.js n'est pas chargeable hors navigateur).
+let mathRenderer = null;
+export function setMathRenderer(fn) { mathRenderer = fn; }
+const mathInline = (tex) => (mathRenderer ? mathRenderer(tex) : String(tex).replace(/&/g, '&amp;').replace(/</g, '&lt;'));
+
 let VARS = { prenom: 'toi' };
 export function setComicVars(v) { VARS = { ...VARS, ...v }; }
 const fillVars = (t) => String(t ?? '').replace(/\{(\w+)\}/g, (m, k) => VARS[k] ?? m);
@@ -606,6 +611,17 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
     // Étalonnage "cinéma" : dégradé de lumière + léger assombrissement en bas
     inner += grading(time, w, h);
     for (const fx of (panel.fx || []).filter((x) => !(x.layer === 'back' || ['concentration', 'vitesse'].includes(x.type) && x.layer !== 'front'))) inner += effect(fx, w, h, r);
+  }
+  // FORMULES écrites « à la main » par-dessus la case (rendu KaTeX, légèrement lumineuses).
+  //   panel.formules = [{ tex, x, y, size, rot, color }]
+  //   x, y : centre de la formule (fractions de l'IMAGE si la case est illustrée, sinon de la case) ;
+  //   size : taille du texte (fraction de la largeur de l'image / de la case) ; rot : inclinaison (°).
+  for (const fm of panel.formules || []) {
+    const [cx, cy] = image && crop ? crop.toPanel([fm.x, fm.y]).map((v, i) => v * (i ? h : w)) : [fm.x * w, fm.y * h];
+    const fs = (fm.size ?? 0.02) * (image && crop ? crop.dw : w);
+    const bw = fs * 14; const bh = fs * 3;
+    inner += `<foreignObject x="${f(cx - bw / 2)}" y="${f(cy - bh / 2)}" width="${f(bw)}" height="${f(bh)}" style="overflow:visible;pointer-events:none">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="bd-formule" style="font-size:${f(fs)}px;--ink:${fm.color || '#e9d5ff'};transform:rotate(${fm.rot ?? -3}deg) skewX(-6deg)">${mathInline(fm.tex)}</div></foreignObject>`;
   }
   const local = (s) => `<g transform="translate(${f(box.x)},${f(box.y)})">${s}</g>`;
   let out = `<g class="panel" data-i="${idx}">

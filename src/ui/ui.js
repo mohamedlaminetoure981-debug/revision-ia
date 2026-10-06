@@ -66,6 +66,9 @@ function renderMath(tex, display) {
   return `<span class="math-pending" data-tex="${esc(tex)}" data-display="${display ? 1 : 0}">${rawMath(tex, display)}</span>`;
 }
 
+/** Formule LaTeX en ligne (pour la BD : formule écrite à la main sur une illustration). */
+export const mathInline = (tex) => renderMath(tex, false);
+
 /** Mise en forme dans une ligne : gras, italique. */
 function inline(s) {
   return s

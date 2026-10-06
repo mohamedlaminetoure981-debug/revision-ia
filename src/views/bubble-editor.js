@@ -15,9 +15,11 @@
 // =====================================================================
 
 import { hasComic, loadComic } from '../data/comic/index.js';
-import { renderPage, revealImages, bubbleGeom, captionGeom, sfxGeom } from '../comic/comic.js';
+import { renderPage, revealImages, bubbleGeom, captionGeom, sfxGeom, setMathRenderer } from '../comic/comic.js';
 import { caseKey, layoutFileName, LAYOUT_PROPS, applyLayout } from '../comic/story-images.js';
-import { esc, toast, confirmBox } from '../ui/ui.js';
+import { esc, toast, confirmBox, mathInline } from '../ui/ui.js';
+
+setMathRenderer(mathInline); // formules écrites à la main sur certaines cases
 
 const DRAFT = (id) => `bdBulles-${id}`;
 const r3 = (n) => Math.round(n * 1000) / 1000;
