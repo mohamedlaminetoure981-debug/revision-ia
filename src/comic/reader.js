@@ -8,6 +8,8 @@
 //   📄 PAGE ENTIÈRE  : la page complète, on fait défiler.
 // Sons : ambiance de la page (mer, ville, nuit…) + effet de chaque case.
 // Une seule page est dessinée à la fois (fluide sur petit Android).
+// REPRISE : la page en cours de chaque chapitre est mémorisée sur l'appareil
+// (localStorage "bdReprise") ; effacée à la fin du chapitre (voir savedPage).
 // =====================================================================
 
 import { renderPage, revealImages, pageBoxes, assetUrl, PAGE_W, PAGE_H } from './comic.js';
@@ -18,6 +20,27 @@ import * as db from '../core/db.js';
 import { t } from '../i18n/index.js';
 
 const MODE_KEY = 'bdMode';
+const RESUME_KEY = 'bdReprise';
+
+function readResume() {
+  try { return JSON.parse(localStorage.getItem(RESUME_KEY) || '{}') || {}; } catch { return {}; }
+}
+function writeResume(all) {
+  try { localStorage.setItem(RESUME_KEY, JSON.stringify(all)); } catch { /* navigation privée */ }
+}
+/**
+ * Page où l'élève s'était arrêté dans ce chapitre (0 = début), ou 0 si le
+ * chapitre a changé de nombre de pages depuis (réécrit : on repart du début).
+ */
+export function savedPage(id, total) {
+  const r = readResume()[id];
+  return r && r.n === total && r.p > 0 && r.p < total ? r.p : 0;
+}
+function savePage(id, page, total) {
+  const all = readResume();
+  if (page > 0) all[id] = { p: page, n: total }; else delete all[id];
+  writeResume(all);
+}
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 /**
@@ -25,12 +48,14 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
  * @param {object} chapter  données du chapitre (data/comic/chapitres/chNN.js)
  * @param {object} meta     { id, title, emoji } (liste des chapitres)
  * @param {Function} onEnd  appelée après la dernière case (écran de fin)
+ * @param {object}   [opts]  { startPage } page d'ouverture (reprise de lecture)
  */
-export async function openReader(el, chapter, meta, onEnd) {
+export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {}) {
   let mode = 'case';
   try { mode = localStorage.getItem(MODE_KEY) || 'case'; } catch { /* navigation privée */ }
   const soundOn = await db.getSetting('sounds');
-  let pageIdx = 0;
+  const chapterId = chapter.id ?? meta.id;
+  let pageIdx = Math.max(0, Math.min(startPage, chapter.pages.length - 1));
   let panelIdx = 0;
   let current = null; // { svg, panels }
   let ambient = null;
@@ -87,6 +112,7 @@ export async function openReader(el, chapter, meta, onEnd) {
     void holder.offsetWidth;
     holder.classList.add(dir > 0 ? 'bd-turn' : 'bd-turn-back');
     $('#bd-pg').textContent = `${t("page")} ${pageIdx + 1}/${total}`;
+    savePage(chapterId, pageIdx, total); // reprise de lecture
     // Ambiance sonore de la page
     if (soundOn && page.ambient !== ambient) {
       ambient = page.ambient;
@@ -169,6 +195,7 @@ export async function openReader(el, chapter, meta, onEnd) {
     }
   }
   function finish() {
+    savePage(chapterId, 0, total); // chapitre terminé : la prochaine lecture repart du début
     stopAmbient();
     ambient = null;
     onEnd?.();

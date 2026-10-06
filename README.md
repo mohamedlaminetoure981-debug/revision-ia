@@ -964,6 +964,12 @@ protégées sont alors les visages des persos dessinés.
   (archives : un sous-dossier de `public/story/chapitre-N/` n'est jamais lu ni publié).
 - Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js`.
 
+### Reprise de lecture
+La page en cours de chaque chapitre est mémorisée sur l'appareil (`localStorage`, clé
+`bdReprise`, dans `src/comic/reader.js`). En rouvrant un chapitre commencé, l'élève choisit
+« ▶️ Reprendre page X » ou « ↺ Recommencer ». La mémoire est effacée à la fin du chapitre,
+et ignorée si le chapitre a changé de nombre de pages. Le gain d'XP reste unique (fin du chapitre).
+
 ## 10 octies. Langues de l'appli
 
 L'appli existe en **français** (par défaut) et en **anglais**. Le choix se fait sur
@@ -1107,7 +1113,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
 - ✅ **v1.19.0** : chapitre 1 réécrit (12 pages, 60 cases, bible de continuité) ;
-  anciennes images archivées ; contrôle des bulles étendu aux cases dessinées.
+  anciennes images archivées ; contrôle des bulles étendu aux cases dessinées ;
+  reprise de lecture (« Reprendre page X » / « Recommencer »).
 - ✅ **v1.18.0** : appli multilingue (étape 1) — système de langues, interface en anglais,
   choix de la langue (bienvenue + Réglages), langue du contenu créé par l'IA, script
   `npm run traduire` prêt pour les répliques et la BD (étape 2, à lancer sur le PC).

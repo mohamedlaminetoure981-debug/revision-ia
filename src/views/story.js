@@ -9,7 +9,7 @@
 import { CHARACTERS } from '../data/characters.js';
 import { CHAPTERS, STORY_TITLE as STORY_TITLE_FR } from '../data/story.js';
 import { play } from '../ui/character.js';
-import { esc, line, mascot, displayName, subjectColor, subjectEmoji, say } from '../ui/ui.js';
+import { esc, line, mascot, displayName, subjectColor, subjectEmoji, say, modal } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { stripSVG } from '../ui/manga.js';
 import { storyOverview, newChaptersSinceLastVisit, markRead, BOSS_POINTS } from '../core/story.js';
@@ -151,10 +151,13 @@ async function reader(el, id) {
 async function comicReader(el, ch, o) {
   el.innerHTML = '<div class="bd"><div class="spinner" style="margin:40vh auto"></div></div>';
   // Le moteur de BD et le chapitre ne sont téléchargés qu'à l'ouverture.
-  const [{ openReader }, data] = await Promise.all([import('../comic/reader.js'), loadComic(ch.id)]);
+  const [{ openReader, savedPage }, data] = await Promise.all([import('../comic/reader.js'), loadComic(ch.id)]);
   const { setComicVars } = await import('../comic/comic.js');
   setComicVars({ prenom: displayName() });
   const next = o.chapters.find((c) => c.id === ch.id + 1);
+  // Chapitre commencé : reprendre là où l'élève s'était arrêté, ou recommencer.
+  let startPage = savedPage(ch.id, data.pages.length);
+  if (startPage) startPage = await resumeChoice(startPage);
   await openReader(el, data, ch, async () => {
     const box = document.createElement('div');
     box.className = 'bd-end';
@@ -175,5 +178,19 @@ async function comicReader(el, ch, o) {
       if (ch.id === 12) sound('victory');
       celebrate(await addXp(XP_RULES.chapter, 'chapters'), box);
     } else sound('page');
+  }, { startPage });
+}
+
+/** Propose « Reprendre page X » ou « Recommencer ». Renvoie la page d'ouverture (0 = début). */
+function resumeChoice(page) {
+  return new Promise((resolve) => {
+    const m = modal(`<h3 style="margin-top:0">${t('📖 Chapitre commencé')}</h3>
+      <p class="small muted">${t('Tu t’étais arrêté(e) à la page')} ${page + 1}.</p>
+      <div class="row nowrap" style="gap:8px;margin-top:12px">
+        <button class="btn ghost grow" id="rs-start">${t('↺ Recommencer')}</button>
+        <button class="btn grow" id="rs-go">${t('▶️ Reprendre page')} ${page + 1}</button>
+      </div>`, { locked: true });
+    m.el.querySelector('#rs-go').onclick = () => { m.close(); resolve(page); };
+    m.el.querySelector('#rs-start').onclick = () => { m.close(); resolve(0); };
   });
 }
