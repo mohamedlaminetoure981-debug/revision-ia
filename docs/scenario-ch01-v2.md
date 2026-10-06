@@ -1,6 +1,7 @@
 # Chapitre 1 — « 3 h 12 » (version 2, réécriture longue)
 
 > Nouveau script validé le 6 octobre 2026. Remplace entièrement l'ancien chapitre 1.
+> **[DESSIN APPLI]** = gros plan sur le cahier dessiné par l'appli (page 3 case 4, page 10 case 1), sans illustration.
 > 12 pages, 61 cases (la page 2 a 6 cases depuis les premières illustrations). Les cases marquées **[ÉCRAN APPLI]** sont des écrans de téléphone
 > dessinés par l'appli (pas d'illustration Gemini). Toutes les autres cases recevront une
 > illustration `public/story/chapitre-1/page-P-case-C.jpg`.
@@ -28,8 +29,9 @@ Au moment de la condensation (page 11) : tentacules aspirés vers le centre, noy
 violet translucide qui brille comme du verre.
 
 ### Personnages du chapitre
-- **Kaï** : tenue de sa fiche de référence, sac à dos (pages 1, 3 case 1, 5 à 12).
-  Pages 3-4 (nuit) : même t-shirt, sans sac, sans veste.
+- **Kaï** : tenue de sa fiche de référence (sweat violet, casque autour du cou), sac à dos
+  (pages 1, 3 case 1, 5 à 12). À la maison (pages 3 cases 2 à 5 et 4) : t-shirt gris foncé,
+  sans sweat (il est sur le dossier de la chaise), sans sac (accroché au mur), casque sur le bureau.
 - **L'Oubli** (voir ci-dessus).
 - **Mory** : uniquement page 12 case 5, sur un toit, lunettes qui brillent, antenne bricolée.
 - **Figurants** : le chauffeur de taxi (taxi jaune, page 2) ; la vendeuse de mangues (pages 5
@@ -48,7 +50,7 @@ violet translucide qui brille comme du verre.
 |---|---|---|---|
 | 1-2 | La corniche de Conakry (mer, pirogues, rambarde, route, lampadaires, palmiers ; page 2 : un panneau publicitaire numérique sur le trottoir côté immeubles) | coucher du soleil | dorée, qui baisse de case en case (page 2 : lampadaires allumés) |
 | 3 case 1 | escalier de l'immeuble de Kaï | nuit tombée | lampe faible |
-| 3-4 | chambre d'étudiant (lit, bureau, ordi, cahier, ventilateur au plafond, réveil, fenêtre sur Kaloum) | 2 h 47 → 3 h 12 | bleue (écran), puis violette (Oubli), puis lampadaire orange |
+| 3-4 | chambre d'étudiant (lit, bureau, ordi, cahier, ventilateur au plafond, réveil, fenêtre sur Kaloum) | 2 h 47 → 3 h 12 | bleue (écran), puis violette (Oubli), puis seulement les lumières de la ville rallumées à travers la fenêtre |
 | 5-12 | marché de Madina (étals, mangues, tissus wax, motos-taxis, foule) avec un **grand panneau publicitaire au-dessus du carrefour**, toujours visible dans les plans larges | 7 h 40 | plein soleil, ombres nettes ; lueur violette autour de l'Oubli |
 | 12 case 5 | un toit qui domine la même rue du marché | 7 h 41 | plein soleil |
 
@@ -115,51 +117,77 @@ normale de plage (palmier, mer turquoise).
 
 ## PAGE 3 — La chambre, la révision (5 cases)
 
-**Case 1** — Transition. L'escalier de son immeuble, nuit tombée. Kaï monte, fatigué, sac sur l'épaule.
+> Images en paysage 16:9 pour les cases 1, 2, 3 et 5. La case 4 est un dessin de l'appli
+> (pas d'illustration). À la maison : Kaï porte un t-shirt gris foncé ; son sweat violet est
+> sur le dossier de la chaise, son casque sur le bureau, son sac à dos accroché au mur.
+
+**Case 1** — Transition. L'escalier de l'immeuble de Kaï, nuit tombée, vu en légère
+contre-plongée : une ampoule nue qui pend, des murs fissurés, une rampe en bois. Kaï monte
+les marches, fatigué, une main sur la rampe, la tête tournée vers le bas ; il porte encore
+son sweat violet, son casque autour du cou et son sac sur l'épaule.
 - Cartouche : « Plus tard. »
 
-**Case 2** — Kaï allongé sur son lit dans le noir, les yeux grands ouverts, le ventilateur
-tourne au plafond.
+**Case 2** — Plan serré, vu d'au-dessus : Kaï allongé sur son lit dans le noir (t-shirt gris
+foncé, un bras derrière la tête), les yeux grands ouverts vers le plafond, lumière bleue
+froide. On entend le ventilateur tourner au plafond.
 - Cartouche : « 2 h 47. »
+- Onomatopée (petite) : « vvvvv… »
 - Pensée de Kaï : « Je dors jamais avant une rentrée. »
 
-**Case 3** — Kaï assis à son bureau, ordi allumé, cahier ouvert. Sur l'écran : un cours
-intitulé « Somme d'une suite géométrique ».
+**Case 3** — Plan large de la chambre (lit, fenêtre sur la ville de nuit, étagère, sac à dos
+accroché au mur, ventilateur au plafond). Kaï, assis à son bureau, de dos et de profil, le
+menton dans la main, ordi allumé (lumière bleue), cahier ouvert. Son sweat violet est sur le
+dossier de la chaise, son casque sur le bureau. Sur l'écran : un cours intitulé « Somme d'une
+suite géométrique ».
 - Pensée de Kaï : « Bon. Une notion. Une seule. »
 
-**Case 4** — Gros plan sur le cahier : sa main écrit S = u₀ / (1 − q), et en dessous
-l'exemple 8 + 4 + 2 + 1 + … = 16.
+**Case 4** — [DESSIN APPLI] Gros plan sur le cahier : sa main écrit S = u₀ / (1 − q), et en
+dessous l'exemple 8 + 4 + 2 + 1 + … = 16.
 - Pensée de Kaï : « Une infinité de termes… mais une somme finie. »
 
-**Case 5** — Kaï s'étire, satisfait, petit sourire. Sur le bureau, le téléphone s'allume et
-vibre. Le réveil à côté affiche 03:12.
+**Case 5** — Même chambre, même cadrage que la case 3. Kaï s'étire à son bureau, de dos, les
+bras en l'air, satisfait. Sur le bureau, le téléphone s'allume et vibre à côté de l'ordi et
+du casque ; le réveil à côté affiche 03:12. Sweat violet sur le dossier de la chaise.
 - Kaï : « Ça y est… j'ai compris. »
 - Onomatopée : « BZZZT »
 
 ## PAGE 4 — 3 h 12 (6 cases)
 
+> Cases 3 à 6 : même chambre, même cadrage (lit à gauche, fenêtre au centre, bureau et chaise
+> à droite, sac à dos accroché au mur, ventilateur au plafond). Kaï porte son t-shirt gris
+> foncé ; son sweat violet est d'abord sur le dossier de la chaise.
+
 **Case 1** — [ÉCRAN APPLI] Écran du téléphone, heure 03:12.
 - Message — LE CRÉATEUR : « Kaï. Tu es le guide. Réunis-les avant que l'Oubli n'efface tout. »
 
-**Case 2** — Très gros plan sur les yeux de Kaï, écarquillés, reflet bleu de l'écran.
+**Case 2** — Très gros plan sur les yeux de Kaï, écarquillés, une goutte de sueur, le reflet
+du téléphone dans les pupilles. Lignes de concentration bleues.
 - Kaï (murmure) : « … Comment il connaît mon nom ? »
 
-**Case 3** — Kaï à la fenêtre, de dos. Au loin, sur Kaloum, les lumières s'éteignent
-quartier par quartier.
+**Case 3** — Kaï debout devant son bureau, de dos, le téléphone dans une main, face à la
+fenêtre. Au loin, sur Kaloum, les lumières s'éteignent quartier par quartier. Sweat violet
+sur le dossier de la chaise.
 - Cartouche : « Au même moment, sur Kaloum, les lumières s'éteignent. Une à une. »
 
 **Case 4** — Même fenêtre, même cadrage. L'obscurité est arrivée jusqu'aux immeubles
-voisins. L'Oubli, immense, se dresse au-dessus de la ville. Kaï recule d'un pas.
+voisins. L'Oubli, immense (capuche, yeux blancs, tentacules, contour violet), se dresse dans
+la fenêtre. Kaï, en reculant de peur, heurte sa chaise, qui commence à basculer ; le sweat
+glisse du dossier.
 - Kaï (murmure) : « C'est quoi… ce truc ? »
+- Onomatopée (près de la chaise) : « CLAC ! »
 
-**Case 5** — Une lueur violette envahit la chambre. L'écran de l'ordi bugge, le texte du
-cours se désagrège en pixels. Sur le cahier, l'encre s'efface… sauf la formule
-S = u₀ / (1 − q), qui reste parfaitement nette (Kaï, paniqué, ne le remarque pas).
+**Case 5** — Même cadrage. Une lueur violette envahit la chambre. Kaï, paniqué, une main dans
+les cheveux, le téléphone dans l'autre. La chaise est renversée par terre, le sweat au sol.
+L'écran de l'ordi bugge, le texte du cours et le cahier se désagrègent en pixels. Sur le
+cahier, l'encre s'efface… sauf une ligne, la formule S = u₀ / (1 − q), qui reste parfaitement
+nette (écrite comme à la main, légèrement lumineuse ; Kaï, paniqué, ne le remarque pas).
 - Onomatopée : « KSSSHHH »
 - Kaï : « Mes cours… ! »
 
-**Case 6** — Kaï a claqué l'ordi. La lumière orange du lampadaire est revenue derrière la
-fenêtre, tout est calme. Kaï, assis par terre contre son lit, en sueur.
+**Case 6** — Même cadrage. La lumière violette a disparu, l'ordi est fermé, la chambre est
+plongée dans la nuit, éclairée seulement par les lumières de la ville qui se sont rallumées à
+travers la fenêtre. Kaï, assis par terre contre le lit, en sueur, les bras autour des
+genoux ; son téléphone est au sol, la chaise et le sweat sont toujours par terre.
 - Pensée de Kaï : « … J'ai rêvé ? »
 
 ## PAGE 5 — Madina, les enseignes se vident (5 cases)
@@ -270,7 +298,7 @@ Kaï compte, concentré.
 
 ## PAGE 10 — La limite (4 cases)
 
-**Case 1** — Souvenir (teinte bleu nuit, bord de case flou) : le cahier de cette nuit, la
+**Case 1** — [DESSIN APPLI] Souvenir (teinte bleu nuit, bord de case flou) : le cahier de cette nuit, la
 formule S = u₀ / (1 − q) restée intacte quand tout le reste s'effaçait.
 - Pensée de Kaï : « Premier terme : huit. Raison : un demi. »
 
