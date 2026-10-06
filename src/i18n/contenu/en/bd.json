@@ -796,7 +796,60 @@
      }
     ]
    },
-   {},
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "HONK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "VROOOOM"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Hey, kid! Sleeping on your feet?!"
+       },
+       {
+        "text": "Sorry, uncle!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "bzzt"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Huh… ?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What’s this glitch… ?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "… I seriously need to sleep."
+       }
+      ]
+     }
+    ]
+   },
    {
     "panels": [
      {
