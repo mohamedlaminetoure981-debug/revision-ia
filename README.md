@@ -956,7 +956,7 @@ recadrage et un ordre de lecture douteux (de haut en bas, de gauche à droite).
 Les cases **sans illustration** (dessin de l'appli) sont vérifiées aussi : les zones
 protégées sont alors les visages des persos dessinés.
 
-### Chapitre 1 (version 2, 12 pages, 60 cases)
+### Chapitre 1 (version 2, 12 pages, 61 cases)
 - Script et bible de continuité : `docs/scenario-ch01-v2.md` ; données : `src/data/comic/chapitres/ch01.js`.
 - Les cases marquées **[ÉCRAN APPLI]** (écrans de téléphone : page 1 case 3, page 4 case 1,
   page 8 case 4, page 9 case 2, page 12 case 4) sont dessinées par l'appli : pas d'image à faire.
@@ -965,7 +965,7 @@ protégées sont alors les visages des persos dessinés.
 - Décor `cahier` (gros plan sur le cahier : `lines`, `keep`, `fade`) dans `src/comic/decors.js`.
 - Traduction anglaise : l'ancienne entrée `ch01` de `src/i18n/contenu/en/bd.json` a été retirée
   (le chapitre 1 s'affiche en français en anglais aussi) ; pour la refaire : `npm run traduire -- en bd`.
-- Panneau créateur → 🖼️ Illustrations des cases : les 60 cases, avec le nom de fichier
+- Panneau créateur → 🖼️ Illustrations des cases : les 61 cases, avec le nom de fichier
   (`page-P-case-C.jpg`) et la description ; les écrans de l'appli sont marqués 📱 (pas d'image).
 
 ### Reprise de lecture
@@ -1116,6 +1116,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.1** : premières illustrations du chapitre 1 (pages 1 et 2, images paysage 16:9) ;
+  la page 2 passe à 6 cases (dont 3 cases égales « ralenti ») ; cadrage et bulles ajustés ;
+  `verifier-bulles` n'expire plus au premier chargement sur un petit PC.
 - ✅ **v1.19.0** : chapitre 1 réécrit (12 pages, 60 cases, bible de continuité) ;
   anciennes images archivées ; contrôle des bulles étendu aux cases dessinées ;
   reprise de lecture (« Reprendre page X » / « Recommencer »).

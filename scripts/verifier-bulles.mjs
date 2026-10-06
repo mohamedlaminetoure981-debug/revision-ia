@@ -21,8 +21,12 @@ import { createServer } from 'vite';
 
 const chapterId = +(process.argv[2] || 1);
 const server = await createServer({ server: { middlewareMode: true }, logLevel: 'error', appType: 'custom' });
-const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom, renderPage } = await server.ssrLoadModule('/src/comic/comic.js');
-const { loadComic } = await server.ssrLoadModule('/src/data/comic/index.js');
+// Le premier chargement peut dépasser 60 s sur un petit PC (préparation des portraits) : on le fait
+// d'abord ici, sans limite de temps ; l'appel suivant lit alors le résultat déjà prêt.
+await server.environments.ssr.transformRequest('virtual:character-images').catch(() => {});
+const load = (path) => server.ssrLoadModule(path);
+const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom, renderPage } = await load('/src/comic/comic.js');
+const { loadComic } = await load('/src/data/comic/index.js');
 const ch = await loadComic(chapterId);
 if (!ch) { console.log(`Chapitre ${chapterId} introuvable.`); process.exit(1); }
 

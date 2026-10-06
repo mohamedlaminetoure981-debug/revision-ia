@@ -1,7 +1,7 @@
 # Chapitre 1 — « 3 h 12 » (version 2, réécriture longue)
 
 > Nouveau script validé le 6 octobre 2026. Remplace entièrement l'ancien chapitre 1.
-> 12 pages, 60 cases. Les cases marquées **[ÉCRAN APPLI]** sont des écrans de téléphone
+> 12 pages, 61 cases (la page 2 a 6 cases depuis les premières illustrations). Les cases marquées **[ÉCRAN APPLI]** sont des écrans de téléphone
 > dessinés par l'appli (pas d'illustration Gemini). Toutes les autres cases recevront une
 > illustration `public/story/chapitre-1/page-P-case-C.jpg`.
 
@@ -46,7 +46,7 @@ violet translucide qui brille comme du verre.
 ### Lieux, heures et lumières
 | Pages | Lieu | Heure | Lumière |
 |---|---|---|---|
-| 1-2 | La corniche de Conakry (mer, pirogues, rambarde, route, grand panneau publicitaire) | coucher du soleil | dorée, qui baisse de case en case |
+| 1-2 | La corniche de Conakry (mer, pirogues, rambarde, route, lampadaires, palmiers ; page 2 : un panneau publicitaire numérique sur le trottoir côté immeubles) | coucher du soleil | dorée, qui baisse de case en case (page 2 : lampadaires allumés) |
 | 3 case 1 | escalier de l'immeuble de Kaï | nuit tombée | lampe faible |
 | 3-4 | chambre d'étudiant (lit, bureau, ordi, cahier, ventilateur au plafond, réveil, fenêtre sur Kaloum) | 2 h 47 → 3 h 12 | bleue (écran), puis violette (Oubli), puis lampadaire orange |
 | 5-12 | marché de Madina (étals, mangues, tissus wax, motos-taxis, foule) avec un **grand panneau publicitaire au-dessus du carrefour**, toujours visible dans les plans larges | 7 h 40 | plein soleil, ombres nettes ; lueur violette autour de l'Oubli |
@@ -78,24 +78,39 @@ passants. Kaï, petit dans le cadre, marche seul, sac à dos sur l'épaule.
 **Case 5** — Kaï repart et traverse la route, les yeux toujours sur son téléphone. Au fond,
 deux phares jaunes approchent.
 
-## PAGE 2 — Le taxi et le panneau (5 cases)
+## PAGE 2 — Le taxi et le panneau (6 cases)
 
-**Case 1** — Le taxi jaune fonce vers le lecteur, phares allumés ; Kaï tourne la tête, surpris.
+> Images en paysage 16:9. Mise en page : case 1 pleine largeur, case 2 pleine largeur, case 3
+> pleine largeur, puis les cases 4, 5 et 6 de même taille côte à côte (effet de « ralenti » :
+> même cadrage, une seule chose change à chaque case).
+
+**Case 1** — Vue depuis l'INTÉRIEUR du taxi, à travers le pare-brise : au premier plan, les
+mains gantées de noir du chauffeur sur le volant. Kaï, au milieu de la route de la corniche,
+sac à dos, téléphone à la main, les yeux écarquillés, est pris dans la lumière des phares.
 - Onomatopée : « TUUUT ! »
 
-**Case 2** — Action. Kaï saute de côté, le taxi le frôle, flou de vitesse, son téléphone
-manque de lui échapper.
+**Case 2** — Vue de DERRIÈRE le taxi : il braque violemment vers la gauche (fumée de pneus,
+traces noires sur la route). Kaï plonge vers la droite, vers le trottoir côté immeubles,
+téléphone toujours en main.
 - Onomatopée : « VRAOOOM »
 
-**Case 3** — Kaï à genoux sur le trottoir. Le chauffeur passe la tête par la fenêtre en s'éloignant.
+**Case 3** — Kaï à genoux sur le trottoir de droite, la main au sol, son sac tombé à côté de
+lui ; le taxi s'éloigne, le chauffeur (gants noirs) se retourne et crie.
 - Chauffeur : « Hé, petit ! On dort debout ?! »
 - Kaï : « Pardon, tonton ! »
 
-**Case 4** — Kaï se relève. Derrière lui, un grand panneau publicitaire clignote en violet,
-les lettres se brouillent comme un bug. Il ne le voit pas encore.
+**Case 4** — Kaï s'est relevé au même endroit, sac sur l'épaule ; il finit d'épousseter son
+genou et regarde de travers le panneau publicitaire devant lui, sur le même trottoir, qui
+glitche en violet.
 - Onomatopée (petite) : « bzzt »
+- Kaï : « Hein… ? »
 
-**Case 5** — Kaï se retourne vers le panneau : il est normal. Il se frotte les yeux.
+**Case 5** — Même cadrage. Kaï, de dos, se frotte les yeux des deux mains ; le panneau
+glitche toujours en violet.
+- Kaï (murmure) : « C'est quoi ce bug… ? »
+
+**Case 6** — Même cadrage. Kaï a baissé les mains et fixe le panneau, redevenu une pub
+normale de plage (palmier, mer turquoise).
 - Pensée de Kaï : « … Faut vraiment que je dorme. »
 
 ## PAGE 3 — La chambre, la révision (5 cases)
