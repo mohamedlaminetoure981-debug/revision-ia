@@ -287,12 +287,18 @@ export async function render(el) {
   };
   // --- 🧪 Test des formules : les chaînes difficiles de npm run verifier-maths, rendues comme dans l'appli ---
   $('#t-maths').onclick = async () => {
-    const [{ MATH_TESTS }, { checkMath }, { default: katex }] = await Promise.all([import('../core/math-tests.js'), import('../core/mathcheck.js'), import('katex'), preloadMath()]);
+    const [{ MATH_TESTS }, { checkMath, checkSpacing }, { default: katex }] = await Promise.all([import('../core/math-tests.js'), import('../core/mathcheck.js'), import('katex'), preloadMath()]);
     let fails = 0;
     const rows = MATH_TESTS.map((x) => {
       const { fixed, errors } = checkMath(x.input, katex);
       for (const e of x.expect || []) if (!fixed.includes(e)) errors.push(`attendu : « ${e} »`);
       for (const e of x.avoid || []) if (fixed.includes(e)) errors.push(`à éviter : « ${e} »`);
+      // Texte AFFICHÉ (vrai DOM de l'appli) : une espace entre le mot et la formule, avant et après
+      const probe = document.createElement('div');
+      for (const block of [true, false]) {
+        probe.innerHTML = block ? rich(x.input) : mathText(x.input);
+        for (const e of checkSpacing(probe, block ? x.shown || [] : [])) errors.push(`affichage ${block ? 'long' : 'court'} : ${e}`);
+      }
       if (errors.length) fails++;
       return `<div class="tile" style="margin-bottom:8px;${errors.length ? 'border-color:var(--bad)' : ''}">
         <div class="tiny muted">${errors.length ? '✗' : '✓'} ${esc(x.name)}</div>
@@ -304,7 +310,7 @@ export async function render(el) {
       </div>`;
     }).join('');
     modal(`<h3>🧪 Test des formules (${MATH_TESTS.length - fails}/${MATH_TESTS.length} ✓)</h3>
-      <p class="tiny muted">Chaque chaîne difficile est réparée puis affichée comme dans l'appli : d'abord en texte long (résumé, fiche), puis en citation de la source. Aucune formule ne doit être en rouge, coupée ou en italique collé.</p>
+      <p class="tiny muted">Chaque chaîne difficile est réparée puis affichée comme dans l'appli : d'abord en texte long (résumé, fiche), puis en citation de la source. Aucune formule ne doit être en rouge, coupée ou en italique collé, et il doit y avoir une espace entre un mot et une formule (avant et après, sauf avant « , . ) »).</p>
       ${rows}<button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };
   // --- BD : quelles cases ont leur illustration (public/story/…) ---

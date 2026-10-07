@@ -1146,6 +1146,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.21.3** : la page Panneau créateur → 🧪 Test des formules contrôle aussi les espaces autour des
+  formules dans le vrai affichage de l'appli (texte long et court) et contient les chaînes réelles
+  des espaces perdus (« un réel q », « Pour q ≠ 1 », « de u_n à u_{n+1} »…).
 - ✅ **v1.21.2** : **espaces autour des formules**. Cause : l'espace existait dans le texte mais les lettres
   italiques de KaTeX « mangeaient » visuellement l'espace avant la formule (citations en italique
   surtout). Corrections : chaque formule en ligne a une marge (`.mi`, sauf après « ( » et avant « , . ) ») ;
