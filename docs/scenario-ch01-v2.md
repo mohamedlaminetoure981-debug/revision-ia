@@ -51,8 +51,22 @@ violet translucide qui brille comme du verre.
 | 1-2 | La corniche de Conakry (mer, pirogues, rambarde, route, lampadaires, palmiers ; page 2 : un panneau publicitaire numérique sur le trottoir côté immeubles) | coucher du soleil | dorée, qui baisse de case en case (page 2 : lampadaires allumés) |
 | 3 case 1 | escalier de l'immeuble de Kaï | nuit tombée | lampe faible |
 | 3-4 | chambre d'étudiant (lit, bureau, ordi, cahier, ventilateur au plafond, réveil, fenêtre sur Kaloum) | 2 h 47 → 3 h 12 | bleue (écran), puis violette (Oubli), puis seulement les lumières de la ville rallumées à travers la fenêtre |
-| 5-12 | marché de Madina (étals, mangues, tissus wax, motos-taxis, foule) avec un **grand panneau publicitaire au-dessus du carrefour**, toujours visible dans les plans larges | 7 h 40 | plein soleil, ombres nettes ; lueur violette autour de l'Oubli |
+| 5-12 | marché de Madina (étal de mangues, étal de tissus wax, boutiques aux enseignes, motos-taxis, foule, pilier en béton côté droit) avec un **grand panneau publicitaire au-dessus du carrefour**, toujours visible dans les plans larges | 7 h 40 | plein soleil, ombres nettes ; lueur violette autour de l'Oubli |
 | 12 case 5 | un toit qui domine la même rue du marché | 7 h 41 | plein soleil |
+
+### Continuité du marché (pages 5 à 12)
+- **Enseignes** : intactes page 5 case 1 ; la case 2 voit le GRAND PANNEAU se vider ; à partir de la
+  case 3, toutes les enseignes des boutiques sont vides, et elles le restent jusqu'à la page 12
+  (case 1), où les lettres reviennent.
+- **Grand panneau** : intact page 5 case 1, presque effacé page 5 cases 3 à 5, **déchiré** à partir de
+  la page 6 case 1 (l'Oubli en sort) ; il reste déchiré jusqu'à la fin du chapitre.
+- **Étal de mangues** : renversé par la foule à partir de la page 6 case 2 (parasol à terre, mangues sur
+  la route) ; il reste renversé jusqu'à la fin du chapitre.
+- **Étal de tissus wax** : intact tout le chapitre (Kaï ne tombe jamais dedans).
+- **Pilier en béton** d'une boutique du côté droit de la rue (enseigne blanche vide) : fissuré page 7
+  case 5 (Kaï est projeté contre lui) ; caisses en plastique bleues et vertes renversées à son pied.
+- **Positions** : Kaï est plus près du carrefour (donc de l'Oubli) que l'étudiant (pages 6 et 7 case 1).
+  Le sac à dos de Kaï tombe sur la route, près du pilier (page 7 case 5), et n'est plus sur lui ensuite.
 
 ### Style
 Manga shonen moderne pour jeunes adultes, encrage noir épais, cel-shading, action lisible et
@@ -192,72 +206,92 @@ genoux ; son téléphone est au sol, la chaise et le sweat sont toujours par ter
 
 ## PAGE 5 — Madina, les enseignes se vident (5 cases)
 
-**Case 1** — Plan large. Le marché de Madina le matin, la foule, les motos, le grand panneau
-au-dessus du carrefour. Kaï traverse en courant, sac sur le dos.
+> Images en paysage 16:9. La rue du marché : étal de mangues (avec la vendeuse) et étal de
+> tissus wax à gauche, boutiques à droite, motos, foule ; au fond, le **grand panneau
+> publicitaire au-dessus du carrefour**. Plein soleil, Kaï intact (sac à dos, casque autour du cou).
+
+**Case 1** — Plan large. La rue du marché de Madina le matin, la foule, les motos, les étals ;
+au fond, au-dessus du carrefour, le grand panneau publicitaire encore intact. Kaï traverse la rue
+en courant, sac sur le dos.
 - Cartouche : « Le lendemain. 7 h 40. Marché de Madina. »
 - Kaï : « En retard dès le premier jour… bravo, Kaï. »
 
-**Case 2** — Kaï ralentit devant une boutique. L'enseigne se vide lettre par lettre, effet
-glitch violet.
+**Case 2** — Plan large. Kaï s'est arrêté au milieu de la rue, la tête levée vers le GRAND
+PANNEAU du carrefour, qui commence à se vider : l'affiche part en pixels violets et laisse un
+fond jaune uni (ce n'est pas l'enseigne d'une boutique).
 - Onomatopée : « bzzt »
 - Kaï : « Hein… ? »
 
-**Case 3** — Plan moyen. Autour de lui, d'autres enseignes se vident. Des passants lèvent la
-tête, inquiets.
+**Case 3** — Plan large. Toutes les enseignes des boutiques de la rue sont maintenant vides à
+leur tour ; le grand panneau est presque vide. Des passants, inquiets, lèvent les bras et pointent
+le doigt vers le haut. Kaï, de dos, avance vers le carrefour.
 - Passant : « Mais… c'était écrit quoi, là ? »
 
-**Case 4** — La vendeuse derrière son étal de mangues, désemparée, face à un client qui attend.
+**Case 4** — La vendeuse derrière son étal de mangues, désemparée, la main sur la tête, face à
+un client qui tient une mangue. Plus loin, Kaï avance vers le carrefour ; enseignes vides.
 - Vendeuse : « Mes prix… je me souviens plus d'aucun prix ! »
 
-**Case 5** — Gros plan sur Kaï, sueur froide. Il tourne lentement la tête vers le grand
-panneau du carrefour, qui grésille en violet.
+**Case 5** — Gros plan de profil sur Kaï, près du carrefour, sueur froide. Au fond, le grand
+panneau presque entièrement effacé grésille en violet au-dessus de lui.
 - Pensée de Kaï : « Comme cette nuit… »
 
 ## PAGE 6 — L'Oubli surgit (5 cases)
 
-**Case 1** — Grande case. Le grand panneau se déchire de l'intérieur : l'Oubli en sort,
-immense, tentacules déployés, pixels qui se détachent.
+> Kaï est plus près du carrefour (donc de l'Oubli) que l'étudiant. Le panneau reste déchiré
+> jusqu'à la fin du chapitre ; l'étal de mangues est renversé à partir de la case 2.
+
+**Case 1** — Grande case. Au premier plan à droite, Kaï (de dos, sac à dos, main tendue)
+regarde le carrefour : le grand panneau se déchire de l'intérieur, l'Oubli en sort en déchirant
+l'affiche (lambeaux), immense, tentacules déployés, pixels qui se détachent.
 - Onomatopée : « KRRRAAACK ! »
 
-**Case 2** — Panique. La foule fuit dans tous les sens, un étal se renverse, les mangues
-roulent au sol.
+**Case 2** — Panique. La foule fuit dans tous les sens, les vendeuses crient, l'étal de mangues
+est renversé par la foule (parasol à terre, mangues qui roulent sur la route). Kaï reste immobile
+au milieu de la rue.
 - Cri (foule) : « COUREZ !! »
 
-**Case 3** — L'étudiant (lunettes, chemise claire, cahier bleu serré contre lui) trébuche et
-tombe. Son cahier glisse sur le sol.
+**Case 3** — L'étudiant (lunettes, chemise claire) trébuche sur une mangue et s'étale en plein
+élan ; son cahier bleu lui échappe et glisse sur la route. Kaï, plus près du carrefour, est hors champ.
 - Étudiant : « Mon cahier… ! »
 
-**Case 4** — Gros plan. Un tentacule fonce vers l'étudiant à terre, qui lève le bras pour se protéger.
+**Case 4** — Un tentacule fonce vers l'étudiant, assis par terre et de dos, qui lève le bras
+pour se protéger. Kaï, plus près du carrefour, est hors champ.
 - Onomatopée : « FWOOSH »
 
-**Case 5** — Kaï, à quelques mètres, figé. Gros plan sur ses jambes qui tremblent et ses poings serrés.
+**Case 5** — Kaï, figé près du carrefour. Gros plan sur ses jambes qui tremblent et ses poings
+serrés ; autour, l'étal renversé, le parasol, les mangues, la foule qui fuit au fond.
 - Pensée de Kaï : « Bouge… BOUGE ! »
 
 ## PAGE 7 — Le sauvetage et le choc (5 cases)
 
-**Case 1** — Kaï s'élance, vu de profil, en pleine course, poussière sous ses pieds, flou de vitesse.
+**Case 1** — Kaï s'élance depuis le fond de la rue (près du carrefour, sous le panneau déchiré)
+et court vers l'étudiant tombé au premier plan, qui lève le bras ; poussière sous ses pieds, le
+tentacule de l'Oubli fend l'air derrière lui.
 - Onomatopée : « TAP TAP TAP »
 
-**Case 2** — Kaï plonge et percute l'étudiant ; les deux roulent hors de la trajectoire. Le
-tentacule frappe le sol à l'endroit exact où était l'étudiant, le sol se fissure.
+**Case 2** — Kaï attrape l'étudiant par le torse et plonge avec lui vers la droite ; le tentacule
+de l'Oubli frappe le sol à l'endroit exact où était l'étudiant, le sol se fissure.
 - Onomatopée : « BOOM ! »
 - Kaï : « BOUGE !! »
 
-**Case 3** — Le cahier bleu, resté au sol, est touché par le tentacule : ses pages se vident
-en pixels violets. L'étudiant, à genoux derrière Kaï, regarde, horrifié.
+**Case 3** — Gros plan au ras du sol sur le cahier bleu, resté ouvert sur la route : le tentacule
+le touche, ses pages se vident en pixels violets. Derrière, flous, Kaï et l'étudiant allongés par
+terre regardent, horrifiés.
 - Étudiant : « Mon cahier ! Tout est effacé ! »
 
 **Case 4** — Un second tentacule surgit sur le côté et frappe Kaï de plein fouet au flanc.
 - Onomatopée : « BAM ! »
 
-**Case 5** — Kaï est projeté dans un étal de tissus wax colorés et s'effondre dedans ; le
-sac à dos vole et tombe plus loin.
+**Case 5** — Le 2ᵉ tentacule projette Kaï contre le pilier en béton d'une boutique du côté droit
+de la rue (enseigne blanche vide) : le pilier se fissure, les caisses en plastique bleues et
+vertes tombent, son sac à dos tombe sur la route. Kaï ne tombe PAS dans l'étal de tissus wax.
 - Onomatopée : « KRASH »
 
 ## PAGE 8 — Au sol (5 cases)
 
-**Case 1** — Kaï à terre, à moitié enseveli sous les tissus wax, lèvre en sang, manche droite
-déchirée, sonné, il grimace.
+**Case 1** — Kaï à terre, au pied du pilier fissuré de la boutique, parmi les caisses en plastique
+bleues et vertes renversées, lèvre en sang, manche droite déchirée, sonné, il grimace. Son sac à
+dos est un peu plus loin, sur la route.
 - Pensée de Kaï : « J'ai… mal… »
 
 **Case 2** — Gros plan sur le visage de Kaï, terrifié : il essaie de se souvenir de quelque
@@ -277,7 +311,7 @@ concentration.
 
 ## PAGE 9 — Le chronomètre (5 cases)
 
-**Case 1** — L'Oubli lance une vague : toutes les enseignes du marché clignotent en même
+**Case 1** — L'Oubli lance une vague : toutes les enseignes (vides) du marché clignotent en même
 temps en violet. Kaï, toujours au sol, attrape son téléphone et lève les yeux.
 - Onomatopée : « VMMMM »
 
@@ -306,7 +340,7 @@ formule S = u₀ / (1 − q) restée intacte quand tout le reste s'effaçait.
 - Kaï : « 8 + 4 + 2 + 1 + … Une infinité de vagues… mais en un temps FINI. »
 
 **Case 3** — Grande case. Kaï se relève, téléphone en main ; derrière lui, au loin, le grand
-panneau du carrefour.
+panneau déchiré du carrefour.
 - Kaï : « Seize secondes. Il va se condenser à la seizième seconde. Là où il a le plus
   mangé… devant le panneau ! »
 
@@ -339,8 +373,8 @@ s'enfuit vers le ciel.
 
 ## PAGE 12 — Après le combat (5 cases)
 
-**Case 1** — Les lettres reviennent sur les enseignes, la vendeuse retrouve ses prix, le
-cahier bleu de l'étudiant se remplit à nouveau.
+**Case 1** — Les lettres reviennent sur les enseignes, la vendeuse retrouve ses prix (son étal de
+mangues reste renversé), le cahier bleu de l'étudiant se remplit à nouveau.
 - Vendeuse : « La mangue, cinq mille ! Je me souviens !! »
 
 **Case 2** — Kaï à genoux, essoufflé, se tient le poing droit (jointures en sang), grimace.
