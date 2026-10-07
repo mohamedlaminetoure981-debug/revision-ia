@@ -135,7 +135,28 @@ Pourquoi ces blocs :
 
 ---
 
-## 5. Fiche des personnages et décors du chapitre 1
+## 5. Cases « illustration + surimpression » (textes posés par l'appli)
+
+Gemini écrit mal (lettres inventées, mots déformés). Quand une image doit montrer des **mots** (carte avec
+des noms de quartiers, panneau, écran avec des chiffres), on sépare le travail :
+
+1. **L'illustration ne contient AUCUN texte.** Dans le prompt : ACTION décrit seulement les formes (« a realistic
+   map of the Conakry peninsula, coastline, sea, main roads, about ten glowing red dots linked by a thin dotted
+   purple line ») et DO NOT dit « no text, no letters, no numbers, no labels, no legend ».
+2. **Prévoir la place des textes** : des zones calmes (mer, aplat de couleur) près des points à nommer, et le
+   sujet bien au centre (16:9).
+3. **L'appli ajoute les textes** (`labels` dans la case, voir README section 10 septies) : texte clair avec un
+   contour sombre, lisible sur n'importe quelle image ; les dates sont plus petites, rosées, en italique.
+4. **Une fois l'image déposée**, placer chaque texte au bon endroit avec le Panneau créateur → ✏️ Éditer les
+   bulles (glisser ; A− / A+ pour la taille), puis 💾 Enregistrer et déposer `bulles-chapitre-N.json`.
+5. Les textes sont **traduits** comme les bulles (`npm run traduire -- en`).
+
+Exemple : chapitre 2, page 4 case 2 (carte de Conakry sur la tablette de Mory : 7 quartiers + 4 dates).
+Dans le Panneau créateur → « 🖼️ Illustrations des cases », ces cases sont marquées 🏷️.
+
+---
+
+## 6. Fiche des personnages et décors du chapitre 1
 
 ### Personnages
 

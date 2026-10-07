@@ -1146,6 +1146,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.20.2** : contrôles du chapitre 2 (`verifier-bulles -- 2` : aucun problème), Panneau créateur
+  (cases à illustrer, écrans 📱, dessins 📓 et cases 🏷️ « illustration + surimpression »), section
+  « illustration + surimpression » dans `docs/methode-illustration.md`.
 - ✅ **v1.20.1** : **textes en surimpression** sur une illustration (`labels` dans une case : noms,
   dates…), style écran de tablette (texte clair, contour sombre), déplaçables et redimensionnables
   avec l'éditeur de bulles (enregistrés dans `bulles-chapitre-N.json`), traduits comme les bulles et
