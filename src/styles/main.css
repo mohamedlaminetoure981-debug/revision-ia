@@ -219,6 +219,11 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--n
 /* Formules : fractions, sommes et limites en ligne en grand (\displaystyle) pour rester lisibles sur
    téléphone ; formule invalide (après réparation) en texte simple lisible, jamais en code rouge. */
 .math-tall { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: middle; padding: 3px 0; }
+/* Espace visible autour d'une formule en ligne (les lettres italiques de KaTeX mangeaient l'espace avant) ;
+   pas de marge après une ouverture « ( » ni avant une ponctuation « , . ) ». */
+.mi { margin: 0 .16em; }
+.mi-l0 { margin-left: 0; }
+.mi-r0 { margin-right: 0; }
 .math-plain { font-style: normal; white-space: normal; }
 .explain { position: relative; border: 1.5px dashed var(--neon-pink); background: color-mix(in srgb, var(--neon-pink) 10%, transparent); border-radius: 18px; padding: 12px 14px; margin: 12px 0; }
 .explain .tag { font-family: var(--font-display); font-size: .72rem; letter-spacing: .05em; color: var(--neon-pink); text-transform: uppercase; margin-bottom: 4px; }

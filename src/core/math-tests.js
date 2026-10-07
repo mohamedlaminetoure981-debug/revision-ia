@@ -6,11 +6,23 @@
 //   input  : texte tel que l'IA (ou un ancien cours enregistré) peut le donner
 //   expect : morceaux qui doivent se trouver dans le texte réparé (facultatif)
 //   avoid  : morceaux qui ne doivent PAS s'y trouver (facultatif)
+//   shown  : morceaux qui doivent se lire dans le TEXTE AFFICHÉ (espaces avant/après les formules)
 // Les caractères de contrôle (\t, \f, \n, \r, \b) imitent les commandes abîmées
 // par les échappements JSON (\times → tabulation + « imes »…).
 // =====================================================================
 
 export const MATH_TESTS = [
+  // --- Espaces autour des formules (texte affiché, vrai DOM) ---
+  { name: 'Espaces : « un réel q »', input: "s'il existe un réel $q$ tel que pour tout entier naturel $n$", shown: ["un réel ⟦q⟧ tel que", "entier naturel ⟦n⟧"] },
+  { name: 'Espaces : « terme u₀ et de raison q »', input: 'de premier terme $u_0$ et de raison $q$, alors', shown: ['premier terme ⟦u_0⟧ et de raison ⟦q⟧, alors'] },
+  { name: 'Espaces : « Pour q ≠ 1 », « des n+1 premiers »', input: 'Pour $q \\neq 1$, la somme des $n+1$ premiers termes', shown: ['Pour ⟦q \\neq 1⟧, la somme des ⟦n+1⟧ premiers termes'] },
+  { name: 'Espaces : Si q = 1 / |q| < 1 / (avec uₙ ≠ 0)', input: 'Si $q = 1$, la suite est constante. Lorsque $|q| < 1$, la somme est finie (avec $u_n \\neq 0$) et plus généralement $u_n = u_p \\times q^{n-p}$', shown: ['Si ⟦q = 1⟧, la suite', 'Lorsque ⟦|q| < 1⟧, la somme', '(avec ⟦u_n \\neq 0⟧) et plus généralement ⟦u_n = u_p \\times q^{n-p}⟧'] },
+  { name: 'Mot « à » hors de la formule', input: 'on passe de $u_n$ à $u_{n+1}$', expect: ['$u_n$ à $u_{n+1}$'], shown: ['de ⟦u_n⟧ à ⟦u_{n+1}⟧'] },
+  { name: 'Mot « à » DANS la formule', input: 'on passe de $u_n à u_{n+1}$', expect: ['$u_n$ à $u_{n+1}$'], shown: ['de ⟦u_n⟧ à ⟦u_{n+1}⟧'] },
+  { name: 'Mots « et », « ou » dans la formule', input: 'si $a et b$ ou $c ou d$ alors', expect: ['$a$ et $b$', '$c$ ou $d$'] },
+  { name: 'Mot collé au $ (avant)', input: 'un réel$q$ de raison$q$ et', shown: ['un réel ⟦q⟧ de raison ⟦q⟧ et'] },
+  { name: 'Mot collé au $ (après)', input: 'le terme $u_0$est donné et $q$tel que', shown: ['⟦u_0⟧ est donné et ⟦q⟧ tel que'] },
+  { name: 'Sans espace : (u_n), $q$, $x$.', input: 'La suite ($u_n$) vérifie $q$, puis $x$. Et « $y$ »', shown: ['(⟦u_n⟧) vérifie ⟦q⟧, puis ⟦x⟧. Et « ⟦y⟧ »'] },
   // --- Les erreurs réelles observées (cours « suites géométriques ») ---
   {
     name: '1. « $ » manquant au début (u_n$)',

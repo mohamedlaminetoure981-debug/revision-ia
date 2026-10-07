@@ -1146,6 +1146,13 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.21.2** : **espaces autour des formules**. Cause : l'espace existait dans le texte mais les lettres
+  italiques de KaTeX « mangeaient » visuellement l'espace avant la formule (citations en italique
+  surtout). Corrections : chaque formule en ligne a une marge (`.mi`, sauf après « ( » et avant « , . ) ») ;
+  si l'IA colle un mot au « $ » (« réel$q$ »), l'espace est ajoutée ; un petit mot français coincé dans
+  une formule (« $u_n à u_{n+1}$ », et, ou, donc, si…) ressort de la formule. Rendu partagé :
+  `src/core/mathrender.js`. `npm run verifier-maths` contrôle maintenant aussi le texte affiché dans
+  un vrai DOM (jsdom, outil de test seulement).
 - ✅ **v1.21.1** : contrôles des formules : `npm run verifier-maths` (52 chaînes difficiles : erreurs
   réelles, fractions imbriquées, sommes, limites, ℕ, racines, %, 1,04, espaces insécables, JSON mal
   échappé) et Panneau créateur → **🧪 Test des formules** (les mêmes chaînes rendues, à vérifier à l'œil).

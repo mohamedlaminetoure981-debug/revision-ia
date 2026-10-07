@@ -190,13 +190,16 @@ function fixInside(t) {
 // Découpage texte / formule : retrouver le « $ » fautif
 // ---------------------------------------------------------------------
 const STRONG = /[_^\\{}=<>≤≥≠∈∉ℕℤℚℝℂ∞∑√×÷→]|\d\s*[+\-*/]\s*\d/;
-const FR_SHORT = new Set(['et', 'ou', 'si', 'on', 'de', 'la', 'le', 'les', 'un', 'une', 'en', 'au', 'du', 'ne', 'est', 'il', 'pour', 'tout', 'donc', 'avec', 'par', 'que', 'qui', 'des', 'sa', 'son', 'se', 'sur', 'a']);
+const FR_SHORT = new Set(['et', 'ou', 'si', 'on', 'de', 'la', 'le', 'les', 'un', 'une', 'en', 'au', 'du', 'ne', 'est', 'il', 'pour', 'tout', 'donc', 'avec', 'par', 'que', 'qui', 'des', 'sa', 'son', 'se', 'sur', 'a', 'à', 'où', 'alors', 'car', 'mais', 'ni', 'soit', 'sont', 'sans', 'dans', 'tel', 'telle', 'puis', 'quand', 'lorsque', 'ainsi', 'vers', 'entre']);
+// Petits mots français qui, seuls entre deux expressions mathématiques (« $u_n à u_{n+1}$ »), sortent de la formule.
+// « a », « de », « un » restent : ce peuvent être des variables ou des suites (a, u_n…).
+const GLUE_WORDS = ['à', 'et', 'ou', 'où', 'donc', 'si', 'alors', 'car', 'mais', 'ni', 'soit', 'sont', 'est', 'pour', 'avec', 'sans', 'dans', 'sur', 'par', 'tel', 'telle', 'puis', 'quand', 'lorsque', 'ainsi', 'vers', 'entre', 'que', 'qui'];
 
 /** Mots français présents dans un morceau (hors \text{…} et hors commandes LaTeX). */
 export function frenchWords(piece) {
   const t = piece.replace(/\\(?:text|mathrm|textbf|textit|operatorname|mbox)\s*\{[^{}]*\}/g, ' ').replace(/\\[A-Za-z]+/g, ' ');
   return (t.match(/[A-Za-zÀ-ÖØ-öø-ÿœŒ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g) || [])
-    .filter((w) => (w.length >= 2 && !MATH_WORDS.has(w)) || (w === 'a' && false));
+    .filter((w) => (w.length >= 2 && !MATH_WORDS.has(w)) || /^[àâéèêôùûçÀ]$/.test(w));
 }
 
 /** 'text' (contient du français), 'math' (formule) ou 'neutral' (espaces, signes, lettre isolée). */
@@ -204,12 +207,34 @@ function classify(piece) {
   const words = frenchWords(piece);
   const strong = STRONG.test(piece);
   if (words.length) {
+    // « a et b », « u_n à u_{n+1} » : seulement de petits mots de liaison → formule (le mot ressortira : splitGlue)
+    if (words.every((w) => GLUE_WORDS.includes(w.toLowerCase())) && /[A-Za-z0-9\\)}]\s+\S+\s+[A-Za-z0-9\\({|]/.test(piece)) return 'math';
     // « x le 3 » : un seul mot ambigu au milieu d'une formule → c'est \le
     if (strong && words.every((w) => LOST_AMBIG.includes(w)) && words.length === 1) return 'math';
     if (words.length >= 2 || words.some((w) => w.length >= 3 || FR_SHORT.has(w.toLowerCase()))) return 'text';
   }
   if (strong) return 'math';
   return /[A-Za-z0-9]/.test(piece) && piece.trim().length <= 3 && /^[\s\d+\-*/().,=A-Za-z]*$/.test(piece) ? 'neutral' : (piece.trim() ? 'neutral' : 'empty');
+}
+
+/**
+ * Une « formule » où un petit mot français sépare deux expressions (« u_n à u_{n+1} ») :
+ * le mot ressort → « $u_n$ à $u_{n+1}$ ». Les \text{…} ne sont pas touchés.
+ */
+function splitGlue(tex) {
+  const kept = [];
+  const t = tex.replace(/\\(?:text|mathrm|textbf|textit|operatorname|mbox)\s*\{[^{}]*\}/g, (m) => `\u0001${kept.push(m) - 1}\u0001`);
+  const re = new RegExp(`(?<=[\\w})\\]|]) +(${GLUE_WORDS.join('|')}) +(?=[\\w\\\\({|\\u0001])`, 'gi');
+  if (!re.test(t)) return `$${fixInside(tex)}$`;
+  const parts = t.split(new RegExp(` +(?:${GLUE_WORDS.join('|')}) +(?=[\\w\\\\({|\\u0001])`, 'i'));
+  const words = [...t.matchAll(new RegExp(` +(${GLUE_WORDS.join('|')}) +(?=[\\w\\\\({|\\u0001])`, 'gi'))].map((m) => m[1]);
+  let out = '';
+  parts.forEach((p, k) => {
+    const piece = p.replace(/\u0001(\d+)\u0001/g, (_, i) => kept[i]).trim();
+    if (piece) out += `$${fixInside(piece)}$`;
+    if (k < words.length) out += ` ${words[k]} `;
+  });
+  return out;
 }
 
 /**
@@ -245,7 +270,7 @@ function repairLine(line) {
     while (j < pieces.length && lab[j] === lab[i]) buf += pieces[j++];
     if (lab[i] === 'math' && buf.trim()) {
       const lead = buf.match(/^\s*/)[0]; const trail = buf.match(/\s*$/)[0];
-      out += `${lead}$${fixInside(buf.trim())}$${trail}`;
+      out += `${lead}${splitGlue(buf.trim())}${trail}`;
     } else out += fixOutside(buf);
     i = j;
   }

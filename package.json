@@ -1,7 +1,7 @@
 {
   "name": "revision-ia",
   "private": true,
-  "version": "1.21.1",
+  "version": "1.21.2",
   "type": "module",
   "description": "Application de révision avec IA (PWA) – La Jeunesse de 2026",
   "scripts": {
@@ -15,6 +15,7 @@
     "verifier-maths": "node scripts/verifier-maths.mjs"
   },
   "devDependencies": {
+    "jsdom": "^29.1.1",
     "sharp": "^0.35.5",
     "vite": "^8.3.1"
   },

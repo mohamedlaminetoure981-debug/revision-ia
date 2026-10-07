@@ -19,7 +19,8 @@ import { characterHTML, play, setExpression, speak } from './character.js';
 import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { voice, playSfx } from './sfx.js';
-import { normalizeMath, mathSegments, isTallMath, safeTex, texToText } from '../core/mathfix.js';
+import { normalizeMath, texToText } from '../core/mathfix.js';
+import { formulaHTML, renderMathText as renderMath2 } from '../core/mathrender.js';
 import { t, locale } from '../i18n/index.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
@@ -42,14 +43,6 @@ export function esc(s) {
 let katex = null;
 let katexLoading = null;
 
-/** KaTeX strict : renvoie le HTML, ou null si la formule est invalide (même après une version prudente). */
-function katexHTML(tex, display) {
-  for (const t of [tex, safeTex(tex)]) {
-    try { return katex.renderToString(t, { displayMode: display, throwOnError: true, strict: 'ignore', output: 'html' }); } catch { /* essai suivant */ }
-  }
-  return null;
-}
-
 /** Formule invalide ou KaTeX pas encore chargé : texte lisible (u₀ × qⁿ), jamais du code rouge. */
 const plainMath = (tex) => `<span class="math-plain">${esc(texToText(tex))}</span>`;
 
@@ -71,10 +64,7 @@ function renderMath(tex, display) {
     preloadMath();
     return `<span class="math-pending" data-tex="${esc(tex)}" data-display="${display ? 1 : 0}">${plainMath(tex)}</span>`;
   }
-  const t = !display && isTallMath(tex) ? `\\displaystyle ${tex}` : tex;
-  const html = katexHTML(t, display);
-  if (!html) return plainMath(tex);
-  return display || t === tex ? html : `<span class="math-tall">${html}</span>`;
+  return formulaHTML(katex, tex, display) ?? plainMath(tex);
 }
 
 /** Formule LaTeX en ligne (pour la BD : formule écrite à la main sur une illustration). */
@@ -91,13 +81,7 @@ export const mathInline = (tex) => renderMath(normalizeMath(`$${tex}$`).replace(
  * @returns {{ html: string, saved: string[] }} texte avec repères \u0000n\u0000 + formules rendues
  */
 export function renderMathText(text, block = false) {
-  const saved = [];
-  const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
-  let s = normalizeMath(text);
-  // Une formule haute seule sur sa ligne (fraction, somme, limite) : centrée, en grand.
-  if (block) s = s.replace(/^[ \t]*\$([^$\n]+)\$[ \t]*([.,;:]?)[ \t]*$/gm, (m, t, p) => (isTallMath(t) ? `$$${t}${p === '.' || p === ',' ? `\\,${p}` : ''}$$` : m));
-  s = mathSegments(s).map((seg) => (seg.text !== undefined ? seg.text : keep(renderMath(seg.tex, block && seg.display)))).join('');
-  return { html: s, saved };
+  return renderMath2(text, block, renderMath);
 }
 const restore = (html, saved) => html.replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
 

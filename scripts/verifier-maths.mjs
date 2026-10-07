@@ -11,15 +11,25 @@
 
 import katex from 'katex';
 import { MATH_TESTS } from '../src/core/math-tests.js';
-import { checkMath } from '../src/core/mathcheck.js';
+import { checkMath, checkSpacing } from '../src/core/mathcheck.js';
+import { renderMathText, formulaHTML } from '../src/core/mathrender.js';
+import { JSDOM } from 'jsdom';
 import { parseJsonLatex, latexToText } from '../src/core/mathfix.js';
 
 const verbose = process.argv.includes('-v');
+// Rendu EXACTEMENT comme dans l'appli (renderMathText), puis lu dans un vrai DOM (jsdom).
+const renderDom = (text, block) => {
+  const { html, saved } = renderMathText(text, block, (tex, display) => formulaHTML(katex, tex, display) ?? `<span class="math-plain">${tex}</span>`);
+  const dom = new JSDOM(`<div id="r">${html.replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i])}</div>`);
+  return dom.window.document.getElementById('r');
+};
 let fails = 0;
 for (const t of MATH_TESTS) {
   const { fixed, errors } = checkMath(t.input, katex);
   for (const e of t.expect || []) if (!fixed.includes(e)) errors.push(`attendu : « ${e} »`);
   for (const e of t.avoid || []) if (fixed.includes(e)) errors.push(`à éviter : « ${e} »`);
+  // Texte affiché : espaces avant/après chaque formule, en texte long (rich) et en texte court (mathText).
+  for (const block of [true, false]) for (const e of checkSpacing(renderDom(t.input, block), block ? t.shown || [] : [])) errors.push(`affichage ${block ? 'long' : 'court'} : ${e}`);
   if (errors.length) fails++;
   console.log(`${errors.length ? '✗' : '✓'} ${t.name}`);
   if (errors.length || verbose) {
