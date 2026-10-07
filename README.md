@@ -970,6 +970,10 @@ protégées sont alors les visages des persos dessinés.
   case 5 pour la seule ligne du cahier qui reste intacte.
 - **Typographie** : une espace insécable est mise automatiquement avant `? ! : ;` dans tous les
   textes affichés de la BD (`src/data/comic/index.js`) : le signe ne reste jamais seul en début de ligne.
+- Pages 5 à 7 : voir la section « Continuité du marché » de `docs/scenario-ch01-v2.md` (grand panneau
+  qui se vide puis déchiré, enseignes vides jusqu'à la page 12, étal de mangues renversé, étal wax
+  intact, pilier en béton fissuré). Astuce : les images des cases illustrées n'ont pas besoin d'effets
+  dessinés par-dessus (glitch, lignes de vitesse) : ils sont dans l'image.
 - Pages 3 et 4 : à la maison, Kaï porte un t-shirt gris foncé ; son sweat violet est sur le dossier
   de la chaise (renversée page 4 case 5), son casque sur le bureau, son sac accroché au mur ; plus de
   « lampadaire orange » : la chambre n'est éclairée que par les lumières de la ville rallumées.
@@ -1127,6 +1131,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.3** : 15 illustrations de plus (pages 5 à 7 du chapitre 1, soit 34 images sur 54) ; scénario
+  des pages 5 à 8 ajusté (grand panneau qui se vide, enseignes vides, étal de mangues renversé,
+  Kaï projeté contre le pilier en béton et non dans l'étal wax) ; bible de continuité du marché ;
+  cadrage et bulles contrôlés (`verifier-bulles` : aucun problème).
 - ✅ **v1.19.2** : 9 illustrations de plus (pages 3 et 4 du chapitre 1) ; onomatopées « vvvvv… » et
   « CLAC ! » ; formule KaTeX écrite à la main sur le cahier (page 4 case 5) ; cases dessinées par
   l'appli marquées dans le Panneau créateur ; espace insécable avant ? ! : ; dans la BD.
