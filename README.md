@@ -1133,6 +1133,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.5** : **chapitre 1 entièrement illustré** (20 illustrations de plus : pages 8 à 12, soit 54 images
+  sur 54 ; les 7 autres cases sont dessinées par l'appli : écrans de téléphone et cahier). Scénario
+  mis à jour (`docs/scenario-ch01-v2.md`) : règle « une fois condensé, l'Oubli devient solide et lourd,
+  donc il tombe ». Cadrage, bulles, pensées et onomatopées des pages 8 à 12 recalés sur les images
+  (`verifier-bulles` : aucun problème ; `verifier-nettete` : toutes nettes) ; dernière rangée de la
+  page 11 agrandie pour garder Kaï et l'Oubli dans la case 5. Nouveau guide : `docs/methode-illustration.md`.
 - ✅ **v1.19.4** : illustrations de la BD nettes dans l'appli. Le lecteur choisissait un fichier trop petit
   (il ignorait que l'image dépasse de la case étroite, ×1,6 à ×2,4) : il compte maintenant la largeur
   réelle de l'image et les écrans jusqu'à ×3. Qualité WebP 85, plus grande version = taille native de
