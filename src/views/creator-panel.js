@@ -298,7 +298,7 @@ export async function render(el) {
       let screens = 0;
       ch.pages.forEach((page, p) => (page.panels || []).forEach((panel, c) => {
         // Écran de téléphone ou cahier dessiné par l'appli : aucune illustration à faire.
-        const own = { ecran: '📱 écran de l\'appli', cahier: '📓 cahier dessiné par l\'appli' }[panel.bg?.id];
+        const own = { ecran: '📱 écran de l\'appli', cahier: '📓 dessin de l\'appli (cahier)', graphe: '📓 dessin de l\'appli (graphe)' }[panel.bg?.id];
         if (own) {
           screens++;
           rows += `<li style="margin:6px 0">${own} (pas d'image) · <b>page ${p + 1}, case ${c + 1}</b>

@@ -1133,6 +1133,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.20.0** : **chapitre 2 réécrit** (« Le signal », version 2 : 12 pages, 58 cases), d'après
+  `docs/scenario-ch02-v2.md` (bible de continuité en tête : main droite bandée de Kaï, règles 6 et 7 de
+  l'Oubli). Descriptions et repères d'illustration pour chaque case ; écrans de téléphone dessinés par
+  l'appli ; deux dessins de l'appli : le graphe du carnet de Mory (décor `graphe`) et le calcul
+  S = 6 / (1 − ½) = 12 en KaTeX. Nouveaux figurants : le prof et le conducteur de moto-taxi. Ancienne
+  traduction anglaise du chapitre 2 retirée (à relancer : `npm run traduire -- en`).
 - ✅ **v1.19.5** : **chapitre 1 entièrement illustré** (20 illustrations de plus : pages 8 à 12, soit 54 images
   sur 54 ; les 7 autres cases sont dessinées par l'appli : écrans de téléphone et cahier). Scénario
   mis à jour (`docs/scenario-ch01-v2.md`) : règle « une fois condensé, l'Oubli devient solide et lourd,

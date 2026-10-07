@@ -41,7 +41,7 @@ export const CHAPTERS = [
   },
   {
     id: 2, emoji: '📡', title: 'Le signal',
-    teaser: 'Un geek de Kaloum traque l’Oubli avec une antenne bricolée.',
+    teaser: 'Le lendemain, personne ne se souvient de Madina. Sauf Mory, qui traque l’Oubli de quartier en quartier.',
     strips: [
       { title: 'Ch. 2 — Mory', panels: [
         c('mory', 'concentration', 'Encore 3 Mo… allez… cette connexion ne m’arrêtera pas !', 'Salle des serveurs', 'BIP BIP'),

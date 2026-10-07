@@ -519,8 +519,16 @@ function carte(w, h, o) {
   const P = (x, y) => `${f(w * x)},${f(h * y)}`;
   s += `<path d="M${P(0.94, 0.2)} L${P(0.62, 0.22)} Q${P(0.5, 0.3)} ${P(0.42, 0.42)} L${P(0.22, 0.7)} Q${P(0.16, 0.78)} ${P(0.2, 0.82)} Q${P(0.27, 0.8)} ${P(0.34, 0.68)} L${P(0.52, 0.48)} Q${P(0.62, 0.4)} ${P(0.94, 0.42)} Z" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2.5"/>
     <path d="M${P(0.3, 0.62)} L${P(0.6, 0.32)} M${P(0.45, 0.6)} L${P(0.8, 0.3)}" stroke="#22d3ee" stroke-width="1.4" opacity=".4"/>
-    <text x="${f(w * 0.2)}" y="${f(h * 0.9 - 8)}" font-family="monospace" font-size="${f(h * 0.045)}" fill="#22d3ee">KALOUM</text>
-    <text x="${f(w * 0.09)}" y="${f(h * 0.14)}" font-family="monospace" font-size="${f(h * 0.05)}" fill="#8be9ff">${esc(o.text || 'OUBLI · ATTAQUES · 7 JOURS')}</text>`;
+    ${o.bare ? '' : `<text x="${f(w * 0.2)}" y="${f(h * 0.9 - 8)}" font-family="monospace" font-size="${f(h * 0.045)}" fill="#22d3ee">KALOUM</text>
+    <text x="${f(w * 0.09)}" y="${f(h * 0.14)}" font-family="monospace" font-size="${f(h * 0.05)}" fill="#8be9ff">${esc(o.text || 'OUBLI · ATTAQUES · 7 JOURS')}</text>`}`;
+  // Points d'attaque placés à la main (rouges, reliés par un pointillé violet) + prochaine cible
+  if (o.points) {
+    const pts = o.points.map(([x, y]) => [w * x, h * y]);
+    s += `<path d="M${pts.map((q) => q.map(f).join(',')).join(' L')}" fill="none" stroke="#c084fc" stroke-width="2.5" stroke-dasharray="6 6" opacity=".9"/>`;
+    for (const [x, y] of pts) s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(h * 0.045)}" fill="#ff3d5a" opacity=".25"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(h * 0.018)}" fill="#ff3d5a" stroke="#ffd0d6" stroke-width="1.5"/>`;
+    if (o.next) s += `<circle cx="${f(w * o.next[0])}" cy="${f(h * o.next[1])}" r="${f(h * 0.03)}" fill="none" stroke="#ff8a9a" stroke-width="2" stroke-dasharray="4 4"/>`;
+    return s;
+  }
   // Points d'attaque (violet) + cible principale (pulsation)
   for (let i = 0; i < (o.spots ?? 7); i++) {
     const t = r(); const x = 0.24 + t * 0.6; const y = 0.72 - t * 0.42 + (r() - 0.5) * 0.08;
@@ -604,7 +612,39 @@ function cahier(w, h, o) {
   return s;
 }
 
-export const DECORS = { corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene, cahier };
+/**
+ * Graphe dessiné à la main dans un carnet (dessin de l'appli, pas d'illustration).
+ *   nodes : [{ name, x, y, red }]  sommets (x, y en fractions de la case ; red = entouré en rouge)
+ *   edges : [[i, j], …]            arêtes (numéros des sommets)
+ */
+function graphe(w, h, o) {
+  const r = rng(o.seed || 23);
+  const nodes = o.nodes || [];
+  const step = Math.max(18, h / 10);
+  let s = `<rect width="${w}" height="${h}" fill="#f4f1e8"/>`;
+  for (let x = step; x < w; x += step) s += `<path d="M${f(x)},0 V${f(h)}" stroke="#c9d9ec" stroke-width="1"/>`;
+  for (let y = step; y < h; y += step) s += `<path d="M0,${f(y)} H${f(w)}" stroke="#c9d9ec" stroke-width="1"/>`;
+  const P = (n) => [w * n.x, h * n.y];
+  const ink = '#1d3a8a';
+  // Arêtes : traits à main levée (légère courbe)
+  for (const [a, b] of o.edges || []) {
+    const [x1, y1] = P(nodes[a]); const [x2, y2] = P(nodes[b]);
+    const mx = (x1 + x2) / 2 + (r() - 0.5) * w * 0.03; const my = (y1 + y2) / 2 + (r() - 0.5) * h * 0.03;
+    s += `<path d="M${f(x1)},${f(y1)} Q${f(mx)},${f(my)} ${f(x2)},${f(y2)}" fill="none" stroke="${ink}" stroke-width="${f(Math.max(2, w * 0.006))}" stroke-linecap="round" opacity=".85"/>`;
+  }
+  const size = Math.max(11, Math.min(w * 0.045, h * 0.06));
+  for (const n of nodes) {
+    const [x, y] = P(n);
+    const R = size * 0.45;
+    s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R)}" fill="${ink}"/>`;
+    if (n.red) s += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(R * 2.3)}" ry="${f(R * 2)}" fill="none" stroke="#d6202e" stroke-width="${f(Math.max(2, size * 0.16))}" transform="rotate(${f((r() - 0.5) * 30)} ${f(x)} ${f(y)})"/>`;
+    const below = n.y < 0.5 ? -1 : 1;
+    s += `<text x="${f(x)}" y="${f(y + below * size * 1.35 + (below > 0 ? size * 0.35 : 0))}" text-anchor="middle" font-family="'Comic Sans MS','Segoe Print',cursive" font-size="${f(size)}" font-weight="700" fill="${ink}" transform="rotate(-2 ${f(x)} ${f(y)})">${esc(n.name)}</text>`;
+  }
+  return s;
+}
+
+export const DECORS = { graphe, corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene, cahier };
 
 /** Dessine un décor (inconnu → aplat). */
 export function decorSVG(name, w, h, o = {}) {
