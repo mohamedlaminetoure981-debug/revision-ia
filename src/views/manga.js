@@ -16,6 +16,7 @@ import { esc, line, sourceHtml, showError, toast, mathText } from '../ui/ui.js';
 import { sound, vibrate, onomatopoeia, celebrate } from '../ui/fx.js';
 import { stripSVG, stripToPng } from '../ui/manga.js';
 import { shareImage, fileName } from '../ui/share.js';
+import { latexToText } from '../core/mathfix.js';
 import { getOrGenerateManga, cachedManga, notionOf } from '../core/manga.js';
 import { addXp, XP_RULES } from '../core/game.js';
 import { t } from '../i18n/index.js';
@@ -119,7 +120,7 @@ export async function render(el, [courseId, idx = '0']) {
     b.textContent = t('⏳ Image en préparation…');
     try {
       const png = await stripToPng(strip, { subtitle: course.subject });
-      const r = await shareImage(png, fileName('manga', strip.title), `📖 ${strip.title} ${t("— révisé en manga avec Révision IA")}`);
+      const r = await shareImage(png, fileName('manga', latexToText(strip.title)), `📖 ${latexToText(strip.title)} ${t("— révisé en manga avec Révision IA")}`);
       if (r === 'shared') say.textContent = line('nia', 'manga_partage');
     } catch (e) {
       toast(t('Impossible de créer l’image sur ce téléphone.'), 'error');

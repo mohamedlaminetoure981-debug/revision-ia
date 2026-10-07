@@ -162,11 +162,12 @@ const goodQuestion = (q) => q && Array.isArray(q.choices) && q.choices.length >=
 async function saveCards(course, pages, i, cards, status) {
   if (await db.getSetting('verifyMode')) cards = await verifyCards(course, pages, cards, status);
   const now = new Date().toISOString();
-  await db.putMany('cards', cards.map((c) => ({
+  await db.putMany('cards', cards.map((c, idx) => ({
     id: db.newId(),
     courseId: course.id,
     subject: course.subject,
     chunk: i,
+    order: idx, // ordre de l'IA = ordre du cours (l'identifiant, aléatoire, ne le garde pas)
     part: c.part,
     question: c.question,
     answer: c.answer,

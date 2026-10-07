@@ -11,12 +11,20 @@
 
 import LZString from 'lz-string';
 import * as db from './db.js';
+import { latexToText } from './mathfix.js';
 
 const EXPLAIN_MAX = 160; // explications raccourcies : lien plus court
 const VERSION = 1;
 
 /** Nettoie un texte (espaces en trop) et le coupe. */
-const cut = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
+const cut = (s, n) => {
+  let t = String(s || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= n) return t;
+  t = t.slice(0, n);
+  // Jamais une formule coupée en deux (un « $ » seul casserait tout le texte chez l'ami)
+  if ((t.match(/(?<!\\)\$/g) || []).length % 2) t = t.slice(0, t.lastIndexOf('$')).replace(/\$$/, '');
+  return `${t.trimEnd()}…`;
+};
 
 /**
  * Crée les données d'un duel.
@@ -62,7 +70,7 @@ export function duelLink(duel) {
 
 /** Message accrocheur pour WhatsApp. */
 export function duelMessage(duel) {
-  const t = duel.ti || duel.su || 'ce quiz';
+  const t = latexToText(duel.ti || duel.su || 'ce quiz');
   const total = duel.q.length;
   if (duel.r) {
     return duel.s > duel.r.score

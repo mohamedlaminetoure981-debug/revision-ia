@@ -1146,6 +1146,16 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.21.0** : **chaîne des formules réparée de bout en bout**. Une seule fonction centrale de
+  rendu (`renderMathText` dans `src/ui/ui.js`, utilisée par `rich()`, `mathText()` et les citations de
+  la source). Avant l'affichage, `normalizeMath` (`src/core/mathfix.js`) répare : « $ » déséquilibrés
+  et formules qui contiennent du français (le découpage est refait), commandes sans barre oblique
+  (in → \in, times, frac, neq…), caractères abîmés par le JSON (\t, \f, \n, \r, \b), %, virgule
+  décimale, ℕ, accolades. Chaque formule est validée par KaTeX ; si elle reste invalide, elle
+  s'affiche en texte lisible (u₀ × qⁿ), jamais en code rouge. Fractions, sommes et limites en grand
+  (centrées si seules sur leur ligne). Côté IA : consignes renforcées et UNE demande de correction si
+  des formules restent invalides. Fiches dans l'ordre des parties du cours ; résumé d'une partie
+  d'exercices avec les énoncés et leurs formules.
 - ✅ **v1.20.2** : contrôles du chapitre 2 (`verifier-bulles -- 2` : aucun problème), Panneau créateur
   (cases à illustrer, écrans 📱, dessins 📓 et cases 🏷️ « illustration + surimpression »), section
   « illustration + surimpression » dans `docs/methode-illustration.md`.

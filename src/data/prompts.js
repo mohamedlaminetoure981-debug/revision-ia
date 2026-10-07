@@ -24,11 +24,19 @@
 // Dans le JSON, chaque barre oblique LaTeX doit être doublée ("\\frac") ; si l'IA
 // l'oublie, core/mathfix.js répare quand même.
 export const SYSTEM = `Prof particulier de lycéens/étudiants francophones (Guinée). Français simple, tutoiement. Exact, uniquement d'après le cours fourni. Markdown simple.
-MATHS partout (titres, questions, choix, explications) en LaTeX : $...$ dans une phrase, $$...$$ seule ; rien hors des $.
-Indices/exposants corrects même si le cours écrit mal ("u(n)", "un+1", "x2") : $u_n$, $u_{n+1}$, $q^{n+1}$, $x^2$ (accolades dès 2 caractères).
-\\frac{a}{b}, \\sqrt{x}, \\times, \\leq, \\geq, \\neq, \\to, \\infty, \\lim_{n \\to +\\infty}, \\sum_{k=0}^{n}.
-JSON : double chaque barre oblique du LaTeX ("\\\\frac").
+MATHS partout (titres, questions, choix, explications, corrections) en LaTeX : $...$ dans une phrase, $$...$$ seule sur sa ligne.
+Chaque formule ENTIÈRE dans UNE seule paire de $ : "$u_{n+1} = q \\times u_n$", jamais "$u_{n+1}$ = q $\\times$ $u_n$". Autant de $ ouvrants que fermants. Jamais de mot français entre deux $ (sinon \\text{...}).
+Fraction, somme ou limite importante : seule sur sa ligne en $$...$$.
+Indices/exposants corrects même si le cours écrit mal ("u(n)", "un+1", "x2") : $u_n$, $u_{n+1}$, $q^{n+1}$, $x^2$ (accolades dès 2 caractères). Virgule décimale : $1{,}04$ ; pourcentage : $4\\,\\%$.
+Commandes TOUJOURS avec leur barre oblique : \\in, \\times, \\frac{a}{b}, \\sqrt{x}, \\leq, \\geq, \\neq, \\to, \\infty, \\cdot, \\dots, \\mathbb{N}, \\left( \\right), \\lim_{n \\to +\\infty}, \\sum_{k=0}^{n}.
+JSON : double CHAQUE barre oblique du LaTeX ("\\\\frac", "\\\\in", "\\\\times").
 "quote" = citation mot pour mot du cours (8 à 20 mots).`;
+
+/** Demande de correction des formules (une seule fois, si des formules restent invalides). */
+export const MATH_FIX_PROMPT = `Certaines formules LaTeX de ce JSON sont invalides ou mal délimitées. Renvoie EXACTEMENT le même JSON (mêmes champs, même contenu, même ordre), en corrigeant SEULEMENT ces formules :
+- chaque formule entière dans une seule paire de $ (ou $$...$$ seule sur sa ligne), aucun mot français entre deux $ ;
+- commandes avec leur barre oblique (\\in, \\times, \\frac{a}{b}, \\sqrt{x}…), accolades équilibrées, \\left avec \\right ;
+- dans le JSON, chaque barre oblique doublée ("\\\\frac").`;
 
 // Morceau de schéma réutilisé : le passage source dans le cours.
 const SOURCE = {
@@ -114,6 +122,8 @@ export function summaryPrompt(text, unitLabel) {
 Une section par partie (titre + n° de ${unitLabel.toLowerCase()}). Commence par la 1re partie, courte.
 Blocs "cours" = contenu fidèle et concis. Si un passage est peu expliqué, ajoute juste après un bloc
 "explication" simple (avec un exemple si utile).
+Partie d'exercices : ne dis pas seulement « cette partie propose des exercices » : reprends les ÉNONCÉS
+principaux (avec leurs formules et données), un par ligne, et le corrigé bref s'il est dans le cours.
 
 COURS :
 ${text}`;
@@ -141,7 +151,8 @@ export function packPrompt(text, unitLabel, want, count) {
   if (want.sections) {
     asks.push(`"sections" : résumé partie par partie, dans l'ordre, sans oublier aucune notion, formule ou méthode.
   Une section par partie (titre + n° de ${unitLabel.toLowerCase()}). Commence par la 1re partie, courte.
-  Blocs "cours" = contenu fidèle et concis. Passage peu expliqué → bloc "explication" simple juste après (exemple si utile).`);
+  Blocs "cours" = contenu fidèle et concis. Passage peu expliqué → bloc "explication" simple juste après (exemple si utile).
+  Partie d'exercices : reprends les ÉNONCÉS principaux (avec leurs formules et données), un par ligne ; corrigé bref s'il est dans le cours.`);
   }
   if (want.cards) {
     asks.push(`"cards" : fiches question/réponse couvrant TOUTES les notions (définitions, formules, méthodes, pièges).

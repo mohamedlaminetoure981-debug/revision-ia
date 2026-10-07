@@ -154,12 +154,27 @@ function backgroundBanner(el, course, kind, charId, text) {
   </div>`;
 }
 
+/** Rang d'une partie dans le cours : « 3. Somme… » → 3 ; sinon section du résumé qui lui ressemble le plus. */
+function partRank(name, summary, k) {
+  const num = String(name || '').match(/^\s*(?:partie\s*)?(\d+)/i);
+  if (num) return +num[1];
+  const words = (x) => new Set(String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(/[a-z]{4,}/g) || []);
+  const w = words(name);
+  let best = -1; let score = 0;
+  (summary || []).forEach((sec, i) => {
+    const sw = words(sec.title);
+    const n = [...w].filter((x) => sw.has(x)).length;
+    if (n > score) { score = n; best = i; }
+  });
+  return best >= 0 ? best + 1 + k / 1000 : 1000 + k;
+}
+
 // ---------------------------------------------------------------------
 // Onglet Fiches (Sora)
 // ---------------------------------------------------------------------
 async function renderCards(el, course) {
   const cards = (await db.getByIndex('cards', 'courseId', course.id))
-    .sort((a, b) => (a.chunk - b.chunk) || a.createdAt.localeCompare(b.createdAt));
+    .sort((a, b) => ((a.chunk ?? 0) - (b.chunk ?? 0)) || ((a.order ?? 0) - (b.order ?? 0)) || a.createdAt.localeCompare(b.createdAt));
   const partial = gen.isPartial(course, 'cards');
   const due = cards.filter((c) => isDue(c)).length;
   const flagged = cards.filter((c) => c.flagged);
@@ -185,6 +200,10 @@ async function renderCards(el, course) {
     if (!p) parts.push((p = { name: c.part, cards: [] }));
     p.cards.push(c);
   }
+  // Parties dans l'ordre du cours (fiches anciennes sans ordre enregistré : numéro de la partie,
+  // sinon position de la partie la plus proche dans le résumé).
+  parts.forEach((p, k) => { p.rank = partRank(p.name, course.summary, k); });
+  parts.sort((a, b) => a.rank - b.rank);
 
   const cardHtml = (c) => `
     <details class="tile" style="margin-bottom:8px;${c.flagged ? 'border-color:var(--bad)' : ''}">
@@ -209,7 +228,7 @@ async function renderCards(el, course) {
       ${due ? `<a class="btn block span-2 green pulse" href="#/review/${course.id}">${t("⚡ Swiper avec Sora")}</a>` : `<div class="tile span-2 center small">${t("Tout est à jour pour ce cours ✓")}</div>`}
     </div>
     ${flagged.length ? `<h2>${t("🚩 Fiches à corriger")}</h2>${flagged.map(cardHtml).join('')}` : ''}
-    ${parts.map((p) => `<h2 style="margin-top:16px">${esc(p.name)}</h2>${p.cards.map(cardHtml).join('')}`).join('')}
+    ${parts.map((p) => `<h2 style="margin-top:16px">${mathText(p.name)}</h2>${p.cards.map(cardHtml).join('')}`).join('')}
     <button class="btn ghost block" id="regen" style="margin-top:12px">${t("🔄 Refaire toutes les fiches")}</button>
   `;
 

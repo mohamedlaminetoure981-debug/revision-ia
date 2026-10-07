@@ -113,11 +113,60 @@ const IDX = '(?:\\d*n(?:\\s*[+-]\\s*\\d+)?|[kp](?:\\s*[+-]\\s*\\d+)?|\\d+)';
 const squash = (t) => t.replace(/\s+/g, '');
 const sub = (t) => (squash(t).length > 1 ? `_{${squash(t)}}` : `_${squash(t)}`);
 
+// Commandes LaTeX dont la barre oblique se perd souvent (« n in \mathbb{N} », « q times u_n »).
+// Remises SEULEMENT dans une formule. Celles qui prennent un argument exigent « { » (ou « [ »).
+const LOST_PLAIN = ['notin', 'in', 'times', 'neq', 'leq', 'geq', 'leqslant', 'geqslant', 'infty', 'to', 'sum', 'prod', 'lim', 'cdot', 'cdots', 'ldots', 'dots', 'approx', 'pm', 'div', 'forall', 'exists', 'Rightarrow', 'rightarrow', 'Leftrightarrow', 'iff', 'implies', 'alpha', 'beta', 'gamma', 'delta', 'Delta', 'lambda', 'varepsilon', 'epsilon', 'sigma', 'theta', 'omega', 'quad', 'qquad', 'subset', 'cup', 'cap', 'emptyset'];
+const LOST_ARG = ['dfrac', 'tfrac', 'frac', 'sqrt', 'mathbb', 'mathrm', 'mathbf', 'text', 'binom', 'overline', 'vec', 'operatorname'];
+const LOST_DELIM = ['left', 'right'];
+// Mots qui peuvent être une commande sans barre (« le », « ne », « ge » sont aussi du français :
+// seulement dans une formule sans autre mot français).
+const LOST_AMBIG = ['le', 'ge', 'ne'];
+// Mots « mathématiques » qui ne trahissent pas du français dans une formule.
+const MATH_WORDS = new Set([...LOST_PLAIN, ...LOST_ARG, ...LOST_DELIM, 'lim', 'sin', 'cos', 'tan', 'ln', 'log', 'exp', 'max', 'min', 'sup', 'inf', 'det', 'mod', 'pgcd', 'ppcm', 'card', 'arccos', 'arcsin', 'arctan', 'ch', 'sh', 'th', 'dx', 'dt', 'dy', 'Im', 'Re', 'id', 'un', 'vn', 'wn', 'GNF', 'FCFA', 'cm', 'km', 'kg', 'mm', 'ml']);
+const reWord = (w) => new RegExp(`(?<![\\\\A-Za-z])${w}(?![A-Za-z])`, 'g');
+
+/** Remet la barre oblique des commandes perdues (dans une formule seulement). */
+function restoreCommands(t) {
+  for (const w of LOST_ARG) t = t.replace(new RegExp(`(?<![\\\\A-Za-z])${w}(?=\\s*[{[])`, 'g'), `\\${w}`);
+  for (const w of LOST_DELIM) t = t.replace(new RegExp(`(?<![\\\\A-Za-z])${w}(?=\\s*(?:[()[\\]|.]|\\\\[{}|]))`, 'g'), `\\${w}`);
+  for (const w of LOST_PLAIN) t = t.replace(reWord(w), `\\${w} `);
+  // « le », « ge », « ne » seuls entre deux termes (x le 3) : \le, \ge, \ne
+  for (const w of LOST_AMBIG) t = t.replace(new RegExp(`(?<=[\\w})]\\s)${w}(?=\\s[\\w\\\\({-])`, 'g'), `\\${w}`);
+  return t.replace(/\\(\w+) +(?=[\s_^}),.=+\-]|$)/g, '\\$1');
+}
+
+/** Accolades et \left / \right équilibrés (sinon KaTeX refuse toute la formule). */
+function balance(t) {
+  let depth = 0; let out = '';
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (c === '\\' && i + 1 < t.length) { out += c + t[++i]; continue; }
+    if (c === '{') depth++;
+    if (c === '}') { if (!depth) continue; depth--; }
+    out += c;
+  }
+  out += '}'.repeat(depth);
+  const L = (out.match(/\\left(?![A-Za-z])/g) || []).length; const R = (out.match(/\\right(?![A-Za-z])/g) || []).length;
+  if (L !== R) out = out.replace(/\\(?:left|right)(?![A-Za-z])\s*/g, '');
+  return out;
+}
+
+const UNI = [
+  [/×/g, '\\times '], [/÷/g, '\\div '], [/≤/g, '\\leq '], [/≥/g, '\\geq '], [/≠/g, '\\neq '], [/→/g, '\\to '],
+  [/⇒/g, '\\Rightarrow '], [/⇔/g, '\\Leftrightarrow '], [/∞/g, '\\infty '], [/∈/g, '\\in '], [/∉/g, '\\notin '],
+  [/·/g, '\\cdot '], [/…/g, '\\dots '], [/−/g, '-'], [/±/g, '\\pm '], [/≈/g, '\\approx '], [/∑/g, '\\sum '], [/Σ(?=_)/g, '\\sum'],
+  [/ℕ/g, '\\mathbb{N}'], [/ℤ/g, '\\mathbb{Z}'], [/ℚ/g, '\\mathbb{Q}'], [/ℝ/g, '\\mathbb{R}'], [/ℂ/g, '\\mathbb{C}'],
+  [/√\s*(\d+(?:[.,]\d+)?|[A-Za-z])/g, '\\sqrt{$1}'], [/√/g, '\\sqrt'], [/²/g, '^2'], [/³/g, '^3'], [/ⁿ/g, '^n'],
+  [/[\u00a0\u202f\u2009\u2007]/g, ' '], [/[‘’]/g, "'"],
+];
+
 /** Corrections à l'INTÉRIEUR d'une formule (le texte de \text{…} n'est pas touché). */
 function fixInside(t) {
+  t = restoreCommands(t);
   const kept = [];
-  t = t.replace(/\\(?:text|mathrm|textbf|operatorname)\{[^{}]*\}/g, (m) => `\u0001${kept.push(m) - 1}\u0001`);
-  return t
+  t = t.replace(/\\(?:text|mathrm|textbf|textit|operatorname|mbox)\s*\{[^{}]*\}/g, (m) => `\u0001${kept.push(m) - 1}\u0001`);
+  for (const [re, by] of UNI) t = t.replace(re, by);
+  t = t
     // u(n), u(n+1), U(0) → u_n, u_{n+1}, U_0 (pas f(x) : seulement les lettres de suite)
     .replace(new RegExp(`(?<![A-Za-z\\\\])(${SEQ})\\s*\\(\\s*(${IDX})\\s*\\)`, 'g'), (_, l, i) => l + sub(i))
     // u_(n+1) → u_{n+1} ; q^(n+1) → q^{n+1}
@@ -125,69 +174,211 @@ function fixInside(t) {
     // un+1, un-1, Un+1 (collés) → u_{n+1} ; 2un → 2u_n ; un, Un seuls → u_n (dans une formule)
     .replace(new RegExp(`(?<![A-Za-z\\\\{])(${SEQ})n([+-]\\d+)(?![\\d])`, 'g'), (_, l, k) => `${l}_{n${k}}`)
     .replace(new RegExp(`(?<![A-Za-z\\\\{])(${SEQ})(n)(?![A-Za-z_{(])`, 'g'), '$1_$2')
-    // u_n+1 écrit comme indice : laissé tel quel (peut vouloir dire u_n + 1)
     // x^10 → x^{10} ; u_10 → u_{10} (sinon seul le 1er chiffre monte/descend)
     .replace(/([_^])(\d{2,})/g, '$1{$2}')
-    // Symboles Unicode courants que KaTeX rend mal en mode formule
-    .replace(/×/g, '\\times ').replace(/÷/g, '\\div ').replace(/≤/g, '\\leq ').replace(/≥/g, '\\geq ')
-    .replace(/≠/g, '\\neq ').replace(/→/g, '\\to ').replace(/⇒/g, '\\Rightarrow ').replace(/⇔/g, '\\Leftrightarrow ')
-    .replace(/∞/g, '\\infty ')
+    // Pourcentage : « % » commence un commentaire en LaTeX (tout le reste disparaissait)
+    .replace(/(?<!\\)%/g, '\\%')
+    // Virgule décimale (1,04) : sans espace parasite après la virgule
+    .replace(/(\d),(?=\d)/g, '$1{,}')
+    // Espaces des grands nombres (500 000) gardés
+    .replace(/(\d) (?=\d{3}(?!\d))/g, '$1\\ ')
     .replace(/\u0001(\d+)\u0001/g, (_, i) => kept[i]);
+  return balance(t.replace(/[ \t]{2,}/g, ' ').trim());
 }
 
-// Maths écrites HORS formule, à mettre entre $…$ (on reste prudent : jamais un mot français).
-const BARE = [
-  // commandes LaTeX avec arguments : \frac{a}{b}, \sqrt{2}, \sqrt[3]{x}, \lim_{n \to +\infty}, \sum_{k=0}^{n}
-  /\\(?:d?frac|binom)\{[^{}]*\}\{[^{}]*\}/g,
-  /\\sqrt(?:\[[^\]]*\])?\{[^{}]*\}/g,
-  /\\(?:lim|sum|prod|int)(?:_\{[^{}]*\}|_[A-Za-z0-9])?(?:\^\{[^{}]*\}|\^[A-Za-z0-9])?/g,
-  // symboles isolés : \times, \leq, \to, \infty, \pi…
-  /\\(?:times|cdot|div|pm|leq?|geq?|leqslant|geqslant|neq|approx|equiv|to|rightarrow|Rightarrow|Leftrightarrow|infty|pi|alpha|beta|gamma|delta|Delta|lambda|mu|sigma|theta|in|notin|subset|cup|cap|forall|exists|mathbb\{[A-Z]\})(?![A-Za-z])/g,
-  // u_n, u_{n+1}, U_0, x_1 ; q^n, x^2, 2^{n+1}, e^{-x}
-  /(?<![A-Za-z\\])[A-Za-z]_(?:\{[^{}\s]{1,12}\}|\([^()\s]{1,10}\)|[A-Za-z0-9]{1,2})(?![A-Za-z])/g,
-  /(?<![A-Za-z\\])[A-Za-z0-9)]+\^(?:\{[^{}]{1,12}\}|\([^()]{1,10}\)|-?[A-Za-z0-9]{1,3})(?![A-Za-z])/g,
-];
+// ---------------------------------------------------------------------
+// Découpage texte / formule : retrouver le « $ » fautif
+// ---------------------------------------------------------------------
+const STRONG = /[_^\\{}=<>≤≥≠∈∉ℕℤℚℝℂ∞∑√×÷→]|\d\s*[+\-*/]\s*\d/;
+const FR_SHORT = new Set(['et', 'ou', 'si', 'on', 'de', 'la', 'le', 'les', 'un', 'une', 'en', 'au', 'du', 'ne', 'est', 'il', 'pour', 'tout', 'donc', 'avec', 'par', 'que', 'qui', 'des', 'sa', 'son', 'se', 'sur', 'a']);
 
-/** Corrections HORS formule : u(n) → $u_n$, un+1 → $u_{n+1}$, u_n → $u_n$… */
-function fixOutside(t) {
-  t = t
-    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})\\s*\\(\\s*(\\d*n(?:\\s*[+-]\\s*\\d+)?|\\d+)\\s*\\)`, 'g'), (_, l, i) => `$${l}${sub(i)}$`)
-    // "un+1" collé (jamais "un + 1" avec espaces : "ajouter un + 1" reste du français)
-    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})n([+-]\\d+)(?![\\d])`, 'g'), (_, l, k) => `$${l}_{n${k}}$`)
-    // "Un" en début de mot suivi de "=" : U_n = … (pas "Un élève")
-    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})n(?=\\s*=)`, 'g'), (_, l) => `$${l}_n$`)
-    // "un" juste après un signe de calcul (= q × un, 2un) : c'est u_n, pas l'article
-    .replace(new RegExp(`(?<=[×*/]\\s?|\\d)(${SEQ})n(?![A-Za-zÀ-ÿ0-9_])`, 'g'), (_, l) => `$${l}_n$`)
-    .replace(new RegExp(`(?<=[=+-]\\s?)(${SEQ})n(?=\\s*(?:[-+×*/=.,;:)]|$))`, 'gm'), (_, l) => `$${l}_n$`);
-  // Chaque motif n'agit que sur le texte encore hors formule (pas de $ dans un $…$).
-  for (const re of BARE) {
-    t = t.split(/(\$[^$\n]+\$)/).map((part, k) => (k % 2 ? part : part.replace(re, (m) => `$${fixInside(m)}$`))).join('');
+/** Mots français présents dans un morceau (hors \text{…} et hors commandes LaTeX). */
+export function frenchWords(piece) {
+  const t = piece.replace(/\\(?:text|mathrm|textbf|textit|operatorname|mbox)\s*\{[^{}]*\}/g, ' ').replace(/\\[A-Za-z]+/g, ' ');
+  return (t.match(/[A-Za-zÀ-ÖØ-öø-ÿœŒ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)?/g) || [])
+    .filter((w) => (w.length >= 2 && !MATH_WORDS.has(w)) || (w === 'a' && false));
+}
+
+/** 'text' (contient du français), 'math' (formule) ou 'neutral' (espaces, signes, lettre isolée). */
+function classify(piece) {
+  const words = frenchWords(piece);
+  const strong = STRONG.test(piece);
+  if (words.length) {
+    // « x le 3 » : un seul mot ambigu au milieu d'une formule → c'est \le
+    if (strong && words.every((w) => LOST_AMBIG.includes(w)) && words.length === 1) return 'math';
+    if (words.length >= 2 || words.some((w) => w.length >= 3 || FR_SHORT.has(w.toLowerCase()))) return 'text';
   }
-  return t;
+  if (strong) return 'math';
+  return /[A-Za-z0-9]/.test(piece) && piece.trim().length <= 3 && /^[\s\d+\-*/().,=A-Za-z]*$/.test(piece) ? 'neutral' : (piece.trim() ? 'neutral' : 'empty');
 }
 
 /**
- * Normalise un texte (Markdown + LaTeX) avant affichage : caractères abîmés réparés,
- * notations mal écrites corrigées, maths hors formule mises entre $…$.
+ * Répare une ligne : chaque morceau entre deux « $ » est classé (texte ou formule).
+ * Si les « $ » sont déséquilibrés, ou si une « formule » contient du français, le
+ * découpage est refait : on ne fait plus confiance à la parité des « $ ».
+ */
+function repairLine(line) {
+  const pieces = line.split(/(?<!\\)\$/);
+  if (pieces.length === 1) return fixOutside(line);
+  const kinds = pieces.map(classify);
+  const nDollars = pieces.length - 1;
+  const parityOk = nDollars % 2 === 0 && pieces.every((p, i) => i % 2 === 0 || kinds[i] !== 'text');
+  // Étiquette de chaque morceau : parité respectée → morceaux impairs = formules ;
+  // sinon → chaque morceau selon son contenu.
+  let lab = pieces.map((p, i) => (parityOk ? (i % 2 ? 'math' : (kinds[i] !== 'text' && !/^\s*[.,;:!?)]/.test(p) ? 'math?' : 'text')) : kinds[i]));
+  // Un morceau neutre (« = q ») ou vide entre deux formules fait partie de la formule.
+  lab = lab.map((l, i) => {
+    if (l === 'math') return 'math';
+    if (l === 'text') return 'text';
+    const prev = lab.slice(0, i).reverse().find((x) => x !== 'empty');
+    const next = lab.slice(i + 1).find((x) => x !== 'empty');
+    const near = (x) => x === 'math' || x === 'math?';
+    if (l === 'math?') return near(prev) && near(next) ? 'math' : 'text';
+    // Les « $ » étant faux, une variable seule ($q$, $n$, $3$) reste une formule.
+    if (!parityOk && /^\s*[A-Za-z0-9]{1,3}\s*$/.test(pieces[i]) && !FR_SHORT.has(pieces[i].trim().toLowerCase())) return 'math';
+    return near(prev) && near(next) ? 'math' : 'text';
+  });
+  // Regroupe les morceaux voisins de même nature (les « $ » entre eux disparaissent).
+  let out = '';
+  for (let i = 0; i < pieces.length;) {
+    let j = i; let buf = '';
+    while (j < pieces.length && lab[j] === lab[i]) buf += pieces[j++];
+    if (lab[i] === 'math' && buf.trim()) {
+      const lead = buf.match(/^\s*/)[0]; const trail = buf.match(/\s*$/)[0];
+      out += `${lead}$${fixInside(buf.trim())}$${trail}`;
+    } else out += fixOutside(buf);
+    i = j;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------
+// Maths écrites HORS formule (« (u_n)_{n in ℕ} », « \frac{1}{2} ») → entre $…$
+// ---------------------------------------------------------------------
+// Noyaux sûrs : commande LaTeX (avec ses arguments), lettre/chiffre/parenthèse suivi de _ ou ^,
+// symbole mathématique Unicode.
+const CORE = /\\[A-Za-z]+(?:\[[^\]]*\])?(?:\s*\{(?:[^{}]|\{[^{}]*\})*\})*|(?:(?<![A-Za-zÀ-ÿ\\])[A-Za-z]|(?<![A-Za-zÀ-ÿ\\\d])\d+|\))[_^](?:\{(?:[^{}]|\{[^{}]*\})*\}|\([^()\s]{1,10}\)|-?[A-Za-z0-9]{1,3}(?![A-Za-zÀ-ÿ]))|[ℕℤℚℝℂ∞∑√≤≥≠∈]/g;
+const OPS = '=+\\-−×÷*/<>≤≥≠∈→';
+
+/** Étend une formule trouvée aux opérations voisines : « 2 × u_n = 3 », « (u_n) ». */
+function grow(t, s, e) {
+  const isOp = (c) => OPS.includes(c);
+  const operand = (i, dir) => { // longueur d'un opérande (nombre, lettre seule, parenthèse) à partir de i
+    if (dir > 0) {
+      const m = t.slice(i).match(/^(?:\d+(?:[.,]\d+)?|[A-Za-z](?![A-Za-zÀ-ÿ'’])|\\[A-Za-z]+(?:\{[^{}]*\})*)/);
+      return m ? m[0].length : 0;
+    }
+    const m = t.slice(0, i).match(/(?:\d+(?:[.,]\d+)?|(?<![A-Za-zÀ-ÿ'’])[A-Za-z])$/);
+    return m ? m[0].length : 0;
+  };
+  // Le noyau est un symbole de relation (≠, ≤, ∈…) : il prend un opérande de chaque côté.
+  if (e - s === 1 && OPS.includes(t[s])) {
+    let m = e; while (t[m] === ' ') m++;
+    const n = operand(m, 1); if (n) e = m + n;
+    let k = s; while (t[k - 1] === ' ') k--;
+    const p = operand(k, -1); if (p) s = k - p;
+  }
+  for (let moved = true; moved;) {
+    moved = false;
+    // à droite : « ) » fermant, ou [espace] opérateur [espace] opérande
+    let k = e; while (t[k] === ' ') k++;
+    if (t[e] === ')' && (t.slice(s, e).split('(').length > t.slice(s, e).split(')').length)) { e++; moved = true; continue; }
+    if (isOp(t[k])) { let m = k + 1; while (t[m] === ' ') m++; const n = operand(m, 1) || (t[m] === '(' ? 1 : 0); if (n) { e = m + n; moved = true; continue; } }
+    if (/[0-9]/.test(t[e - 1]) && /[A-Za-z]/.test(t[e]) && !/[A-Za-zÀ-ÿ]/.test(t[e + 1] || '')) { e++; moved = true; continue; }
+    // à gauche : « ( », opérande opérateur, chiffre collé (2u_n)
+    k = s; while (t[k - 1] === ' ') k--;
+    if (t[s - 1] === '(') { s--; moved = true; continue; }
+    if (isOp(t[k - 1])) { let m = k - 1; while (t[m - 1] === ' ') m--; const n = operand(m, -1) || (t[m - 1] === ')' ? 1 : 0); if (n) { s = m - n; moved = true; continue; } }
+    if (/\d/.test(t[s - 1])) { s--; moved = true; continue; }
+  }
+  return [s, e];
+}
+
+/** Corrections HORS formule : u(n) → $u_n$, un+1 → $u_{n+1}$, (u_n)_{n in ℕ} → $(u_n)_{n \in \mathbb{N}}$… */
+function fixOutside(t) {
+  if (!t.trim()) return t;
+  t = t
+    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})\\s*\\(\\s*(\\d*n(?:\\s*[+-]\\s*\\d+)?|\\d+)\\s*\\)`, 'g'), (_, l, i) => `${l}${sub(i)}`)
+    // "un+1" collé (jamais "un + 1" avec espaces : "ajouter un + 1" reste du français)
+    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})n([+-]\\d+)(?![\\d])`, 'g'), (_, l, k) => `${l}_{n${k}}`)
+    // "Un" en début de mot suivi de "=" : U_n = … (pas "Un élève")
+    .replace(new RegExp(`(?<![A-Za-zÀ-ÿ\\\\])(${SEQ})n(?=\\s*=)`, 'g'), (_, l) => `${l}_n`)
+    // "un" juste après un signe de calcul (= q × un, 2un) : c'est u_n, pas l'article
+    .replace(new RegExp(`(?<=[×*/]\\s?|\\d)(${SEQ})n(?![A-Za-zÀ-ÿ0-9_])`, 'g'), (_, l) => `${l}_n`)
+    .replace(new RegExp(`(?<=[=+-]\\s?)(${SEQ})n(?=\\s*(?:[-+×*/=.,;:)]|$))`, 'gm'), (_, l) => `${l}_n`);
+  // Formules repérées puis étendues, puis fusionnées si elles se touchent.
+  const spans = [];
+  for (const m of t.matchAll(CORE)) {
+    // « in » et « to » perdus au milieu d'une formule restent dans la formule (ils sont dans les accolades)
+    const [s, e] = grow(t, m.index, m.index + m[0].length);
+    if (spans.length && s <= spans.at(-1)[1] + 1 && !/[A-Za-zÀ-ÿ]{2,}/.test(t.slice(spans.at(-1)[1], s))) spans.at(-1)[1] = Math.max(e, spans.at(-1)[1]);
+    else spans.push([s, e]);
+  }
+  if (!spans.length) return t;
+  let out = ''; let last = 0;
+  for (let [s, e] of spans) {
+    let tex = t.slice(s, e);
+    // ponctuation finale et parenthèse ouvrante orpheline laissées dehors
+    const tail = tex.match(/[\s.,;:!?]*$/)[0]; tex = tex.slice(0, tex.length - tail.length); e -= tail.length;
+    if (!tex.trim() || !/[_^\\ℕℤℚℝℂ∞∑√≤≥≠∈]/.test(tex)) continue;
+    out += `${t.slice(last, s)}$${fixInside(tex)}$`;
+    last = e;
+  }
+  return out + t.slice(last);
+}
+
+/**
+ * RÉPARATION des maths d'un texte (Markdown + LaTeX), avant tout affichage :
+ *  - caractères abîmés par les échappements JSON réparés (\t → \times, \f → \frac…) ;
+ *  - \( … \) et \[ … \] convertis en $…$ et $$…$$ ;
+ *  - « $ » déséquilibrés ou formules qui contiennent du français : découpage refait ;
+ *  - commandes sans barre oblique remises (in → \in…) dans les formules seulement ;
+ *  - notations mal écrites corrigées (u(n) → u_n, x^10 → x^{10}, 1,04, %, ℕ…) ;
+ *  - maths écrites hors formule mises entre $…$.
+ * Résultat : uniquement des $…$ (en ligne) et $$…$$ (seuls sur leur ligne), bien appariés.
  * Les blocs de code (`…`) ne sont pas touchés.
  */
 export function normalizeMath(text) {
   let s = repairControlChars(String(text ?? ''));
-  // Découpe : formules ($$…$$, $…$, \[…\], \(…\)), code (`…`) et texte normal.
-  const re = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+?\$|`[^`\n]+`)/g;
-  let out = '';
+  if (!s) return s;
+  const kept = [];
+  const keep = (v) => `\u0002${kept.push(v) - 1}\u0002`;
+  s = s.replace(/`[^`\n]+`/g, keep)
+    .replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => `$$${t}$$`)
+    .replace(/\\\(([\s\S]+?)\\\)/g, (_, t) => `$${t}$`)
+    // \$ (vrai signe dollar) mis de côté
+    .replace(/\\\$/g, keep)
+    // Formules centrées $$…$$ (bien appariées) : réparées à part, sur leur propre ligne
+    .replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(`\n$$${fixInside(t.replace(/\s*\n\s*/g, ' '))}$$\n`))
+    .replace(/\$\$/g, '$');
+  s = s.split('\n').map(repairLine).join('\n');
+  // Lignes vides parasites autour des formules centrées
+  s = s.replace(/\u0002(\d+)\u0002/g, (_, i) => kept[i]);
+  return s.replace(/^[ \t]*\n(?=\$\$)/gm, '').replace(/(\$\$)\n[ \t]*\n/g, '$1\n').replace(/^\n+|\n+$/g, (m) => (text.startsWith('\n') ? m : ''));
+}
+
+/**
+ * Découpe un texte RÉPARÉ en morceaux : [{ text }] ou [{ tex, display }].
+ * À utiliser après normalizeMath (les « $ » y sont toujours appariés).
+ */
+export function mathSegments(fixed) {
+  const out = [];
   let last = 0;
-  for (let m; (m = re.exec(s));) {
-    out += fixOutside(s.slice(last, m.index));
-    const tok = m[0];
-    if (tok.startsWith('`')) out += tok;
-    else if (tok.startsWith('$$')) out += `$$${fixInside(tok.slice(2, -2))}$$`;
-    else if (tok.startsWith('$')) out += `$${fixInside(tok.slice(1, -1))}$`;
-    else out += tok.slice(0, 2) + fixInside(tok.slice(2, -2)) + tok.slice(-2);
-    last = m.index + tok.length;
+  for (const m of String(fixed).matchAll(/\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g)) {
+    if (m.index > last) out.push({ text: fixed.slice(last, m.index) });
+    out.push(m[1] !== undefined ? { tex: m[1].trim(), display: true } : { tex: m[2].trim(), display: false });
+    last = m.index + m[0].length;
   }
-  out += fixOutside(s.slice(last));
+  if (last < fixed.length) out.push({ text: fixed.slice(last) });
   return out;
+}
+
+/** Une formule « haute » (fraction, somme, limite…) : affichée en grand pour rester lisible. */
+export const isTallMath = (tex) => /\\(?:d?frac|sum|prod|lim|int|binom|sqrt\s*\{[^{}]*\\frac)/.test(tex);
+
+/** Version de secours encore plus prudente d'une formule refusée par KaTeX. */
+export function safeTex(tex) {
+  return balance(String(tex).replace(/\\(?:left|right|big|Big|bigg|Bigg)(?![A-Za-z])\s*/g, '').replace(/&/g, '\\&').replace(/#/g, '\\#'));
 }
 
 // ---------------------------------------------------------------------
@@ -225,8 +416,8 @@ const script = (t, table, mark) => {
 };
 const atom = (t) => (/^[\w.²³ⁿ√π∞]+$/u.test(t) ? t : `(${t})`);
 
-/** Convertit une formule LaTeX en texte Unicode lisible. */
-function texToText(tex) {
+/** Convertit une formule LaTeX en texte Unicode lisible (aussi : secours si KaTeX refuse une formule). */
+export function texToText(tex) {
   let s = String(tex);
   let out = '';
   for (let i = 0; i < s.length;) {

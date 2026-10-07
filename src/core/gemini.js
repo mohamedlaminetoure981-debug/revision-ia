@@ -23,6 +23,7 @@
 
 import { getSetting, setSetting } from './db.js';
 import { parseJsonLatex } from './mathfix.js';
+import { MATH_FIX_PROMPT } from '../data/prompts.js';
 import { countRequest, markExhausted, isExhausted, resetTimeText } from './quota.js';
 import { t, getLang, LANGS } from '../i18n/index.js';
 
@@ -374,6 +375,7 @@ export async function generateJSON(opts) {
   const tm = { label, start: performance.now(), firstText: 0, end: 0, model: '', retries: 0, switches: [], stream: !!streamKey };
   let lastError = null;
   let jsonTries = 0;
+  let mathFixTried = false;
   let sameModel = false; // true = on réessaie le même modèle (sans bascule)
   let quickSwitch = false; // modèle précédent épuisé pour la journée : bascule sans attendre
 
@@ -432,6 +434,12 @@ export async function generateJSON(opts) {
     const problems = json ? validate(json, schema) : [t('JSON illisible')];
     const extra = json && !problems.length && check ? check(json) : null;
     if (json && !problems.length && !extra) {
+      // Formules encore invalides après réparation : UNE demande de correction à l'IA.
+      if (!opts.noMathCheck && !mathFixTried) {
+        mathFixTried = true;
+        const fixed = await fixMathOnce(json, { model, apiKey, req, schema, check, tm, onStatus });
+        if (fixed) json = fixed;
+      }
       // Streaming : on transmet les éventuels derniers éléments.
       if (streamKey && onItem) {
         const all = json[streamKey] || [];
@@ -457,6 +465,31 @@ export async function generateJSON(opts) {
     if (!left && !opts.model) throw quotaDayError();
   }
   throw lastError || new AIError('SERVER', t('🛠️ Les serveurs de Gemini sont surchargés. Réessaie dans quelques minutes.'));
+}
+
+/**
+ * Vérifie les formules d'une réponse (après réparation, avec KaTeX) ; s'il en reste
+ * d'invalides, redemande UNE fois au même modèle de corriger seulement ces formules.
+ * Renvoie la réponse corrigée (si elle est meilleure) ou null (on garde l'originale :
+ * l'affichage répare et montre en texte lisible ce qui reste invalide).
+ */
+async function fixMathOnce(json, { model, apiKey, req, schema, check, tm, onStatus }) {
+  let bad;
+  try {
+    const [{ default: katex }, { badFormulas }] = await Promise.all([import('katex'), import('./mathcheck.js')]);
+    bad = badFormulas(json, katex);
+    if (!bad.length) return null;
+    onStatus?.(t('🧮 Correction des formules…'));
+    const prompt = `${MATH_FIX_PROMPT}\n\nFORMULES À CORRIGER :\n- ${bad.join('\n- ')}\n\nJSON À CORRIGER :\n${JSON.stringify(json)}`;
+    const result = await callModel(model, apiKey, buildBody({ ...req, parts: [{ text: prompt }], temperature: 0.1 }, model), { stream: false, tm });
+    if (result.http) return null;
+    const out = parseJsonLatex(result.text);
+    if (validate(out, schema).length || (check && check(out))) return null;
+    return badFormulas(out, katex).length < bad.length ? out : null;
+  } catch (e) {
+    console.warn('Correction des formules impossible :', e);
+    return null;
+  }
 }
 
 /** Erreur "plus aucun modèle gratuit disponible aujourd'hui" (Tidiane l'explique). */

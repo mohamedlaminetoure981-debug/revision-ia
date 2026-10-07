@@ -84,7 +84,7 @@ export async function render(el, [courseId, idx]) {
   // --- Étape 2 : Ren pose ses questions, l'élève répond une par une ---
   function answer(res, explanation) {
     const answers = [];
-    say(res.reaction || line('ren', 'feynman_attente'), 'clin');
+    say(latexToText(res.reaction || line('ren', 'feynman_attente')), 'clin');
     const ask = (i) => {
       if (i >= res.questions.length) return grade(res.attempt, answers);
       $('#chat').insertAdjacentHTML('beforeend', `<div class="msg ren"><b>${t("Ren :")}</b> ${mathText(res.questions[i])}</div>`);
@@ -97,7 +97,7 @@ export async function render(el, [courseId, idx]) {
       $('#zone').scrollIntoView({ behavior: 'smooth', block: 'end' });
       const reply = (txt) => {
         answers[i] = txt;
-        $('#chat').insertAdjacentHTML('beforeend', `<div class="msg me">${txt ? esc(txt) : `<i>${t("Je sais pas…")}</i>`}</div>`);
+        $('#chat').insertAdjacentHTML('beforeend', `<div class="msg me">${txt ? mathText(txt) : `<i>${t("Je sais pas…")}</i>`}</div>`);
         say(i < res.questions.length - 1 ? line('ren', 'feynman_relance') : line('ren', 'feynman_attente'), i % 2 ? 'reflexion' : 'clin');
         ask(i + 1);
       };

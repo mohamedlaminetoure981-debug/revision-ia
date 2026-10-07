@@ -94,7 +94,7 @@ export function offerStatus(o) {
     b.textContent = t('⏳ Image en préparation…');
     try {
       const png = await statusPng(o);
-      const r = await shareImage(png, fileName('statut', o.sub || o.kicker, 'jpg'), `${o.kicker} ${o.big} ${t("🔥 — Révision IA")}`);
+      const r = await shareImage(png, fileName('statut', latexToText(o.sub || o.kicker), 'jpg'), `${latexToText(o.kicker)} ${latexToText(o.big)} ${t("🔥 — Révision IA")}`);
       if (r !== 'cancelled') { m.close(); import('./ui.js').then(({ toast }) => toast(line('binta', 'statut_partage'), 'ok')); }
     } catch (e) {
       console.error(e);

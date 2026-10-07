@@ -116,7 +116,7 @@ export async function render(el) {
       ${missedCards.length || topQuiz.length ? `
         ${missedCards.map((x) => `
           <a class="missed" href="#/course/${x.card.courseId}/fiches">
-            <span class="chip bad">✗ ${x.n}</span><span class="grow small">${esc(x.card.question.slice(0, 120))}</span></a>`).join('')}
+            <span class="chip bad">✗ ${x.n}</span><span class="grow small">${esc(latexToText(x.card.question).slice(0, 120))}</span></a>`).join('')}
         ${topQuiz.map(([q, n]) => `
           <div class="missed"><span class="chip warn">🎯 ${n}</span><span class="grow small">${esc(latexToText(q).slice(0, 120))}</span></div>`).join('')}`
       : `<p class="small muted">${t("Rien pour l’instant. Soit t’es un génie, soit faut réviser 😏")}</p>`}
@@ -172,7 +172,7 @@ function weeklyWrapped(el, { p, cards, reviews, results }) {
       ? `<div class="kicker">${t("Ta matière star")}</div><div class="mid" style="font-size:2rem">${esc(topSubject[0])}</div><div class="small">${topSubject[1]} ${t("révisions cette semaine")}</div>`
       : `<div class="kicker">${t("Ta matière star")}</div><div class="mid">${t("Pas encore de révision cette semaine")}</div>` },
     { cls: 'w1', html: worst
-      ? `<div class="kicker">${t("La notion qui te résiste")}</div><div class="mid" style="font-size:1.15rem;max-width:420px">« ${esc(worst.question.slice(0, 140))} »</div><div class="small">${t("On la bat la semaine prochaine 💪")}</div>`
+      ? `<div class="kicker">${t("La notion qui te résiste")}</div><div class="mid" style="font-size:1.15rem;max-width:420px">« ${esc(latexToText(worst.question).slice(0, 140))} »</div><div class="small">${t("On la bat la semaine prochaine 💪")}</div>`
       : `<div class="kicker">${t("Notion qui te résiste")}</div><div class="huge">0</div><div class="mid">${t("Aucune. Respect.")}</div>` },
     { cls: 'w5', html: `${characterHTML('binta', { expression: 'celebration', size: 160 })}
         <div class="bubble top" style="max-width:340px;margin:10px auto;text-align:left;--c:${CHARACTERS.binta.color}"><span class="who">Binta</span>${esc(line('binta', 'fin'))}</div>

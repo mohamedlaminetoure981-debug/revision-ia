@@ -12,7 +12,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS, TEAM } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, rich, line, mascot, toast } from '../ui/ui.js';
+import { esc, rich, line, mascot, toast, mathText } from '../ui/ui.js';
 import { sound, vibrate, confetti, onomatopoeia, celebrate } from '../ui/fx.js';
 import { power, suspendPowers, resumePowers } from '../ui/powers.js';
 import { decodeDuel, makeDuel, shareDuel } from '../core/duel.js';
@@ -60,7 +60,7 @@ export async function render(el, [code]) {
           <div class="side">${characterHTML(mine, { expression: 'concentration', size: 120 })}<b>${esc(name || t('Toi'))}</b><span class="score-pill dim">?/${total}</span></div>
         </div>
         <h1 class="display center" style="font-size:1.5rem;margin:12px 0 4px">⚔️ ${esc(d.n || t('Ton ami'))} ${t("te défie !")}</h1>
-        <p class="center muted small" style="margin:0">${esc(d.ti || d.su || t('Quiz'))} · ${total} ${t("questions")}</p>
+        <p class="center muted small" style="margin:0">${mathText(d.ti || d.su || t('Quiz'))} · ${total} ${t("questions")}</p>
         <div class="mascot" style="--c:${ren.color};max-width:420px;margin:14px auto">${characterHTML('ren', { expression: 'joie', size: 70 })}
           <div class="bubble"><span class="who">Ren</span><span class="say">${esc(line('ren', 'duel_intro'))}</span></div></div>
         ${profile ? '' : `
@@ -158,7 +158,7 @@ export async function render(el, [code]) {
     el.innerHTML = `
       <div class="fs duel-screen ${win ? 'win' : draw ? 'draw' : 'lose'}" style="--c:${ren.color};overflow-y:auto">
         <div class="fs-top"><a class="fs-close" href="#/" style="display:grid;place-items:center;text-decoration:none">✕</a></div>
-        ${received ? `<p class="center small muted" style="margin:0">📩 ${esc(themName)} ${t("a répondu à ton défi «")} ${esc(d.ti || 'quiz')} »</p>` : ''}
+        ${received ? `<p class="center small muted" style="margin:0">📩 ${esc(themName)} ${t("a répondu à ton défi «")} ${mathText(d.ti || 'quiz')} »</p>` : ''}
         <div class="duel-face final">
           <div class="side ${win ? 'winner' : ''}">${characterHTML(meChar, { expression: win ? 'celebration' : draw ? 'clin' : 'surprise', size: 130, aura: win ? 3 : 0 })}<b>${esc(meName)}</b><span class="score-pill big">${me}/${total}</span></div>
           <div class="vs">VS</div>

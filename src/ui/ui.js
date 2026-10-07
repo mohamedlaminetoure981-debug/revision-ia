@@ -19,7 +19,7 @@ import { characterHTML, play, setExpression, speak } from './character.js';
 import { getProfileSync } from '../core/game.js';
 import { isCreator, creatorName } from '../core/creator.js';
 import { voice, playSfx } from './sfx.js';
-import { normalizeMath } from '../core/mathfix.js';
+import { normalizeMath, mathSegments, isTallMath, safeTex, texToText } from '../core/mathfix.js';
 import { t, locale } from '../i18n/index.js';
 
 /** Échappe les caractères spéciaux HTML (sécurité : évite l'injection de code). */
@@ -41,33 +41,65 @@ export function esc(s) {
 // la formule s'affiche en texte, puis elle est remplacée automatiquement.
 let katex = null;
 let katexLoading = null;
-const rawMath = (tex, display) => esc(display ? `$$${tex}$$` : `$${tex}$`);
-function mathHTML(tex, display) {
-  try {
-    return katex.renderToString(tex, { displayMode: display, throwOnError: false, output: 'html' });
-  } catch {
-    return `<code>${rawMath(tex, display)}</code>`;
+
+/** KaTeX strict : renvoie le HTML, ou null si la formule est invalide (même après une version prudente). */
+function katexHTML(tex, display) {
+  for (const t of [tex, safeTex(tex)]) {
+    try { return katex.renderToString(t, { displayMode: display, throwOnError: true, strict: 'ignore', output: 'html' }); } catch { /* essai suivant */ }
   }
+  return null;
 }
+
+/** Formule invalide ou KaTeX pas encore chargé : texte lisible (u₀ × qⁿ), jamais du code rouge. */
+const plainMath = (tex) => `<span class="math-plain">${esc(texToText(tex))}</span>`;
 
 /** Charge KaTeX (une seule fois), puis met en forme les formules en attente. */
 export function preloadMath() {
   katexLoading ||= import('./math.js').then((m) => {
     katex = m.default;
-    document.querySelectorAll('.math-pending').forEach((el) => { el.outerHTML = mathHTML(el.dataset.tex, el.dataset.display === '1'); });
+    document.querySelectorAll('.math-pending').forEach((el) => { el.outerHTML = renderMath(el.dataset.tex, el.dataset.display === '1'); });
   }).catch(() => { katexLoading = null; });
   return katexLoading;
 }
 
-/** Affiche une formule LaTeX avec KaTeX (ou le texte brut en attendant / en cas d'erreur). */
+/**
+ * UNE formule (déjà réparée par normalizeMath) → HTML. Les formules « hautes » en ligne
+ * (fractions, sommes, limites) passent en \displaystyle pour rester lisibles sur téléphone.
+ */
 function renderMath(tex, display) {
-  if (katex) return mathHTML(tex, display);
-  preloadMath();
-  return `<span class="math-pending" data-tex="${esc(tex)}" data-display="${display ? 1 : 0}">${rawMath(tex, display)}</span>`;
+  if (!katex) {
+    preloadMath();
+    return `<span class="math-pending" data-tex="${esc(tex)}" data-display="${display ? 1 : 0}">${plainMath(tex)}</span>`;
+  }
+  const t = !display && isTallMath(tex) ? `\\displaystyle ${tex}` : tex;
+  const html = katexHTML(t, display);
+  if (!html) return plainMath(tex);
+  return display || t === tex ? html : `<span class="math-tall">${html}</span>`;
 }
 
 /** Formule LaTeX en ligne (pour la BD : formule écrite à la main sur une illustration). */
-export const mathInline = (tex) => renderMath(tex, false);
+export const mathInline = (tex) => renderMath(normalizeMath(`$${tex}$`).replace(/^\$|\$$/g, ''), false);
+
+/**
+ * FONCTION CENTRALE des maths : tout texte qui peut contenir des formules passe par ici
+ * (via rich() pour un texte long, mathText() pour un texte court, sourceHtml() pour les
+ * citations). Le texte est d'abord RÉPARÉ (normalizeMath : $ déséquilibrés, commandes sans
+ * barre oblique, échappements JSON…), puis chaque formule est validée par KaTeX ; une
+ * formule qui reste invalide s'affiche en texte lisible.
+ * @param {string} text
+ * @param {boolean} block true = une formule haute seule sur sa ligne est centrée (rich)
+ * @returns {{ html: string, saved: string[] }} texte avec repères \u0000n\u0000 + formules rendues
+ */
+export function renderMathText(text, block = false) {
+  const saved = [];
+  const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
+  let s = normalizeMath(text);
+  // Une formule haute seule sur sa ligne (fraction, somme, limite) : centrée, en grand.
+  if (block) s = s.replace(/^[ \t]*\$([^$\n]+)\$[ \t]*([.,;:]?)[ \t]*$/gm, (m, t, p) => (isTallMath(t) ? `$$${t}${p === '.' || p === ',' ? `\\,${p}` : ''}$$` : m));
+  s = mathSegments(s).map((seg) => (seg.text !== undefined ? seg.text : keep(renderMath(seg.tex, block && seg.display)))).join('');
+  return { html: s, saved };
+}
+const restore = (html, saved) => html.replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
 
 /** Mise en forme dans une ligne : gras, italique. */
 function inline(s) {
@@ -82,18 +114,10 @@ function inline(s) {
  * *italique*, `code`, formules $...$ et $$...$$.
  */
 export function rich(text) {
-  const saved = []; // morceaux mis de côté (formules, code) pour ne pas les abîmer
-  const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
-
-  // 0. Notation correcte : LaTeX abîmé réparé, u(n) → u_n, maths hors formule entre $…$
-  //    (vaut aussi pour les fiches et résumés enregistrés avant la correction).
-  let s = normalizeMath(text);
-  // 1. On met de côté les formules et le code.
-  s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(renderMath(t.trim(), true)));
-  s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => keep(renderMath(t.trim(), true)));
-  s = s.replace(/\\\((.+?)\\\)/g, (_, t) => keep(renderMath(t, false)));
-  s = s.replace(/\$([^$\n]+?)\$/g, (_, t) => keep(renderMath(t, false)));
-  s = s.replace(/`([^`\n]+)`/g, (_, t) => keep(`<code>${esc(t)}</code>`));
+  // 0-1. Formules réparées et rendues (fonction centrale), code mis de côté.
+  const { html, saved } = renderMathText(text, true);
+  const keep = (h) => `\u0000${saved.push(h) - 1}\u0000`;
+  let s = html.replace(/`([^`\n]+)`/g, (_, t) => keep(`<code>${esc(t)}</code>`));
 
   // 2. On protège le reste du texte.
   s = esc(s);
@@ -138,7 +162,7 @@ export function rich(text) {
   closeTable();
 
   // 4. On remet les formules et le code.
-  return out.join('\n').replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
+  return restore(out.join('\n'), saved);
 }
 
 /**
@@ -147,14 +171,8 @@ export function rich(text) {
  * texte écrit par l'IA qui peut contenir des maths.
  */
 export function mathText(text) {
-  const saved = [];
-  const keep = (html) => `\u0000${saved.push(html) - 1}\u0000`;
-  let s = normalizeMath(text);
-  s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(renderMath(t.trim(), false)));
-  s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => keep(renderMath(t.trim(), false)));
-  s = s.replace(/\\\((.+?)\\\)/g, (_, t) => keep(renderMath(t, false)));
-  s = s.replace(/\$([^$\n]+?)\$/g, (_, t) => keep(renderMath(t, false)));
-  return inline(esc(s)).replace(/\s*\n\s*/g, ' ').replace(/\u0000(\d+)\u0000/g, (_, i) => saved[i]);
+  const { html, saved } = renderMathText(text, false);
+  return restore(inline(esc(html)).replace(/\s*\n\s*/g, ' '), saved);
 }
 
 // ---------------------------------------------------------------------
@@ -381,7 +399,7 @@ export function sourceHtml(course, source) {
     absente: `<span class="chip bad" title="${t("Citation introuvable dans le cours : méfie-toi")}">${t("⚠ non retrouvée")}</span>`,
   }[checkQuote(course, source)];
   return `<div class="source">📖 <strong>${label} ${esc(source.page)}</strong> ${badge}
-    <blockquote>« ${esc(source.quote)} »</blockquote></div>`;
+    <blockquote>« ${mathText(source.quote)} »</blockquote></div>`;
 }
 
 // ---------------------------------------------------------------------

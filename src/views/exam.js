@@ -61,7 +61,7 @@ async function renderSetup(el) {
     ${exams.map((x) => {
       const best = x.attempts?.length ? Math.max(...x.attempts.map((a) => a.total)) : null;
       return `<a class="tile" href="#/exam/${x.id}" style="display:block;margin-bottom:8px;text-decoration:none;color:inherit">
-        <div class="row nowrap"><div class="grow"><strong>${esc(x.title)}</strong>
+        <div class="row nowrap"><div class="grow"><strong>${mathText(x.title)}</strong>
           <div class="tiny muted">${frDate(x.createdAt)} · ${x.minutes} ${t("min ·")} ${x.questions.length} ${t("questions")}</div></div>
           ${x.session ? `<span class="chip warn">${t("en cours")}</span>` : best === null ? `<span class="chip">${t("à faire")}</span>` : `<span class="chip ${best >= 10 ? 'ok' : 'bad'}">${best}/20</span>`}</div></a>`;
     }).join('')}`;
@@ -92,7 +92,7 @@ async function renderSetup(el) {
 // ---------------------------------------------------------------------
 function renderIntro(el, exam) {
   el.innerHTML = `
-    <div class="screen-head"><a class="back-btn" href="#/exam">←</a><h1 style="font-size:1.2rem">${esc(exam.title)}</h1></div>
+    <div class="screen-head"><a class="back-btn" href="#/exam">←</a><h1 style="font-size:1.2rem">${mathText(exam.title)}</h1></div>
     <div class="tile center" style="margin-bottom:12px">
       ${characterHTML('ren', { expression: 'concentration', size: 150 })}
       <div class="bubble top" style="text-align:left;margin:10px 0;--c:${CHARACTERS.ren.color}"><span class="who">Ren</span>${esc(line('ren', 'arrivee'))}</div>
@@ -122,7 +122,7 @@ function renderSession(el, exam, courses) {
   const endAt = s.startedAt + exam.minutes * 60000;
   el.innerHTML = `
     <div class="exam-timer tile glass" id="timer">
-      <div class="row nowrap"><span class="grow"><strong>${esc(exam.title)}</strong></span><span class="display" id="clock">--:--</span></div>
+      <div class="row nowrap"><span class="grow"><strong>${mathText(exam.title)}</strong></span><span class="display" id="clock">--:--</span></div>
       <div class="bar" style="margin-top:6px"><div id="tbar" style="width:100%;background:var(--grad-fire)"></div></div>
     </div>
     ${exam.questions.map((q, i) => `
@@ -215,7 +215,7 @@ function renderResult(el, exam, courses, attempt, xpResult) {
   const color = total >= 16 ? 'var(--neon-green)' : total >= 12 ? 'var(--neon-cyan)' : total >= 8 ? 'var(--neon-yellow)' : 'var(--neon-pink)';
   const courseOf = (q) => courses.find((c) => c.title === q.course) || courses[0];
   el.innerHTML = `
-    <div class="screen-head"><a class="back-btn" href="#/exam">←</a><h1 style="font-size:1.2rem">${esc(exam.title)}</h1></div>
+    <div class="screen-head"><a class="back-btn" href="#/exam">←</a><h1 style="font-size:1.2rem">${mathText(exam.title)}</h1></div>
     <div class="tile center speedlines" style="margin-bottom:12px;border-color:${color}">
       ${characterHTML('ren', { expression: total >= 14 ? 'surprise' : total >= 10 ? 'joie' : 'encouragement', size: 140 })}
       <div class="label">${t("Ta note")}</div>
@@ -242,11 +242,12 @@ function renderResult(el, exam, courses, attempt, xpResult) {
         <details><summary class="small" style="cursor:pointer">${t("📋 Corrigé type")}</summary><div class="rich small">${rich(q.kind === 'qcm' ? `${'ABCD'[q.correctIndex]}. ${q.choices[q.correctIndex]}\n\n${q.expected}` : q.expected)}</div></details>
         ${courseOf(q) ? sourceHtml(courseOf(q), q.source) : ''}
       </div>`;
+    }).join('')}
+    <button class="btn pink block" id="again" style="margin-bottom:20px">${t("🔁 Repasser cet examen")}</button>`;
+  // Bouton « Partager en statut » (le titre passe en texte simple : pas de LaTeX sur l'image)
   el.querySelector('#status')?.addEventListener('click', () => offerStatus({
     kicker: t('Examen blanc'), big: `${total}/20`, sub: exam.title.slice(0, 40), lines: [VERDICT[attempt.verdict] || t('Réussi !')],
   }));
-    }).join('')}
-    <button class="btn pink block" id="again" style="margin-bottom:20px">${t("🔁 Repasser cet examen")}</button>`;
   el.querySelector('#again').onclick = async () => {
     exam.showIntro = true;
     await db.put('exams', exam);
