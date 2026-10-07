@@ -14,7 +14,7 @@
 
 import { renderPage, revealImages, pageBoxes, assetUrl, setMathRenderer, PAGE_W, PAGE_H } from './comic.js';
 import { mathInline } from '../ui/ui.js';
-import { setDisplayWidth, preloadPage } from './story-images.js';
+import { setDisplayWidth, preloadPage, storyImage } from './story-images.js';
 import { playSfx, startAmbient, stopAmbient } from '../ui/sfx.js';
 import { vibrate } from '../ui/fx.js';
 import * as db from '../core/db.js';
@@ -23,6 +23,7 @@ import { t } from '../i18n/index.js';
 setMathRenderer(mathInline); // formules écrites à la main sur certaines cases
 const MODE_KEY = 'bdMode';
 const RESUME_KEY = 'bdReprise';
+const MAX_UPSCALE = 1.15; // agrandissement maximal d'une illustration par rapport à sa taille d'origine
 
 function readResume() {
   try { return JSON.parse(localStorage.getItem(RESUME_KEY) || '{}') || {}; } catch { return {}; }
@@ -61,6 +62,7 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
   let panelIdx = 0;
   let current = null; // { svg, panels }
   let ambient = null;
+  let settle = null; // fin du zoom (voir focusPanel)
 
   el.innerHTML = `
     <div class="bd">
@@ -134,12 +136,24 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
     // L'écran n'est pas encore affiché (taille 0) : on réessaie à l'image suivante.
     if (!vw || !vh) { requestAnimationFrame(() => focusPanel(false)); return; }
     const pad = 10;
-    const k = Math.min((vw - pad * 2) / p.box.w, (vh - pad * 2) / p.box.h);
+    let k = Math.min((vw - pad * 2) / p.box.w, (vh - pad * 2) / p.box.h);
+    // Netteté : on ne zoome jamais l'illustration au-delà de ~1,15 fois sa taille d'origine
+    // (écran haute densité compris). Si la case est très recadrée, le zoom est un peu réduit.
+    const src = storyImage(chapterId, pageIdx, panelIdx);
+    if (src?.w && p.crop) {
+      const dpr = window.devicePixelRatio || 1;
+      k = Math.min(k, Math.max((MAX_UPSCALE * src.w) / (p.crop.dw * dpr), k * 0.6));
+    }
     const cx = p.box.x + p.box.w / 2; const cy = p.box.y + p.box.h / 2;
     // La page est dessinée à sa taille "naturelle" (PAGE_W px de large), puis transformée.
     holder.style.width = `${PAGE_W}px`;
     holder.style.height = `${PAGE_H}px`;
     holder.style.transition = animate ? 'transform .55s cubic-bezier(.3,.9,.3,1)' : 'none';
+    // « will-change » seulement PENDANT le zoom : s'il restait, le navigateur garderait l'image
+    // calculée à l'échelle de la 1re case et l'agrandirait (flou) pour les cases suivantes.
+    holder.style.willChange = animate ? 'transform' : 'auto';
+    clearTimeout(settle);
+    if (animate) settle = setTimeout(() => { holder.style.willChange = 'auto'; }, 650);
     holder.style.transform = `translate(${vw / 2 - cx * k}px, ${vh / 2 - cy * k}px) scale(${k})`;
     const poly = p.poly.map((q) => `${q[0]},${q[1]}`).join(' L');
     const veil = svg.querySelector('#bd-veil');

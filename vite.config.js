@@ -19,6 +19,7 @@ import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSy
 import { join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 import { processSheets, sheetFiles, CHAR_DIR } from './scripts/planches.mjs';
+import { STORY_QUALITY, widthsFor, variantName, maxBytesFor } from './scripts/story-widths.mjs';
 
 const base = process.env.BASE_PATH || '/';
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
@@ -170,8 +171,9 @@ function preloadFonts() {
 // chapitre 1. Ce plugin :
 //   - cherche ces fichiers et donne leur liste à l'appli (module
 //     "virtual:story-images", lu par src/comic/story-images.js) ;
-//   - au build, les optimise en WebP, en 3 LARGEURS (600, 900 et 1200 px ;
-//     la plus grande fait moins de 200 Ko) : l'appli choisit selon l'écran ;
+//   - au build, les optimise en WebP (qualité 85) en plusieurs LARGEURS (600, 900, 1200 px et la
+//     taille d'origine, jusqu'à 2400 px : voir scripts/story-widths.mjs) : l'appli choisit selon
+//     la taille réellement affichée de l'image et la densité de l'écran ;
 //   - crée pour chaque image un APERÇU FLOU minuscule (≈ 300 octets) inclus
 //     dans l'appli : la case s'affiche aussitôt, puis l'image nette arrive en fondu
 //     (avec "sharp" ; s'il manque, l'image est publiée telle quelle) ;
@@ -181,10 +183,6 @@ function preloadFonts() {
 const STORY_DIR = 'public/story';
 const STORY_FILE = /^page-(\d+)-case-(\d+)\.(webp|png|jpe?g)$/i;
 const STORY_ID = 'virtual:story-images';
-const STORY_WIDTHS = [600, 900, 1200]; // la plus grande garde le nom sans suffixe
-const STORY_MAX_BYTES = { 600: 70 * 1024, 900: 130 * 1024, 1200: 200 * 1024 };
-/** Nom publié d'une largeur : chapitre-1/page-1-case-1.webp (1200) ou …-600.webp */
-const variantName = (key, w) => (w === 1200 ? `${key}.webp` : `${key}-${w}.webp`);
 
 /** { 'chapitre-1/page-2-case-3': 'chapitre-1/Page-2-Case-3.PNG', … } (le .webp gagne s'il y a des doublons) */
 function scanStory() {
@@ -226,17 +224,19 @@ async function loadSharp() {
   try { return (await import('sharp')).default; } catch { return null; }
 }
 
-/** WebP de largeur max `width` ; qualité baissée (puis taille réduite) jusqu'à passer sous le plafond. */
+/**
+ * WebP de largeur max `width`, qualité 85 (smartSubsample : les contours colorés restent nets).
+ * Filet de sécurité : si le fichier dépasse le plafond de poids (image très chargée), la qualité
+ * baisse par petits pas, jamais sous 77 ; la taille de l'image n'est jamais réduite.
+ */
 async function optimize(sharp, input, width = 1200) {
-  let px = width;
+  const cap = maxBytesFor(width);
   let out;
-  for (let tries = 0; tries < 18; tries++) {
-    const q = 82 - (tries % 6) * 8; // 82 → 42
+  for (let q = STORY_QUALITY; q >= 77; q -= 2) {
     out = await sharp(input).rotate()
-      .resize({ width: px, height: px, fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: q, effort: 5 }).toBuffer();
-    if (out.length <= STORY_MAX_BYTES[width]) break;
-    if (tries % 6 === 5) px = Math.round(px * 0.8);
+      .resize({ width, height: width * 4, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: q, effort: 5, smartSubsample: true }).toBuffer();
+    if (out.length <= cap) break;
   }
   return out;
 }
@@ -247,8 +247,6 @@ async function lqip(sharp, file) {
   return `data:image/webp;base64,${buf.toString('base64')}`;
 }
 
-/** Largeurs à publier pour une image de largeur `w` (jamais d'agrandissement). */
-const widthsFor = (w) => { const l = STORY_WIDTHS.filter((x) => x <= w); return l.length ? (l.includes(1200) ? l : [...l, 1200]) : [1200]; };
 
 function storyImages() {
   let isBuild = false;
@@ -279,9 +277,10 @@ function storyImages() {
         // ?v=empreinte du fichier : une image remplacée sur GitHub change d'adresse,
         // donc le cache (service worker) ne garde jamais une ancienne version.
         const v = `?v=${createHash('md5').update(readFileSync(path)).digest('hex').slice(0, 8)}`;
-        const srcs = optimized ? Object.fromEntries(widthsFor(w).map((x) => [x, `story/${variantName(key, x)}${v}`])) : { [w || 1200]: `story/${file}${v}` };
+        const ws = widthsFor(w);
+        const srcs = optimized ? Object.fromEntries(ws.map((x) => [x, `story/${variantName(key, x, ws)}${v}`])) : { [w || 1200]: `story/${file}${v}` };
         images[key] = {
-          src: optimized ? `story/${variantName(key, 1200)}${v}` : `story/${file}${v}`,
+          src: optimized ? `story/${variantName(key, ws.at(-1), ws)}${v}` : `story/${file}${v}`,
           w,
           h: (turned ? meta.width : meta.height) || 0,
           lqip: sharp ? await lqip(sharp, path).catch(() => '') : '',
@@ -327,9 +326,10 @@ export const LAYOUTS = ${JSON.stringify(scanLayouts(this))};`;
         const meta = await sharp(input).metadata();
         const w = (meta.orientation || 1) >= 5 ? meta.height : meta.width;
         const sizes = [];
-        for (const width of widthsFor(w)) {
+        const ws = widthsFor(w);
+        for (const width of ws) {
           const buf = await optimize(sharp, input, width);
-          const dest = join(outDir, 'story', variantName(key, width));
+          const dest = join(outDir, 'story', variantName(key, width, ws));
           mkdirSync(join(dest, '..'), { recursive: true });
           writeFileSync(dest, buf);
           sizes.push(`${width} px ${Math.round(buf.length / 1024)} Ko`);

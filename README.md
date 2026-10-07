@@ -868,6 +868,8 @@ public/story/chapitre-1/page-2-case-3.webp
               └── chapitre 1
 ```
 - Formats acceptés : **.webp**, **.png** ou **.jpg** (n'importe quelle taille).
+- **Netteté** : dépose l'image en pleine taille (plus elle est large, plus elle reste nette ; une image de
+  1376 px ne peut pas être plus nette que 1376 px). Contrôle : `npm run verifier-nettete -- 1`.
 - Pour connaître le nom exact de chaque case : appli → **Panneau créateur** →
   **🖼️ Illustrations des cases**. Chaque case y est listée avec ✅ (illustrée) ou
   ⬜ (dessin), son nom de fichier et la description de la scène.
@@ -1131,6 +1133,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.19.4** : illustrations de la BD nettes dans l'appli. Le lecteur choisissait un fichier trop petit
+  (il ignorait que l'image dépasse de la case étroite, ×1,6 à ×2,4) : il compte maintenant la largeur
+  réelle de l'image et les écrans jusqu'à ×3. Qualité WebP 85, plus grande version = taille native de
+  l'image (ex. 1376 px ; 1600/2000/2400 px créées si l'image source est plus grande, voir
+  `scripts/story-widths.mjs`). Zoom du lecteur limité à ×1,15 la taille d'origine ; plus de
+  `will-change` permanent (il figeait la netteté). Contrôle : `npm run verifier-nettete -- N`.
 - ✅ **v1.19.3** : 15 illustrations de plus (pages 5 à 7 du chapitre 1, soit 34 images sur 54) ; scénario
   des pages 5 à 8 ajusté (grand panneau qui se vide, enseignes vides, étal de mangues renversé,
   Kaï projeté contre le pilier en béton et non dans l'étal wax) ; bible de continuité du marché ;

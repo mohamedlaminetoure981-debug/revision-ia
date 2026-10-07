@@ -1,7 +1,7 @@
 {
   "name": "revision-ia",
   "private": true,
-  "version": "1.19.3",
+  "version": "1.19.4",
   "type": "module",
   "description": "Application de révision avec IA (PWA) – La Jeunesse de 2026",
   "scripts": {
@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "verifier-bulles": "node scripts/verifier-bulles.mjs",
     "i18n:extraire": "node scripts/i18n-extraire.mjs",
-    "traduire": "node scripts/traduire.mjs"
+    "traduire": "node scripts/traduire.mjs",
+    "verifier-nettete": "node scripts/verifier-nettete.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.5",

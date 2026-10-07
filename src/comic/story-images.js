@@ -29,14 +29,14 @@ export function storyImage(chapter, pageIdx, panelIdx) {
 // ---------------------------------------------------------------------
 // CHOIX DE LA TAILLE (équivalent de srcset, que les images SVG n'ont pas)
 // ---------------------------------------------------------------------
-// Largeur affichée (px CSS) d'une case { w, h } (unités de page). Par défaut : estimation
+// Largeur affichée (px CSS) d'une CASE { w, h } (unités de page). Par défaut : estimation
 // du lecteur "case par case" (zoom sur la case) ; le lecteur la précise à l'ouverture.
 let displayWidth = (box) => {
   if (typeof window === 'undefined') return 1000;
   return Math.min(window.innerWidth - 20, (box.w * (window.innerHeight - 140)) / box.h);
 };
 
-/** Le lecteur indique comment la page est affichée : (case { w, h }) → largeur en px CSS à l'écran. */
+/** Le lecteur indique comment la page est affichée : (case { w, h }) → largeur de la case en px CSS à l'écran. */
 export function setDisplayWidth(fn) { displayWidth = fn; }
 
 /** Connexion lente ou "économie de données" : on vise une image un peu plus légère. */
@@ -46,16 +46,24 @@ function slowNet() {
 }
 
 /**
- * Fichier le mieux adapté à l'écran : la plus petite largeur publiée qui couvre la
- * taille affichée × densité de l'écran (plafonnée à 2 : au-delà, la différence ne se
- * voit pas mais coûte cher sur une connexion lente).
+ * Part de l'image qui dépasse de la case : l'image remplit la case en gardant ses proportions
+ * (recadrage « cover »), donc dans une case étroite elle est bien PLUS LARGE que la case.
+ * Ex. image 16:9 dans une case de 305 × 400 : l'image fait 2,3 fois la largeur de la case.
+ */
+export const coverFactor = (img, box) => Math.max(1, (img.w / img.h) * (box.h / box.w) || 1);
+
+/**
+ * Fichier le mieux adapté à l'écran : la plus petite largeur publiée qui couvre la largeur
+ * RÉELLEMENT affichée de l'IMAGE (case × recadrage) × densité de l'écran (jusqu'à 3 : téléphones
+ * haute densité). Avant, seule la largeur de la case comptait : une image recadrée dans une case
+ * étroite était agrandie, donc floue.
  */
 export function pickSrc(img, box) {
   if (!img?.srcs) return img?.src || null;
-  const dpr = typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio || 1) : 1;
-  const need = displayWidth(box) * dpr * (slowNet() ? 0.75 : 1);
+  const dpr = typeof window !== 'undefined' ? Math.min(3, window.devicePixelRatio || 1) : 1;
+  const need = displayWidth(box) * (img.w ? coverFactor(img, box) : 1) * dpr * (slowNet() ? 0.85 : 1);
   const widths = Object.keys(img.srcs).map(Number).sort((a, b) => a - b);
-  const w = widths.find((x) => x >= need * 0.9) ?? widths.at(-1);
+  const w = widths.find((x) => x >= need * 0.97) ?? widths.at(-1);
   return img.srcs[w];
 }
 

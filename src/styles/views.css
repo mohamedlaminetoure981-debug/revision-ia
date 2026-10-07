@@ -375,7 +375,7 @@ details > summary .rich p { display: inline; margin: 0; }
 .bd-title { font-family: var(--font-display); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bd-view { flex: 1; min-height: 0; position: relative; overflow-y: auto; overflow-x: hidden; touch-action: pan-y; }
 .bd-view.case { overflow: hidden; touch-action: none; cursor: pointer; }
-.bd-page { transform-origin: 0 0; margin: 0 auto; max-width: 760px; will-change: transform; }
+.bd-page { transform-origin: 0 0; margin: 0 auto; max-width: 760px; } /* pas de will-change permanent : il rendrait les cases zoomées floues */
 .bd-view.case .bd-page { max-width: none; margin: 0; }
 .bd-page svg { display: block; width: 100%; height: 100%; }
 .bd-view:not(.case) .bd-page svg { height: auto; }
