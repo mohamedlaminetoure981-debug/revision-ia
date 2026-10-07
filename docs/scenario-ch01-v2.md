@@ -21,6 +21,8 @@
 4. Dans ce chapitre, ses vagues suivent une suite géométrique : 8 s, 4 s, 2 s, 1 s…
    (premier terme 8, raison ½). Somme : S = u₀ / (1 − q) = 8 / (1 − ½) = 16 secondes.
    Il se condense à la 16ᵉ seconde, là où il a le plus mangé (devant le grand panneau).
+5. **Une fois condensé, l'Oubli devient solide et lourd, donc il tombe** : le noyau de verre quitte le
+   panneau, chute et s'arrête à hauteur de poitrine, au pied de l'immeuble d'angle (page 11 case 3).
 
 ### Apparence de l'Oubli
 Silhouette encapuchonnée immense, yeux blancs sans pupilles, contour violet lumineux,
@@ -36,7 +38,7 @@ violet translucide qui brille comme du verre.
 - **Mory** : uniquement page 12 case 5, sur un toit, lunettes qui brillent, antenne bricolée.
 - **Figurants** : le chauffeur de taxi (taxi jaune, page 2) ; la vendeuse de mangues (pages 5
   et 12, pagne coloré, foulard) ; l'étudiant (pages 6 à 12 : jeune homme, lunettes, chemise
-  claire, cahier bleu) ; un passant caché derrière un étal (page 9).
+  claire, cahier bleu) ; un passant caché derrière l'étal de mangues renversé (page 9 : chemise verte, petit bonnet blanc).
 
 ### État physique de Kaï (à respecter case par case)
 - Pages 1 à 7 case 4 : intact.
@@ -52,7 +54,7 @@ violet translucide qui brille comme du verre.
 | 3 case 1 | escalier de l'immeuble de Kaï | nuit tombée | lampe faible |
 | 3-4 | chambre d'étudiant (lit, bureau, ordi, cahier, ventilateur au plafond, réveil, fenêtre sur Kaloum) | 2 h 47 → 3 h 12 | bleue (écran), puis violette (Oubli), puis seulement les lumières de la ville rallumées à travers la fenêtre |
 | 5-12 | marché de Madina (étal de mangues, étal de tissus wax, boutiques aux enseignes, motos-taxis, foule, pilier en béton côté droit) avec un **grand panneau publicitaire au-dessus du carrefour**, toujours visible dans les plans larges | 7 h 40 | plein soleil, ombres nettes ; lueur violette autour de l'Oubli |
-| 12 case 5 | un toit qui domine la même rue du marché | 7 h 41 | plein soleil |
+| 12 case 5 | le toit-terrasse au réservoir d'eau, au-dessus des boutiques de droite, qui domine la même rue | 7 h 41 | plein soleil |
 
 ### Continuité du marché (pages 5 à 12)
 - **Enseignes** : intactes page 5 case 1 ; la case 2 voit le GRAND PANNEAU se vider ; à partir de la
@@ -65,6 +67,14 @@ violet translucide qui brille comme du verre.
 - **Étal de tissus wax** : intact tout le chapitre (Kaï ne tombe jamais dedans).
 - **Pilier en béton** d'une boutique du côté droit de la rue (enseigne blanche vide) : fissuré page 7
   case 5 (Kaï est projeté contre lui) ; caisses en plastique bleues et vertes renversées à son pied.
+- **L'Oubli et le panneau** : il sort du panneau page 6 ; page 8 case 3 il a quitté le panneau et flotte
+  au-dessus de Kaï (le panneau reste déchiré et vide) ; page 10 case 3 il s'éloigne vers le panneau,
+  comme aspiré ; page 11 case 3 son noyau, devenu solide et lourd, tombe du panneau et s'arrête à
+  hauteur de poitrine, au pied de l'immeuble d'angle (règle 5).
+- **Route de Kaï vers le carrefour** (pages 10 à 11) : le long des boutiques de droite, puis sur
+  l'asphalte ; aucun étal sur le chemin ; une moto rouge renversée près du carrefour (page 11 case 2).
+- **Page 8 case 1** : l'étudiant, à genoux, est en arrière-plan ; le téléphone fissuré est au sol près
+  de la main de Kaï (il le ramasse page 9 case 1).
 - **Positions** : Kaï est plus près du carrefour (donc de l'Oubli) que l'étudiant (pages 6 et 7 case 1).
   Le sac à dos de Kaï tombe sur la route, près du pilier (page 7 case 5), et n'est plus sur lui ensuite.
 
@@ -289,16 +299,18 @@ vertes tombent, son sac à dos tombe sur la route. Kaï ne tombe PAS dans l'éta
 
 ## PAGE 8 — Au sol (5 cases)
 
-**Case 1** — Kaï à terre, au pied du pilier fissuré de la boutique, parmi les caisses en plastique
-bleues et vertes renversées, lèvre en sang, manche droite déchirée, sonné, il grimace. Son sac à
-dos est un peu plus loin, sur la route.
+**Case 1** — Kaï est assis au pied du pilier fissuré de la boutique, parmi les caisses en plastique
+bleues et vertes renversées, lèvre en sang, manche droite déchirée, sonné, il grimace. Son téléphone
+à l'écran fissuré est au sol près de sa main, son sac à dos un peu plus loin ; l'étudiant, à genoux,
+est en arrière-plan.
 - Pensée de Kaï : « J'ai… mal… »
 
-**Case 2** — Gros plan sur le visage de Kaï, terrifié : il essaie de se souvenir de quelque
-chose et n'y arrive pas. Effet glitch violet sur le bord de la case.
+**Case 2** — Gros plan sur le visage terrifié de Kaï : il essaie de se souvenir de quelque
+chose et n'y arrive pas. Effet glitch violet UNIQUEMENT sur les bords de la case.
 - Pensée de Kaï (bulle qui se brouille) : « Le prénom de ma mère… c'est… c'est… »
 
-**Case 3** — Contre-plongée. L'Oubli se penche au-dessus de lui, immense, yeux blancs.
+**Case 3** — Vue depuis les yeux de Kaï, en contre-plongée : l'Oubli a quitté le grand panneau et flotte
+au-dessus de lui, immense, yeux blancs ; au loin, le panneau est déchiré et vide.
 - L'Oubli (murmure violet) : « …Savoir… non révisé… À MOI… »
 
 **Case 4** — [ÉCRAN APPLI] À côté de la main de Kaï, son téléphone tombé au sol, écran
@@ -311,20 +323,20 @@ concentration.
 
 ## PAGE 9 — Le chronomètre (5 cases)
 
-**Case 1** — L'Oubli lance une vague : toutes les enseignes (vides) du marché clignotent en même
-temps en violet. Kaï, toujours au sol, attrape son téléphone et lève les yeux.
+**Case 1** — Même point de vue (les yeux de Kaï) : sa main ramasse son téléphone ; l'Oubli lance une
+vague (anneau violet) et les enseignes vides s'allument en violet.
 - Onomatopée : « VMMMM »
 
 **Case 2** — [ÉCRAN APPLI] Le chronomètre du téléphone, lancé. Il affiche 00:08,0 au moment
 de la vague suivante.
 - Pensée de Kaï : « Huit secondes entre les deux premières vagues. »
 
-**Case 3** — Nouvelles vagues, plus rapprochées ; les enseignes clignotent de plus en plus vite.
-Kaï compte, concentré.
+**Case 3** — Même point de vue : quatre anneaux de plus en plus rapprochés, les enseignes clignotent de
+plus en plus vite. Kaï compte, son téléphone en main.
 - Onomatopée : « VMMM… VMM… VM »
 - Pensée de Kaï : « Puis quatre… puis deux… puis une… »
 
-**Case 4** — Un passant caché derrière un étal renversé, paniqué.
+**Case 4** — Un passant (chemise verte, petit bonnet blanc) caché derrière l'étal de mangues renversé, paniqué.
 - Passant : « Il accélère ! Il va tout dévorer, il s'arrêtera jamais !! »
 
 **Case 5** — Kaï, le regard dur, le téléphone à la main.
@@ -339,26 +351,28 @@ formule S = u₀ / (1 − q) restée intacte quand tout le reste s'effaçait.
 **Case 2** — Gros plan sur Kaï, un sourire de compréhension malgré le sang sur sa lèvre.
 - Kaï : « 8 + 4 + 2 + 1 + … Une infinité de vagues… mais en un temps FINI. »
 
-**Case 3** — Grande case. Kaï se relève, téléphone en main ; derrière lui, au loin, le grand
-panneau déchiré du carrefour.
+**Case 3** — Grande case. Kaï se relève près du pilier, téléphone en main ; l'Oubli s'éloigne vers le
+grand panneau déchiré du carrefour, comme aspiré.
 - Kaï : « Seize secondes. Il va se condenser à la seizième seconde. Là où il a le plus
   mangé… devant le panneau ! »
 
-**Case 4** — L'étudiant tend le bras vers Kaï qui part déjà en courant vers le panneau.
+**Case 4** — L'étudiant, à genoux, tend le bras vers Kaï qui court déjà vers le carrefour.
 - Étudiant : « T'es fou ?! Reviens ! »
 
 ## PAGE 11 — Seize (5 cases)
 
-**Case 1** — Kaï court à travers le marché et glisse sous un étal pour esquiver un tentacule.
+**Case 1** — Kaï, à mi-chemin du carrefour, glisse sur l'asphalte comme au baseball sous un tentacule
+(il n'y a pas d'étal sur sa route).
 - Onomatopée : « FWOOSH »
 - Kaï : « Onze… »
 
-**Case 2** — Kaï saute par-dessus une moto renversée ; derrière lui, un tentacule fracasse le sol.
+**Case 2** — Kaï saute par-dessus une moto rouge renversée, près du carrefour ; derrière lui, un tentacule
+fracasse le sol.
 - Onomatopée : « KRAK ! »
 - Kaï : « Treize… quatorze… »
 
-**Case 3** — Devant le grand panneau, l'Oubli se contracte : ses tentacules sont aspirés vers
-le centre, un noyau compact violet translucide apparaît, brillant comme du verre. Kaï arme
+**Case 3** — En se condensant, l'Oubli devient solide et lourd : son noyau de verre violet translucide
+tombe du grand panneau et s'arrête à hauteur de poitrine, au pied de l'immeuble d'angle. Kaï arme
 son poing droit.
 - Kaï : « Quinze… »
 
@@ -373,8 +387,8 @@ s'enfuit vers le ciel.
 
 ## PAGE 12 — Après le combat (5 cases)
 
-**Case 1** — Les lettres reviennent sur les enseignes, la vendeuse retrouve ses prix (son étal de
-mangues reste renversé), le cahier bleu de l'étudiant se remplit à nouveau.
+**Case 1** — Tout revient : les lettres sur les enseignes, les prix de la vendeuse (son étal de mangues
+reste renversé), le cahier bleu de l'étudiant. Kaï est au loin, à genoux au carrefour.
 - Vendeuse : « La mangue, cinq mille ! Je me souviens !! »
 
 **Case 2** — Kaï à genoux, essoufflé, se tient le poing droit (jointures en sang), grimace.
@@ -388,7 +402,8 @@ mangues reste renversé), le cahier bleu de l'étudiant se remplit à nouveau.
 **Case 4** — [ÉCRAN APPLI] L'écran fissuré du téléphone s'allume.
 - Message — LE CRÉATEUR : « 1 sur 8. Trouve les autres. »
 
-**Case 5** — Plan large depuis un toit qui domine la même rue du marché. Mory, de profil,
-antenne bricolée posée à côté de lui, tient un chronomètre arrêté sur 16,0. Ses lunettes brillent.
+**Case 5** — Plan large depuis le toit-terrasse au réservoir d'eau, au-dessus des boutiques de droite, qui
+domine la même rue du marché. Mory, accroupi, antenne bricolée posée à côté de lui, tient un
+chronomètre (la mention « 16,0 » est dans sa réplique). Ses lunettes brillent.
 - Mory (murmure) : « Il a trouvé la limite… tout seul. Un deuxième. Enfin. »
 - Cartouche : « À suivre… »

@@ -582,7 +582,7 @@ export default {
       rows: [{ h: 0.3, cols: [0.58, 0.42], ctilt: [-22] }, { h: 0.38, cols: [1], tilt: 30 }, { h: 0.32, cols: [0.44, 0.56], ctilt: [22] }],
       panels: [
         {
-          action: 'Kaï à terre, au pied du pilier fissuré de la boutique (côté droit de la rue), parmi les caisses en plastique bleues et vertes renversées ; lèvre en sang, manche droite déchirée, poussière, sonné, il grimace. Son sac à dos est un peu plus loin, sur la route. Marché, plein soleil.',
+          action: 'Kaï est assis au pied du pilier fissuré de la boutique (côté droit de la rue), parmi les caisses en plastique bleues et vertes renversées ; lèvre en sang, manche droite déchirée, poussière, sonné, il grimace. Son téléphone à l’écran fissuré est au sol près de sa main, son sac à dos un peu plus loin. L’étudiant, à genoux, est en arrière-plan. Marché, plein soleil.',
           bg: { id: 'aplat', color: '#b9a58c', color2: '#6f6a74' },
           chars: [{ id: 'kai', expr: 'encouragement', shot: 'buste', x: 0.5, y: 0.28, fill: 0.72, turn: 0.2 }],
           fx: [{ type: 'trame', color: '#1f6fb2', opacity: 0.3 }],
@@ -595,7 +595,7 @@ export default {
           bubbles: [{ type: 'pensee', text: 'J’ai… mal…', x: 0.24, y: 0.13, w: 0.4, who: 0 }],
         },
         {
-          action: 'Gros plan sur le visage de Kaï, terrifié : il essaie de se souvenir de quelque chose et n’y arrive pas. Effet glitch violet sur le bord de la case. Lèvre en sang. Plein soleil.',
+          action: 'Gros plan sur le visage terrifié de Kaï : il essaie de se souvenir de quelque chose et n’y arrive pas. Effet glitch violet UNIQUEMENT sur les bords de la case. Lèvre en sang. Plein soleil.',
           bg: { id: 'aplat', color: '#2a1f55', color2: '#0d0718' },
           chars: [{ id: 'kai', expr: 'surprise', shot: 'gros', x: 0.5, y: 0.08, fill: 1.05, light: VIOLET }],
           fx: [{ type: 'glitch', n: 8 }],
@@ -607,7 +607,7 @@ export default {
           bubbles: [{ type: 'pensee', text: 'Le prénom de ma mère… c’est… c’est…', x: 0.25, y: 0.2, w: 0.42, who: 0 }],
         },
         {
-          action: 'Contre-plongée. L’Oubli se penche au-dessus de Kaï, immense, yeux blancs, contour violet. Kaï au premier plan, éclairé en violet. Lèvre en sang. Ciel bleu derrière, ombre violette.',
+          action: 'Vue depuis les yeux de Kaï, en contre-plongée : l’Oubli a quitté le grand panneau et flotte au-dessus de lui, immense, yeux blancs, contour violet ; au loin, le panneau est déchiré et vide. Les pieds de Kaï en bas de l’image. Ciel bleu, ombre violette.',
           bg: { id: 'oubli' },
           chars: [
             { id: 'oubli', pose: 'flotte', shot: 'taille', x: 0.6, y: 0.0, fill: 1, seed: 2 },
@@ -648,7 +648,7 @@ export default {
       rows: [{ h: 0.34, cols: [1], tilt: -30 }, { h: 0.33, cols: [0.44, 0.56], ctilt: [24] }, { h: 0.33, cols: [0.5, 0.5], ctilt: [-20] }],
       panels: [
         {
-          action: 'L’Oubli lance une vague : toutes les enseignes (vides) du marché clignotent en même temps en violet. Kaï, toujours au sol, attrape son téléphone et lève les yeux. Plein soleil, lueur violette. Kaï : lèvre en sang, manche déchirée, poussière, sans sac.',
+          action: 'Même point de vue que la page 8 case 3 (les yeux de Kaï) : sa main (manche déchirée) ramasse son téléphone ; l’Oubli lance une vague (anneau violet) et les enseignes vides s’allument en violet. Plein soleil, lueur violette.',
           bg: { id: 'marche', time: 'jour', horizon: 0.55, vp: 0.6 },
           chars: [
             { id: 'oubli', pose: 'flotte', shot: 'pied', x: 0.68, y: 0.92, fill: 0.85, seed: 11 },
@@ -670,7 +670,7 @@ export default {
           bubbles: [{ type: 'pensee', text: 'Huit secondes entre les deux premières vagues.', x: 0.5, y: 0.82, w: 0.86, tail: false }],
         },
         {
-          action: 'Nouvelles vagues, plus rapprochées ; les enseignes clignotent de plus en plus vite. Kaï compte, concentré. Plein soleil, éclats violets. Lèvre en sang, manche déchirée.',
+          action: 'Même point de vue : quatre anneaux violets de plus en plus rapprochés, les enseignes clignotent de plus en plus vite. Kaï, qui compte, tient son téléphone. Plein soleil, éclats violets.',
           bg: { id: 'marche', time: 'jour', horizon: 0.5, vp: 0.4 },
           chars: [{ id: 'kai', expr: 'concentration', shot: 'buste', x: 0.7, y: 0.32, fill: 0.7, turn: -0.2 }],
           fx: [{ type: 'teinte', color: VIOLET, opacity: 0.12 }, { type: 'glitch', n: 10 }],
@@ -684,7 +684,7 @@ export default {
           bubbles: [{ type: 'pensee', text: 'Puis quatre… puis deux… puis une…', x: 0.27, y: 0.6, w: 0.48, who: 0 }],
         },
         {
-          action: 'Un passant caché derrière un étal renversé, paniqué. Marché de Madina, plein soleil.',
+          action: 'Un passant (chemise verte, petit bonnet blanc) caché derrière l’étal de mangues renversé, paniqué ; l’Oubli et ses anneaux au loin, Kaï assis au fond de la rue. Marché de Madina, plein soleil.',
           bg: { id: 'marche', time: 'jour', horizon: 0.5, vp: 0.6 },
           chars: [{ id: 'passant', pose: 'debout', expr: 'surprise', shot: 'americain', x: 0.68, y: 0.42, fill: 0.62 }],
           fx: [{ type: 'trame', color: '#000', opacity: 0.15 }],
@@ -740,7 +740,7 @@ export default {
           bubbles: [{ type: 'parole', text: '8 + 4 + 2 + 1 + … Une infinité de vagues… mais en un temps FINI.', x: 0.36, y: 0.16, w: 0.7, size: 17, who: 0 }],
         },
         {
-          action: 'GRANDE CASE. Kaï se relève, téléphone en main, au milieu du marché dévasté ; derrière lui, au loin, le grand panneau du carrefour et l’Oubli. Plein soleil, lueur violette au fond. Lèvre en sang, manche droite déchirée, poussière, sans sac.',
+          action: 'GRANDE CASE. Kaï se relève près du pilier fissuré, téléphone en main ; l’Oubli s’éloigne vers le grand panneau du carrefour, comme aspiré. Le sac à dos est sur la route. Plein soleil. Lèvre en sang, manche droite déchirée, poussière, sans sac sur lui.',
           bg: { id: 'marche', time: 'jour', horizon: 0.6, vp: 0.7 },
           chars: [
             { id: 'oubli', pose: 'flotte', shot: 'pied', x: 0.78, y: 0.72, fill: 0.42, seed: 11 },
@@ -759,7 +759,7 @@ export default {
           ],
         },
         {
-          action: 'L’étudiant (lunettes, chemise claire) tend le bras vers Kaï qui part déjà en courant vers le panneau. Marché, plein soleil.',
+          action: 'L’étudiant (lunettes, chemise claire), à genoux au premier plan, tend le bras vers Kaï qui court déjà vers le carrefour, le long des boutiques. Marché, plein soleil.',
           bg: { id: 'marche', time: 'jour', horizon: 0.5, vp: 0.8 },
           chars: [
             { id: 'etudiant', pose: 'main_tendue', expr: 'surprise', shot: 'americain', x: 0.22, y: 0.18, fill: 0.85 },
@@ -782,7 +782,7 @@ export default {
       rows: [{ h: 0.24, cols: [0.5, 0.5], ctilt: [24] }, { h: 0.24, cols: [1], tilt: -30 }, { h: 0.34, cols: [1], tilt: 30 }, { h: 0.18, cols: [1] }],
       panels: [
         {
-          action: 'Kaï court à travers le marché et glisse sous un étal pour esquiver un tentacule. Plein soleil. Lèvre en sang, manche déchirée, poussière, sans sac.',
+          action: 'Kaï, à mi-chemin du carrefour, glisse sur l’asphalte comme au baseball sous un tentacule de l’Oubli (il n’y a pas d’étal sur sa route). Plein soleil. Lèvre en sang, manche déchirée, poussière, sans sac.',
           bg: { id: 'marche', time: 'jour', horizon: 0.5, vp: 0.5 },
           chars: [{ id: 'kai', pose: 'plongeon', shot: 'pied', x: 0.5, y: 0.98, fill: 0.55, blur: -80 }],
           fx: [{ type: 'vitesse', angle: 0, n: 22, opacity: 0.4 }],
@@ -796,7 +796,7 @@ export default {
           sound: 'swipe',
         },
         {
-          action: 'Kaï saute par-dessus une moto renversée ; derrière lui, un tentacule fracasse le sol. Plein soleil. Lèvre en sang, manche déchirée.',
+          action: 'Kaï saute par-dessus une moto rouge renversée, près du carrefour ; derrière lui, un tentacule fracasse le sol. Plein soleil. Lèvre en sang, manche déchirée.',
           bg: { id: 'marche', time: 'jour', horizon: 0.6, vp: 0.5 },
           chars: [{ id: 'kai', pose: 'saut', shot: 'pied', x: 0.6, y: 0.8, fill: 0.55 }],
           fx: [{ type: 'impact', x: 0.18, y: 0.85, size: 0.3 }, { type: 'fissure', x: 0.18, y: 0.9, size: 0.3 }],
@@ -810,7 +810,7 @@ export default {
           sound: 'hit',
         },
         {
-          action: 'Devant le grand panneau du carrefour, l’Oubli se contracte : ses tentacules sont aspirés vers le centre, un noyau compact violet translucide apparaît, brillant comme du verre. Kaï, au premier plan, arme son poing droit. Plein soleil, lueur violette intense. Lèvre en sang, manche déchirée.',
+          action: 'En se condensant, l’Oubli devient solide et lourd : son noyau de verre violet translucide tombe du grand panneau et s’arrête à hauteur de poitrine, au pied de l’immeuble d’angle. Kaï, au premier plan, arme son poing droit. Plein soleil. Lèvre en sang, manche déchirée.',
           bg: { id: 'flash', color: '#1a0b2e', lines: '#c4b5fd', cx: 0.65, cy: 0.5 },
           chars: [
             { id: 'oubli', pose: 'flotte', shot: 'pied', x: 0.68, y: 0.96, fill: 0.85, seed: 3 },
@@ -868,7 +868,7 @@ export default {
       rows: [{ h: 0.3, cols: [1], tilt: -26 }, { h: 0.36, cols: [0.5, 0.5], ctilt: [22] }, { h: 0.34, cols: [0.42, 0.58], ctilt: [-24] }],
       panels: [
         {
-          action: 'Les lettres reviennent sur les enseignes du marché, la vendeuse retrouve ses prix (joie ; son étal de mangues reste renversé), le cahier bleu de l’étudiant se remplit à nouveau. Marché de Madina, plein soleil.',
+          action: 'Tout revient : les lettres sur les enseignes, les prix de la vendeuse (joie ; son étal de mangues reste renversé), le cahier bleu de l’étudiant. Kaï est au loin, à genoux au carrefour. Marché de Madina, plein soleil.',
           bg: { id: 'marche', time: 'jour', horizon: 0.55, vp: 0.5 },
           chars: [{ id: 'vendeuse', pose: 'poing_leve', expr: 'joie', shot: 'americain', x: 0.28, y: 0.26, fill: 0.74 }],
           fx: [{ type: 'lueur', x: 0.7, y: 0.25, color: '#ffd23f', size: 0.4, opacity: 0.35 }],
@@ -921,7 +921,7 @@ export default {
           sound: 'bubble',
         },
         {
-          action: 'Plan large depuis un toit qui domine la même rue du marché (7 h 41, plein soleil). Mory, de profil, antenne bricolée posée à côté de lui, tient un chronomètre arrêté sur 16,0. Ses lunettes brillent.',
+          action: 'Plan large depuis le toit-terrasse au réservoir d’eau, au-dessus des boutiques de droite, qui domine la même rue du marché (7 h 41, plein soleil). Mory, accroupi, antenne bricolée posée à côté de lui, tient un chronomètre (sa mention « 16,0 » est dans sa réplique). Ses lunettes brillent.',
           bg: { id: 'toit', time: 'jour', horizon: 0.62, props: false, roofY: 0.98 },
           chars: [{ id: 'mory', expr: 'clin', shot: 'buste', x: 0.66, y: 0.2, fill: 0.8, turn: -0.3 }],
           fx: [{ type: 'lueur', x: 0.68, y: 0.5, color: '#22d3ee', size: 0.08, opacity: 0.8 }],
