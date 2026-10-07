@@ -17,7 +17,7 @@ const typo = (t) => (typeof t === 'string' ? t.replace(/[ \u202f\u00a0]+([?!:;])
 function fixTypography(chapter) {
   for (const page of chapter.pages || []) {
     for (const panel of page.panels || []) {
-      for (const list of [panel.bubbles, panel.captions, panel.sfx]) for (const it of list || []) it.text = typo(it.text);
+      for (const list of [panel.bubbles, panel.captions, panel.sfx, panel.labels]) for (const it of list || []) it.text = typo(it.text);
       if (panel.bg) { panel.bg.text = typo(panel.bg.text); panel.bg.from = typo(panel.bg.from); }
     }
   }

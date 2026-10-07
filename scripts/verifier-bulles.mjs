@@ -8,7 +8,8 @@
 //   ✗ une bulle, un cartouche ou une onomatopée couvre une zone protégée
 //     (panel.illus.keep : visages, perso principal, action, objet clé) ;
 //   ✗ une bulle couvre plus de 25 % de la case ;
-//   ✗ un texte déborde de la case ;
+//   ✗ un texte déborde de la case (textes en surimpression compris) ;
+//   ✗ deux textes se touchent ;
 //   ✗ une zone protégée est coupée par le recadrage (panel.illus.focus) ;
 //   ⚠ l'ordre des bulles ne suit pas la lecture (haut → bas, gauche → droite).
 // Les cases SANS illustration (dessin de l'appli) sont vérifiées aussi : les
@@ -25,7 +26,7 @@ const server = await createServer({ server: { middlewareMode: true }, logLevel: 
 // d'abord ici, sans limite de temps ; l'appel suivant lit alors le résultat déjà prêt.
 await server.environments.ssr.transformRequest('virtual:character-images').catch(() => {});
 const load = (path) => server.ssrLoadModule(path);
-const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom, renderPage } = await load('/src/comic/comic.js');
+const { layoutPage, panelInfo, bubbleGeom, captionGeom, sfxGeom, labelGeom, renderPage } = await load('/src/comic/comic.js');
 const { loadComic } = await load('/src/data/comic/index.js');
 const ch = await loadComic(chapterId);
 if (!ch) { console.log(`Chapitre ${chapterId} introuvable.`); process.exit(1); }
@@ -90,6 +91,8 @@ ch.pages.forEach((page, p) => {
     (panel.bubbles || []).forEach((b, i) => { const g = bubbleGeom(b, box); items.push({ kind: `bulle ${i + 1} « ${String(b.text).slice(0, 22)} »`, shape: ellipse(g, g.type === 'cri' ? 1.21 : g.type === 'pensee' ? 1.16 : 1.03), cover: g.cover, size: g.size, center: [g.cx, g.cy], bubble: true }); });
     (panel.captions || []).forEach((cp, i) => { const g = captionGeom(cp, box); items.push({ kind: `cartouche ${i + 1}`, shape: rect(g.x, g.y, g.w, g.h), cover: g.cover, size: g.size }); });
     (panel.sfx || []).forEach((o, i) => { const g = sfxGeom(o, box); items.push({ kind: `onomatopée « ${o.text} »`, shape: g.corners, cover: g.cover, size: g.size }); });
+    // Textes en surimpression : posés SUR l'image exprès (pas de contrôle des zones protégées).
+    (panel.labels || []).forEach((l) => { const g = labelGeom(l, box); items.push({ kind: `texte sur l’image « ${l.text} »`, shape: rect(g.x0, g.y0, g.w, g.h), cover: g.cover, size: g.size, label: true }); });
     for (const it of items) {
       // Échantillonnage de la forme sur une grille fine
       const xs = it.shape.map((q) => q[0]); const ys = it.shape.map((q) => q[1]);
@@ -99,7 +102,7 @@ ch.pages.forEach((page, p) => {
         if (!inPoly([x, y], it.shape)) continue;
         n++;
         if (!inPoly([x, y], poly)) outside++;
-        for (const k of keeps) if (inPoly([x, y], k.poly)) hits.set(k.label, (hits.get(k.label) || 0) + 16);
+        if (!it.label) for (const k of keeps) if (inPoly([x, y], k.poly)) hits.set(k.label, (hits.get(k.label) || 0) + 16);
       }
       for (const [label, a] of hits) {
         const kArea = Math.abs(k2area(keeps.find((k) => k.label === label).poly));

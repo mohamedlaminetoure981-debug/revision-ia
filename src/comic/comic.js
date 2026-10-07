@@ -4,7 +4,7 @@
 // Une PAGE (1000 × 1500) = une grille de CASES (rangées × colonnes, bords
 // droits ou en biais) + des cases libres (incrustations).
 // Une CASE = décor + personnages (pose, expression, cadrage) + effets
-//            + bulles + cartouches + onomatopées.
+//            + bulles + cartouches + onomatopées + textes en surimpression (labels).
 // Tout est décrit dans les fichiers de chapitres (src/data/comic/chapitres/).
 //
 // Une case peut être REMPLACÉE par une illustration : dépose simplement
@@ -474,6 +474,27 @@ export function sfxGeom(o, box) {
   return { x, y, size, rot, corners, cover: (hw * 2 * (top + bot)) / (box.area || box.w * box.h) };
 }
 
+/**
+ * Géométrie d'un TEXTE EN SURIMPRESSION (posé sur l'illustration : nom de quartier, date…).
+ * l = { text, x, y, size, style: 'nom' | 'date', color } ; x, y = centre du texte (fractions de la case).
+ */
+export function labelGeom(l, box) {
+  const date = l.style === 'date';
+  const size = l.size || Math.round(autoTextSize(box, 'caption') * (date ? 0.72 : 0.9));
+  const text = fillVars(l.text);
+  const w = text.length * size * 0.62 + size * 0.4; const h = size * 1.3;
+  const x = box.x + (l.x ?? 0.5) * box.w; const y = box.y + (l.y ?? 0.5) * box.h;
+  return { size, text, x, y, x0: x - w / 2, y0: y - h / 2, w, h, cover: (w * h) / (box.area || box.w * box.h) };
+}
+
+/** Texte en surimpression, style écran de tablette : texte clair, contour sombre (lisible sur toute image). */
+function label(l, box) {
+  const { size, text, x, y } = labelGeom(l, box);
+  const date = l.style === 'date';
+  const fill = /^#[0-9a-f]{6}$/i.test(l.color || '') ? l.color : date ? '#ffd5db' : '#f2f8ff';
+  return `<text x="${f(x)}" y="${f(y + size * 0.36)}" text-anchor="middle" font-family="${FONT}" font-size="${f(size)}" font-weight="800"${date ? ' font-style="italic"' : ''} letter-spacing="${f(size * 0.02)}" fill="${fill}" stroke="#05070f" stroke-width="${f(size * 0.24)}" stroke-linejoin="round" paint-order="stroke">${esc(text)}</text>`;
+}
+
 /** Mélange deux couleurs hex (k = part de la seconde). */
 function mixHex(a, b, k) {
   const pa = parseInt(a.slice(1), 16); const pb = parseInt(b.slice(1), 16);
@@ -634,6 +655,7 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   // Textes au-dessus de tout (chacun dans un groupe repérable par l'éditeur de bulles)
   let text = '';
   const tag = (k, i, s) => `<g data-edit="${idx}:${k}:${i}">${s}</g>`;
+  (panel.labels || []).forEach((l, i) => { text += tag('labels', i, label(l, box)); });
   (panel.sfx || []).forEach((s, i) => { text += tag('sfx', i, sfx(s, box)); });
   (panel.captions || []).forEach((c, i) => { text += tag('captions', i, caption(c, box)); });
   (panel.bubbles || []).forEach((b, i) => { text += tag('bubbles', i, bubble(b, box, heads)); });

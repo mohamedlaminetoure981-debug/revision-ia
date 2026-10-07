@@ -991,6 +991,19 @@ La page en cours de chaque chapitre est mémorisée sur l'appareil (`localStorag
 « ▶️ Reprendre page X » ou « ↺ Recommencer ». La mémoire est effacée à la fin du chapitre,
 et ignorée si le chapitre a changé de nombre de pages. Le gain d'XP reste unique (fin du chapitre).
 
+### Textes en surimpression (illustration + textes de l'appli)
+Pour une image qui doit montrer des mots (carte, panneau, écran…), l'illustration est faite **sans
+aucun texte** et l'appli pose les textes par-dessus, bien lisibles (texte clair, contour sombre) :
+```js
+labels: [
+  { text: 'Kaloum', x: 0.13, y: 0.82 },              // nom (x, y = centre du texte, fractions de la case)
+  { text: '08/09', x: 0.29, y: 0.79, style: 'date' }, // date (plus petite, rosée, en italique)
+],
+```
+Une fois l'image déposée : Panneau créateur → ✏️ Éditer les bulles → la case → glisser chaque texte à
+sa place (poignée carrée ou A− / A+ pour la taille) → 💾 Enregistrer → déposer `bulles-chapitre-N.json`.
+Les textes sont traduits comme les bulles (`npm run traduire -- en`).
+
 ## 10 octies. Langues de l'appli
 
 L'appli existe en **français** (par défaut) et en **anglais**. Le choix se fait sur
@@ -1133,6 +1146,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.20.1** : **textes en surimpression** sur une illustration (`labels` dans une case : noms,
+  dates…), style écran de tablette (texte clair, contour sombre), déplaçables et redimensionnables
+  avec l'éditeur de bulles (enregistrés dans `bulles-chapitre-N.json`), traduits comme les bulles et
+  contrôlés par `verifier-bulles`. Utilisé pour la carte de Conakry (chapitre 2, page 4 case 2).
 - ✅ **v1.20.0** : **chapitre 2 réécrit** (« Le signal », version 2 : 12 pages, 58 cases), d'après
   `docs/scenario-ch02-v2.md` (bible de continuité en tête : main droite bandée de Kaï, règles 6 et 7 de
   l'Oubli). Descriptions et repères d'illustration pour chaque case ; écrans de téléphone dessinés par

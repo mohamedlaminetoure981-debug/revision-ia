@@ -307,7 +307,8 @@ export async function render(el) {
         }
         const ok = !!storyImage(id, p, c);
         total++; if (ok) { done++; n++; }
-        rows += `<li style="margin:6px 0">${ok ? '✅ illustrée' : '⬜ dessin SVG'} · <b>page ${p + 1}, case ${c + 1}</b><br>
+        const over = panel.labels?.length ? ` · 🏷️ illustration SANS texte + ${panel.labels.length} textes en surimpression (à placer avec l'éditeur de bulles)` : '';
+        rows += `<li style="margin:6px 0">${ok ? '✅ illustrée' : '⬜ dessin SVG'} · <b>page ${p + 1}, case ${c + 1}</b>${over}<br>
           <code style="user-select:all;font-size:12px">${esc(storyFileName(id, p, c))}</code>
           ${panel.action ? `<div class="tiny dim">${esc(panel.action)}</div>` : ''}</li>`;
       }));

@@ -2,7 +2,8 @@
 // bubble-editor.js — ÉDITEUR DE BULLES (Panneau créateur → BD)
 // ---------------------------------------------------------------------
 // On choisit un chapitre et une case, puis, à la souris ou au doigt :
-//   - on DÉPLACE une bulle, un cartouche ou une onomatopée (glisser) ;
+//   - on DÉPLACE une bulle, un cartouche, une onomatopée ou un texte posé sur l'image
+//     (surimpression : noms de quartiers, dates…) en le faisant glisser ;
 //   - on l'AGRANDIT ou la RÉTRÉCIT (poignée carrée en bas à droite) ;
 //   - on ORIENTE LA POINTE d'une bulle (poignée ronde au bout de la pointe) ;
 //   - on change la TAILLE DU TEXTE (boutons A− / A+), l'angle d'une onomatopée.
@@ -15,7 +16,7 @@
 // =====================================================================
 
 import { hasComic, loadComic } from '../data/comic/index.js';
-import { renderPage, revealImages, bubbleGeom, captionGeom, sfxGeom, setMathRenderer } from '../comic/comic.js';
+import { renderPage, revealImages, bubbleGeom, captionGeom, sfxGeom, labelGeom, setMathRenderer } from '../comic/comic.js';
 import { caseKey, layoutFileName, LAYOUT_PROPS, applyLayout } from '../comic/story-images.js';
 import { esc, toast, confirmBox, mathInline } from '../ui/ui.js';
 
@@ -23,7 +24,7 @@ setMathRenderer(mathInline); // formules écrites à la main sur certaines cases
 
 const DRAFT = (id) => `bdBulles-${id}`;
 const r3 = (n) => Math.round(n * 1000) / 1000;
-const KIND_NAME = { bubbles: 'Bulle', captions: 'Cartouche', sfx: 'Onomatopée' };
+const KIND_NAME = { bubbles: 'Bulle', captions: 'Cartouche', sfx: 'Onomatopée', labels: 'Texte sur l’image' };
 
 /** Positions de tout le chapitre, au format de bulles-chapitre-N.json. */
 function exportLayout(ch) {
@@ -76,7 +77,7 @@ export async function openBubbleEditor() {
     try { draft = JSON.parse(localStorage.getItem(DRAFT(id)) || 'null'); } catch { /* ignoré */ }
     if (draft?.cases) { applyLayout(ch, draft.cases); toast('Brouillon restauré (modifications non encore publiées).'); }
     $('#be-case').innerHTML = ch.pages.flatMap((pg, p) => (pg.panels || []).map((pn, c) => {
-      const n = (pn.bubbles?.length || 0) + (pn.captions?.length || 0) + (pn.sfx?.length || 0);
+      const n = (pn.bubbles?.length || 0) + (pn.captions?.length || 0) + (pn.sfx?.length || 0) + (pn.labels?.length || 0);
       return `<option value="${p}:${c}">Page ${p + 1}, case ${c + 1}${n ? ` · ${n} texte${n > 1 ? 's' : ''}` : ''}</option>`;
     })).join('');
     pageIdx = 0; panelIdx = 0; sel = null;
@@ -107,6 +108,7 @@ export async function openBubbleEditor() {
   function geomOf(kind, item, box) {
     if (kind === 'bubbles') { const g = bubbleGeom(item, box); return { x0: g.cx - g.rx, y0: g.cy - g.ry, x1: g.cx + g.rx, y1: g.cy + g.ry, size: g.size }; }
     if (kind === 'captions') { const g = captionGeom(item, box); return { x0: g.x, y0: g.y, x1: g.x + g.w, y1: g.y + g.h, size: g.size }; }
+    if (kind === 'labels') { const g = labelGeom(item, box); return { x0: g.x0, y0: g.y0, x1: g.x0 + g.w, y1: g.y0 + g.h, size: g.size }; }
     const g = sfxGeom(item, box); const xs = g.corners.map((q) => q[0]); const ys = g.corners.map((q) => q[1]);
     return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys), size: g.size };
   }
@@ -130,7 +132,7 @@ export async function openBubbleEditor() {
   function tools() {
     const t = $('#be-tools');
     if (!sel) {
-      t.innerHTML = '<p class="tiny dim" style="margin:0">Touche une bulle, un cartouche ou une onomatopée pour la modifier. Glisse pour déplacer ; poignée carrée = taille ; poignée rose = pointe.</p>';
+      t.innerHTML = '<p class="tiny dim" style="margin:0">Touche une bulle, un cartouche, une onomatopée ou un texte sur l’image pour le modifier. Glisse pour déplacer ; poignée carrée = taille ; poignée rose = pointe.</p>';
       return;
     }
     const item = panel()[sel.kind][sel.i];
@@ -207,6 +209,7 @@ export async function openBubbleEditor() {
       item.y = clamp((start.y ?? (sel.kind === 'bubbles' ? 0.2 : sel.kind === 'captions' ? 0.03 : 0.5)) + dy, -0.1, 1.1);
     } else if (drag.mode === 'resize') {
       if (sel.kind === 'sfx') item.size = Math.max(16, Math.round(drag.size0 * (1 + (dx * box.w) / 300)));
+      else if (sel.kind === 'labels') item.size = Math.max(8, Math.round(drag.size0 * (1 + (dx * box.w) / 200)));
       else item.w = clamp((start.w ?? (sel.kind === 'captions' ? 0.6 : 0.5)) + dx * 2, 0.1, 1);
     } else if (drag.mode === 'tail') {
       item.tail = [clamp((p.x - box.x) / box.w, -0.05, 1.05), clamp((p.y - box.y) / box.h, -0.05, 1.05)];

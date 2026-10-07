@@ -116,6 +116,7 @@ export const LAYOUT_PROPS = {
   bubbles: ['x', 'y', 'w', 'size', 'tail'],
   captions: ['x', 'y', 'w', 'size', 'right'],
   sfx: ['x', 'y', 'size', 'rot'],
+  labels: ['x', 'y', 'size'], // textes en surimpression sur l'illustration
 };
 
 /** Applique au chapitre les positions d'un fichier bulles-chapitre-N.json. */
