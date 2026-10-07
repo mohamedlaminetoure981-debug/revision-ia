@@ -1146,6 +1146,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.21.1** : contrôles des formules : `npm run verifier-maths` (52 chaînes difficiles : erreurs
+  réelles, fractions imbriquées, sommes, limites, ℕ, racines, %, 1,04, espaces insécables, JSON mal
+  échappé) et Panneau créateur → **🧪 Test des formules** (les mêmes chaînes rendues, à vérifier à l'œil).
+  Règle ajoutée dans CLAUDE.md : tout affichage de texte passe par la fonction centrale des maths.
 - ✅ **v1.21.0** : **chaîne des formules réparée de bout en bout**. Une seule fonction centrale de
   rendu (`renderMathText` dans `src/ui/ui.js`, utilisée par `rich()`, `mathText()` et les citations de
   la source). Avant l'affichage, `normalizeMath` (`src/core/mathfix.js`) répare : « $ » déséquilibrés

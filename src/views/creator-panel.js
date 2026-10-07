@@ -11,7 +11,7 @@
 import * as db from '../core/db.js';
 import { CHARACTERS, TEAM, EXPRESSIONS } from '../data/characters.js';
 import { characterHTML, play } from '../ui/character.js';
-import { esc, mascot, confirmBox, toast, modal } from '../ui/ui.js';
+import { esc, mascot, confirmBox, toast, modal, rich, mathText, preloadMath } from '../ui/ui.js';
 import { power } from '../ui/powers.js';
 import { runWithCouncil } from '../ui/council.js';
 import { confetti, onomatopoeia } from '../ui/fx.js';
@@ -89,6 +89,7 @@ export async function render(el) {
       <div class="panel-grid">${LEVELS.map((l, i) => `<button class="btn ghost" data-council="${i}">${l.name}</button>`).join('')}</div>
       <h2>🎉 Divers</h2>
       <div class="panel-grid">
+        <button class="btn ghost" id="t-maths">🧪 Test des formules</button>
         <button class="btn ghost" id="t-confetti">Confettis</button>
         <button class="btn ghost" id="t-ono">Onomatopée</button>
         <button class="btn ghost" id="t-install">Installation</button>
@@ -283,6 +284,28 @@ export async function render(el) {
       cells += `<figure class="bd-cell wide"><svg viewBox="0 0 600 400">${decorSVG(d, 600, 400, { time: t, seed: i + 1, text: 'Message de test', from: 'TEST' })}</svg><figcaption>${d} · ${t}</figcaption></figure>`;
     });
     modal(`<h3>Décors</h3><div class="bd-gallery">${cells}</div><button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
+  };
+  // --- 🧪 Test des formules : les chaînes difficiles de npm run verifier-maths, rendues comme dans l'appli ---
+  $('#t-maths').onclick = async () => {
+    const [{ MATH_TESTS }, { checkMath }, { default: katex }] = await Promise.all([import('../core/math-tests.js'), import('../core/mathcheck.js'), import('katex'), preloadMath()]);
+    let fails = 0;
+    const rows = MATH_TESTS.map((x) => {
+      const { fixed, errors } = checkMath(x.input, katex);
+      for (const e of x.expect || []) if (!fixed.includes(e)) errors.push(`attendu : « ${e} »`);
+      for (const e of x.avoid || []) if (fixed.includes(e)) errors.push(`à éviter : « ${e} »`);
+      if (errors.length) fails++;
+      return `<div class="tile" style="margin-bottom:8px;${errors.length ? 'border-color:var(--bad)' : ''}">
+        <div class="tiny muted">${errors.length ? '✗' : '✓'} ${esc(x.name)}</div>
+        <div class="rich">${rich(x.input)}</div>
+        <div class="source" style="margin-top:6px">« ${mathText(x.input)} »</div>
+        ${errors.map((e) => `<div class="tiny" style="color:var(--bad)">✗ ${esc(e)}</div>`).join('')}
+        <details><summary class="tiny dim" style="cursor:pointer">Texte reçu / réparé</summary>
+          <pre class="tiny" style="white-space:pre-wrap;word-break:break-word">${esc(JSON.stringify(x.input))}\n→ ${esc(fixed)}</pre></details>
+      </div>`;
+    }).join('');
+    modal(`<h3>🧪 Test des formules (${MATH_TESTS.length - fails}/${MATH_TESTS.length} ✓)</h3>
+      <p class="tiny muted">Chaque chaîne difficile est réparée puis affichée comme dans l'appli : d'abord en texte long (résumé, fiche), puis en citation de la source. Aucune formule ne doit être en rouge, coupée ou en italique collé.</p>
+      ${rows}<button class="btn block" data-close style="margin-top:10px">Fermer</button>`);
   };
   // --- BD : quelles cases ont leur illustration (public/story/…) ---
   $('#t-bd-images').onclick = async () => {

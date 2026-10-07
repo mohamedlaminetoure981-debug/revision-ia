@@ -45,6 +45,13 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   jamais remettre un `location.reload()` sur `controllerchange` (il effaçait le prénom à la
   1re visite). Brouillons de saisie : `src/ui/drafts.js` (attribut `data-draft`) et
   `welcomeDraft` (écran de bienvenue).
+- **Formules (règle obligatoire)** : tout nouvel affichage de texte qui peut contenir des maths (texte de
+  l'IA ou du cours) passe par la fonction centrale `renderMathText` de `src/ui/ui.js`, via `rich()` (texte
+  long), `mathText()` (texte court, titre, citation) ou `sourceHtml()` ; jamais `esc()` seul. Image,
+  attribut, partage ou fichier : `latexToText()` (`src/core/mathfix.js`). La réparation est dans
+  `normalizeMath` (mathfix.js) ; contrôle : `npm run verifier-maths` (chaînes dans `src/core/math-tests.js`,
+  aussi visibles dans Panneau créateur → 🧪 Test des formules). Toute erreur de formule trouvée : l'ajouter
+  à `math-tests.js`.
 - **Code** : `src/core` (logique), `src/views` (écrans), `src/ui` (composants),
   `src/comic` (BD/lecteur), `src/data` (personnages, prompts, histoire), `scripts/` (build).
 - **Personnages** (Kaï, Mory, Nia, Sora, Ren, Awa, Tidiane, Binta) : dessinés en SVG par défaut,
