@@ -1158,6 +1158,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.1** : contrôles du chapitre 3 (`verifier-bulles -- 3` : aucun problème ; croquis, calcul et écrans
+  lisibles sur un téléphone de 360 px ; message du Créateur agrandi : option `big` de l'écran) ; anciennes
+  traductions anglaises du chapitre 3 retirées (BD et teaser : à relancer avec `npm run traduire -- en`) ;
+  Panneau créateur : une case marquée `[ILLUSTRATION]` reste « à illustrer » même si l'appli y dessine un brouillon.
 - ✅ **v1.23.0** : **chapitre 3 réécrit** d'après `docs/scenario-ch03-v2.md` (12 pages, 58 cases,
   bible de continuité : pluie, vêtements mouillés pages 1 à 4, main bandée de Kaï, règles 7 et 8 de
   l'Oubli). Descriptions et repères d'illustration pour chaque case ; grandes cases pour les moments forts

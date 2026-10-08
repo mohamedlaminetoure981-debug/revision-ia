@@ -367,7 +367,7 @@ export default {
           sound: 'boss',
         },
         {
-          action: 'Gros plan sur un livre ouvert sur une table : les lettres s’envolent de la page une à une, en pixels violets ; la page se vide.',
+          action: '[ILLUSTRATION] Gros plan sur un livre ouvert sur une table (en attendant l’image, l’appli dessine une page de cahier qui s’efface) : les lettres s’envolent de la page une à une, en pixels violets ; la page se vide.',
           bg: { id: 'cahier', lines: ['Chapitre 4 : les dérivées', 'f′(a) = lim (f(a+h) − f(a)) / h', 'pente de la tangente'], fade: true, keep: [] },
           fx: [{ type: 'glitch', n: 22 }],
           illus: {
@@ -671,9 +671,9 @@ export default {
             dots: [[0.16, 0.743, '#c0392b'], [0.4, 0.419, '#e67e22'], [0.88, 0.16, '#1f8a4c']],
           },
           labels: [
-            { text: 'l’étale', x: 0.86, y: 0.07, size: 34, style: 'main', color: '#1f8a4c', rot: -3 },
-            { text: 'énergie', x: 0.17, y: 0.06, size: 26, style: 'main' },
-            { text: 'temps', x: 0.88, y: 0.95, size: 26, style: 'main' },
+            { text: 'l’étale', x: 0.84, y: 0.07, size: 46, style: 'main', color: '#1f8a4c', rot: -3 },
+            { text: 'énergie', x: 0.2, y: 0.1, size: 36, style: 'main' },
+            { text: 'temps', x: 0.86, y: 0.94, size: 36, style: 'main' },
           ],
           sound: 'sparkle',
         },
@@ -932,7 +932,7 @@ export default {
         },
         {
           action: '[ÉCRAN APPLI] Le téléphone de Kaï s’allume : message du Créateur « 3 sur 8. ».',
-          bg: { id: 'ecran', text: '3 sur 8.', from: 'LE CRÉATEUR', clock: '10:01' },
+          bg: { id: 'ecran', text: '3 sur 8.', from: 'LE CRÉATEUR', clock: '10:01', big: true },
           sound: 'bubble',
         },
         {

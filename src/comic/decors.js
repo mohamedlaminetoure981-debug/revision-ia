@@ -491,9 +491,11 @@ function ecran(w, h, o) {
   const g = uid('scr');
   // retour à la ligne : le texte doit rester dans l'encadré violet (largeur 0,7 × pw)
   const wrap = (txt, max) => { const out = []; let cur = ''; for (const word of txt.split(' ')) { if ((cur + ' ' + word).trim().length > max && cur) { out.push(cur); cur = word; } else cur = (cur + ' ' + word).trim(); } if (cur) out.push(cur); return out; };
-  const fromLines = wrap(from, 17);
-  const lines = msg.split('\n').flatMap((part) => wrap(part, 19));
-  const step = pw * 0.085;
+  // big : texte agrandi (message court, lisible sur un petit téléphone)
+  const k = o.big ? 1.5 : 1;
+  const fromLines = wrap(from, Math.round(17 / k));
+  const lines = msg.split('\n').flatMap((part) => wrap(part, Math.round(19 / k)));
+  const step = pw * 0.085 * k;
   return `${aplat(w, h, { color: '#0b1022', color2: '#000' })}
     <defs><radialGradient id="${g}" cx="50%" cy="40%"><stop offset="0" stop-color="#8be9ff" stop-opacity=".45"/><stop offset="1" stop-color="#8be9ff" stop-opacity="0"/></radialGradient></defs>
     <circle cx="${f(w / 2)}" cy="${f(py + ph * 0.4)}" r="${f(pw)}" fill="url(#${g})"/>
@@ -501,8 +503,8 @@ function ecran(w, h, o) {
     <rect x="${f(px + pw * 0.05)}" y="${f(py + pw * 0.05)}" width="${f(pw * 0.9)}" height="${f(ph - pw * 0.1)}" rx="${f(pw * 0.08)}" fill="#0e1430"/>
     <text x="${f(w / 2)}" y="${f(py + pw * 0.28)}" text-anchor="middle" font-family="Arial" font-size="${f(pw * 0.16)}" font-weight="700" fill="#e8ecff">${time}</text>
     <rect x="${f(px + pw * 0.1)}" y="${f(py + pw * 0.42)}" width="${f(pw * 0.8)}" height="${f(pw * 0.14 + (fromLines.length + lines.length) * step)}" rx="${f(pw * 0.05)}" fill="#1f2a55" stroke="#8b5cf6" stroke-width="2"/>
-    ${fromLines.map((l, i) => `<text x="${f(px + pw * 0.15)}" y="${f(py + pw * 0.53 + i * step)}" font-family="Arial" font-size="${f(pw * 0.065)}" font-weight="700" fill="#c4b5fd">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`).join('')}
-    ${lines.map((l, i) => `<text x="${f(px + pw * 0.15)}" y="${f(py + pw * 0.63 + (fromLines.length - 1 + i) * step)}" font-family="Arial" font-size="${f(pw * 0.06)}" fill="#e8ecff">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`).join('')}`;
+    ${fromLines.map((l, i) => `<text x="${f(px + pw * 0.15)}" y="${f(py + pw * 0.53 + i * step)}" font-family="Arial" font-size="${f(pw * 0.065 * k)}" font-weight="700" fill="#c4b5fd">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`).join('')}
+    ${lines.map((l, i) => `<text x="${f(px + pw * 0.15)}" y="${f(py + pw * 0.545 + (fromLines.length + i) * step)}" font-family="Arial" font-size="${f(pw * 0.06 * k)}" fill="#e8ecff">${l.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text>`).join('')}`;
 }
 
 /** Écran d'ordinateur de Mory : carte de la presqu'île de Conakry et points d'attaque. */
