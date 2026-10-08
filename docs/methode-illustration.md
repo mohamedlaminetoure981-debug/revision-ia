@@ -156,7 +156,82 @@ Dans le Panneau créateur → « 🖼️ Illustrations des cases », ces cases s
 
 ---
 
-## 6. Fiche des personnages et décors du chapitre 1
+## 6. Leçons du chapitre 2 (53 illustrations)
+
+### 6.1 Bloc EYE-LINE : quand deux personnages se parlent
+Sans consigne, Gemini fait regarder la caméra, ou regarder « dans le vide ». Ajouter un bloc dédié :
+
+```
+EYE-LINE
+Kaï looks at Mory: his head is turned to the right, his pupils are fixed on Mory's eyes.
+Mory looks at Kaï: his head is turned to the left, his pupils are fixed on Kaï's eyes.
+Mory's glasses are fully transparent: both of his eyes and pupils are clearly visible through the lenses
+(no opaque reflection, no white glare).
+Nobody looks at the camera.
+```
+
+- Dire pour chacun **la direction de la tête ET celle des pupilles** (« head », « pupils »).
+- Les **verres de Mory doivent être transparents** : sinon Gemini dessine un reflet blanc ou cyan opaque
+  et l'on ne voit plus ses yeux (l'éclat cyan reste sur la monture et sur les lignes de la veste).
+- Pour une réplique, la bouche du personnage qui parle est légèrement ouverte, l'autre a la bouche fermée.
+
+### 6.2 Repère de taille entre personnages
+Gemini rapetisse ou agrandit un personnage selon la case (Mory adolescent, Kaï enfant, tête géante…).
+Ajouter dans CHARACTER LOCK :
+
+```
+SIZE REFERENCE
+Kaï and Mory are both young adults of the same height: their shoulders are at the same level,
+their faces are adult faces (not child-like, no big round cheeks), natural proportions.
+```
+
+Et joindre **une case validée où les deux sont ensemble** (pas deux fiches séparées) quand on les redessine côte à côte.
+
+### 6.3 Montrer un personnage de dos quand son visage n'est pas indispensable
+Chaque visage dessiné est un risque (cheveux, âge, regard qui change). Quand le texte ne l'exige pas, **le montrer de dos
+ou en amorce** : un seul visage à contrôler au lieu de deux, la pose est plus simple, et le personnage reste reconnaissable
+à sa silhouette (sweat violet, casque autour du cou ; veste marine à lignes cyan). Exemples du chapitre 2 :
+Kaï de dos au premier plan face à Mory (page 3), Mory qui s'éloigne (page 4), Kaï et Mory de dos face à la ville (page 6),
+Kaï de dos en amorce à gauche, Mory au centre (page 12 case 5).
+
+### 6.4 Bloc REALISM LOCK
+Pour garder un rendu manga cohérent d'une case à l'autre, et éviter qu'une scène devienne « photo » ou « 3D » :
+
+```
+REALISM LOCK
+Same modern shonen manga style as the reference: thick black outlines, cel-shading. No photorealism, no 3D render,
+no painterly style. Realistic proportions and physics: real weight, real shadows, objects rest on surfaces,
+hands have five fingers, no deformed anatomy. Light source and shadows consistent with the time of day.
+```
+
+À placer juste après STYLE. Il corrige aussi les mains (doigts en trop) et les ombres incohérentes.
+
+### 6.5 Une nouvelle discussion AI Studio par page, et après deux retouches ratées
+- **Une discussion par page** (déjà vu au §4) ; **et** repartir d'une nouvelle discussion **après deux retouches ratées**
+  de la même case : au-delà, Gemini s'enferme dans son erreur (il reproduit la même faute, ou en ajoute). On recopie le
+  prompt d'origine, on joint la dernière case validée, et on corrige la consigne fautive plutôt que de la répéter.
+- Ne retoucher qu'**un seul défaut à la fois** (« only change the eyes direction, keep everything else identical »).
+
+### 6.6 Déposer les images par git quand un fichier dépasse 25 Mo
+Le site GitHub (« Add file → Upload files ») **refuse les fichiers de plus de 25 Mo** (les PNG d'AI Studio en 16:9 font
+souvent 2 Mo, mais un lot de nombreuses images, ou un PNG exceptionnel, dépasse la limite et le dépôt échoue).
+Dans ce cas : déposer **par git** (depuis le PC : copier les images dans `public/story/chapitre-N/`, puis
+`git add`, `git commit`, `git push` sur `main`), pas par le site. Le build réduit ensuite les images (WebP, 1376 px max
+si la source est plus petite), donc des PNG lourds ne ralentissent pas l'appli.
+
+### 6.7 Autres constats
+- **Cases étroites** (3 cases sur une rangée) : l'image 16:9 y est très recadrée (30 % de sa largeur visible) donc
+  agrandie et moins nette ; le sujet doit être **au centre** et **les rangées de 3 cases évitées** pour les images à
+  plusieurs personnages (le chapitre 2 a élargi les cases des pages 4 et 8).
+- **Bandeau de couleur** : parfois Gemini laisse une bande unie en haut de l'image (ex. chapitre 2 page 1 case 1 et
+  page 7 case 1) ; la bande peut servir de place pour un cartouche, sinon redemander l'image avec « no flat color band,
+  the scene fills the entire frame ».
+- **Texte sur un objet** (nom sur un taxi, enseigne) : Gemini l'invente ; ajouter « all signs, taxi plates and
+  billboards are blank ».
+
+---
+
+## 7. Fiche des personnages et décors du chapitre 1
 
 ### Personnages
 

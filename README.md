@@ -1151,6 +1151,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.22.1** : `docs/methode-illustration.md` : leçons du chapitre 2 (bloc EYE-LINE, repère de taille entre
+  personnages, personnage de dos, bloc REALISM LOCK, une discussion par page et après deux retouches ratées,
+  dépôt des images par git au-delà de 25 Mo).
 - ✅ **v1.22.0** : **chapitre 2 entièrement illustré** (53 illustrations + 5 cases dessinées par l'appli :
   3 écrans de téléphone, le graphe du carnet de Mory, le calcul S = 6 / (1 − ½) = 12). Descriptions des
   cases mises à jour d'après les images (ch02.js et `docs/scenario-ch02-v2.md`). Cadrage, bulles,
