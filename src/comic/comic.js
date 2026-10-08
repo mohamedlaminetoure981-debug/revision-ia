@@ -483,7 +483,8 @@ export function sfxGeom(o, box) {
 
 /**
  * Géométrie d'un TEXTE EN SURIMPRESSION (posé sur l'illustration : nom de quartier, date…).
- * l = { text, x, y, size, style: 'nom' | 'date', color } ; x, y = centre du texte (fractions de la case).
+ * l = { text, x, y, size, style: 'nom' | 'date' | 'main', color, rot } ; x, y = centre du texte (fractions de la case).
+ * 'main' : écrit à la main sur un croquis de l'appli (encre bleue ou color).
  */
 export function labelGeom(l, box) {
   const date = l.style === 'date';
@@ -497,6 +498,11 @@ export function labelGeom(l, box) {
 /** Texte en surimpression, style écran de tablette : texte clair, contour sombre (lisible sur toute image). */
 function label(l, box) {
   const { size, text, x, y } = labelGeom(l, box);
+  // Écriture à la main sur un croquis de l'appli : encre bleue (ou de la couleur du trait), halo papier.
+  if (l.style === 'main') {
+    const ink = /^#[0-9a-f]{6}$/i.test(l.color || '') ? l.color : '#1d3a8a';
+    return `<text x="${f(x)}" y="${f(y + size * 0.36)}" text-anchor="middle" font-family="'Comic Sans MS','Segoe Print',cursive" font-size="${f(size)}" font-weight="700" fill="${ink}" stroke="#f4f1e8" stroke-width="${f(size * 0.3)}" stroke-linejoin="round" paint-order="stroke" transform="rotate(${l.rot ?? -2} ${f(x)} ${f(y)})">${esc(text)}</text>`;
+  }
   const date = l.style === 'date';
   const fill = /^#[0-9a-f]{6}$/i.test(l.color || '') ? l.color : date ? '#ffd5db' : '#f2f8ff';
   return `<text x="${f(x)}" y="${f(y + size * 0.36)}" text-anchor="middle" font-family="${FONT}" font-size="${f(size)}" font-weight="800"${date ? ' font-style="italic"' : ''} letter-spacing="${f(size * 0.02)}" fill="${fill}" stroke="#05070f" stroke-width="${f(size * 0.24)}" stroke-linejoin="round" paint-order="stroke">${esc(text)}</text>`;

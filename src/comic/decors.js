@@ -492,7 +492,7 @@ function ecran(w, h, o) {
   // retour à la ligne : le texte doit rester dans l'encadré violet (largeur 0,7 × pw)
   const wrap = (txt, max) => { const out = []; let cur = ''; for (const word of txt.split(' ')) { if ((cur + ' ' + word).trim().length > max && cur) { out.push(cur); cur = word; } else cur = (cur + ' ' + word).trim(); } if (cur) out.push(cur); return out; };
   const fromLines = wrap(from, 17);
-  const lines = wrap(msg, 19);
+  const lines = msg.split('\n').flatMap((part) => wrap(part, 19));
   const step = pw * 0.085;
   return `${aplat(w, h, { color: '#0b1022', color2: '#000' })}
     <defs><radialGradient id="${g}" cx="50%" cy="40%"><stop offset="0" stop-color="#8be9ff" stop-opacity=".45"/><stop offset="1" stop-color="#8be9ff" stop-opacity="0"/></radialGradient></defs>
@@ -614,6 +614,45 @@ function cahier(w, h, o) {
 }
 
 /**
+ * Croquis à main levée sur papier quadrillé (dessin de l'appli, pas d'illustration) :
+ *   origin : [x, y] origine des axes (fractions de la case) ; axes tracés avec flèches
+ *   curve  : [[x, y], …] points de la courbe (lissée)
+ *   segs   : [{ a: [x, y], b: [x, y], color, dash }] droites (corde, tangentes)
+ *   dots   : [[x, y, color], …] points marqués
+ * Les mots du croquis (« vitesse moyenne »…) sont des labels de style 'main' (traduits).
+ */
+function croquis(w, h, o) {
+  const step = Math.max(18, h / 10);
+  const ink = '#1d3a8a';
+  const lw = Math.max(2.5, Math.min(w, h) * 0.008);
+  let s = `<rect width="${f(w)}" height="${f(h)}" fill="#f4f1e8"/>`;
+  for (let x = step; x < w; x += step) s += `<path d="M${f(x)},0 V${f(h)}" stroke="#c9d9ec" stroke-width="1"/>`;
+  for (let y = step; y < h; y += step) s += `<path d="M0,${f(y)} H${f(w)}" stroke="#c9d9ec" stroke-width="1"/>`;
+  const P = ([x, y]) => [w * x, h * y];
+  if (o.origin) {
+    const [ox, oy] = P(o.origin); const a = lw * 4;
+    s += `<path d="M${f(ox)},${f(oy)} H${f(w * 0.95)} M${f(w * 0.95 - a)},${f(oy - a * 0.6)} L${f(w * 0.95)},${f(oy)} L${f(w * 0.95 - a)},${f(oy + a * 0.6)}
+      M${f(ox)},${f(oy)} V${f(h * 0.06)} M${f(ox - a * 0.6)},${f(h * 0.06 + a)} L${f(ox)},${f(h * 0.06)} L${f(ox + a * 0.6)},${f(h * 0.06 + a)}" fill="none" stroke="${ink}" stroke-width="${f(lw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  const pts = (o.curve || []).map(P);
+  if (pts.length > 1) {
+    // Courbe lissée (Catmull-Rom → Bézier)
+    let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i]; const p1 = pts[i]; const p2 = pts[i + 1]; const p3 = pts[i + 2] || p2;
+      d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)},${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)},${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])},${f(p2[1])}`;
+    }
+    s += `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${f(lw * 1.5)}" stroke-linecap="round"/>`;
+  }
+  for (const sg of o.segs || []) {
+    const [x1, y1] = P(sg.a); const [x2, y2] = P(sg.b);
+    s += `<path d="M${f(x1)},${f(y1)} L${f(x2)},${f(y2)}" stroke="${sg.color || '#c0392b'}" stroke-width="${f(lw * 1.2)}" stroke-linecap="round"${sg.dash ? ` stroke-dasharray="${f(lw * 3)} ${f(lw * 2.5)}"` : ''}/>`;
+  }
+  for (const [x, y, c] of o.dots || []) s += `<circle cx="${f(w * x)}" cy="${f(h * y)}" r="${f(lw * 2.2)}" fill="${c || ink}" stroke="#f4f1e8" stroke-width="${f(lw * 0.6)}"/>`;
+  return s;
+}
+
+/**
  * Graphe dessiné à la main dans un carnet (dessin de l'appli, pas d'illustration).
  *   nodes : [{ name, x, y, red }]  sommets (x, y en fractions de la case ; red = entouré en rouge)
  *   edges : [[i, j], …]            arêtes (numéros des sommets)
@@ -645,7 +684,7 @@ function graphe(w, h, o) {
   return s;
 }
 
-export const DECORS = { graphe, corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene, cahier };
+export const DECORS = { graphe, croquis, corniche, rue, marche, classe, bibliotheque, toit, plage, dojo, chambre, flash, aplat, oubli, ecran, carte, arene, cahier };
 
 /** Dessine un décor (inconnu → aplat). */
 export function decorSVG(name, w, h, o = {}) {

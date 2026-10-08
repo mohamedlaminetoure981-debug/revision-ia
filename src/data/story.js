@@ -59,7 +59,7 @@ export const CHAPTERS = [
   },
   {
     id: 3, emoji: '📚', title: 'La voix de la bibliothèque',
-    teaser: 'Un matin de pluie, une voix explique les cours avec des images.',
+    teaser: 'Sous la pluie, l’antenne de Mory les mène à la bibliothèque. Nia y explique les dérivées… et l’Oubli s’est adapté.',
     strips: [
       { title: 'Ch. 3 — Nia', panels: [
         c('nia', 'reflexion', 'Une dérivée, c’est la vitesse d’une pirogue à un instant précis…', 'Bibliothèque infinie'),

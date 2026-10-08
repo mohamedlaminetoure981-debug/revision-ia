@@ -1009,6 +1009,13 @@ Une fois l'image déposée : Panneau créateur → ✏️ Éditer les bulles →
 sa place (poignée carrée ou A− / A+ pour la taille) → 💾 Enregistrer → déposer `bulles-chapitre-N.json`.
 Les textes sont traduits comme les bulles (`npm run traduire -- en`).
 
+### Croquis dessinés par l'appli (`bg: { id: 'croquis' }`)
+Pour un schéma mathématique « à la main » (courbe, corde, tangentes) sans illustration : papier quadrillé,
+axes (`origin`), courbe lissée (`curve`, liste de points), droites (`segs` : `{ a, b, color }`), points
+(`dots`). Les mots du croquis sont des `labels` de style `'main'` (encre bleue ou `color`, halo papier),
+donc traduits comme les bulles. Exemples : chapitre 3, page 2 case 4 (pirogue) et page 9 case 2 (l'étale).
+Un écran de téléphone (`bg 'ecran'`) accepte des retours à la ligne `\n` dans `text` (chronomètre).
+
 ## 10 octies. Langues de l'appli
 
 L'appli existe en **français** (par défaut) et en **anglais**. Le choix se fait sur
@@ -1151,6 +1158,13 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.0** : **chapitre 3 réécrit** d'après `docs/scenario-ch03-v2.md` (12 pages, 58 cases,
+  bible de continuité : pluie, vêtements mouillés pages 1 à 4, main bandée de Kaï, règles 7 et 8 de
+  l'Oubli). Descriptions et repères d'illustration pour chaque case ; grandes cases pour les moments forts
+  (page 6 case 1, page 7 case 3, page 11 case 4) ; écrans de l'appli (chronomètre à trois temps, message
+  du Créateur) ; nouveaux croquis de l'appli (`bg 'croquis'` : la pirogue, la courbe de l'étale) et calcul
+  KaTeX (page 10 case 1) ; nouveaux figurants (bibliothécaire, étudiante en hijab vert, étudiant en
+  chemise jaune) ; teaser du chapitre 3 mis à jour.
 - ✅ **v1.22.2** : **contrôle visuel du chapitre 2** (captures Playwright de chaque case, 3 écrans × français/anglais,
   modes « case par case » et « page entière »). Bulles déplacées/réduites/agrandies (textes trop petits sur Android
   agrandis), tailles et queues recalées ; les queues de bulles s'arrêtent devant les zones « visage » ;

@@ -75,7 +75,7 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
 - **Mode Histoire** (Kaï, sans appel à l'IA) : 12 chapitres, textes dans `src/data/story.js`
   et BD dans `src/data/comic/chapitres/chNN.js`. Chapitre 1 = version 2 (12 pages, 61 cases),
   script et bible de continuité dans `docs/scenario-ch01-v2.md` ; chapitre 2 = version 2 (12 pages, 58 cases),
-  `docs/scenario-ch02-v2.md` ; reprise de lecture
+  `docs/scenario-ch02-v2.md` ; chapitre 3 = version 2 (12 pages, 58 cases), `docs/scenario-ch03-v2.md` ; reprise de lecture
   (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées.
   Guide pour illustrer les prochains chapitres avec Gemini : `docs/methode-illustration.md`.
   Cases dessinées par l'appli (écrans de téléphone `ecran`, cahier `cahier`) : jamais d'illustration.

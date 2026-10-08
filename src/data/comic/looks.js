@@ -38,5 +38,8 @@ export const EXTRA_LOOKS = {
   passant: { build: 'm', skin: '#5a3825', hair: '#120c09', hairStyle: 'court', outfit: 'tee', top: '#8b5cf6', top2: '#2a1f55', pants: '#16161c', shoes: '#f2f0fa', sole: '#8b5cf6' },
   prof: { build: 'm', skin: '#4a2c1d', hair: '#8a8580', hairStyle: 'court', outfit: 'tee', top: '#f2f0fa', top2: '#d9d4c8', pants: '#3a3a42', shoes: '#2a1d14', sole: '#3a3a42' },
   conducteur: { build: 'm', skin: '#5a3825', hair: '#120c09', hairStyle: 'casquette', cap: '#1f2a44', outfit: 'tee', top: '#ff7a1a', top2: '#ffd23f', pants: '#2a2e38', shoes: '#15161c', sole: '#3a3a42' },
+  bibliothecaire: { build: 'f', skin: '#5e3a24', hair: '#1a110c', hairStyle: 'foulard', wrap: '#1f2a5c', outfit: 'tee', top: '#f2f0fa', top2: '#1f2a5c', skirt: '#1f2a5c', skirt2: '#2f3a6c', pants: '#1f2a5c', shoes: '#2a1d14', sole: '#3a2a1a' },
+  etudiante_hijab: { build: 'f', skin: '#7a4a2e', hair: '#1a110c', hairStyle: 'foulard', wrap: '#1f9d55', outfit: 'tee', top: '#f2f0fa', top2: '#1f9d55', pants: '#2f2f3a', shoes: '#f2f0fa', sole: '#1f9d55' },
+  etudiant_jaune: { build: 'm', skin: '#4a2c1d', hair: '#120c09', hairStyle: 'court', outfit: 'tee', top: '#f5c518', top2: '#e0a800', pants: '#23264a', shoes: '#2f2f3a', sole: '#f2f0fa' },
   passante: { build: 'f', skin: '#8d5a3b', hair: '#1f140e', hairStyle: 'chignon', outfit: 'tee', top: '#ff8a3d', top2: '#ffffff', pants: '#23264a', shoes: '#f2f0fa', sole: '#ff8a3d' },
 };
