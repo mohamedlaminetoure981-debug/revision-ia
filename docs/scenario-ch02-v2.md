@@ -63,7 +63,8 @@
 entrent, sacs sur l'épaule. Kaï, petit dans le cadre, marche seul, la main droite bandée.
 - Cartouche : « Le lendemain. Université de Conakry. »
 
-**Case 2** — Dans l'amphi. Le prof dessine au tableau des points reliés par des traits.
+**Case 2** — Dans l'amphi (vu du fond, par-dessus les épaules des étudiants). Le prof, petit au loin,
+dessine au tableau un graphe : des points reliés par des traits.
 - Prof : « Aujourd'hui : les graphes. Des sommets… et des arêtes. »
 
 **Case 3** — Kaï assis dans les gradins, la main bandée posée sur la table, l'air ailleurs.
@@ -95,12 +96,13 @@ cahier bleu).
 
 ## PAGE 3 — La rencontre (5 cases)
 
-**Case 1** — À la sortie de l'amphi, la foule des étudiants dans le couloir. Une voix derrière
-Kaï.
+**Case 1** — À la sortie de l'amphi : le « couloir » est une **galerie extérieure à piliers de béton**,
+ouverte sur la cour (palmiers). Kaï avance vers nous, la foule des étudiants derrière lui devant
+la porte ; Mory, adossé à un pilier à gauche, bras croisés, l'observe. Une voix.
 - Voix (hors champ) : « Seize secondes. »
 
-**Case 2** — Kaï se retourne : **Mory**, adossé à un pilier, bras croisés, lunettes qui
-brillent.
+**Case 2** — Kaï (de dos, au premier plan) se retourne : **Mory**, adossé à un pilier de la galerie,
+bras croisés, une jambe repliée, lunettes qui brillent.
 - Mory : « Pas mal, le gars de Madina. »
 
 **Case 3** — Kaï, stupéfait, face à Mory.
@@ -120,9 +122,10 @@ brillent.
 - Mory : « Regarde. »
 
 **Case 2** — [ILLUSTRATION + SURIMPRESSION] Gros plan sur l'écran de la tablette : une
-**carte réaliste de la presqu'île de Conakry** (la côte, la mer, les grandes routes, les
-quartiers), avec une dizaine de **points rouges** lumineux, reliés par une fine ligne
-pointillée violette, de Kaloum jusqu'à Madina. L'illustration ne contient AUCUN texte.
+**carte réaliste de la presqu'île de Conakry**, vue de dessus (la côte, la mer sombre, les grandes
+routes, les quartiers, des espaces verts), avec onze **points rouges** lumineux (le plus gros, au
+centre, est la prochaine cible), reliés par une fine ligne pointillée violette, de la pointe de
+Kaloum vers le nord-est. L'illustration ne contient AUCUN texte.
 - Surimpression par l'appli : les noms des quartiers (Kaloum, Matam, Madina, Dixinn,
   Hamdallaye, Bonfi, Taouyah) et les dates des attaques à côté de quelques points.
 
@@ -183,15 +186,16 @@ bandée.
 lampadaires orange qui défilent.
 - Cartouche : « 20 h 52. Route du Prince. »
 
-**Case 2** — Sur la moto, Kaï tient son téléphone prêt.
+**Case 2** — Vue de côté, les trois sur la moto (le conducteur devant, Kaï au milieu, Mory derrière).
+Kaï tient son téléphone prêt ; Mory se penche à son oreille pour lui parler.
 - Mory : « T'as ton chrono ? »
 - Kaï : « Toujours. »
 
 **Case 3** — Devant eux, les feux tricolores clignotent en violet. Le conducteur freine.
 - Conducteur : « Wallahi, c'est quoi ça ?! »
 
-**Case 4** — Kaï et Mory sautent de la moto. Au bout de la route, le rond-point : les
-panneaux de direction se vident.
+**Case 4** — Kaï et Mory sautent de la moto (le conducteur, terrifié, se prend la tête). Au bout de
+la route, le rond-point : les panneaux de direction se vident.
 - Cartouche : « Rond-point de Hamdallaye. »
 
 ## PAGE 8 — L'attaque (5 cases)
@@ -237,8 +241,8 @@ S = 6 / (1 − ½) = 12.
 **Case 1** — Kaï s'élance entre les voitures arrêtées.
 - Kaï : « Cinq… »
 
-**Case 2** — Un tentacule écrase le capot d'une voiture derrière lui ; Kaï roule par-dessus un
-autre capot.
+**Case 2** — Parkour : Kaï glisse sur le capot d'une voiture blanche pendant qu'un tentacule écrase
+un taxi jaune derrière lui (éclats de verre).
 - Onomatopée : « KRAAANG ! »
 - Kaï : « Sept… »
 
@@ -259,11 +263,12 @@ poitrine, au-dessus de l'îlot central.
 **Case 2** — Gros plan sur la main droite bandée de Kaï, qui tremble.
 - Pensée de Kaï : « Pas avec cette main… »
 
-**Case 3** — Kaï pivote sur son pied droit, la jambe gauche qui part.
+**Case 3** — Kaï pivote sur son pied droit, la jambe GAUCHE qui part (préparation du coup de pied
+retourné).
 - Onomatopée : « SWISH »
 
-**Case 4** — Pleine largeur. Coup de pied retourné : le talon gauche de Kaï percute le noyau,
-qui se fissure.
+**Case 4** — Pleine largeur. Coup de pied retourné de la jambe GAUCHE : le talon gauche de Kaï
+percute le noyau, qui se fissure.
 - Kaï : « DOUZE !!! »
 - Onomatopée : « KRAAAK ! »
 
@@ -278,13 +283,14 @@ central, épuisé. Mory traverse entre les voitures pour le rejoindre.
 **Case 2** — Mory tend la main à Kaï.
 - Mory : « Je suis pas un combattant. Je suis le gars qui sait OÙ frapper. »
 
-**Case 3** — Gros plan sur la poignée de main (la main bandée de Kaï dans celle de Mory).
+**Case 3** — Gros plan sur la poignée de main : la main DROITE bandée de Kaï dans celle de Mory.
 - Kaï : « Et moi, QUAND. »
 
 **Case 4** — [ÉCRAN APPLI] Le téléphone de Kaï s'allume.
 - Message — LE CRÉATEUR : « 2 sur 8. Bien joué. »
 
 **Case 5** — La petite antenne de Mory clignote fort, l'écran de sa tablette affiche un pic
-énorme. Mory, les lunettes qui brillent, regarde au loin.
+énorme. Mory (au centre), les lunettes qui brillent, regarde au loin ; Kaï, de dos, en amorce
+à gauche.
 - Mory : « Attends… Un pic énorme. Demain matin… là où on garde les livres. »
 - Cartouche : « À suivre… »

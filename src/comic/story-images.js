@@ -58,10 +58,10 @@ export const coverFactor = (img, box) => Math.max(1, (img.w / img.h) * (box.h / 
  * haute densité). Avant, seule la largeur de la case comptait : une image recadrée dans une case
  * étroite était agrandie, donc floue.
  */
-export function pickSrc(img, box) {
+export function pickSrc(img, box, zoom = 1) {
   if (!img?.srcs) return img?.src || null;
   const dpr = typeof window !== 'undefined' ? Math.min(3, window.devicePixelRatio || 1) : 1;
-  const need = displayWidth(box) * (img.w ? coverFactor(img, box) : 1) * dpr * (slowNet() ? 0.85 : 1);
+  const need = displayWidth(box) * (img.w ? coverFactor(img, box) : 1) * Math.max(1, zoom || 1) * dpr * (slowNet() ? 0.85 : 1);
   const widths = Object.keys(img.srcs).map(Number).sort((a, b) => a - b);
   const w = widths.find((x) => x >= need * 0.97) ?? widths.at(-1);
   return img.srcs[w];

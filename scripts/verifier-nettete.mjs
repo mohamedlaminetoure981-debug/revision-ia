@@ -77,7 +77,7 @@ ch.pages.forEach((page, p) => {
       const wOld = (old.find((x) => x >= needOld * 0.9) ?? old.at(-1)) || 1200;
       const upOld = realOld / wOld;
       // Règle actuelle : le vrai pickSrc.
-      const wNew = pickSrc(withSrcs, box);
+      const wNew = pickSrc(withSrcs, box, panel.illus?.zoom);
       const upNew = real / wNew;
       pire = Math.max(pire, upNew);
       cols.push(`${pr.nom} : ${wOld} px ${fmt(upOld)} → ${wNew} px ${fmt(upNew)}`);

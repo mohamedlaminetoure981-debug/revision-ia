@@ -559,11 +559,13 @@ export function assetUrl(p) {
  * Recadrage d'une illustration (iw × ih) pour REMPLIR une case (w × h), en gardant
  * le point focal (fx, fy, entre 0 et 1 dans l'image) le plus près possible du centre.
  * Le résultat ne dépend pas de l'écran : la page a toujours le même repère (1000 × 1500).
+ * zoom (facultatif, ≥ 1) : agrandit l'image autour du point focal (ex. carte dont on veut lire les noms) ;
+ * à garder modéré (≈ 1,5 max) : au-delà l'image est agrandie, donc moins nette (voir verifier-nettete).
  * @returns {{ x, y, dw, dh, toPanel([u, v]) → [x, y] en fractions de la case }}
  */
-export function cropImage(w, h, iw, ih, focus = [0.5, 0.5]) {
+export function cropImage(w, h, iw, ih, focus = [0.5, 0.5], zoom = 1) {
   if (!iw || !ih) iw = w, ih = h; // dimensions inconnues : recadrage centré
-  const s = Math.max(w / iw, h / ih);
+  const s = Math.max(w / iw, h / ih) * Math.max(1, zoom || 1); // zoom > 1 : on agrandit autour du point focal
   const dw = iw * s; const dh = ih * s;
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const x = clamp(w / 2 - focus[0] * dw, w - dw, 0);
@@ -579,9 +581,9 @@ export function panelInfo(panel, poly, idx, pageIdx, chapterId) {
   const box = { ...bboxOf(poly), area: polyArea(poly) };
   const story = storyImage(chapterId, pageIdx, idx);
   // Taille d'image adaptée à l'écran (600 / 900 / 1200 px), voir story-images.js.
-  const src = (story && pickSrc(story, box)) || panel.image || null;
+  const src = (story && pickSrc(story, box, panel.illus?.zoom)) || panel.image || null;
   const il = panel.illus || {};
-  const crop = src ? cropImage(box.w, box.h, story?.w, story?.h, il.focus) : null;
+  const crop = src ? cropImage(box.w, box.h, story?.w, story?.h, il.focus, il.zoom) : null;
   return { box, src, crop, illus: il, lqip: story?.lqip || '' };
 }
 

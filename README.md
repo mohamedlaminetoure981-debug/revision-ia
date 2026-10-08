@@ -991,6 +991,11 @@ La page en cours de chaque chapitre est mémorisée sur l'appareil (`localStorag
 « ▶️ Reprendre page X » ou « ↺ Recommencer ». La mémoire est effacée à la fin du chapitre,
 et ignorée si le chapitre a changé de nombre de pages. Le gain d'XP reste unique (fin du chapitre).
 
+### Zoom d'une illustration (`illus.zoom`)
+Pour une image dont on veut lire des détails (une carte avec des noms), `illus: { focus: [x, y], zoom: 1.4 }`
+agrandit l'image autour du point focal. Rester modéré (≈ 1,5 maximum : au-delà l'image est agrandie, donc
+moins nette ; `npm run verifier-nettete -- N` le signale).
+
 ### Textes en surimpression (illustration + textes de l'appli)
 Pour une image qui doit montrer des mots (carte, panneau, écran…), l'illustration est faite **sans
 aucun texte** et l'appli pose les textes par-dessus, bien lisibles (texte clair, contour sombre) :
@@ -1146,6 +1151,14 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.22.0** : **chapitre 2 entièrement illustré** (53 illustrations + 5 cases dessinées par l'appli :
+  3 écrans de téléphone, le graphe du carnet de Mory, le calcul S = 6 / (1 − ½) = 12). Descriptions des
+  cases mises à jour d'après les images (ch02.js et `docs/scenario-ch02-v2.md`). Cadrage, bulles,
+  pensées et onomatopées recalés sur les images (`verifier-bulles -- 2` : aucun problème ;
+  `verifier-nettete -- 2` : toutes nettes). Carte de Conakry (page 4 case 2) : noms de quartiers et
+  dates placés sur la terre uniquement. Nouveau réglage `illus.zoom` (zoom modéré autour du point focal,
+  ici 1,4 pour lire la carte) ; rangées de cases étroites élargies (pages 4 et 8) pour garder les
+  images nettes.
 - ✅ **v1.21.3** : la page Panneau créateur → 🧪 Test des formules contrôle aussi les espaces autour des
   formules dans le vrai affichage de l'appli (texte long et court) et contient les chaînes réelles
   des espaces perdus (« un réel q », « Pour q ≠ 1 », « de u_n à u_{n+1} »…).
