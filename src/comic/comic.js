@@ -376,7 +376,7 @@ export function bubbleGeom(b, box) {
  *   who  : index du perso qui parle (la queue pointe vers sa bouche/tête)
  *   tail : [x, y] cible manuelle de la queue (0-1, dans la case), ou false
  */
-function bubble(b, box, heads) {
+function bubble(b, box, heads, faces = []) {
   const { type, size, lines, lh, th, rx, ry, cx, cy } = bubbleGeom(b, box);
   const fill = b.fill || '#fff';
   const ink = b.ink || INK;
@@ -396,7 +396,14 @@ function bubble(b, box, heads) {
     // La pointe s'arrête juste avant la bouche (sans la toucher).
     let edge = Math.max(rim + size * 0.6, Math.min(L - size * 0.5, rim + Math.min(size * 4, (L - rim) * 0.85)));
     if (type === 'pensee') edge = Math.max(edge, rim + size * 2); // ronds de pensée bien séparés
-    const tip = [cx + ux * edge, cy + uy * edge];
+    let tip = [cx + ux * edge, cy + uy * edge];
+    // La pointe ne doit jamais entrer dans un visage (zones « visage » des repères) : elle s'arrête à son bord.
+    const inFace = (q) => faces.some((z) => q[0] > box.x + z[0] && q[0] < box.x + z[2] && q[1] > box.y + z[1] && q[1] < box.y + z[3]);
+    if (inFace(tip)) {
+      let t = edge;
+      while (t > rim + size * 0.6 && inFace([cx + ux * t, cy + uy * t])) t -= size * 0.25;
+      edge = Math.max(t, rim + size * 0.6); tip = [cx + ux * edge, cy + uy * edge];
+    }
     const nx = -uy; const ny = ux; const bw = Math.min(rx, ry) * 0.3;
     if (type === 'pensee') {
       for (let i = 1; i <= 3; i++) { const t = (rim + (edge - rim) * (i / 3.2)) / edge; s += `<circle cx="${f(cx + (tip[0] - cx) * t)}" cy="${f(cy + (tip[1] - cy) * t)}" r="${f(size * (0.5 - i * 0.11))}" fill="${fill}" stroke="${ink}" stroke-width="${f(sw * 0.45)}"/>`; }
@@ -597,6 +604,8 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   let inner = '';
   const heads = [];
   const overflow = [];
+  // zones « visage » (repères de la case) en coordonnées de la case : les queues de bulles s'arrêtent devant
+  const faces = image ? (illus.keep || []).filter((k) => /visage|tête/i.test(k[4] || '')).map(([a, b, c, d]) => { const p0 = crop.toPanel([a, b]); const p1 = crop.toPanel([c, d]); return [p0[0] * w, p0[1] * h, p1[0] * w, p1[1] * h]; }) : [];
   if (image) {
     // Illustration recadrée pour remplir la case, en gardant le point focal
     // (panel.illus.focus). Les persos ne sont pas dessinés : les bulles visent
@@ -660,7 +669,7 @@ function renderPanel(panel, poly, idx, pageIdx, chapterId) {
   (panel.labels || []).forEach((l, i) => { text += tag('labels', i, label(l, box)); });
   (panel.sfx || []).forEach((s, i) => { text += tag('sfx', i, sfx(s, box)); });
   (panel.captions || []).forEach((c, i) => { text += tag('captions', i, caption(c, box)); });
-  (panel.bubbles || []).forEach((b, i) => { text += tag('bubbles', i, bubble(b, box, heads)); });
+  (panel.bubbles || []).forEach((b, i) => { text += tag('bubbles', i, bubble(b, box, heads, faces)); });
   return { svg: out, text, box, heads, illustrated: !!image, crop };
 }
 

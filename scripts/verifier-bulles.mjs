@@ -106,8 +106,13 @@ ch.pages.forEach((page, p) => {
       }
       for (const [label, a] of hits) {
         const kArea = Math.abs(k2area(keeps.find((k) => k.label === label).poly));
-        if (a / kArea > 0.02) { out.push(`✗ ${it.kind} couvre « ${label} » (${pct(a / kArea)} de la zone)`); problems++; }
+        const isFace = /visage|tête/i.test(label); // zone « visage » : tolérance quasi nulle
+        if (a / kArea > (isFace ? 0.005 : 0.02)) { out.push(`✗ ${it.kind} couvre ${isFace ? 'un VISAGE' : 'la zone'} « ${label} » (${pct(a / kArea)} de la zone)`); problems++; }
       }
+      // Lisibilité sur un petit téléphone (360 px) : taille réelle à l'écran en mode « case par case »
+      const px = it.size * Math.min(340 / box.w, 700 / box.h, 1.15);
+      if (it.size && px < 6.5 && !it.label) { out.push(`✗ ${it.kind} : texte trop petit sur un téléphone de 360 px (${px.toFixed(1)} px, minimum 6,5)`); problems++; }
+      else if (it.size && px < 8 && !it.label) out.push(`⚠ ${it.kind} : texte petit sur un téléphone de 360 px (${px.toFixed(1)} px)`);
       if (n && outside / n > 0.04) { out.push(`✗ ${it.kind} déborde de la case (${pct(outside / n)})`); problems++; }
       if (it.bubble && it.cover > 0.25) { out.push(`✗ ${it.kind} couvre ${pct(it.cover)} de la case (max 25 %)`); problems++; }
     }

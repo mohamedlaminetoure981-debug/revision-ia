@@ -1151,6 +1151,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.22.2** : **contrôle visuel du chapitre 2** (captures Playwright de chaque case, 3 écrans × français/anglais,
+  modes « case par case » et « page entière »). Bulles déplacées/réduites/agrandies (textes trop petits sur Android
+  agrandis), tailles et queues recalées ; les queues de bulles s'arrêtent devant les zones « visage » ;
+  écran de téléphone dessiné par l'appli : le texte reste dans l'encadré ; `verifier-bulles` signale maintenant une
+  bulle posée sur un visage et un texte trop petit à 360 px ; `docs/methode-illustration.md` §6.8 (contrôle par
+  captures après chaque dépôt d'images).
 - ✅ **v1.22.1** : `docs/methode-illustration.md` : leçons du chapitre 2 (bloc EYE-LINE, repère de taille entre
   personnages, personnage de dos, bloc REALISM LOCK, une discussion par page et après deux retouches ratées,
   dépôt des images par git au-delà de 25 Mo).

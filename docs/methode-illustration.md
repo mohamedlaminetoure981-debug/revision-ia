@@ -229,6 +229,16 @@ si la source est plus petite), donc des PNG lourds ne ralentissent pas l'appli.
 - **Texte sur un objet** (nom sur un taxi, enseigne) : Gemini l'invente ; ajouter « all signs, taxi plates and
   billboards are blank ».
 
+### 6.8 Contrôle visuel par captures (obligatoire après le dépôt des images d'un chapitre)
+Le calcul (`npm run verifier-bulles -- N`) ne remplace pas les yeux : **après avoir déposé les images d'un chapitre,
+toujours faire un contrôle visuel par captures d'écran** (Playwright, chaque case en mode « case par case » et en
+« page entière », sur 360 × 740, 412 × 915 et 1366 × 768, en français ET en anglais, car l'anglais est plus long).
+Une case est en échec si un texte couvre un visage (yeux, bouche, front, menton), une main qui agit, un objet clé
+(tablette, téléphone, noyau, carte), s'il pointe vers le mauvais personnage, déborde de la case, chevauche un autre
+texte, ou est trop petit pour un téléphone. Pour que le contrôle automatique aide : noter dans `illus.keep` chaque
+visage avec un nom commençant par « visage » (ex. `'visage de Mory'`) ; `verifier-bulles` signale alors toute bulle
+posée dessus et tout texte trop petit à 360 px. Les queues de bulles s'arrêtent d'elles-mêmes devant ces visages.
+
 ---
 
 ## 7. Fiche des personnages et décors du chapitre 1
