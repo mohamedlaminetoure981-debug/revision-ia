@@ -1158,6 +1158,11 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.2** : **illustrations du chapitre 3** reliées (53 images `.png`/`.jpg` dans `public/story/chapitre-3/`,
+  5 cases dessinées par l'appli) ; description de chaque case réécrite d'après l'image (bibliothèque : fenêtres
+  à gauche, rayonnages à droite, horloge au-dessus des rayonnages centraux ; « Chuuut ! » hors champ page 3 ;
+  page 4 en miroir) ; recadrages, zones protégées, bulles et onomatopées replacés (contrôle visuel page par page) ;
+  `docs/methode-illustration.md` §6 bis : toujours joindre une case déjà illustrée comme référence de STYLE.
 - ✅ **v1.23.1** : contrôles du chapitre 3 (`verifier-bulles -- 3` : aucun problème ; croquis, calcul et écrans
   lisibles sur un téléphone de 360 px ; message du Créateur agrandi : option `big` de l'écran) ; anciennes
   traductions anglaises du chapitre 3 retirées (BD et teaser : à relancer avec `npm run traduire -- en`) ;

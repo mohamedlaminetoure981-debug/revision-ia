@@ -241,6 +241,35 @@ posée dessus et tout texte trop petit à 360 px. Les queues de bulles s'arrête
 
 ---
 
+## 6 bis. Leçons du chapitre 3 (53 illustrations, bibliothèque)
+
+### 6 bis.1 Nouveau décor : TOUJOURS joindre une case déjà illustrée comme référence de STYLE
+Pour un lieu jamais dessiné (la bibliothèque du chapitre 3), on a tendance à ne joindre que la photo ou l'image
+de référence du **décor**. Résultat : **Gemini part en photoréalisme** (rendu photo, lumière « réelle »), ou
+change de style d'une case à l'autre (bibliothèque grise et froide, puis boisée et dorée aux pages 12).
+La parade :
+- joindre **au moins une case déjà illustrée et validée** (d'un chapitre précédent si besoin) comme
+  **référence de STYLE**, en plus de la référence du décor ;
+- le dire dans le prompt : « Image 1 = STYLE reference only (line art, cel-shading, colors). Image 2 = LAYOUT
+  reference of the place (copy the room, not its rendering) » ;
+- garder le bloc REALISM LOCK (§6.4) : « no photorealism, no 3D render ».
+
+### 6 bis.2 Autres constats du chapitre 3
+- **Plan du lieu écrit noir sur blanc** : la salle de lecture a été inversée plusieurs fois (fenêtres à droite au
+  lieu de gauche, porte derrière Nia). Écrire dans SCENE LOCK : « windows and rain on the LEFT, tall shelves on the
+  RIGHT, the clock on the back wall ABOVE the central shelves, Nia sits at the far end of her table, facing the
+  entrance ».
+- **Main bandée** : Gemini bande souvent les DEUX mains de Kaï, ou la mauvaise. Écrire « ONLY his RIGHT hand is
+  bandaged, his left hand is bare » et vérifier chaque image.
+- **Pluie dans la salle** : dans plusieurs cases intérieures, la pluie tombe DANS la bibliothèque. Écrire « rain only
+  outside, behind the windows; no rain indoors ».
+- **Objets qui se transforment** : le dictionnaire tenu « comme une batte » est devenu un livre monté au bout d'un
+  manche. Décrire la prise exacte (« he holds the big book itself with both hands, no handle »).
+- **Personnage hors champ** : pour une réplique qui vient de l'extérieur de la case (le « Chuuut ! » de la
+  bibliothécaire), ne pas la dessiner ; dans le code, la bulle a une queue `tail` qui sort par le bord de la case.
+
+---
+
 ## 7. Fiche des personnages et décors du chapitre 1
 
 ### Personnages
