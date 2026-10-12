@@ -4,7 +4,7 @@
 
 /** Quota, limite ou service indisponible : on s'arrête proprement, on reprendra au prochain lancement. */
 export class ArretQuota extends Error {
-  constructor(message, reprise) { super(message); this.reprise = reprise; } // reprise : Date ou null
+  constructor(message, reprise, code = null) { super(message); this.reprise = reprise; this.code = code; } // reprise : Date ou null ; code : 'modeles-refuses' si aucun modèle n'est ouvert
 }
 /** Échec limité à UNE case (image refusée, réponse vide…) : on passe à la suivante. */
 export class ErreurCase extends Error {}

@@ -4,6 +4,19 @@ Cet outil génère ou retouche les illustrations du Mode Histoire **directement 
 copier-coller dans AI Studio. Il construit le prompt tout seul (règles de `methode-illustration.md`),
 joint les bonnes références, et ne remplace **jamais** une image sans ton accord.
 
+Deux façons de s'en servir :
+
+| | Mode API (automatique) | **Mode gratuit à la main** (semi-automatique) |
+|---|---|---|
+| Qui génère l'image ? | l'outil, en appelant Gemini | **toi, dans AI Studio** (gratuit) |
+| Clé API | obligatoire | inutile |
+| Prérequis | un modèle d'images ouvert à ta clé (souvent la **facturation**) | rien |
+| Commandes | `retoucher`, `generer`, `illustrer-lot` | `preparer` puis `importer` |
+
+Si `npm run modeles-images` ne te donne rien (ou que l'outil dit « indisponible pour ta clé »), prends
+le **mode gratuit à la main** : va directement au **§ A** ci-dessous. Tout le reste (références, lots,
+`comparer`, `accepter`, sauvegardes) marche pareil dans les deux modes.
+
 Toutes les commandes se tapent dans **PowerShell**, dans le dossier du projet :
 
 ```powershell
@@ -13,7 +26,92 @@ git pull
 
 ---
 
-## 1. Une seule fois : la clé API
+## A. MODE GRATUIT À LA MAIN (AI Studio) — étape par étape
+
+L'outil fait le travail pénible (écrire le prompt, choisir les bonnes images, ranger le résultat) ;
+toi, tu fais seulement le passage dans AI Studio.
+
+### A1. Préparer une case
+
+```powershell
+# Retouche ciblée (avec une consigne entre guillemets) :
+npm run preparer -- 3 4 2 "Seule la main DROITE de Kaï est bandée : enlève le bandage de sa main gauche"
+
+# Génération (sans consigne) :
+npm run preparer -- 3 5 2
+```
+
+(= chapitre 3, page 4, case 2.) L'outil :
+1. construit **exactement le même prompt** que le mode API et l'affiche ;
+2. le **copie dans le presse-papiers** (rien à sélectionner) ;
+3. met les **images à joindre** dans un dossier, **numérotées dans l'ordre** (`1-case-a-retoucher.png`,
+   `2-style-….jpg`, `3-perso-kai-bande.jpg`, `4-perso-mory.jpg`, `5-decor-….jpg`) — seulement les
+   personnages **présents dans la case** — et **ouvre ce dossier** dans l'Explorateur Windows
+   (`%TEMP%\revision-ia-illustration\ch3-p4-c2`) ;
+4. te rappelle les étapes. Les lignes ⚠️ t'indiquent les références manquantes (voir `references/README.md`).
+
+Pour voir tout ça **sans rien copier ni ouvrir** : ajoute `--essai`.
+
+### A2. Dans AI Studio (aistudio.google.com)
+
+1. **Nouvelle discussion** (une par case, voir `methode-illustration.md` §4).
+2. Vérifie que le **modèle « Image »** est sélectionné (Nano Banana / Gemini Image).
+3. **Colle le prompt** (Ctrl+V).
+4. **Joins les images du dossier, dans l'ordre** : 1-…, puis 2-…, puis 3-… (le prompt dit « Image 1 :
+   …, Image 2 : … » : l'ordre compte).
+5. Clique sur **Générer**. Si le résultat n'est pas bon : une seule correction à la fois, et après
+   deux essais ratés, recommence une nouvelle discussion.
+6. **Télécharge l'ORIGINAL** (bouton de téléchargement de l'image, jamais une capture d'écran :
+   la capture est plus petite et floue).
+
+### A3. Ramener l'image
+
+```powershell
+npm run importer -- 3 4 2
+```
+
+L'outil prend l'**image la plus récente de ton dossier Téléchargements** (png, jpg ou webp, de moins de
+**30 minutes**), la recadre en 16:9 si besoin et la range dans
+`public/story/chapitre-3/_propositions/` sous le bon nom. **Ton fichier téléchargé n'est pas touché.**
+Options :
+- image plus ancienne : `npm run importer -- 3 4 2 --minutes=120` ;
+- image ailleurs : `npm run importer -- 3 4 2 "C:\chemin\mon-image.png"` ;
+- autre dossier Téléchargements : ajoute dans `.env.local` : `ILLUS_TELECHARGEMENTS=D:\Telechargements`.
+
+### A4. Comparer, puis accepter (comme en mode API)
+
+```powershell
+npm run comparer -- 3
+npm run accepter -- 3 4 2
+npm run verifier-bulles -- 3
+git add public/story/chapitre-3
+git commit -m "Chapitre 3 : retouche page 4 case 2"
+git push
+```
+
+### A5. Plusieurs cases à la suite (lot)
+
+Remplis `docs/retouches/chapitre-3.json` (voir §6 plus bas), puis répète ces deux commandes :
+
+```powershell
+npm run preparer -- 3 --suivante     # prépare la PROCHAINE tâche non faite
+# … AI Studio …
+npm run importer -- 3 <page> <case>  # (la commande exacte t'est rappelée) marque la tâche comme faite
+```
+
+`npm run preparer -- 3 --etat` montre où tu en es (✅ faite · ⏳ à faire · ⏸️ mise de côté).
+Tu peux t'arrêter et reprendre le lendemain : l'avancement est gardé.
+
+> Astuce : sans clé API, la description de la case reste en français dans le prompt (AI Studio la
+> comprend). Avec une clé (même sans accès aux images), elle est traduite en anglais, comme en mode API.
+
+---
+
+---
+
+## 1. Mode API — une seule fois : la clé API
+
+> Cette partie ne sert qu'au **mode API**. Pour le mode gratuit à la main, tu n'as pas besoin de clé.
 
 1. Va sur **aistudio.google.com** → *Get API key* → crée ou copie ta clé.
 2. Crée le fichier `.env.local` à la racine du projet (il est dans `.gitignore` : il ne part jamais
@@ -177,10 +275,12 @@ Les dossiers `_propositions/` et `_sauvegardes/` ne sont ni publiés dans l'appl
 | `ILLUS_STYLE_REFS=2` | nombre de cases de style jointes pour une génération |
 | `ILLUS_TRADUIRE=non` | envoie la description en français, sans traduction |
 | `ILLUS_FOURNISSEUR=gemini` | service d'images (seul Gemini existe pour l'instant) |
+| `ILLUS_TELECHARGEMENTS=…` | dossier où `importer` cherche l'image (défaut : Téléchargements) |
 
 ## 10. Pour le développeur
 
 `scripts/illustrer.mjs` (commandes), `scripts/illustration/config.mjs` (clé, personnages, décors),
 `scripts/illustration/prompt.mjs` (détection des personnages, références, prompts),
+Le mode à la main (`preparer`, `importer`) est dans `scripts/illustrer.mjs` et réutilise la même construction de prompt que le mode API (`construire`).
 `scripts/illustration/fournisseurs/` (un fichier par service : `gemini.mjs` ; pour en ajouter un,
 copier son interface et l'inscrire dans `index.mjs`).

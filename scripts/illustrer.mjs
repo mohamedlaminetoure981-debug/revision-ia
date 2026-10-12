@@ -12,6 +12,9 @@
 //   npm run comparer  -- 3            (page avant / après dans le navigateur)
 //   npm run accepter  -- 3 5 2        (la proposition remplace l'image, l'ancienne est sauvegardée)
 //   npm run modeles-images            (modèles d'images ouverts à ta clé)
+// MODE GRATUIT À LA MAIN (si ta clé n'ouvre aucun modèle d'images) :
+//   npm run preparer -- 3 4 2 "consigne"   prompt copié + images à joindre dans un dossier numéroté
+//   npm run importer -- 3 4 2              ramène l'image téléchargée dans _propositions/
 // Options : --essai (montre ce qui serait envoyé, SANS appeler l'API ni avoir de clé),
 //           --refaire (refait aussi les tâches déjà faites), --toutes (generer : aussi les cases
 //           déjà illustrées), --forcer (ignore l'arrêt pour quota enregistré).
@@ -25,11 +28,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import os from 'node:os';
 import { execFile } from 'node:child_process';
 import sharp from 'sharp';
 import {
   ROOT, LOT_DIR, readEnv, retenirSecret, masquer, loadChapter, caseImage, isAppDrawn,
-  propDir, saveDir, caseName, PERSONNAGES,
+  propDir, saveDir, caseName, PERSONNAGES, IMG_EXT,
 } from './illustration/config.mjs';
 import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, rel } from './illustration/prompt.mjs';
 import { choisirFournisseur } from './illustration/fournisseurs/index.mjs';
@@ -53,7 +57,11 @@ const USAGE = `Commandes (voir docs/outil-illustration.md) :
   npm run illustrer-lot -- <chapitre> [--essai] [--refaire]
   npm run comparer -- <chapitre>
   npm run accepter -- <chapitre> <page> <case> [fichier]
-  npm run modeles-images`;
+  npm run modeles-images
+Mode gratuit à la main (AI Studio) :
+  npm run preparer -- <chapitre> <page> <case> ["consigne"] [--essai]
+  npm run preparer -- <chapitre> --suivante      (prochaine tâche de docs/retouches/chapitre-N.json)
+  npm run importer -- <chapitre> <page> <case> [--essai]`;
 
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
 const writeJson = (f, v) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`); };
@@ -130,7 +138,7 @@ async function preparer(n, chapter, t) {
 /** Texte de la scène, traduit en anglais (cache local) sauf en mode essai. */
 async function scene(n, panel, service) {
   const fr = cleanAction(panel.action);
-  if (ESSAI || /^(non|no|0)$/i.test(env.ILLUS_TRADUIRE || '')) return { text: fr, lang: 'fr' };
+  if (ESSAI || !service || /^(non|no|0)$/i.test(env.ILLUS_TRADUIRE || '')) return { text: fr, lang: 'fr' };
   const cacheFile = path.join(propDir(n), 'traductions.json');
   const cache = readJson(cacheFile, {});
   const k = crypto.createHash('sha1').update(fr).digest('hex').slice(0, 16);
@@ -164,19 +172,31 @@ async function seize9(buf) {
 // ---------------------------------------------------------------------
 // Exécution d'une tâche
 // ---------------------------------------------------------------------
-async function executer(n, chapter, t, four) {
+/** Tout ce qu'il faut pour une tâche : références, scène, prompt, images (identique en mode API et à la main). */
+async function construire(n, chapter, t, service, { redimensionner = true } = {}) {
   const label = `page ${t.page} case ${t.case}`;
   const prep = await preparer(n, chapter, t);
-  if (prep.ignore) { console.log(`⏭️  ${label} : ${prep.ignore}`); return 'ignore'; }
-  const sc = await scene(n, prep.panel, four.service);
+  if (prep.ignore) return { ignore: prep.ignore, label };
+  const sc = await scene(n, prep.panel, service);
   const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, refs: prep.refs, consigne: t.consigne || '' };
   const texte = t.type === 'retouche' ? buildEditPrompt(o) : buildGenerationPrompt(o);
-  const images = await Promise.all(prep.refs.map((r, i) => charger(r, t.type === 'retouche' && i === 0)));
+  const images = redimensionner ? await Promise.all(prep.refs.map((r, i) => charger(r, t.type === 'retouche' && i === 0))) : [];
+  return { prep, sc, texte, images, label };
+}
 
+function afficherTache(n, t, c) {
+  const { prep, images, label } = c;
   console.log(`\n${t.type === 'retouche' ? '🖌️  Retouche' : '🎨 Génération'} — chapitre ${n}, ${label}${t.consigne ? ` : « ${t.consigne} »` : ''}`);
   console.log(`   Personnages : ${prep.chars.filter((x) => x !== 'kai-bande').map((x) => PERSONNAGES[x].nom + (x === 'kai' && prep.chars.includes('kai-bande') ? ' (main droite bandée)' : '')).join(', ') || 'aucun'} · décor : ${prep.decor || '—'}`);
-  prep.refs.forEach((r, i) => console.log(`   Image ${i + 1} : ${rel(r.file)}  (${Math.round(images[i].data.length / 1024)} Ko envoyés)`));
+  prep.refs.forEach((r, i) => console.log(`   Image ${i + 1} : ${rel(r.file)}${images[i] ? `  (${Math.round(images[i].data.length / 1024)} Ko envoyés)` : ''}`));
   prep.avert.forEach((a) => console.log(`   ⚠️ ${a}`));
+}
+
+async function executer(n, chapter, t, four) {
+  const c = await construire(n, chapter, t, four.service);
+  if (c.ignore) { console.log(`⏭️  ${c.label} : ${c.ignore}`); return 'ignore'; }
+  const { prep, sc, texte, images } = c;
+  afficherTache(n, t, c);
 
   if (ESSAI) {
     const base = path.join(propDir(n), `essai-${caseName(t.page, t.case)}`);
@@ -203,6 +223,7 @@ async function executer(n, chapter, t, four) {
 }
 
 /** Lance une liste de tâches ; s'arrête proprement au quota, reprend au prochain lancement. */
+let lotCourant = false;
 async function lancer(n, taches, { sauter = false } = {}) {
   const etat = readJson(ETAT, {});
   if (!ESSAI && etat.reprise && new Date(etat.reprise) > new Date() && !flags.has('--forcer')) {
@@ -214,14 +235,14 @@ async function lancer(n, taches, { sauter = false } = {}) {
   if (!ESSAI) {
     const key = env[four.cle];
     if (!key) {
-      console.log(`❌ Clé manquante. Crée le fichier .env.local à la racine du projet avec la ligne :\n   ${four.cle}=ta_clé\n   (ou essaie sans clé avec --essai)`);
+      console.log(`❌ Clé manquante. Crée le fichier .env.local à la racine du projet avec la ligne :\n   ${four.cle}=ta_clé\n   (ou essaie sans clé avec --essai, ou travaille gratuitement avec AI Studio : npm run preparer)`);
       process.exit(1);
     }
     retenirSecret(key);
   }
   const chapter = await loadChapter(n);
   const bilan = { fait: 0, ignore: 0, echec: 0, saute: 0, essai: 0 };
-  let arrete = false;
+  let arrete = false; let refuses = null;
   for (const t of taches) {
     if (sauter && !ESSAI && !flags.has('--refaire') && dejaFait(n, t)) { bilan.saute++; continue; }
     try {
@@ -231,6 +252,7 @@ async function lancer(n, taches, { sauter = false } = {}) {
     } catch (e) {
       if (e instanceof ArretQuota) {
         arrete = true;
+        if (e.code === 'modeles-refuses') refuses = t;
         writeJson(ETAT, { raison: e.message, reprise: e.reprise ? e.reprise.toISOString() : null, date: new Date().toISOString() });
         console.log(`\n⏸️  Arrêt propre : ${masquer(e.message)}.`);
         console.log(e.reprise ? `   Réessaie après ${quandFr(e.reprise)} : relance la même commande, elle reprendra là où elle s'est arrêtée.` : '   Relance la même commande plus tard : elle reprendra là où elle s\'est arrêtée.');
@@ -244,6 +266,10 @@ async function lancer(n, taches, { sauter = false } = {}) {
   const parts = [bilan.fait && `${bilan.fait} proposition(s)`, bilan.essai && `${bilan.essai} essai(s)`, bilan.saute && `${bilan.saute} déjà faite(s)`, bilan.ignore && `${bilan.ignore} case(s) de l'appli ignorée(s)`, bilan.echec && `${bilan.echec} échec(s)`].filter(Boolean);
   console.log(`\nBilan : ${parts.join(' · ') || 'rien à faire'}.`);
   if (bilan.fait) console.log(`Compare : npm run comparer -- ${n}   puis   npm run accepter -- ${n} <page> <case>`);
+  if (refuses) {
+    const cmdP = lotCourant ? `npm run preparer -- ${n} --suivante` : `npm run preparer -- ${n} ${refuses.page} ${refuses.case}${refuses.consigne ? ` "${refuses.consigne.replace(/"/g, '\\"')}"` : ''}`;
+    console.log(`\n💡 Aucun modèle d'images n'est ouvert à ta clé (en général : facturation requise). Tu peux continuer GRATUITEMENT avec AI Studio à la main :\n   1) ${cmdP}\n   2) colle le prompt dans AI Studio, joins les images du dossier, génère, télécharge l'image\n   3) npm run importer -- ${n} ${refuses.page} ${refuses.case}\n   Guide : docs/outil-illustration.md (mode gratuit à la main).`);
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -329,6 +355,164 @@ function lireLot(n) {
   return list;
 }
 
+
+// ---------------------------------------------------------------------
+// MODE GRATUIT À LA MAIN (AI Studio) : preparer → (AI Studio) → importer
+// ---------------------------------------------------------------------
+const DOSSIER_PREP = path.join(os.tmpdir(), 'revision-ia-illustration');
+const prepMetaFile = (n, p, c) => path.join(propDir(n), '_preparees', `${caseName(p, c)}.json`);
+
+/** Court nom lisible pour une image jointe, d'après son rôle. */
+function nomRef(r) {
+  const role = r.role || '';
+  const base = path.basename(r.file).replace(/\.[^.]+$/, '');
+  if (/^the existing panel/.test(role)) return 'case-a-retoucher';
+  if (/^STYLE/.test(role)) return `style-${base}`;
+  if (/^CHARACTER reference for (.+?):/.test(role)) return `perso-${base}`;
+  if (/^SETTING/.test(role)) return `decor-${base}`;
+  return `autre-${base}`;
+}
+
+/** Copie le texte dans le presse-papiers (Windows : Set-Clipboard). Renvoie true si c'est fait. */
+function presserPapiers(fichier) {
+  return new Promise((resolve) => {
+    let cmd; let a;
+    if (process.platform === 'win32') {
+      cmd = 'powershell'; a = ['-NoProfile', '-Command', `Get-Content -Raw -Encoding UTF8 -LiteralPath '${fichier.replace(/'/g, "''")}' | Set-Clipboard`];
+    } else if (process.platform === 'darwin') { cmd = 'sh'; a = ['-c', `pbcopy < "${fichier}"`]; } else { cmd = 'sh'; a = ['-c', `(command -v wl-copy >/dev/null && wl-copy < "${fichier}") || (command -v xclip >/dev/null && xclip -selection clipboard < "${fichier}")`]; }
+    try { execFile(cmd, a, (err) => resolve(!err)); } catch { resolve(false); }
+  });
+}
+function ouvrirDossier(dir) {
+  const cmd = process.platform === 'win32' ? 'explorer' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+  try { execFile(cmd, [dir], () => {}); } catch { /* pas d'explorateur */ }
+}
+
+/** Ligne de suivi d'un lot : ✅ fait · ⏳ à faire · ⏸️ mise de côté. */
+function etatLot(n) {
+  const f = path.join(LOT_DIR, `chapitre-${n}.json`);
+  let all = [];
+  try { all = (JSON.parse(fs.readFileSync(f, 'utf8')).taches || []); } catch { return null; }
+  return all.map((t, i) => ({ i: i + 1, t, ignore: !!t.ignorer, type: /^(retouche|retoucher)$/i.test(t.type) ? 'retouche' : 'generation' }))
+    .map((x) => ({ ...x, fait: !x.ignore && dejaFait(n, { ...x.t, type: x.type }) }));
+}
+
+async function preparerManuel(n, t) {
+  const chapter = await loadChapter(n);
+  // Traduction de la scène : seulement si une clé existe (les modèles TEXTE sont gratuits) ; sinon description en français.
+  let service = null;
+  const key = env.GEMINI_API_KEY;
+  if (!ESSAI && key) { retenirSecret(key); try { service = choisirFournisseur(env).service; } catch { service = null; } }
+  const c = await construire(n, chapter, t, service, { redimensionner: false });
+  if (c.ignore) { console.log(`⏭️  ${c.label} : ${c.ignore}`); return 'ignore'; }
+  const { prep, texte } = c;
+  const dir = path.join(DOSSIER_PREP, `ch${n}-p${t.page}-c${t.case}`);
+  const noms = prep.refs.map((r, i) => {
+    const premier = i === 0 && t.type === 'retouche';
+    return `${i + 1}-${nomRef(r)}${premier ? path.extname(r.file).toLowerCase() : '.jpg'}`;
+  });
+  c.images = new Array(prep.refs.length).fill(null);
+  afficherTache(n, t, c);
+  console.log(`\n📋 MODE À LA MAIN (AI Studio, gratuit)${ESSAI ? ' — ESSAI : rien n\'est copié ni ouvert' : ''}`);
+  console.log(`   Dossier des images à joindre : ${dir}`);
+  prep.refs.forEach((r, i) => console.log(`   ${noms[i]}   ←  ${rel(r.file)}`));
+  if (c.sc.lang === 'fr' && !ESSAI) console.log('   (description en français : pas de clé ou traduction impossible — AI Studio comprend le français, ça marche aussi)');
+  if (ESSAI && c.sc.lang === 'fr') console.log('   (au vrai lancement, la description est traduite en anglais si une clé est disponible)');
+
+  if (!ESSAI) {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(dir, { recursive: true });
+    for (let i = 0; i < prep.refs.length; i++) {
+      const dest = path.join(dir, noms[i]);
+      if (i === 0 && t.type === 'retouche') fs.copyFileSync(prep.refs[i].file, dest); // la case à retoucher : copie exacte
+      else fs.writeFileSync(dest, (await charger(prep.refs[i], false)).data);
+    }
+    fs.writeFileSync(path.join(dir, 'prompt.txt'), texte);
+    fs.writeFileSync(path.join(dir, 'LISEZ-MOI.txt'), `Chapitre ${n}, page ${t.page}, case ${t.case} (${t.type === 'retouche' ? 'retouche' : 'génération'})\n\n1. Colle le prompt (déjà dans le presse-papiers, sinon ouvre prompt.txt) dans AI Studio.\n2. Joins les images de ce dossier DANS L'ORDRE : 1-..., 2-..., 3-...\n3. Vérifie que le modèle « Image » est sélectionné, génère, télécharge l'ORIGINAL (pas une capture).\n4. Dans PowerShell : npm run importer -- ${n} ${t.page} ${t.case}\n`);
+    writeJson(prepMetaFile(n, t.page, t.case), {
+      type: t.type, consigne: t.consigne || '', date: new Date().toISOString(), prompt: texte,
+      references: prep.refs.map((r) => ({ fichier: rel(r.file), role: r.role })),
+    });
+  } else {
+    fs.mkdirSync(propDir(n), { recursive: true });
+    fs.writeFileSync(path.join(propDir(n), `essai-${caseName(t.page, t.case)}.txt`), texte);
+  }
+  console.log(`\n----- PROMPT (à coller dans AI Studio) -----\n${texte}\n--------------------------------------------`);
+  if (!ESSAI) {
+    const ok = await presserPapiers(path.join(dir, 'prompt.txt'));
+    console.log(ok ? '\n✅ Le prompt est dans le presse-papiers (Ctrl+V pour coller).' : `\n⚠️ Copie automatique impossible ici : ouvre ${path.join(dir, 'prompt.txt')} et copie-le.`);
+    ouvrirDossier(dir);
+  }
+  console.log(`\nÀ FAIRE MAINTENANT :
+  1. Colle le prompt dans AI Studio (aistudio.google.com).
+  2. Joins les images du dossier ${ESSAI ? '(qui s\'ouvrira)' : 'qui vient de s\'ouvrir'}, dans l'ordre : 1-…, 2-…, 3-…
+  3. Vérifie que le modèle « Image » est sélectionné, clique sur Générer, puis télécharge l'original.
+  4. Reviens ici : npm run importer -- ${n} ${t.page} ${t.case}`);
+  return 'fait';
+}
+
+/** Image la plus récente du dossier Téléchargements. */
+function dernierTelechargement(minutes) {
+  const dir = env.ILLUS_TELECHARGEMENTS || path.join(os.homedir(), 'Downloads');
+  if (!fs.existsSync(dir)) throw new Error(`Dossier Téléchargements introuvable : ${dir}. Indique-le dans .env.local : ILLUS_TELECHARGEMENTS=C:\\chemin\\vers\\dossier`);
+  const list = fs.readdirSync(dir).filter((f) => IMG_EXT.test(f))
+    .map((f) => { const full = path.join(dir, f); const st = fs.statSync(full); return { f, full, t: st.mtimeMs, ok: st.isFile() && st.size > 20000 }; })
+    .filter((x) => x.ok).sort((a, b) => b.t - a.t);
+  const recent = list.filter((x) => Date.now() - x.t <= minutes * 60000);
+  return { dir, list, recent };
+}
+
+async function importerManuel(n, p, c, fichier) {
+  const minutes = Number((argv.find((a) => a.startsWith('--minutes=')) || '').split('=')[1]) || 30;
+  let src;
+  if (fichier) {
+    const full = path.resolve(fichier);
+    if (!fs.existsSync(full)) { console.log(`❌ Fichier introuvable : ${full}`); process.exit(1); }
+    src = { f: path.basename(full), full, t: fs.statSync(full).mtimeMs };
+  } else {
+    const { dir, list, recent } = dernierTelechargement(minutes);
+    if (!recent.length) {
+      console.log(`❌ Aucune image de moins de ${minutes} minutes dans ${dir}.`);
+      if (list[0]) console.log(`   La plus récente : ${list[0].f} (il y a ${Math.round((Date.now() - list[0].t) / 60000)} min). Pour la prendre : ajoute --minutes=${Math.ceil((Date.now() - list[0].t) / 60000) + 5}, ou donne son chemin en 4ᵉ argument.`);
+      else console.log('   Aucune image trouvée : as-tu bien téléchargé l\'image depuis AI Studio (bouton de téléchargement, pas une capture) ?');
+      process.exit(1);
+    }
+    src = recent[0];
+    if (recent.length > 1) console.log(`   (${recent.length} images récentes : la plus récente est prise, ${recent[1].f} sera ignorée)`);
+  }
+  const buf = fs.readFileSync(src.full);
+  const m = await sharp(buf).metadata();
+  const ratio = m.width / m.height;
+  console.log(`📥 Image prise : ${src.full}  (${m.width} × ${m.height}, il y a ${Math.max(0, Math.round((Date.now() - src.t) / 60000))} min)`);
+  if (m.width < 1000) console.log('   ⚠️ Image petite (moins de 1000 px de large) : est-ce bien l\'original téléchargé, et pas une capture d\'écran ?');
+  if (Math.abs(ratio - 16 / 9) > 0.05) console.log(`   ⚠️ Format ${ratio.toFixed(2)} au lieu de 1,78 (16:9) : l'image sera recadrée au centre.`);
+  const meta = readJson(prepMetaFile(n, p, c), {});
+  if (!meta.type) console.log('   (pas de préparation trouvée pour cette case : métadonnées minimales)');
+  const dir = propDir(n);
+  const nom = `${caseName(p, c)}--${stamp()}.png`;
+  if (ESSAI) { console.log(`🧪 ESSAI : elle serait rangée dans ${rel(path.join(dir, nom))}. Rien n'est copié.`); return; }
+  // Déjà importée ?
+  if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).filter((x) => x.startsWith(`${caseName(p, c)}--`) && x.endsWith('.json'))) {
+    const j = readJson(path.join(dir, f), {});
+    if (j.source?.nom === src.f && j.source?.mtime === Math.round(src.t)) { console.log(`   ⚠️ Cette image a déjà été importée pour cette case (${f.replace('.json', '.png')}).`); }
+  }
+  const png = await seize9(buf);
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, nom);
+  fs.writeFileSync(file, png);
+  writeJson(file.replace(/\.png$/, '.json'), {
+    type: meta.type || 'generation', chapitre: n, page: p, case: c, consigne: meta.consigne || '', modele: 'AI Studio (à la main)', fournisseur: 'manuel',
+    date: new Date().toISOString(), references: meta.references || [], note: '', prompt: meta.prompt || '', source: { nom: src.f, mtime: Math.round(src.t) },
+  });
+  // Tâche du lot correspondante : faite.
+  const lot = etatLot(n);
+  if (lot) { const x = lot.find((q) => !q.ignore && !q.fait && q.t.page === p && q.t.case === c); if (x) noter(n, { ...x.t, type: x.type }, 'fait', { importe: nom }); }
+  comparer(n, false);
+  console.log(`✅ Proposition rangée : ${rel(file)}  (ton fichier téléchargé n'est pas touché)`);
+  console.log(`Ensuite :\n   npm run comparer -- ${n}          (voir avant / après)\n   npm run accepter -- ${n} ${p} ${c}      (la garder : l'ancienne image est sauvegardée)`);
+  if (lot) { const reste = etatLot(n).filter((q) => !q.ignore && !q.fait).length; if (reste) console.log(`   Lot : ${reste} tâche(s) restante(s) → npm run preparer -- ${n} --suivante`); else console.log('   Lot : toutes les tâches sont faites 🎉'); }
+}
+
 // ---------------------------------------------------------------------
 // Commandes
 // ---------------------------------------------------------------------
@@ -357,7 +541,33 @@ try {
     else await lancer(n, taches, { sauter: taches.length > 1 });
   } else if (cmd === 'lot') {
     const n = num(args[0], 'Chapitre');
+    lotCourant = true;
     await lancer(n, lireLot(n), { sauter: true });
+  } else if (cmd === 'preparer') {
+    const n = num(args[0], 'Chapitre');
+    if (flags.has('--suivante') || flags.has('--etat') || args.length === 1) {
+      const lot = etatLot(n);
+      if (!lot) { console.log(`❌ Pas de lot pour le chapitre ${n} : crée docs/retouches/chapitre-${n}.json (copie exemple.json), ou précise la page et la case : npm run preparer -- ${n} <page> <case> ["consigne"]`); process.exit(1); }
+      const actifs = lot.filter((x) => !x.ignore);
+      console.log(`Lot du chapitre ${n} : ${actifs.filter((x) => x.fait).length}/${actifs.length} faite(s)`);
+      lot.forEach((x) => console.log(`   ${x.ignore ? '⏸️' : x.fait ? '✅' : '⏳'} n°${x.i} · ${x.type} · page ${x.t.page} case ${x.t.case}${x.t.consigne ? ` · « ${String(x.t.consigne).slice(0, 70)} »` : ''}`));
+      if (flags.has('--etat')) process.exit(0);
+      let fini = false;
+      for (const x of lot) {
+        if (x.ignore || (x.fait && !flags.has('--refaire'))) continue;
+        const r = await preparerManuel(n, { ...x.t, type: x.type });
+        if (r === 'ignore') { if (!ESSAI) noter(n, { ...x.t, type: x.type }, 'fait', { ignore: true }); continue; }
+        console.log(`\n(tâche n°${x.i} du lot ; après l'import, relance « npm run preparer -- ${n} --suivante » pour la tâche d'après)`);
+        fini = true; break;
+      }
+      if (!fini) console.log('\n✅ Toutes les tâches du lot sont faites (ou mises de côté).');
+    } else {
+      const [p, c] = [num(args[1], 'Page'), num(args[2], 'Case')];
+      const consigne = args.slice(3).join(' ').trim();
+      await preparerManuel(n, { type: consigne ? 'retouche' : 'generation', page: p, case: c, consigne });
+    }
+  } else if (cmd === 'importer') {
+    await importerManuel(num(args[0], 'Chapitre'), num(args[1], 'Page'), num(args[2], 'Case'), args[3]);
   } else if (cmd === 'comparer') {
     comparer(num(args[0], 'Chapitre'));
   } else if (cmd === 'accepter') {

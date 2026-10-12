@@ -1175,6 +1175,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.6** : outil d'illustration, **mode gratuit à la main** (sans clé ni facturation) : `npm run preparer`
+  (prompt copié dans le presse-papiers + images numérotées dans un dossier ouvert dans l'Explorateur ;
+  `--suivante` pour un lot) puis `npm run importer` (image la plus récente de Téléchargements → `_propositions/`) ;
+  si tous les modèles de l'API sont refusés, l'outil propose ce mode. Guide : `docs/outil-illustration.md`.
 - ✅ **v1.23.5** : **outil d'illustration** (sur le PC, clé dans `.env.local`) : `npm run generer`, `retoucher`,
   `illustrer-lot`, `comparer`, `accepter`, `modeles-images` ; prompts automatiques (règles de
   `methode-illustration.md`), références jointes selon la case (`references/`), propositions jamais publiées,

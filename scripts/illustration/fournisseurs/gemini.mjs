@@ -102,7 +102,7 @@ export function creer(env) {
       }
     }
     if (jour) throw new ArretQuota('quota du jour épuisé (tous les modèles essayés)', prochainMinuitPacifique());
-    throw new ArretQuota(`aucun modèle de la liste n'est ouvert à ta clé (${modeles.join(', ')}). Lance « npm run modeles-images » pour voir les modèles disponibles, puis mets le bon nom dans .env.local (GEMINI_IMAGE_MODEL=…). Les modèles d'images peuvent exiger la facturation activée`, null);
+    throw new ArretQuota(`aucun modèle de la liste n'est ouvert à ta clé (${modeles.join(', ')}). Lance « npm run modeles-images » pour voir les modèles disponibles, puis mets le bon nom dans .env.local (GEMINI_IMAGE_MODEL=…). Les modèles d'images peuvent exiger la facturation activée`, null, 'modeles-refuses');
   }
 
   return {
