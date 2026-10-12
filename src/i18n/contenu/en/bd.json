@@ -1035,5 +1035,1044 @@
     ]
    }
   ]
+ },
+ "ch02": {
+  "title": "The Signal",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "The next day. University of Conakry."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Today: graphs. Vertices… and edges."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "How can I think about math… after yesterday?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You! Madina, yesterday! You okay?!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Madina? … Do we know each other?"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "He… doesn't remember?"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "No results.",
+       "from": "Search: \"Madina attack\""
+      }
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Madina? The market was quiet yesterday, right?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What about this, then? I wasn't dreaming."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A graph is a map of connections. Who is connected to who."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Sixteen seconds."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Not bad, the guy from Madina."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You… you remember?!"
+       },
+       {
+        "text": "I review everything. All the time. He can't take what I've locked in."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "The others? He took their memories. Like your signs."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Who are you, anyway?"
+       },
+       {
+        "text": "Mory. 2nd year too. Back row."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Look."
+       }
+      ]
+     },
+     {
+      "labels": [
+       {
+        "text": "Hamdallaye"
+       },
+       {
+        "text": "Madina"
+       },
+       {
+        "text": "Matam"
+       },
+       {
+        "text": "Taouyah"
+       },
+       {
+        "text": "Dixinn"
+       },
+       {
+        "text": "Bonfi"
+       },
+       {
+        "text": "Kaloum"
+       },
+       {
+        "text": "16/09"
+       },
+       {
+        "text": "01/10"
+       },
+       {
+        "text": "06/10"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A month of attacks. Nobody noticed a thing. Except me."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Why are you showing me this?"
+       },
+       {
+        "text": "Because you found out WHEN he's vulnerable. I can find WHERE."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Tonight at my place. Kaloum. Bring something to write with."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "That evening. Kaloum, on Mory's roof."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Two bars of signal. Forty seconds to load."
+       },
+       {
+        "text": "How do you cope?"
+       },
+       {
+        "text": "Mental training."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Neighborhoods are the vertices. Roads are the edges."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It always jumps to the neighbor with the most roads. The vertex with the highest degree. Where the most people pass through."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "And from Madina, the most connected one is…"
+       },
+       {
+        "text": "Hamdallaye roundabout. Six roads."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "BEEP BEEP BEEP"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Energy spike. It's getting ready."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Tonight. Around 9 p.m."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "With this hand… I won't be able to hit the same way."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "I find WHERE. You find WHEN."
+       },
+       {
+        "text": "… Deal."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "8:52 p.m. Route du Prince."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Got your stopwatch?"
+       },
+       {
+        "text": "Always."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Wallahi, what is that?!"
+       }
+      ]
+     },
+     {
+      "captions": [
+       {
+        "text": "Hamdallaye roundabout."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "HONK! HOOONK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "KRRRAAACK!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "RUN!!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "VMMMM"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "First wave."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "00:06.0",
+       "from": "STOPWATCH"
+      },
+      "bubbles": [
+       {
+        "text": "Six seconds."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "VMM… VM"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Then three… then one and a half…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Same ratio as Madina. One half."
+       },
+       {
+        "text": "So?"
+       }
+      ]
+     },
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "Twelve seconds! But where? The roundabout is huge!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Where it ate the most. The center. The node. The vertex of all vertices."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Five…"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "KRAAANG!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Seven…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "On the left! Behind the taxi!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Nine… ten…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Eleven…"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bg": {
+       "lines": "#c4b5fd"
+      }
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Not with this hand…"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "sfx": [
+       {
+        "text": "SWISH"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "bubbles": [
+       {
+        "text": "TWELVE!!!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "KRAAAK !"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "SHHHRRRAAA"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "I'm no fighter. I'm the guy who knows WHERE to hit."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "And me, WHEN."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "2 out of 8. Nice job.",
+       "from": "THE CREATOR"
+      }
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Wait… A huge spike. Tomorrow morning… where the books are kept."
+       }
+      ],
+      "captions": [
+       {
+        "text": "To be continued…"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ch03": {
+  "title": "The Voice of the Library",
+  "pages": [
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "The next day. 9:40 AM. It's raining on Conakry."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You sure about this?"
+       },
+       {
+        "text": "My antenna is never wrong."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "10 o'clock. Right here."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A library…"
+       },
+       {
+        "text": "Where books are kept."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "captions": [
+       {
+        "text": "9:52 AM. University library."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Picture a pirogue."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Between Kaloum and the Loos Islands, it takes an hour. Its average speed is distance divided by time. Easy."
+       }
+      ]
+     },
+     {
+      "labels": [
+       {
+        "text": "average speed"
+       },
+       {
+        "text": "instantaneous speed"
+       },
+       {
+        "text": "time"
+       },
+       {
+        "text": "position"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "But the derivative is the speed at ONE precise moment. Not the whole trip. RIGHT NOW."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "I finally get it!!"
+       },
+       {
+        "text": "Shhh!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "beep beep beep"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Wait… when she speaks, my antenna goes wild."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "When she explains, knowledge gets anchored. Oblivion can't touch it anymore."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "She's the only one who actually explains things well."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "You want a lesson… or a towel?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "We're… looking for someone."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "In here, we look for books. People belong outside."
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "BEEP BEEP BEEP!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "It's here."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "bzzt… bzzt"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": [
+        "Chapter 4: Derivatives",
+        "f′(a) = lim (f(a+h) − f(a)) / h",
+        "slope of the tangent"
+       ]
+      },
+      "sfx": [
+       {
+        "text": "VMMMM"
+       }
+      ]
+     },
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "My thesis! Everything's disappearing!!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "GET OUT!!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "KRRRAAACK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "CRASH!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Watch out!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "… Thanks."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Breathe."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Oblivion is like a tide. It only sweeps away what isn't anchored."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#a78bfa"
+      },
+      "bubbles": [
+       {
+        "text": "ANCHOR YOURSELVES! Recite your notes! Out loud!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "The derivative of x² is 2x…"
+       },
+       {
+        "text": "A vector has a magnitude…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It's working… She built a dam."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "sfx": [
+       {
+        "text": "VMMMM"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "Lap 1: 5.0 s\nLap 2: 4.6 s\nLap 3: 4.1 s",
+       "from": "STOPWATCH"
+      }
+     },
+     {
+      "bg": {
+       "lines": "#7c3aed"
+      },
+      "bubbles": [
+       {
+        "text": "It's not working! It's not a geometric sequence anymore!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It adapted. Its energy is going up… but slower and slower."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Hand it over."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     null,
+     {
+      "labels": [
+       {
+        "text": "slack tide"
+       },
+       {
+        "text": "energy"
+       },
+       {
+        "text": "time"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Look at the slope. It's decreasing. It's a rising tide."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#e879f9"
+      },
+      "bubbles": [
+       {
+        "text": "When the slope reaches zero, it's slack tide. It stops at the peak… and freezes."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "When?"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "In ten seconds."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "And it'll condense where it ate the most: the big central table."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What do I hit it with?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "This one, I've read ten times. It can't erase it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Six…"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Eight… nine…"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "BOOM!"
+       }
+      ]
+     },
+     {
+      "bg": {
+       "lines": "#8b5cf6"
+      },
+      "bubbles": [
+       {
+        "text": "TEN!!!"
+       }
+      ],
+      "sfx": [
+       {
+        "text": "KRAAAK!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "SHHHRRRAAA"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "It's back! Everything!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "People always told me I overcomplicate everything."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "You? You make things simple."
+       },
+       {
+        "text": "Join us."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Alright. On one condition: I get to write the summaries."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "3 out of 8.",
+       "from": "THE CREATOR"
+      }
+     },
+     {
+      "captions": [
+       {
+        "text": "The next day. 5:40 a.m. La corniche."
+       },
+       {
+        "text": "To be continued…"
+       }
+      ]
+     }
+    ]
+   }
+  ]
  }
 }
