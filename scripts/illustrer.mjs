@@ -35,7 +35,7 @@ import {
   ROOT, LOT_DIR, readEnv, retenirSecret, masquer, loadChapter, caseImage, isAppDrawn,
   propDir, saveDir, caseName, PERSONNAGES, IMG_EXT,
 } from './illustration/config.mjs';
-import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, rel } from './illustration/prompt.mjs';
+import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, resumeCase, decrireRef, rel } from './illustration/prompt.mjs';
 import { choisirFournisseur } from './illustration/fournisseurs/index.mjs';
 import { ArretQuota, ErreurCase, quandFr } from './illustration/fournisseurs/erreurs.mjs';
 
@@ -101,12 +101,12 @@ async function preparer(n, chapter, t) {
 
   // Références, par priorité : case à retoucher, style, 1 par personnage, décor, puis les suivantes.
   const prio = []; const rest = [];
-  if (t.type === 'retouche') prio.push({ role: 'the existing panel to EDIT (keep everything not mentioned in the change).', file: target });
+  if (t.type === 'retouche') prio.push({ kind: 'edit', file: target });
   const memeDecor = (p, c) => detectDecor(chapter, p - 1, c - 1) === decor;
   const st = styleRefs(n, t.page, t.case, t.type === 'retouche' ? 1 : Math.max(1, Number(env.ILLUS_STYLE_REFS) || 1), memeDecor);
   if (st.warn) avert.push(st.warn);
   if (!st.files.length) avert.push('aucune case illustrée trouvée pour la référence de STYLE : risque de photoréalisme');
-  st.files.forEach((f) => prio.push({ role: 'STYLE reference: an already validated panel of this comic. Copy its drawing style, line weight, shading and colors only — not its content, characters or composition.', file: f }));
+  st.files.forEach((f) => prio.push({ kind: 'style', file: f }));
   for (const id of chars) {
     if (id === 'kai-bande') continue;
     let files = id === 'kai' && chars.includes('kai-bande') ? characterRefs('kai-bande') : [];
@@ -115,7 +115,8 @@ async function preparer(n, chapter, t) {
       if (['kai', 'mory', 'nia', 'binta', 'sora', 'ren', 'awa', 'tidiane'].includes(id)) avert.push(`pas de référence pour ${PERSONNAGES[id].nom} : dépose references/personnages/${id === 'kai' && chars.includes('kai-bande') ? 'kai-bande' : id}.png`);
       continue;
     }
-    files.forEach((f, k) => (k ? rest : prio).push({ role: `CHARACTER reference for ${PERSONNAGES[id].nom}: same face, hair and clothes. Ignore its background, pose and framing.`, file: f }));
+    const variante = id === 'kai' && chars.includes('kai-bande') && characterRefs('kai-bande').length ? 'kai-bande' : null;
+    files.forEach((f, k) => (k ? rest : prio).push({ kind: 'character', charId: id, variante, file: f }));
   }
   let dr = decorRefs(decor, n);
   // Pas de fichier dans references/decors/ et aucune case de ce décor dans le chapitre : une case
@@ -124,10 +125,10 @@ async function preparer(n, chapter, t) {
     dr = await decorPanelsElsewhere(decor, n, loadChapter);
   }
   if (decor && !dr.length && t.type === 'generation') avert.push(`pas de référence de décor « ${decor} » : tu peux déposer references/decors/${decor}.jpg`);
-  dr.forEach((f, k) => (k ? rest : prio).push({ role: 'SETTING reference: layout and objects of the place only. Draw it in the manga style of the STYLE reference.', file: f }));
+  dr.forEach((f, k) => (k ? rest : prio).push({ kind: 'decor', decor, file: f }));
   for (const f of t.references || []) {
     const abs = path.resolve(ROOT, f);
-    if (fs.existsSync(abs)) rest.push({ role: 'extra reference given by the author.', file: abs }); else avert.push(`référence introuvable : ${f}`);
+    if (fs.existsSync(abs)) rest.push({ kind: 'extra', file: abs }); else avert.push(`référence introuvable : ${f}`);
   }
   const refs = [...prio, ...rest].slice(0, MAX_REFS);
   if (prio.length + rest.length > MAX_REFS) avert.push(`${prio.length + rest.length - MAX_REFS} référence(s) en trop non jointe(s) (maximum ${MAX_REFS}, réglable : ILLUS_MAX_REFS)`);
@@ -172,12 +173,34 @@ async function seize9(buf) {
 // ---------------------------------------------------------------------
 // Exécution d'une tâche
 // ---------------------------------------------------------------------
+/**
+ * Légende de chaque image jointe PAR SON CONTENU (les images ne restent pas dans l'ordre dans
+ * AI Studio) : résumé court et visuel de la case à retoucher / de chaque case de style.
+ */
+async function decrireRefs(n, chapter, t, prep, sc) {
+  const resumeDe = async (file) => {
+    const m = file.replace(/\\/g, '/').match(/chapitre-(\d+)\/page-(\d+)-case-(\d+)\./i);
+    if (!m) return '';
+    const [k, p, c] = [+m[1], +m[2], +m[3]];
+    const ch = k === n ? chapter : await loadChapter(k).catch(() => null);
+    const panel = ch?.pages?.[p - 1]?.panels?.[c - 1];
+    if (!panel) return '';
+    return resumeCase({ chars: detectCharacters(panel), decor: detectDecor(ch, p - 1, c - 1), texte: '' }); // sans la scène : il ne doit pas ressembler à la case à retoucher
+  };
+  for (const r of prep.refs) {
+    if (r.kind === 'edit') r.resume = resumeCase({ chars: prep.chars, decor: prep.decor, texte: sc.text });
+    else if (r.kind === 'style') { r.resume = await resumeDe(r.file); r.pourRetouche = t.type === 'retouche'; }
+    r.role = decrireRef(r);
+  }
+}
+
 /** Tout ce qu'il faut pour une tâche : références, scène, prompt, images (identique en mode API et à la main). */
 async function construire(n, chapter, t, service, { redimensionner = true } = {}) {
   const label = `page ${t.page} case ${t.case}`;
   const prep = await preparer(n, chapter, t);
   if (prep.ignore) return { ignore: prep.ignore, label };
   const sc = await scene(n, prep.panel, service);
+  await decrireRefs(n, chapter, t, prep, sc);
   const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, refs: prep.refs, consigne: t.consigne || '' };
   const texte = t.type === 'retouche' ? buildEditPrompt(o) : buildGenerationPrompt(o);
   const images = redimensionner ? await Promise.all(prep.refs.map((r, i) => charger(r, t.type === 'retouche' && i === 0))) : [];
@@ -188,7 +211,7 @@ function afficherTache(n, t, c) {
   const { prep, images, label } = c;
   console.log(`\n${t.type === 'retouche' ? '🖌️  Retouche' : '🎨 Génération'} — chapitre ${n}, ${label}${t.consigne ? ` : « ${t.consigne} »` : ''}`);
   console.log(`   Personnages : ${prep.chars.filter((x) => x !== 'kai-bande').map((x) => PERSONNAGES[x].nom + (x === 'kai' && prep.chars.includes('kai-bande') ? ' (main droite bandée)' : '')).join(', ') || 'aucun'} · décor : ${prep.decor || '—'}`);
-  prep.refs.forEach((r, i) => console.log(`   Image ${i + 1} : ${rel(r.file)}${images[i] ? `  (${Math.round(images[i].data.length / 1024)} Ko envoyés)` : ''}`));
+  prep.refs.forEach((r, i) => console.log(`   Image jointe : ${rel(r.file)}${images[i] ? `  (${Math.round(images[i].data.length / 1024)} Ko envoyés)` : ''}`));
   prep.avert.forEach((a) => console.log(`   ⚠️ ${a}`));
 }
 
@@ -359,17 +382,19 @@ function lireLot(n) {
 // ---------------------------------------------------------------------
 // MODE GRATUIT À LA MAIN (AI Studio) : preparer → (AI Studio) → importer
 // ---------------------------------------------------------------------
+const ORDRE_FR = (t) => (t.type === 'retouche'
+  ? 'Joins D\'ABORD la case à retoucher SEULE (a-RETOUCHER-…), puis les autres images ENSEMBLE (style-…, perso-…, decor-…) : l\'ordre des autres n\'a pas d\'importance.'
+  : 'Joins toutes les images du dossier (style-…, perso-…, decor-…) : l\'ordre n\'a pas d\'importance.');
 const DOSSIER_PREP = path.join(os.tmpdir(), 'revision-ia-illustration');
 const prepMetaFile = (n, p, c) => path.join(propDir(n), '_preparees', `${caseName(p, c)}.json`);
 
 /** Court nom lisible pour une image jointe, d'après son rôle. */
 function nomRef(r) {
-  const role = r.role || '';
   const base = path.basename(r.file).replace(/\.[^.]+$/, '');
-  if (/^the existing panel/.test(role)) return 'case-a-retoucher';
-  if (/^STYLE/.test(role)) return `style-${base}`;
-  if (/^CHARACTER reference for (.+?):/.test(role)) return `perso-${base}`;
-  if (/^SETTING/.test(role)) return `decor-${base}`;
+  if (r.kind === 'edit') return `a-RETOUCHER-${base}`;
+  if (r.kind === 'style') return `style-${base}`;
+  if (r.kind === 'character') return `perso-${base}`;
+  if (r.kind === 'decor') return `decor-${base}`;
   return `autre-${base}`;
 }
 
@@ -407,9 +432,11 @@ async function preparerManuel(n, t) {
   if (c.ignore) { console.log(`⏭️  ${c.label} : ${c.ignore}`); return 'ignore'; }
   const { prep, texte } = c;
   const dir = path.join(DOSSIER_PREP, `ch${n}-p${t.page}-c${t.case}`);
-  const noms = prep.refs.map((r, i) => {
-    const premier = i === 0 && t.type === 'retouche';
-    return `${i + 1}-${nomRef(r)}${premier ? path.extname(r.file).toLowerCase() : '.jpg'}`;
+  const vus = new Set();
+  const noms = prep.refs.map((r) => {
+    let nom = `${nomRef(r)}${r.kind === 'edit' ? path.extname(r.file).toLowerCase() : '.jpg'}`;
+    for (let k = 2; vus.has(nom); k++) nom = nom.replace(/(-\d+)?(\.\w+)$/, `-${k}$2`);
+    vus.add(nom); return nom;
   });
   c.images = new Array(prep.refs.length).fill(null);
   afficherTache(n, t, c);
@@ -424,11 +451,11 @@ async function preparerManuel(n, t) {
     fs.mkdirSync(dir, { recursive: true });
     for (let i = 0; i < prep.refs.length; i++) {
       const dest = path.join(dir, noms[i]);
-      if (i === 0 && t.type === 'retouche') fs.copyFileSync(prep.refs[i].file, dest); // la case à retoucher : copie exacte
+      if (prep.refs[i].kind === 'edit') fs.copyFileSync(prep.refs[i].file, dest); // la case à retoucher : copie exacte
       else fs.writeFileSync(dest, (await charger(prep.refs[i], false)).data);
     }
     fs.writeFileSync(path.join(dir, 'prompt.txt'), texte);
-    fs.writeFileSync(path.join(dir, 'LISEZ-MOI.txt'), `Chapitre ${n}, page ${t.page}, case ${t.case} (${t.type === 'retouche' ? 'retouche' : 'génération'})\n\n1. Colle le prompt (déjà dans le presse-papiers, sinon ouvre prompt.txt) dans AI Studio.\n2. Joins les images de ce dossier DANS L'ORDRE : 1-..., 2-..., 3-...\n3. Vérifie que le modèle « Image » est sélectionné, génère, télécharge l'ORIGINAL (pas une capture).\n4. Dans PowerShell : npm run importer -- ${n} ${t.page} ${t.case}\n`);
+    fs.writeFileSync(path.join(dir, 'LISEZ-MOI.txt'), `Chapitre ${n}, page ${t.page}, case ${t.case} (${t.type === 'retouche' ? 'retouche' : 'génération'})\n\n1. Colle le prompt (déjà dans le presse-papiers, sinon ouvre prompt.txt) dans AI Studio.\n2. ${ORDRE_FR(t)}\n3. Vérifie que le modèle « Image » est sélectionné, génère, télécharge l'ORIGINAL (pas une capture).\n4. Dans PowerShell : npm run importer -- ${n} ${t.page} ${t.case}\n\nLes images ne restent pas toujours dans l'ordre dans AI Studio : ce n'est pas grave, le prompt décrit chaque image par son contenu.\n`);
     writeJson(prepMetaFile(n, t.page, t.case), {
       type: t.type, consigne: t.consigne || '', date: new Date().toISOString(), prompt: texte,
       references: prep.refs.map((r) => ({ fichier: rel(r.file), role: r.role })),
@@ -445,7 +472,8 @@ async function preparerManuel(n, t) {
   }
   console.log(`\nÀ FAIRE MAINTENANT :
   1. Colle le prompt dans AI Studio (aistudio.google.com).
-  2. Joins les images du dossier ${ESSAI ? '(qui s\'ouvrira)' : 'qui vient de s\'ouvrir'}, dans l'ordre : 1-…, 2-…, 3-…
+  2. ${ORDRE_FR(t)}
+     (dossier ${ESSAI ? 'qui s\'ouvrira' : 'qui vient de s\'ouvrir'} ; le prompt décrit chaque image par son contenu : si AI Studio les mélange, ce n'est pas grave)
   3. Vérifie que le modèle « Image » est sélectionné, clique sur Générer, puis télécharge l'original.
   4. Reviens ici : npm run importer -- ${n} ${t.page} ${t.case}`);
   return 'fait';

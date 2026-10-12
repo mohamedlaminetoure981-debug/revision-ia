@@ -44,9 +44,9 @@ npm run preparer -- 3 5 2
 (= chapitre 3, page 4, case 2.) L'outil :
 1. construit **exactement le même prompt** que le mode API et l'affiche ;
 2. le **copie dans le presse-papiers** (rien à sélectionner) ;
-3. met les **images à joindre** dans un dossier, **numérotées dans l'ordre** (`1-case-a-retoucher.png`,
-   `2-style-….jpg`, `3-perso-kai-bande.jpg`, `4-perso-mory.jpg`, `5-decor-….jpg`) — seulement les
-   personnages **présents dans la case** — et **ouvre ce dossier** dans l'Explorateur Windows
+3. met les **images à joindre** dans un dossier, avec des **noms parlants** (`a-RETOUCHER-page-4-case-2.png`,
+   `style-page-4-case-1.jpg`, `perso-kai-bande.jpg`, `perso-mory.jpg`, `decor-bibliotheque.jpg`) —
+   seulement les personnages **présents dans la case** — et **ouvre ce dossier** dans l'Explorateur Windows
    (`%TEMP%\revision-ia-illustration\ch3-p4-c2`) ;
 4. te rappelle les étapes. Les lignes ⚠️ t'indiquent les références manquantes (voir `references/README.md`).
 
@@ -57,8 +57,13 @@ Pour voir tout ça **sans rien copier ni ouvrir** : ajoute `--essai`.
 1. **Nouvelle discussion** (une par case, voir `methode-illustration.md` §4).
 2. Vérifie que le **modèle « Image »** est sélectionné (Nano Banana / Gemini Image).
 3. **Colle le prompt** (Ctrl+V).
-4. **Joins les images du dossier, dans l'ordre** : 1-…, puis 2-…, puis 3-… (le prompt dit « Image 1 :
-   …, Image 2 : … » : l'ordre compte).
+4. **Joins d'abord la case à retoucher SEULE** (`a-RETOUCHER-…`), **puis toutes les autres images ensemble**
+   (`style-…`, `perso-…`, `decor-…`). **L'ordre des autres n'a aucune importance** : AI Studio et Gemini
+   les mélangent souvent, et c'est normal. Le prompt ne parle jamais de « première » ou « deuxième » image :
+   il décrit **chaque image par son contenu** (« the 16:9 comic panel showing Kaï… », « the character sheet
+   of a young man with a big round afro… », « the empty university library… ») et dit à Gemini de les
+   reconnaître lui-même. En retouche, il ajoute : « si tu hésites, l'image à modifier est celle qui
+   correspond à cette description ». (En génération, joins simplement toutes les images ensemble.)
 5. Clique sur **Générer**. Si le résultat n'est pas bon : une seule correction à la fois, et après
    deux essais ratés, recommence une nouvelle discussion.
 6. **Télécharge l'ORIGINAL** (bouton de téléchargement de l'image, jamais une capture d'écran :
@@ -176,6 +181,20 @@ npm run retoucher -- 3 4 2 "Seule la main DROITE de Kaï est bandée : enlève l
 = chapitre 3, page 4, case 2, puis la consigne **entre guillemets**. Gemini reçoit l'image actuelle
 et doit changer **uniquement** ce qui est demandé (composition, cadrage, style, couleurs, taille gardés).
 Conseils : une seule correction à la fois ; une consigne en anglais est souvent mieux suivie.
+
+---
+
+### Comment les images sont décrites dans le prompt (modes API et à la main)
+
+| Image jointe | Description donnée à Gemini |
+|---|---|
+| case à retoucher | « the 16:9 comic panel showing *(personnages, lieu, début de la scène)* (this is the image to EDIT) » |
+| case de style | « another finished panel of the same comic, a DIFFERENT scene… use it for the drawing style only » |
+| fiche d'un personnage | « the character sheet of *(description visuelle courte)* on a plain background » |
+| décor | « the empty *(lieu)* with no people » |
+
+Chaque prompt contient aussi : « The attached images may be in any order: identify each one by its content. »
+Seuls les personnages présents dans la case ont une fiche jointe.
 
 ---
 

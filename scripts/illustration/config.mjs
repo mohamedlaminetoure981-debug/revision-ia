@@ -90,47 +90,66 @@ export function isAppDrawn(panel) {
 export const PERSONNAGES = {
   kai: {
     nom: 'Kaï', re: /\bka[ïi](?![a-z])/i,
+    court: 'a young man with short curly high-top hair, a purple hoodie and black headphones around his neck',
     lock: 'Kaï: young Black man about 20, short black curly high-top hair with faded sides, purple hoodie with white drawstrings, black over-ear headphones resting around his NECK (never on his ears), black joggers, white sneakers, small dark-grey backpack.',
   },
   'kai-bande': { // variante choisie automatiquement quand la description parle de bandage
     nom: 'Kaï (main bandée)', ref: 'kai-bande',
+    court: 'a young man with short curly high-top hair, a purple hoodie and his RIGHT hand wrapped in a white bandage',
     lock: 'His RIGHT hand ONLY is wrapped in a white bandage; his LEFT hand is bare (never bandage both hands).',
   },
   mory: {
     nom: 'Mory', re: /\bmory\b/i,
+    court: 'a young man with a big round afro, rectangular glasses and a navy jacket with glowing cyan lines',
     lock: 'Mory: young Black man about 20, big round black afro with subtle teal highlights, rectangular glasses with fully TRANSPARENT lenses (both eyes clearly visible, no opaque glare), navy high-collar zip jacket with glowing cyan lines, dark-grey cargo pants, black-and-cyan sneakers, black backpack.',
   },
   nia: {
     nom: 'Nia', re: /\bnia\b/i,
+    court: 'a young woman with long black box braids with beads, gold hoop earrings and a plum cardigan over a pink top',
     lock: 'Nia: young Black woman about 20, long black box braids with small gold and pink beads, gold hoop earrings, plum/purple knit cardigan over a pink top, black jeans, grey sneakers; calm and confident.',
   },
   binta: {
     nom: 'Binta', re: /\bbinta\b/i,
+    court: 'a young woman with a high spiky black ponytail, gold hoop earrings and a magenta zip jacket',
     lock: 'Binta: young Black woman about 20, high spiky black ponytail tied with a pink scrunchie, small pink hair clip, gold hoop earrings, magenta high-collar zip jacket; energetic.',
   },
   sora: {
     nom: 'Sora', re: /\bsora\b/i,
+    court: 'a young woman with two round afro puffs with lime star clips and an olive-green hoodie',
     lock: 'Sora: young Black woman about 20, two round afro puffs with small lime-green star clips, olive-green hoodie with lime trims; playful.',
   },
   ren: {
     nom: 'Ren', re: /\bren\b/i,
+    court: 'a young man with short dreadlocks and a dark red bomber jacket',
     lock: 'Ren: young Black man about 20, short dreadlocks, dark red bomber jacket with orange trims, thin chain necklace; rival attitude.',
   },
   awa: {
     nom: 'Awa', re: /\bawa\b/i,
+    court: 'a young woman with a high bun in a mustard headwrap, a whistle around her neck and a mustard track jacket',
     lock: 'Awa: young Black woman about 20, hair in a high bun wrapped in a mustard headwrap, whistle on a cord around her neck, mustard and brown track jacket; coach attitude.',
   },
   tidiane: {
     nom: 'Tidiane', re: /\btidiane\b/i,
+    court: 'a young man with short wavy hair, a short beard and a navy hoodie',
     lock: 'Tidiane: young Black man about 20, short wavy black hair, short beard, navy hoodie with light-blue trims, wireless earbuds; calm.',
   },
   // Figurants (pas de référence obligatoire : seulement si un fichier existe)
-  bibliothecaire: { nom: 'la bibliothécaire', re: /biblioth[ée]caire/i, lock: 'The librarian: woman about 50, reading glasses low on her nose, navy headscarf, white blouse.' },
-  etudiante_hijab: { nom: 'l’étudiante au hijab', lock: 'A female student about 20 wearing a hijab.' },
-  etudiant_jaune: { nom: 'l’étudiant au t-shirt jaune', lock: 'A male student about 20 in a yellow t-shirt.' },
-  etudiant: { nom: 'un étudiant', lock: 'A male student about 20.' },
-  etudiante: { nom: 'une étudiante', lock: 'A female student about 20.' },
-  oubli: { nom: 'l’Oubli', re: /\boubli\b/i, lock: 'The Oblivion ("l’Oubli"): a huge shadow entity made of violet letters and pixels, with a glowing violet crystal core; NOT a human.' },
+  bibliothecaire: { nom: 'la bibliothécaire', re: /biblioth[ée]caire/i, court: 'a woman of about 50 with reading glasses, a navy headscarf and a white blouse', lock: 'The librarian: woman about 50, reading glasses low on her nose, navy headscarf, white blouse.' },
+  etudiante_hijab: { nom: 'l’étudiante au hijab', court: 'a young woman wearing a green hijab', lock: 'A female student about 20 wearing a hijab.' },
+  etudiant_jaune: { nom: 'l’étudiant au t-shirt jaune', court: 'a young man in a yellow t-shirt', lock: 'A male student about 20 in a yellow t-shirt.' },
+  etudiant: { nom: 'un étudiant', court: 'a young male student', lock: 'A male student about 20.' },
+  etudiante: { nom: 'une étudiante', court: 'a young female student', lock: 'A female student about 20.' },
+  oubli: { nom: 'l’Oubli', court: 'a huge shadow creature made of violet letters, with a glowing violet crystal core', lock: 'The Oblivion ("l’Oubli"): a huge shadow entity made of violet letters and pixels, with a glowing violet crystal core; NOT a human.' },
+};
+/** Lieu en quelques mots (légende d'une image jointe : « the empty … with no people »). */
+export const DECORS_COURT = {
+  bibliotheque: 'university library reading room (long wooden tables with green reading lamps, tall bookshelves)',
+  rue: 'street / university campus of Conakry',
+  classe: 'university lecture hall',
+  marche: 'Madina market street in Conakry',
+  corniche: 'Corniche seafront of Conakry (sea, rocks, sea wall, palm trees)',
+  chambre: 'student bedroom',
+  toit: 'rooftop terrace with a water tank',
 };
 export const HEROS = ['kai', 'mory', 'nia', 'binta', 'sora', 'ren', 'awa', 'tidiane'];
 

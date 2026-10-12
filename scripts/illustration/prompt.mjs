@@ -11,7 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PERSONNAGES, HEROS, DECORS, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT } from './config.mjs';
+import { PERSONNAGES, HEROS, DECORS, DECORS_COURT, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT } from './config.mjs';
 
 /** Description de la case sans les marqueurs [ILLUSTRATION], [DESSIN APPLI]… */
 export const cleanAction = (a) => String(a || '').replace(/\[[A-ZÉÈ ]+\]\s*/g, '').trim();
@@ -121,7 +121,7 @@ export async function decorPanelsElsewhere(decor, n, load, max = 1) {
 // ---------------------------------------------------------------------
 const STYLE = `STYLE
 Modern shonen manga illustration: thick black ink outlines, cel-shading, saturated colors, readable realistic action, no cute or chibi style.
-Copy EXACTLY the drawing style, line weight, shading and color palette of the STYLE reference image(s).
+Copy EXACTLY the drawing style, line weight, shading and color palette of the attached finished comic panel(s) used as style references.
 16:9 landscape image, the subject centered: faces, hands and key objects stay in the central third.
 Leave calm areas (wall, sky, floor, ceiling) around the subject.`;
 
@@ -145,16 +145,73 @@ No panel borders, no comic page layout, no split screen: one single picture.
 No extra characters beyond those described, no duplicated character, no twin, no reflection of a character.
 Nobody looks at the camera.`;
 
-/** Légende des images jointes (« Image 1 : … »). */
+/**
+ * Début d'une description, court : les phrases (≥ 60 signes en tout), coupé à ≤ max signes
+ * sur une virgule / un point-virgule si possible. Sans point final (ajouté par l'appelant).
+ */
+export function premierePhrase(txt, max = 150) {
+  const t = String(txt || '').replace(/\s+/g, ' ').trim();
+  const phrases = t.match(/[^.!?…]+[.!?…]*(?:\s+|$)/g) || [t];
+  let out = '';
+  for (const ph of phrases) { out = `${out} ${ph}`.trim(); if (out.length >= 60) break; }
+  if (out.length > max) {
+    const cut = out.slice(0, max);
+    const k = Math.max(cut.lastIndexOf(';'), cut.lastIndexOf(','));
+    out = (k > max * 0.5 ? cut.slice(0, k) : cut.replace(/\s+\S*$/, '')).trim();
+  }
+  return out.replace(/[\s.;,:!?…]+$/, '');
+}
+
+/** Les personnages d'une case, en quelques mots visuels : « Kaï (a young man …), Mory (…) ». */
+export function personnesCourt(chars) {
+  const vus = chars.filter((id) => id !== 'kai-bande' && id !== 'oubli');
+  const txt = vus.map((id) => {
+    const c = id === 'kai' && chars.includes('kai-bande') ? PERSONNAGES['kai-bande'].court : PERSONNAGES[id].court;
+    return /^(l[’']|un |une |la )/i.test(PERSONNAGES[id].nom) ? c : `${PERSONNAGES[id].nom} (${c})`;
+  });
+  if (chars.includes('oubli')) txt.push(PERSONNAGES.oubli.court);
+  return txt.join(', ');
+}
+
+/**
+ * Résumé court et VISUEL d'une case, pour la reconnaître parmi les images jointes :
+ * « Kaï (…) and Mory (…) in the university library reading room; scene: "<début de la scène>" ».
+ */
+export function resumeCase({ chars, decor, texte }) { // texte vide : sans la scène (case de style)
+  const gens = personnesCourt(chars);
+  const lieu = decor && DECORS_COURT[decor] ? `the ${DECORS_COURT[decor]}` : '';
+  const ph = premierePhrase(texte);
+  const base = [gens, lieu].filter(Boolean).join(' in ');
+  return `${base}${ph ? `${base ? '; scene: ' : 'scene: '}“${ph}”` : ''}`.trim();
+}
+
+/**
+ * Description d'une image jointe par son CONTENU (jamais par son numéro : les images ne restent
+ * pas dans l'ordre quand on les joint dans AI Studio / Gemini). ref = { kind, resume, charId, decor }.
+ */
+export function decrireRef(r) {
+  if (r.kind === 'edit') return `the 16:9 comic panel showing ${r.resume} (this is the image to EDIT)`;
+  if (r.kind === 'style') return `another finished panel of the same comic, a DIFFERENT scene${r.pourRetouche ? ' from the panel to edit' : ''}${r.resume ? `, showing ${r.resume}` : ''} — use it for the drawing style only, never for its content, characters, poses or composition`;
+  if (r.kind === 'character') {
+    const p = PERSONNAGES[r.charId];
+    const c = r.charId === 'kai' && r.variante === 'kai-bande' ? PERSONNAGES['kai-bande'].court : p.court;
+    return `the character sheet of ${c} (${p.nom.replace(/ \(.*\)/, '')}) on a plain background: use it for the face, hair and clothes of ${p.nom.replace(/ \(.*\)/, '')} only, ignoring its pose and framing`;
+  }
+  if (r.kind === 'decor') return `the empty ${DECORS_COURT[r.decor] || r.decor || 'setting'} with no people: use it for the layout and objects of the place only, drawn in the manga style of the style panel`;
+  return 'an extra reference image given by the author';
+}
+
+/** Légende des images jointes : par contenu, avec la phrase « dans n'importe quel ordre ». */
 function legend(refs) {
-  return refs.map((r, i) => `Image ${i + 1}: ${r.role}`).join('\n');
+  if (!refs.length) return '';
+  return `ATTACHED IMAGES\nThe attached images may be in any order: identify each one by its content.\n${refs.map((r) => `- ${r.role}`).join('\n')}`;
 }
 
 function characterLock(chars) {
   if (!chars.length) return 'CHARACTER LOCK\nNo named character appears in this picture.';
   const lines = chars.map((id) => PERSONNAGES[id].lock);
   const main = chars.filter((id) => id !== 'kai-bande' && id !== 'oubli');
-  return `CHARACTER LOCK\n${lines.join('\n')}\nExactly ${main.length} described character(s): ${main.map((id) => PERSONNAGES[id].nom).join(', ')}. Each one appears ONCE. Same face as their reference image when one is given.`;
+  return `CHARACTER LOCK\n${lines.join('\n')}\nExactly ${main.length} described character(s): ${main.map((id) => PERSONNAGES[id].nom).join(', ')}. Each one appears ONCE. Same face as in their character sheet when one is attached.`;
 }
 
 const EYELINE = `EYE-LINE
@@ -168,7 +225,7 @@ Glasses are transparent: both eyes and pupils visible through the lenses.`;
  */
 export function buildGenerationPrompt(o) {
   const blocks = [
-    `TASK\nDraw ONE comic panel for the manga "Révision IA — La Jeunesse de 2026" (Conakry, Guinea).${o.refs.length ? `\nAttached images:\n${legend(o.refs)}` : ''}`,
+    `TASK\nDraw ONE comic panel for the manga "Révision IA — La Jeunesse de 2026" (Conakry, Guinea).${o.refs.length ? `\n\n${legend(o.refs)}` : ''}`,
     STYLE,
     REALISM,
     `SCENE LOCK / INVENTORY\n${o.decor && DECORS[o.decor] ? DECORS[o.decor] : 'Use only the setting described in the SCENE.'}\nNothing else added to the setting.`,
@@ -182,11 +239,12 @@ export function buildGenerationPrompt(o) {
   return blocks.join('\n\n');
 }
 
-/** Prompt de RETOUCHE : modifier SEULEMENT ce qui est demandé. */
+/** Prompt de RETOUCHE : modifier SEULEMENT ce qui est demandé. L'image à retoucher est reconnue par sa description. */
 export function buildEditPrompt(o) {
+  const cible = o.refs.find((r) => r.kind === 'edit')?.resume || o.scene;
   return [
-    `EDIT TASK\nImage 1 is an existing, validated comic panel. Edit Image 1.\nApply ONLY this change: ${o.consigne}\nKeep EVERYTHING else identical to Image 1: same composition, framing and camera angle, same characters with the same poses, positions, faces, hair and clothes, same background, same colors and lighting, same line style, same 16:9 size and aspect ratio.\nDo not redraw, restyle, recolor, zoom, crop or move anything that the change does not require.`,
-    `Attached images:\n${legend(o.refs)}`,
+    `EDIT TASK\nEdit the existing, validated comic panel: the attached 16:9 panel showing ${cible}.\nIf you are unsure which image to edit, it is the one that matches this description: ${cible}.\nApply ONLY this change: ${o.consigne}\nKeep EVERYTHING else identical in that panel: same composition, framing and camera angle, same characters with the same poses, positions, faces, hair and clothes, same background, same colors and lighting, same line style, same 16:9 size and aspect ratio.\nDo not redraw, restyle, recolor, zoom, crop or move anything that the change does not require. The other attached images are references only: never edit them and never copy their composition.`,
+    legend(o.refs),
     `CONTEXT (what the panel shows${o.sceneLang === 'fr' ? ', written in French' : ''})\n${o.scene}`,
     characterLock(o.chars),
     AGE,

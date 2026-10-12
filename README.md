@@ -1175,6 +1175,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.7** : outil d'illustration : le prompt ne désigne plus les images par leur numéro (AI Studio les
+  mélange) mais par leur **contenu** (case à retoucher, case de style, fiche de personnage, décor) ; phrase
+  « images dans n'importe quel ordre » et « si tu hésites, c'est celle qui correspond à cette description » ;
+  dossier de `preparer` avec des noms parlants (`a-RETOUCHER-…`, `style-…`, `perso-…`, `decor-…`).
 - ✅ **v1.23.6** : outil d'illustration, **mode gratuit à la main** (sans clé ni facturation) : `npm run preparer`
   (prompt copié dans le presse-papiers + images numérotées dans un dossier ouvert dans l'Explorateur ;
   `--suivante` pour un lot) puis `npm run importer` (image la plus récente de Téléchargements → `_propositions/`) ;
