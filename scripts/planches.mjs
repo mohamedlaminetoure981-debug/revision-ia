@@ -17,6 +17,12 @@
 //     Autant de planches qu'on veut (planche-c, planche-d…), y compris à UN SEUL
 //     portrait : "planche-c": "reflexion" (= grille 1 × 1). Une expression présente
 //     dans plusieurs planches : c'est la DERNIÈRE de la liste qui compte.
+//     Option "entier": true (dans une planche) : le personnage est montré EN ENTIER, jamais rogné
+//     (queue de cheval, poing levé, pouces…) : cadrage sur l'ensemble des expressions, petite
+//     marge autour, bustes alignés en bas, même échelle partout. Sinon, cadrage serré sur le visage.
+//     Avec "entier", "visage": { "cx": 48.6, "haut": 32, "larg": 39 } (en % de l'image finale : centre du
+//     visage, repère « haut de tête » et largeur de tête) dit à calques.mjs où chercher les yeux et la
+//     bouche (la queue de cheval fausse la mesure automatique).
 //   Sans planches.json : planche-a et planche-b en 2 × 2, dans l'ordre
 //     A = neutre, joie, réflexion, célébration ; B = encouragement, surprise, concentration, clin.
 // Étapes (appelées par vite.config.js, en local comme au build) :
@@ -65,6 +71,9 @@ function readConfig(dir) {
       out[stem] = { file, grille: c.grille || [2, 2], cases: c.cases || {}, zones: c.zones || {}, fond: c.fond };
       // Réglage de cadrage optionnel par expression (geste qui dépasse du cadre) : voir README.
       if (c.cadrage) out[stem].cadrage = c.cadrage;
+      // "entier": true → portrait ENTIER (queue de cheval, poing levé, pouces…) : voir processSheets.
+      if (c.entier) out[stem].entier = true;
+      if (c.visage) out[stem].visage = c.visage;
       // Options rares (voir README) : traits de séparation clairs seulement ; bande de
       // mesure de la tête (fractions de hauteur sous le haut des cheveux).
       if (c.traits) out[stem].traits = c.traits;
@@ -390,7 +399,7 @@ function keepMain(rgba, box) {
   const nw = r - l + 1; const nh = b - t + 1;
   const out = Buffer.alloc(nw * nh * 4);
   for (let y = 0; y < nh; y++) rgba.copy(out, y * nw * 4, ((y + t) * w + l) * 4, ((y + t) * w + l + nw) * 4);
-  return { rgba: out, w: nw, h: nh, cutL: box.cutL && l === 0, cutR: box.cutR && r === w - 1, cutT: box.cutT && t === 0 };
+  return { rgba: out, w: nw, h: nh, l, t, cutL: box.cutL && l === 0, cutR: box.cutR && r === w - 1, cutT: box.cutT && t === 0 };
 }
 
 /** Fondu doux en haut (cheveux coupés par le bord de leur case). */
@@ -540,6 +549,8 @@ function fadeSides(rgba, w, h, left, right) {
 export async function processSheets(sharp) {
   const files = {}; const images = {}; const report = {};
   for (const [id, { sheets, error }] of Object.entries(findSheets())) {
+    const entier = Object.values(sheets).some((s) => s.entier);
+    const visage = Object.values(sheets).map((s) => s.visage).find(Boolean);
     const rep = (report[id] = {});
     if (error) rep._erreur = error;
     const cells = [];
@@ -576,7 +587,7 @@ export async function processSheets(sharp) {
         if (!box) { rep[expr] = `${t.label} vide`; continue; }
         const cell = keepMain(cutOut(px, W, zBg, box, kk), box);
         if (!cell) { rep[expr] = `${t.label} vide`; continue; }
-        cells.push({ expr, ...cell, ...measure(cell.rgba, cell.w, cell.h, s.tete), hash, cadrage: (s.cadrage || {})[expr] });
+        cells.push({ expr, ...cell, gx: box.x + cell.l - t.x0, gy: box.y + cell.t - t.y0, ...measure(cell.rgba, cell.w, cell.h, s.tete), hash, cadrage: (s.cadrage || {})[expr] });
       }
     }
     // Même expression dans plusieurs planches : la dernière remplace les précédentes.
@@ -593,6 +604,9 @@ export async function processSheets(sharp) {
     //  - cheveux coupés en haut par la case → recalage sur le visage de la référence.
     for (const c of cells) {
       if (c === R) Object.assign(c, { sigma: 1, tx: 0, ty: 0 });
+      // « entier » : toutes les cases ont la même échelle (même planche, mêmes cases) ; position = place
+      // du portrait dans sa case. Plus fiable que de mesurer la queue de cheval ou de chercher le visage.
+      else if (entier) Object.assign(c, { sigma: 1, tx: c.gx - R.gx, ty: c.gy - R.gy });
       else if (c.cutT || R.cutT) Object.assign(c, await register(sharp, R, c));
       else { const sigma = R.head / c.head; Object.assign(c, { sigma, tx: R.center - sigma * c.center, ty: R.top - sigma * c.top }); }
     }
@@ -601,19 +615,33 @@ export async function processSheets(sharp) {
     // ne dépasse pas 80 % de la largeur.
     const TOP = OUT_H * 0.03;
     const need = Math.max(...cells.map((c) => (OUT_H - TOP) / Math.max(1, c.ty + c.sigma * c.h - R.top)));
-    const G = Math.min(need, (OUT_W * 0.8) / R.head);
+    let G = Math.min(need, (OUT_W * 0.8) / R.head);
+    // Mode « entier » : cadre = réunion des portraits (dans le repère de la référence). Même échelle
+    // pour tous, centré, petite marge ; le bas des bustes touche le bas de l'image (le haut garde une marge).
+    let X0 = 0; let Y0 = 0;
+    if (entier) {
+      const U = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+      for (const c of cells) {
+        U.x0 = Math.min(U.x0, c.tx); U.y0 = Math.min(U.y0, c.ty);
+        U.x1 = Math.max(U.x1, c.tx + c.sigma * c.w); U.y1 = Math.max(U.y1, c.ty + c.sigma * c.h);
+      }
+      G = Math.min((OUT_W * 0.94) / (U.x1 - U.x0), (OUT_H * 0.96) / (U.y1 - U.y0));
+      X0 = (OUT_W - G * (U.x1 - U.x0)) / 2 - G * U.x0;
+      Y0 = OUT_H - G * U.y1;
+    }
     images[id] = {};
     let neutreCanvas = null;
     for (const c of cells) {
       if ((c.cutL || c.cutR) && !(c.cadrage && c.cadrage.fondu === false)) fadeSides(c.rgba, c.w, c.h, c.cutL, c.cutR);
       if (c.cutT) fadeTop(c.rgba, c.w, c.h); // cheveux coupés par le bord de la case : fondu
       let s = G * c.sigma;
-      let left = Math.round(OUT_W / 2 + G * (c.tx - R.center)); let top = Math.round(TOP + G * (c.ty - R.top));
+      let left = entier ? Math.round(X0 + G * c.tx) : Math.round(OUT_W / 2 + G * (c.tx - R.center));
+      let top = entier ? Math.round(Y0 + G * c.ty) : Math.round(TOP + G * (c.ty - R.top));
       // Cadrage optionnel de CETTE expression (planches.json → "cadrage") : léger dézoom
       // autour des yeux (ils restent à la même hauteur) + décalage en % de l'image,
       // et "fondu": false pour ne pas estomper le bord (main au bord de la planche).
       // Sans réglage, rien ne change.
-      if (c.cadrage) {
+      if (c.cadrage && !entier) {
         const z = Number(c.cadrage.zoom) || 1;
         const px = OUT_W / 2; const py = TOP + 0.78 * G * R.head; // centre de la tête, ligne des yeux
         s *= z;
@@ -646,7 +674,7 @@ export async function processSheets(sharp) {
     // Clignement / bouche : calques tirés des variantes du portrait neutre (calques.mjs).
     if (neutreCanvas) {
       const { data, info } = await sharp(neutreCanvas).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-      const L = await buildLayers(sharp, join(CHAR_DIR, id), id, { rgba: data, w: info.width, h: info.height }, { cx: OUT_W / 2, top: TOP, w: G * R.head });
+      const L = await buildLayers(sharp, join(CHAR_DIR, id), id, { rgba: data, w: info.width, h: info.height }, entier ? (visage ? { cx: (OUT_W * visage.cx) / 100, top: (OUT_H * visage.haut) / 100, w: (OUT_W * visage.larg) / 100 } : { cx: X0 + G * R.center, top: Y0 + G * R.top, w: G * R.head }) : { cx: OUT_W / 2, top: TOP, w: G * R.head });
       Object.assign(files, L.files);
       if (Object.keys(L.calques).length) images[id].calques = L.calques;
       for (const [k, v] of Object.entries(L.report)) rep[k] = v;

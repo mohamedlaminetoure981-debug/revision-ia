@@ -413,6 +413,16 @@ seulement, avec `"cadrage"` dans la planche concernée. Sans `"cadrage"`, rien n
   quand le buste touche le bord de la planche, ce qui effacerait le bout des doigts).
 - `bord` (en px sur 720) : efface les filets collés au bord gauche/droit du cadre (ex. bras
   levé coupé par le cadre qui ne laisse qu'un trait, Awa/célébration : `"bord": 10`).
+
+**Personnage ENTIER, jamais rogné (Binta : queue de cheval, poing levé, pouces).** Ajoute
+`"entier": true` dans les planches du perso : le cadrage ne se règle plus sur le visage mais sur
+l'ensemble des expressions (même échelle pour toutes, centré, petite marge, bustes alignés en bas).
+L'appli affiche déjà les portraits en `contain` (jamais déformés ni coupés) : c'est le cadrage
+fabriqué au build qui rognait. Avec `"entier"`, ajoute aussi `"visage": { "cx": 48.6, "haut": 32, "larg": 39 }`
+(en % de l'image finale : centre du visage, repère « haut de tête », largeur de tête) pour que le
+clignement et la bouche retrouvent les yeux et la bouche (la queue de cheval fausse la mesure
+automatique). Si tu refais les planches, vérifie le clignement dans le Panneau créateur.
+Les autres persos (sans `"entier"`) restent identiques à l'octet près.
 - Les réglages sont facultatifs. Pour vérifier : lancer le build et regarder le
   portrait (doigts entiers, yeux alignés avec les autres expressions).
 
@@ -1165,6 +1175,8 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.4** : portraits de **Binta entiers** (queue de cheval, poing, pouces visibles ; option `"entier"` de
+  `planches.json`), clignement et bouche recalés ; les 7 autres persos identiques à l'octet près.
 - ✅ **v1.23.3** : **BD silencieuse par défaut** ; bouton 🔊 « Immersion » dans le lecteur (ambiance 4 s max au
   changement de scène, bruitage + vibration uniquement sur les gros impacts, une seule fois) ; plus d'ambiance
   en boucle ni de bruit de page.

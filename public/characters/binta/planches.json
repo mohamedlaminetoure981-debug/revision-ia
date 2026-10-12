@@ -1,4 +1,4 @@
 {
-  "planche-a": {"grille": [2, 2], "cases": {"neutre": 1, "joie": 2, "reflexion": 3, "celebration": 4}},
-  "planche-b": {"zones": {"encouragement": [0, 0, 50, 50], "surprise": [50, 0, 50, 50], "concentration": [0, 50, 50, 50], "clin": [50, 50, 50, 50]}}
+  "planche-a": {"grille": [2, 2], "entier": true, "visage": {"cx": 48.6, "haut": 32, "larg": 39}, "cases": {"neutre": 1, "joie": 2, "reflexion": 3, "celebration": 4}},
+  "planche-b": {"entier": true, "zones": {"encouragement": [0, 0, 50, 50], "surprise": [50, 0, 50, 50], "concentration": [0, 50, 50, 50], "clin": [50, 50, 50, 50]}}
 }
