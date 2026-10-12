@@ -259,6 +259,7 @@
  "🧠 Explique-moi": "🧠 Explain it to me",
  "🧠 Explique-moi comme si j'étais nul": "🧠 Explain it like I'm clueless",
  "🧪 Tester": "🧪 Test",
+ "🧮 Correction des formules…": "🧮 Fixing the formulas…",
  "😴 Au lit avant": "😴 In bed before",
  "🚩 fausse": "🚩 wrong",
  "🚩 Fiches à corriger": "🚩 Cards to fix",
@@ -557,6 +558,9 @@
  "Image illisible :": "Unreadable image:",
  "Image n°": "Image #",
  "Imagine trois carrés collés aux côtés du triangle : les deux petits remplissent pile le grand.": "Picture three squares stuck to the sides of the triangle: the two small ones exactly fill the big one.",
+ "Immersion": "Immersion",
+ "Immersion activée : toucher pour couper le son": "Immersion on: tap to turn the sound off",
+ "Immersion désactivée : toucher pour activer le son": "Immersion off: tap to turn the sound on",
  "Impossible de charger le lecteur PDF (connexion ?).": "Couldn't load the PDF reader (connection?).",
  "Impossible de créer l’image sur ce téléphone.": "Can't create the image on this phone.",
  "Impossible de créer l’image.": "Couldn't create the image.",
@@ -944,9 +948,5 @@
  "XP gagnés par jour sur les 14 derniers jours": "XP earned per day over the last 14 days",
  "XP gagnés par jour. Touche une barre pour voir le détail.": "XP earned per day. Tap a bar to see the details.",
  "Yo ! Moi c'est": "Yo! I'm",
- "YOSH!": "YOSH!",
- "🧮 Correction des formules…": "🧮 Fixing the formulas…",
- "Immersion": "Immersion",
- "Immersion activée : toucher pour couper le son": "Immersion on: tap to turn the sound off",
- "Immersion désactivée : toucher pour activer le son": "Immersion off: tap to turn the sound on"
+ "YOSH!": "YOSH!"
 }
