@@ -150,6 +150,7 @@ export const DEFAULT_SETTINGS = {
   sounds: true, // effets sonores style anime (activés par défaut)
   volume: 0.55, // volume des sons (0 à 1)
   vibration: true, // vibrations légères sur mobile
+  bdImmersion: false, // BD : sons d'ambiance et d'impact + vibration (silence par défaut)
   quizTimer: false, // minuteur visuel pendant les quiz
   // Phase 3 : scène du conseil de correction ET pouvoirs spéciaux.
   // 'complete' (tout), 'short' (version courte, pas de pouvoir plein écran), 'off' (désactivé)

@@ -6,7 +6,9 @@
 //                     le reste de la page est assombri. Tape = case suivante,
 //                     tape à gauche = case précédente.
 //   📄 PAGE ENTIÈRE  : la page complète, on fait défiler.
-// Sons : ambiance de la page (mer, ville, nuit…) + effet de chaque case.
+// Sons : AUCUN par défaut (les lecteurs de manga lisent en silence). Bouton 🔊 « Immersion »
+// (réglage mémorisé « bdImmersion ») : ambiance de la scène (4 s max, volume bas, au changement
+// de scène) + bruitage et vibration courts sur les grosses onomatopées d'impact, une seule fois.
 // Une seule page est dessinée à la fois (fluide sur petit Android).
 // REPRISE : la page en cours de chaque chapitre est mémorisée sur l'appareil
 // (localStorage "bdReprise") ; effacée à la fin du chapitre (voir savedPage).
@@ -23,6 +25,11 @@ import { t } from '../i18n/index.js';
 setMathRenderer(mathInline); // formules écrites à la main sur certaines cases
 const MODE_KEY = 'bdMode';
 const RESUME_KEY = 'bdReprise';
+
+// Grosse onomatopée d'impact (BOUM, KRAAAK, KRRRAAACK, FRRRAAAS…) : marquée `impact: true` dans
+// l'onomatopée du chapitre (indépendant de la langue : en anglais le mot change, pas le drapeau).
+export const isImpact = (panel) => (panel?.sfx || []).some((o) => o.impact === true);
+const AMBIENT_OPTS = { vol: 0.3, maxSec: 4 };
 const MAX_UPSCALE = 1.15; // agrandissement maximal d'une illustration par rapport à sa taille d'origine
 
 function readResume() {
@@ -56,12 +63,15 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {}) {
   let mode = 'case';
   try { mode = localStorage.getItem(MODE_KEY) || 'case'; } catch { /* navigation privée */ }
-  const soundOn = await db.getSetting('sounds');
+  let immersion = false;
+  try { immersion = !!(await db.getSetting('bdImmersion')); } catch { /* silence */ }
   const chapterId = chapter.id ?? meta.id;
   let pageIdx = Math.max(0, Math.min(startPage, chapter.pages.length - 1));
   let panelIdx = 0;
   let current = null; // { svg, panels }
   let ambient = null;
+  const played = new Set(); // impacts déjà joués (un seul son par case)
+  let io = null; // observateur (mode page entière)
   let settle = null; // fin du zoom (voir focusPanel)
 
   el.innerHTML = `
@@ -70,6 +80,7 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
         <a class="fs-close" href="#/histoire" aria-label="${t("Fermer")}" style="display:grid;place-items:center;text-decoration:none">✕</a>
         <div class="grow" style="min-width:0"><div class="tiny dim">${t("Chapitre")} ${meta.id}/12 · <span id="bd-pg"></span></div>
           <div class="bd-title">${esc(meta.emoji || '')} ${esc(chapter.title || meta.title)}</div></div>
+        <button class="icon-btn" id="bd-immersion" aria-pressed="false" style="opacity:.6"></button>
         <button class="icon-btn" id="bd-mode" aria-label="${t("Changer de mode de lecture")}"></button>
       </div>
       <div class="bd-view" id="bd-view"><div class="bd-page" id="bd-page"></div></div>
@@ -117,13 +128,37 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
     holder.classList.add(dir > 0 ? 'bd-turn' : 'bd-turn-back');
     $('#bd-pg').textContent = `${t("page")} ${pageIdx + 1}/${total}`;
     savePage(chapterId, pageIdx, total); // reprise de lecture
-    // Ambiance sonore de la page
-    if (soundOn && page.ambient !== ambient) {
-      ambient = page.ambient;
-      if (ambient) startAmbient(ambient); else stopAmbient();
+    // Ambiance de la scène : seulement en mode Immersion, au changement de scène, 4 s au plus
+    stopAmbient();
+    if (immersion && page.ambient && page.ambient !== ambient) {
+      try { startAmbient(page.ambient, AMBIENT_OPTS); } catch { /* son bloqué */ }
     }
-    playSfx('page');
-    vibrate(6);
+    ambient = page.ambient || null;
+    watchImpacts();
+  }
+
+  /** Bruitage + vibration d'un gros impact, une seule fois par case, mode Immersion seulement. */
+  function impact(idx, delay = 0) {
+    const panelData = chapter.pages[pageIdx]?.panels?.[idx];
+    const key = `${pageIdx}:${idx}`;
+    if (!immersion || played.has(key) || !isImpact(panelData)) return;
+    played.add(key);
+    setTimeout(() => {
+      try { playSfx('impact'); } catch { /* son bloqué */ }
+      try { vibrate(30); } catch { /* vibration non disponible */ }
+    }, delay);
+  }
+
+  /** Page entière : l'impact part quand la case apparaît à l'écran en défilant. */
+  function watchImpacts() {
+    io?.disconnect(); io = null;
+    if (mode !== 'page' || typeof IntersectionObserver === 'undefined') return;
+    try {
+      io = new IntersectionObserver((entries) => entries.forEach((en) => {
+        if (en.isIntersecting) impact(Number(en.target.dataset.i));
+      }), { root: view, threshold: 0.6 });
+      holder.querySelectorAll('.panel[data-i]').forEach((g) => { if (isImpact(chapter.pages[pageIdx].panels[g.dataset.i])) io.observe(g); });
+    } catch { io = null; }
   }
 
   /** Mode case par case : cadre la case `panelIdx` (zoom + translation animés). */
@@ -165,8 +200,7 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
       g.classList.remove('bd-sfx'); void g.getBoundingClientRect(); g.classList.add('bd-sfx');
       g.style.animationDelay = animate ? '.3s' : '0s';
     });
-    const panelData = chapter.pages[pageIdx].panels[panelIdx];
-    if (soundOn && panelData?.sound) setTimeout(() => playSfx(panelData.sound), animate ? 260 : 0);
+    impact(panelIdx, animate ? 260 : 0);
   }
 
   function pageMode() {
@@ -191,10 +225,11 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
     $('#bd-mode').textContent = mode === 'case' ? '📄' : '🔍';
     $('#bd-mode').title = mode === 'case' ? t('Lire la page entière') : t('Lire case par case');
     if (mode === 'case') focusPanel(false); else pageMode();
+    watchImpacts();
   }
 
   function next() {
-    if (mode === 'case' && panelIdx < current.panels.length - 1) { panelIdx++; focusPanel(); playSfx('tap'); return; }
+    if (mode === 'case' && panelIdx < current.panels.length - 1) { panelIdx++; focusPanel(); return; }
     if (pageIdx < total - 1) {
       pageIdx++; panelIdx = 0; drawPage(1);
       if (mode === 'case') focusPanel(false); else pageMode();
@@ -213,6 +248,7 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
   function finish() {
     savePage(chapterId, 0, total); // chapitre terminé : la prochaine lecture repart du début
     stopAmbient();
+    io?.disconnect();
     ambient = null;
     onEnd?.();
   }
@@ -239,6 +275,7 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
   window.addEventListener('hashchange', () => {
     document.removeEventListener('keydown', onKey);
     window.removeEventListener('resize', onResize);
+    io?.disconnect();
     stopAmbient();
   }, { once: true });
   $('#bd-next').onclick = next;
@@ -248,6 +285,22 @@ export async function openReader(el, chapter, meta, onEnd, { startPage = 0 } = {
     try { localStorage.setItem(MODE_KEY, mode); } catch { /* ignoré */ }
     applyMode();
   };
+
+  function applyImmersion() {
+    const b = $('#bd-immersion');
+    b.textContent = immersion ? '🔊' : '🔇';
+    b.style.opacity = immersion ? '1' : '.6';
+    b.setAttribute('aria-pressed', String(immersion));
+    b.title = immersion ? t('Immersion activée : toucher pour couper le son') : t('Immersion désactivée : toucher pour activer le son');
+    b.setAttribute('aria-label', t('Immersion'));
+  }
+  $('#bd-immersion').onclick = async () => {
+    immersion = !immersion;
+    if (!immersion) stopAmbient();
+    applyImmersion();
+    try { await db.setSetting('bdImmersion', immersion); } catch { /* ignoré */ }
+  };
+  applyImmersion();
 
   drawPage(1);
   applyMode();

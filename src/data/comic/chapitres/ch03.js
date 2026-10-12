@@ -438,7 +438,7 @@ export default {
             keep: [[0.36, 0.02, 0.64, 0.7, 'l’Oubli et son cristal']],
             free: [[0.13, 0.62, 0.42, 0.9, 'tables et sol (bas gauche)']],
           },
-          sfx: [{ text: 'KRRRAAACK !', x: 0.3, y: 0.84, size: 64, rot: -8, color: VIOLET }],
+          sfx: [{ text: 'KRRRAAACK !', x: 0.3, y: 0.84, size: 64, rot: -8, color: VIOLET, impact: true }],
           sound: 'boss',
         },
         {
@@ -450,7 +450,7 @@ export default {
             keep: [[0.25, 0.25, 0.8, 0.5, 'tentacule de lettres'], [0.62, 0.15, 0.83, 0.7, 'livres qui tombent']],
             free: [[0.17, 0.6, 0.5, 0.85, 'tables et rayonnage (bas gauche)']],
           },
-          sfx: [{ text: 'FRRRAAAS !', x: 0.32, y: 0.7, size: 40, rot: -6, color: VIOLET }],
+          sfx: [{ text: 'FRRRAAAS !', x: 0.32, y: 0.7, size: 40, rot: -6, color: VIOLET, impact: true }],
         },
         {
           action: `Un haut rayonnage (à droite) bascule dans une lueur violette, ses livres en tombent ; Kaï (à gauche), en fente, attrape Nia par l’avant-bras et la tire vers lui, sa main droite bandée tendue en arrière pour l’équilibre ; Nia, déséquilibrée, regarde par-dessus son épaule le rayonnage qui tombe. Au fond, l’horloge au-dessus des rayonnages centraux ; fenêtres et pluie à gauche. ${KAI} ${NIA}`,
@@ -833,7 +833,7 @@ export default {
             keep: [[0.36, 0.3, 0.66, 0.8, 'noyau qui s’écrase sur la table qui se fend']],
             free: [[0.7, 0.18, 1, 0.55, 'rayonnages (droite)']],
           },
-          sfx: [{ text: 'BOUM !', x: 0.82, y: 0.2, size: 56, rot: -8, color: '#ffd23f' }],
+          sfx: [{ text: 'BOUM !', x: 0.82, y: 0.2, size: 56, rot: -8, color: '#ffd23f', impact: true }],
           sound: 'hit',
         },
         {
@@ -848,7 +848,7 @@ export default {
             mouths: [[0.335, 0.21]],
           },
           bubbles: [{ type: 'cri', text: 'DIX !!!', x: 0.13, y: 0.2, w: 0.24, size: 30, who: 0 }],
-          sfx: [{ text: 'KRAAAK !', x: 0.77, y: 0.88, size: 56, rot: -8, color: VIOLET }],
+          sfx: [{ text: 'KRAAAK !', x: 0.77, y: 0.88, size: 56, rot: -8, color: VIOLET, impact: true }],
           sound: 'hit',
         },
         {

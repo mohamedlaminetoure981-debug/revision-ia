@@ -749,6 +749,13 @@ const m = await import('/src/ui/powers.js'); sessionStorage.clear(); m.power('re
   jouée quand il parle dans une bulle.
 - Pour modifier un son : change les fréquences (Hz) et durées (secondes) de sa fonction.
 - Tous les sons se testent dans **Panneau créateur → 🔊 Sons**.
+- **BD (mode Histoire) : silencieuse par défaut.** Bouton discret **🔇/🔊 « Immersion »** en haut du lecteur
+  (choix mémorisé : réglage `bdImmersion`). Activée : l'ambiance de la scène (pluie, ville…) se lance au
+  changement de scène, volume bas, et s'éteint en fondu au bout de 4 s au plus (`startAmbient(nom, { vol, maxSec })`) ;
+  bruitage court (`impact`) + vibration courte (`navigator.vibrate`, seulement si l'appareil le permet) UNE
+  seule fois, quand apparaît une case dont l'onomatopée porte `impact: true` (BOUM, KRAAAK, KRRRAAACK,
+  FRRRAAAS… : chapitres 1 à 3). Pour une nouvelle grosse onomatopée d'impact, ajouter `impact: true`.
+  Si le navigateur bloque le son ou la vibration, rien ne casse (tout est dans des `try/catch`).
 
 ---
 
@@ -1158,6 +1165,9 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.3** : **BD silencieuse par défaut** ; bouton 🔊 « Immersion » dans le lecteur (ambiance 4 s max au
+  changement de scène, bruitage + vibration uniquement sur les gros impacts, une seule fois) ; plus d'ambiance
+  en boucle ni de bruit de page.
 - ✅ **v1.23.2** : **illustrations du chapitre 3** reliées (53 images `.png`/`.jpg` dans `public/story/chapitre-3/`,
   5 cases dessinées par l'appli) ; description de chaque case réécrite d'après l'image (bibliothèque : fenêtres
   à gauche, rayonnages à droite, horloge au-dessus des rayonnages centraux ; « Chuuut ! » hors champ page 3 ;

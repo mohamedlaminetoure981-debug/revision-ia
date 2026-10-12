@@ -770,7 +770,7 @@ export default {
             keep: [[0.38, 0.03, 0.65, 0.55, 'l’Oubli'], [0.33, 0.55, 0.52, 1, 'Kaï de dos'], [0.55, 0.6, 0.74, 1, 'Mory de dos']],
             free: [[0.05, 0.7, 0.3, 0.95, 'rue (gauche)']],
           },
-          sfx: [{ text: 'KRRRAAACK !', x: 0.17, y: 0.86, size: 36, rot: -10, color: '#c084fc' }],
+          sfx: [{ text: 'KRRRAAACK !', x: 0.17, y: 0.86, size: 36, rot: -10, color: '#c084fc', impact: true }],
           sound: 'boss',
         },
         {
@@ -968,7 +968,7 @@ export default {
             free: [[0.72, 0, 0.8, 0.3, 'ciel (droite)']],
             mouths: [[0.27, 0.22]],
           },
-          sfx: [{ text: 'KRAAANG !', x: 0.6, y: 0.88, size: 26, rot: 8, color: '#ff5a3d' }],
+          sfx: [{ text: 'KRAAANG !', x: 0.6, y: 0.88, size: 26, rot: 8, color: '#ff5a3d', impact: true }],
           bubbles: [{ type: 'parole', text: 'Sept…', x: 0.88, y: 0.1, w: 0.24, who: 0 }],
           sound: 'hit',
         },
@@ -1099,7 +1099,7 @@ export default {
             mouths: [null, [0.17, 0.36]],
           },
           bubbles: [{ type: 'cri', text: 'DOUZE !!!', x: 0.17, y: 0.1, w: 0.24, size: 26, tail: [0.17, 0.36] }],
-          sfx: [{ text: 'KRAAAK !', x: 0.78, y: 0.9, size: 50, rot: -9, color: '#c084fc' }],
+          sfx: [{ text: 'KRAAAK !', x: 0.78, y: 0.9, size: 50, rot: -9, color: '#c084fc', impact: true }],
           sound: 'hit',
         },
         {

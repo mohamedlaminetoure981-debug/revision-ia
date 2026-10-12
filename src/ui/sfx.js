@@ -86,6 +86,11 @@ function noise({ dur = 0.3, vol = 0.4, at = 0, type = 'bandpass', f = 1200, to, 
 // Bibliothèque de sons
 // ---------------------------------------------------------------------
 const SOUNDS = {
+  // Impact de la BD (mode Immersion) : court, grave, volume bas
+  impact: () => {
+    tone({ type: 'sine', f: 140, to: 50, dur: 0.18, vol: 0.2 });
+    noise({ dur: 0.14, vol: 0.12, type: 'lowpass', f: 900, to: 200, q: 0.7 });
+  },
   // Clic des boutons principaux
   click: () => tone({ type: 'triangle', f: 900, to: 1400, dur: 0.05, vol: 0.25 }),
   tap: () => tone({ type: 'triangle', f: 700, to: 950, dur: 0.05, vol: 0.2 }),
@@ -304,18 +309,25 @@ const AMBIENTS = {
 };
 export const AMBIENT_LIST = Object.keys(AMBIENTS);
 
-/** Lance une ambiance (arrête la précédente). Renvoie false si le son n'est pas encore disponible. */
-export function startAmbient(name) {
+/**
+ * Lance une ambiance (arrête la précédente). Renvoie false si le son n'est pas encore disponible.
+ * Options (BD, mode Immersion) : vol = volume (0 à 1, défaut 1), maxSec = s'éteint en fondu
+ * tout seul après ce délai (jamais de boucle sans fin).
+ */
+export function startAmbient(name, { vol = 1, maxSec = 0 } = {}) {
   stopAmbient();
   unlock();
   if (!ctx || !AMBIENTS[name]) return false;
   const gain = ctx.createGain();
+  const fadeIn = maxSec ? 0.5 : 1.5;
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 1.5); // fondu d'entrée
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), ctx.currentTime + fadeIn); // fondu d'entrée
   gain.connect(master);
   const timers = [];
   const nodes = AMBIENTS[name](gain, timers);
   ambient = { nodes, timers, gain };
+  // Fondu de sortie lancé à temps pour que tout soit éteint à maxSec (constante de temps 0,3 s)
+  if (maxSec) { const mine = ambient; setTimeout(() => { if (ambient === mine) stopAmbient(); }, Math.max(0, maxSec * 1000 - 900)); }
   return true;
 }
 
