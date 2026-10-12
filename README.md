@@ -1175,6 +1175,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.5** : **outil d'illustration** (sur le PC, clé dans `.env.local`) : `npm run generer`, `retoucher`,
+  `illustrer-lot`, `comparer`, `accepter`, `modeles-images` ; prompts automatiques (règles de
+  `methode-illustration.md`), références jointes selon la case (`references/`), propositions jamais publiées,
+  arrêt propre et reprise en cas de quota, mode `--essai` sans clé. Guide : `docs/outil-illustration.md`.
 - ✅ **v1.23.4** : portraits de **Binta entiers** (queue de cheval, poing, pouces visibles ; option `"entier"` de
   `planches.json`), clignement et bouche recalés ; les 7 autres persos identiques à l'octet près.
 - ✅ **v1.23.3** : **BD silencieuse par défaut** ; bouton 🔊 « Immersion » dans le lecteur (ambiance 4 s max au

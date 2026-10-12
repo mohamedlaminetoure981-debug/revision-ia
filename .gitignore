@@ -9,3 +9,7 @@ dist/
 revision-ia-sauvegarde-*.json
 # Réglages locaux de Claude Code
 .claude/
+# Outil d'illustration (npm run generer / retoucher) : propositions, sauvegardes et état locaux
+public/story/*/_propositions/
+public/story/*/_sauvegardes/
+.illustration-etat.json

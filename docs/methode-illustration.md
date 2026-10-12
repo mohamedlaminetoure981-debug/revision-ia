@@ -6,6 +6,9 @@ le chapitre 1 (54 illustrations + 7 cases dessinées par l'appli) a appris.
 
 > En une phrase : **préparer des références, écrire des prompts très cadrés, vérifier chaque image
 > contre une liste d'erreurs connues, et toujours repartir de la dernière case validée.**
+>
+> 🤖 Ces règles sont appliquées automatiquement par l'**outil d'illustration** (`npm run generer`,
+> `npm run retoucher`…) : voir `docs/outil-illustration.md`.
 
 ---
 

@@ -78,6 +78,11 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   `docs/scenario-ch02-v2.md` ; chapitre 3 = version 2 (12 pages, 58 cases), `docs/scenario-ch03-v2.md` ; reprise de lecture
   (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées.
   Guide pour illustrer les prochains chapitres avec Gemini : `docs/methode-illustration.md`.
+  **Outil d'illustration** (sur le PC de l'utilisateur, clé dans `.env.local`, jamais affichée) :
+  `npm run generer|retoucher|illustrer-lot|comparer|accepter|modeles-images` (`scripts/illustrer.mjs`,
+  `scripts/illustration/`), références dans `references/`, lots dans `docs/retouches/chapitre-N.json`,
+  résultats dans `public/story/chapitre-N/_propositions/` (ni publiés ni commités). Dans le cloud : `--essai`.
+  Guide : `docs/outil-illustration.md`.
   Cases dessinées par l'appli (écrans de téléphone `ecran`, cahier `cahier`) : jamais d'illustration.
   Textes posés sur une illustration sans texte (carte…) : `labels` dans la case (éditeur de bulles, traduits).
   Formule à la main sur une image : `formules` dans la case (KaTeX). Espace insécable avant ? ! : ; automatique. Les révisions donnent des points

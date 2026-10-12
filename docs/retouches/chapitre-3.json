@@ -1,0 +1,15 @@
+{
+  "_aide": "Retouches du chapitre 3 (défauts repérés lors du contrôle des images). Lancer : npm run illustrer-lot -- 3 (essai sans clé : ajouter --essai). Chaque tâche faite est sautée au lancement suivant. \"ignorer\": true = mise de côté. Guide : docs/outil-illustration.md",
+  "taches": [
+    { "type": "retouche", "page": 1, "case": 2, "consigne": "Only Kaï's RIGHT hand is bandaged. Remove the bandage from his LEFT hand (bare hand, same pose). Change nothing else." },
+    { "type": "retouche", "page": 1, "case": 3, "consigne": "Only Kaï's RIGHT hand is bandaged. Remove the bandage from his LEFT hand at the bottom of the image (bare hand). Change nothing else." },
+    { "type": "retouche", "page": 3, "case": 2, "consigne": "Only Kaï's RIGHT hand is bandaged. Remove the bandage from his LEFT hand at the bottom of the image (bare hand). Change nothing else." },
+    { "type": "retouche", "page": 4, "case": 2, "consigne": "Only Kaï's RIGHT hand (the one scratching his head) is bandaged. Remove the bandage from his LEFT hand at the bottom (bare hand). Change nothing else." },
+    { "type": "retouche", "page": 12, "case": 3, "consigne": "Only Kaï's RIGHT hand is bandaged. Remove the bandage from his LEFT hand (bare hand). Change nothing else." },
+    { "type": "retouche", "page": 10, "case": 4, "consigne": "Remove all the rain streaks falling INSIDE the library: rain only outside, behind the window glass. Change nothing else." },
+    { "type": "retouche", "page": 10, "case": 5, "consigne": "Remove all the rain streaks falling INSIDE the library: rain only outside, behind the window glass. Change nothing else." },
+    { "type": "retouche", "page": 11, "case": 4, "consigne": "Remove the bat handle: Kaï holds the big red book itself with both hands, like a bat, and hits the crystal with the book. Change nothing else." },
+    { "type": "retouche", "page": 4, "case": 4, "consigne": "The wall clock shows exactly 10:00 (hour hand on 10, minute hand on 12). Change nothing else.", "ignorer": true },
+    { "type": "generation", "page": 3, "case": 5, "consigne": "The two soaked boys at the door are Kaï and Mory (see their references), not strangers in white t-shirts.", "personnages": ["nia", "kai", "kai-bande", "mory"], "ignorer": true }
+  ]
+}
