@@ -1,8 +1,8 @@
 {
-  "_aide": "Copie ce fichier en chapitre-N.json (N = numéro du chapitre), puis : npm run illustrer-lot -- N. Les tâches déjà faites sont sautées (--refaire pour les refaire). \"ignorer\": true met une tâche de côté. Guide : docs/outil-illustration.md",
+  "_aide": "RÈGLE : décris les positions DANS L'IMAGE (« the hand on the LEFT side of the image, near his hip »), jamais « his left hand » ; un seul changement par tâche. Copie ce fichier en chapitre-N.json (N = numéro du chapitre), puis : npm run illustrer-lot -- N. Les tâches déjà faites sont sautées (--refaire pour les refaire). \"ignorer\": true met une tâche de côté. Guide : docs/outil-illustration.md",
   "taches": [
-    { "type": "retouche", "page": 4, "case": 2, "consigne": "Seule la main DROITE de Kaï est bandée : enlève le bandage de sa main gauche (main nue). Ne change rien d'autre." },
-    { "type": "retouche", "page": 10, "case": 4, "consigne": "Enlève la pluie qui tombe à l'intérieur de la bibliothèque : la pluie reste seulement derrière les fenêtres." },
+    { "type": "retouche", "page": 4, "case": 2, "consigne": "REMOVE the bandage from the hand at the BOTTOM RIGHT of Kaï (hanging low, on the right side of the image): it must be bare brown skin. Keep the bandaged hand scratching his head on the LEFT side of the image." },
+    { "type": "retouche", "page": 10, "case": 4, "consigne": "REMOVE all the rain streaks that cross the room. Rain must stay ONLY behind the glass of the windows on the LEFT side of the image." },
     { "type": "generation", "page": 3, "case": 5, "consigne": "Les deux garçons à la porte sont Kaï et Mory, trempés.", "personnages": ["nia", "kai", "kai-bande", "mory"] },
     { "type": "generation", "page": 11, "case": 4, "consigne": "Kaï tient le gros livre rouge lui-même à deux mains, sans manche.", "ignorer": true }
   ]

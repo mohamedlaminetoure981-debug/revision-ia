@@ -1185,6 +1185,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.9** : outil d'illustration : **prompt de retouche court** (« EDIT THIS PANEL: … » en majuscules, « Change ONLY that »,
+  « le résultat doit être visiblement différent ») ; en retouche, seules la case et les fiches des personnages
+  concernés sont jointes ; consignes écrites avec les **positions dans l'image** (docs/retouches/chapitre-3.json réécrit en
+  regardant chaque image) ; `npm run relancer -- N P C` copie le message de relance pour la même discussion AI Studio.
 - ✅ **v1.23.8** : **`npm run publier`** (git pull + commit + push en une commande, sans jamais envoyer .env / _propositions /
   _sauvegardes / node_modules, arrêt si clé API détectée, conflits expliqués sans rien forcer) ; `npm run accepter`
   publie tout seul (`--sans-publier` pour ne pas envoyer) ; `npm run bulles -- N` range le dernier

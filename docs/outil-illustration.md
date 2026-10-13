@@ -136,6 +136,13 @@ npm run verifier-bulles -- 3
 (`accepter` lance `npm run publier` : plus aucune commande git à taper — voir le **§ B**.
 Pour ne pas envoyer tout de suite : `npm run accepter -- 3 4 2 --sans-publier`.)
 
+### A4 bis. Gemini a renvoyé la même image ?
+
+Reste dans la **même discussion AI Studio** et lance `npm run relancer -- 3 4 2` : le message de relance est
+copié dans le presse-papiers, tu le colles, puis `npm run importer -- 3 4 2` (voir le § 4, « Gemini a renvoyé
+l'image inchangée »). Écris tes consignes avec les **positions dans l'image** (« the hand on the LEFT side of
+the image »), pas « sa main gauche ».
+
 ### A5. Plusieurs cases à la suite (lot)
 
 Remplis `docs/retouches/chapitre-3.json` (voir §6 plus bas), puis répète ces deux commandes :
@@ -217,12 +224,54 @@ Le prompt complet est aussi écrit dans `public/story/chapitre-3/_propositions/e
 ## 4. Retoucher une case
 
 ```powershell
-npm run retoucher -- 3 4 2 "Seule la main DROITE de Kaï est bandée : enlève le bandage de sa main gauche"
+npm run retoucher -- 3 1 3 "REMOVE the bandage from the hand at the BOTTOM of the image, just to the RIGHT of the purple hoodie"
 ```
 
-= chapitre 3, page 4, case 2, puis la consigne **entre guillemets**. Gemini reçoit l'image actuelle
-et doit changer **uniquement** ce qui est demandé (composition, cadrage, style, couleurs, taille gardés).
-Conseils : une seule correction à la fois ; une consigne en anglais est souvent mieux suivie.
+= chapitre 3, page 1, case 3, puis la consigne **entre guillemets**. Le prompt de retouche est **court** exprès
+(les longs prompts font renvoyer l'image inchangée) :
+
+```
+EDIT THIS PANEL: <TA CONSIGNE EN MAJUSCULES>.
+Change ONLY that. Keep everything else exactly the same (composition, characters, poses, faces, clothes, background, colors, style, 16:9).
+The attached images may be in any order: the image to edit is the 16:9 comic panel showing … (+ fiches en référence).
+DO NOT add any text, letters, speech bubbles or white shapes.
+The result MUST be visibly different from the original in the requested area. Returning the same image is a failure.
+```
+
+Images jointes en retouche : **la case à retoucher + la fiche des personnages dont parle la consigne** (nommés,
+ou « bandage » → Kaï). **Pas** la case de style, **pas** le décor, sauf si la consigne en parle (style, fond,
+fenêtre, pluie, rayonnage, horloge…). Moins d'images = moins de risque que Gemini renvoie l'image sans rien changer.
+
+### ✍️ Comment écrire une consigne de retouche (règle importante)
+
+1. **Décris les positions DANS L'IMAGE**, jamais « sa main gauche » : la gauche d'un personnage qui te fait face
+   est à DROITE de l'image, et Gemini s'y perd. Écris : « the hand on the **LEFT side of the image**, near his hip »,
+   « the raised hand on the **RIGHT side of the image**, next to Mory ». Regarde l'image pour savoir où est
+   chaque main avant d'écrire.
+2. **Un seul changement par consigne.** Pour deux changements, fais deux tâches l'une après l'autre
+   (accepte la première avant de lancer la seconde).
+3. **Court, concret, en anglais** (Gemini suit mieux) ; un verbe d'action : REMOVE, ADD, CHANGE, MOVE.
+4. Dis ce qui doit **rester** si c'est utile : « Keep the bandaged hand held against the cheek on the LEFT of the image ».
+5. Pour un objet : repère-le par sa place (« the grey bat handle between his hands and the red book, in the
+   center of the image »).
+
+Exemples (`docs/retouches/chapitre-3.json`, écrits en regardant chaque image) :
+- « REMOVE the bandage from the raised open hand on the RIGHT side of Kaï (the hand held up next to Mory) : it must be bare brown skin. »
+- « REMOVE all the rain streaks that cross the room … Rain must stay ONLY behind the glass of the windows on the LEFT side of the image. »
+
+### 🔁 Gemini a renvoyé l'image inchangée ?
+
+C'est le défaut le plus courant. Dans la **MÊME discussion AI Studio** (ne change pas de discussion, ne rejoins rien) :
+
+```powershell
+npm run relancer -- 3 1 3
+```
+
+Le message court est **copié dans le presse-papiers** : « You returned an unchanged image. The edit was NOT applied.
+Apply it now: *ta consigne* ». Colle-le dans la même discussion, laisse Gemini régénérer, télécharge l'original,
+puis `npm run importer -- 3 1 3`. (La consigne est reprise de ta dernière préparation de la case, sinon du lot
+`docs/retouches/chapitre-3.json` ; tu peux aussi la donner : `npm run relancer -- 3 1 3 "ta consigne"`.)
+Après **2 relances ratées** : nouvelle discussion + `npm run preparer -- 3 1 3 "consigne plus précise"`.
 
 ---
 
@@ -230,10 +279,12 @@ Conseils : une seule correction à la fois ; une consigne en anglais est souvent
 
 | Image jointe | Description donnée à Gemini |
 |---|---|
-| case à retoucher | « the 16:9 comic panel showing *(personnages, lieu, début de la scène)* (this is the image to EDIT) » |
+| case à retoucher | « the 16:9 comic panel showing *(personnages, lieu, début de la scène en génération)* (the image to EDIT) » |
 | case de style | « another finished panel of the same comic, a DIFFERENT scene… use it for the drawing style only » |
 | fiche d'un personnage | « the character sheet of *(description visuelle courte)* on a plain background » |
 | décor | « the empty *(lieu)* with no people » |
+
+(En **retouche**, le prompt est court : voir le § 4 ; seules la case, les fiches concernées et, si la consigne en parle, le style ou le décor sont jointes.)
 
 Chaque prompt contient aussi : « The attached images may be in any order: identify each one by its content. »
 Seuls les personnages présents dans la case ont une fiche jointe.

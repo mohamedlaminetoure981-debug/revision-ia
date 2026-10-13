@@ -190,7 +190,7 @@ export function resumeCase({ chars, decor, texte }) { // texte vide : sans la sc
  * pas dans l'ordre quand on les joint dans AI Studio / Gemini). ref = { kind, resume, charId, decor }.
  */
 export function decrireRef(r) {
-  if (r.kind === 'edit') return `the 16:9 comic panel showing ${r.resume} (this is the image to EDIT)`;
+  if (r.kind === 'edit') return `the 16:9 comic panel showing ${r.resume} (the image to EDIT)`;
   if (r.kind === 'style') return `another finished panel of the same comic, a DIFFERENT scene${r.pourRetouche ? ' from the panel to edit' : ''}${r.resume ? `, showing ${r.resume}` : ''} — use it for the drawing style only, never for its content, characters, poses or composition`;
   if (r.kind === 'character') {
     const p = PERSONNAGES[r.charId];
@@ -239,17 +239,26 @@ export function buildGenerationPrompt(o) {
   return blocks.join('\n\n');
 }
 
-/** Prompt de RETOUCHE : modifier SEULEMENT ce qui est demandé. L'image à retoucher est reconnue par sa description. */
+/**
+ * Prompt de RETOUCHE : COURT (les longs prompts de retouche font renvoyer l'image inchangée).
+ * 1) la consigne d'abord, en majuscules ; 2) « change ONLY that » ; 3) l'ordre des images ;
+ * 4) un DO NOT minimal ; 5) « le résultat doit être visiblement différent ».
+ * Pas de CONTEXT, CHARACTER LOCK, HEIGHT/AGE LOCK ni REALISM LOCK (ils noient la consigne).
+ */
 export function buildEditPrompt(o) {
-  const cible = o.refs.find((r) => r.kind === 'edit')?.resume || o.scene;
+  const consigne = String(o.consigne || '').trim().replace(/[.\s]+$/, '');
+  const edit = o.refs.find((r) => r.kind === 'edit');
+  const autres = o.refs.filter((r) => r.kind !== 'edit');
+  const cible = edit?.resume ? ` showing ${edit.resume}` : '';
+  const ordre = `The attached images may be in any order: the image to edit is the 16:9 comic panel${cible}.${autres.length
+    ? ` The other image${autres.length > 1 ? 's are' : ' is'} reference only (never edit ${autres.length > 1 ? 'them' : 'it'}):\n${autres.map((r) => `- ${r.role}`).join('\n')}`
+    : ''}`;
   return [
-    `EDIT TASK\nEdit the existing, validated comic panel: the attached 16:9 panel showing ${cible}.\nIf you are unsure which image to edit, it is the one that matches this description: ${cible}.\nApply ONLY this change: ${o.consigne}\nKeep EVERYTHING else identical in that panel: same composition, framing and camera angle, same characters with the same poses, positions, faces, hair and clothes, same background, same colors and lighting, same line style, same 16:9 size and aspect ratio.\nDo not redraw, restyle, recolor, zoom, crop or move anything that the change does not require. The other attached images are references only: never edit them and never copy their composition.`,
-    legend(o.refs),
-    `CONTEXT (what the panel shows${o.sceneLang === 'fr' ? ', written in French' : ''})\n${o.scene}`,
-    characterLock(o.chars),
-    AGE,
-    REALISM,
-    DONOT,
+    `EDIT THIS PANEL: ${consigne.toUpperCase()}.`,
+    'Change ONLY that. Keep everything else exactly the same (composition, characters, poses, faces, clothes, background, colors, style, 16:9).',
+    ordre,
+    'DO NOT add any text, letters, speech bubbles or white shapes.',
+    'The result MUST be visibly different from the original in the requested area. Returning the same image is a failure.',
   ].join('\n\n');
 }
 

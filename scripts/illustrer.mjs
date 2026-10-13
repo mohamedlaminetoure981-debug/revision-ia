@@ -62,7 +62,8 @@ const USAGE = `Commandes (voir docs/outil-illustration.md) :
 Mode gratuit à la main (AI Studio) :
   npm run preparer -- <chapitre> <page> <case> ["consigne"] [--essai]
   npm run preparer -- <chapitre> --suivante      (prochaine tâche de docs/retouches/chapitre-N.json)
-  npm run importer -- <chapitre> <page> <case> [--essai]`;
+  npm run importer -- <chapitre> <page> <case> [--essai]
+  npm run relancer -- <chapitre> <page> <case> ["consigne"]   (message de relance à coller dans la MÊME discussion)`;
 
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
 const writeJson = (f, v) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`); };
@@ -93,7 +94,8 @@ async function preparer(n, chapter, t) {
   if (t.type === 'retouche' && !target) throw new ErreurCase(`pas encore d'image pour la page ${t.page} case ${t.case} : utilise « npm run generer -- ${n} ${t.page} ${t.case} »`);
 
   const avert = [];
-  const chars = (t.personnages || detectCharacters(panel, t.consigne || '')).filter((id) => {
+  const tousPersos = t.personnages || detectCharacters(panel, t.consigne || '');
+  const chars = tousPersos.filter((id) => {
     if (PERSONNAGES[id]) return true;
     avert.push(`personnage inconnu « ${id} » ignoré (connus : ${Object.keys(PERSONNAGES).join(', ')})`); return false;
   });
@@ -104,11 +106,25 @@ async function preparer(n, chapter, t) {
   const prio = []; const rest = [];
   if (t.type === 'retouche') prio.push({ kind: 'edit', file: target });
   const memeDecor = (p, c) => detectDecor(chapter, p - 1, c - 1) === decor;
-  const st = styleRefs(n, t.page, t.case, t.type === 'retouche' ? 1 : Math.max(1, Number(env.ILLUS_STYLE_REFS) || 1), memeDecor);
+  // RETOUCHE : on ne joint que la case + les fiches des personnages dont parle la consigne ; la case de style
+  // et le décor seulement si la consigne en parle (trop d'images → Gemini renvoie l'image inchangée).
+  const retouche = t.type === 'retouche';
+  const parleStyle = retouche && /\b(style|dessin|trait|encrage|ink|line ?art|cel[- ]?shad)/i.test(t.consigne || '');
+  const parleDecor = retouche && /\b(background|backdrop|setting|d[ée]cor|arri[èe]re-plan|fond|window|fen[êe]tre|shel(f|ves)|bookshel|rayonnage|[ée]tag[èe]re|wall|mur|floor|sol|ceiling|plafond|lamp|lampe|rain|pluie|clock|horloge|library|biblioth[èe]que|room|salle|street|rue)\b/i.test(t.consigne || '');
+  let persosRetouche = chars;
+  if (retouche) {
+    const nomme = new Set(detectCharacters({ action: t.consigne || '' }, '').filter((id) => id !== 'kai-bande'));
+    for (const id of (t.personnages || [])) nomme.add(id);
+    const bandage = /band(é|e|age)/i.test(t.consigne || '') && chars.includes('kai');
+    if (bandage) nomme.add('kai');
+    persosRetouche = chars.filter((id) => nomme.has(id) || (id === 'kai-bande' && nomme.has('kai')));
+    if (!persosRetouche.includes('kai-bande') && bandage && chars.includes('kai-bande')) persosRetouche.push('kai-bande');
+  }
+  const st = retouche && !parleStyle ? { files: [] } : styleRefs(n, t.page, t.case, retouche ? 1 : Math.max(1, Number(env.ILLUS_STYLE_REFS) || 1), memeDecor);
   if (st.warn) avert.push(st.warn);
-  if (!st.files.length) avert.push('aucune case illustrée trouvée pour la référence de STYLE : risque de photoréalisme');
+  if (!retouche && !st.files.length) avert.push('aucune case illustrée trouvée pour la référence de STYLE : risque de photoréalisme');
   st.files.forEach((f) => prio.push({ kind: 'style', file: f }));
-  for (const id of chars) {
+  for (const id of (retouche ? persosRetouche : chars)) {
     if (id === 'kai-bande') continue;
     let files = id === 'kai' && chars.includes('kai-bande') ? characterRefs('kai-bande') : [];
     if (!files.length) files = characterRefs(id);
@@ -119,13 +135,13 @@ async function preparer(n, chapter, t) {
     const variante = id === 'kai' && chars.includes('kai-bande') && characterRefs('kai-bande').length ? 'kai-bande' : null;
     files.forEach((f, k) => (k ? rest : prio).push({ kind: 'character', charId: id, variante, file: f }));
   }
-  let dr = decorRefs(decor, n);
+  let dr = retouche && !parleDecor ? [] : decorRefs(decor, n);
   // Pas de fichier dans references/decors/ et aucune case de ce décor dans le chapitre : une case
   // illustrée du même lieu dans un autre chapitre (ex. la corniche du chapitre 1).
-  if (!dr.length && t.type === 'generation' && !st.files.some((f) => { const m = path.basename(f).match(/^page-(\d+)-case-(\d+)\./); return m && memeDecor(+m[1], +m[2]); })) {
+  if (!dr.length && !retouche && !st.files.some((f) => { const m = path.basename(f).match(/^page-(\d+)-case-(\d+)\./); return m && memeDecor(+m[1], +m[2]); })) {
     dr = await decorPanelsElsewhere(decor, n, loadChapter);
   }
-  if (decor && !dr.length && t.type === 'generation') avert.push(`pas de référence de décor « ${decor} » : tu peux déposer references/decors/${decor}.jpg`);
+  if (decor && !dr.length && !retouche) avert.push(`pas de référence de décor « ${decor} » : tu peux déposer references/decors/${decor}.jpg`);
   dr.forEach((f, k) => (k ? rest : prio).push({ kind: 'decor', decor, file: f }));
   for (const f of t.references || []) {
     const abs = path.resolve(ROOT, f);
@@ -189,7 +205,7 @@ async function decrireRefs(n, chapter, t, prep, sc) {
     return resumeCase({ chars: detectCharacters(panel), decor: detectDecor(ch, p - 1, c - 1), texte: '' }); // sans la scène : il ne doit pas ressembler à la case à retoucher
   };
   for (const r of prep.refs) {
-    if (r.kind === 'edit') r.resume = resumeCase({ chars: prep.chars, decor: prep.decor, texte: sc.text });
+    if (r.kind === 'edit') r.resume = resumeCase({ chars: prep.chars.filter((x) => x !== 'kai-bande'), decor: prep.decor, texte: '' }); // sans « main bandée » : l'image à retoucher a justement ce défaut
     else if (r.kind === 'style') { r.resume = await resumeDe(r.file); r.pourRetouche = t.type === 'retouche'; }
     r.role = decrireRef(r);
   }
@@ -200,7 +216,7 @@ async function construire(n, chapter, t, service, { redimensionner = true } = {}
   const label = `page ${t.page} case ${t.case}`;
   const prep = await preparer(n, chapter, t);
   if (prep.ignore) return { ignore: prep.ignore, label };
-  const sc = await scene(n, prep.panel, service);
+  const sc = t.type === 'retouche' ? { text: '', lang: 'fr' } : await scene(n, prep.panel, service); // retouche : pas de description de scène (prompt court)
   await decrireRefs(n, chapter, t, prep, sc);
   const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, refs: prep.refs, consigne: t.consigne || '' };
   const texte = t.type === 'retouche' ? buildEditPrompt(o) : buildGenerationPrompt(o);
@@ -489,6 +505,34 @@ async function preparerManuel(n, t) {
   return 'fait';
 }
 
+/**
+ * Message de RELANCE (retouche) : à coller dans la MÊME discussion AI Studio quand Gemini a renvoyé
+ * l'image inchangée. La consigne vient de (dans l'ordre) : la ligne de commande, la dernière préparation
+ * de la case, le lot docs/retouches/chapitre-N.json.
+ */
+async function relancer(n, p, c, consigneDonnee) {
+  let consigne = consigneDonnee;
+  let source = 'ta consigne';
+  if (!consigne) {
+    const meta = readJson(prepMetaFile(n, p, c), {});
+    if (meta.type === 'retouche' && meta.consigne) { consigne = meta.consigne; source = 'la dernière préparation de cette case'; }
+  }
+  if (!consigne) {
+    const lot = etatLot(n);
+    const x = lot && (lot.find((q) => q.type === 'retouche' && q.t.page === p && q.t.case === c && !q.ignore) || lot.find((q) => q.type === 'retouche' && q.t.page === p && q.t.case === c));
+    if (x?.t.consigne) { consigne = x.t.consigne; source = `le lot docs/retouches/chapitre-${n}.json (tâche n°${x.i})`; }
+  }
+  if (!consigne) { console.log(`❌ Je ne trouve pas la consigne de la page ${p} case ${c}. Écris-la : npm run relancer -- ${n} ${p} ${c} "ta consigne"`); process.exit(1); }
+  const message = `You returned an unchanged image. The edit was NOT applied. Apply it now: ${consigne.replace(/[.\s]+$/, '')}.`;
+  console.log(`🔁 Message de relance (consigne prise dans ${source}) :\n\n${message}\n`);
+  if (ESSAI) { console.log('🧪 ESSAI : rien n\'est copié.'); return; }
+  const f = path.join(DOSSIER_PREP, 'relance.txt');
+  fs.mkdirSync(DOSSIER_PREP, { recursive: true });
+  fs.writeFileSync(f, message);
+  console.log((await presserPapiers(f)) ? '✅ Copié dans le presse-papiers (Ctrl+V).' : `⚠️ Copie automatique impossible ici : copie le message ci-dessus (ou ouvre ${f}).`);
+  console.log(`\nÀ FAIRE : colle-le dans la MÊME discussion AI Studio (sans nouvelle image, sans nouvelle discussion), laisse Gemini régénérer,\npuis télécharge l'original et lance : npm run importer -- ${n} ${p} ${c}\nSi ça ne marche toujours pas après 2 relances : nouvelle discussion + npm run preparer -- ${n} ${p} ${c} "consigne plus précise" (voir les positions DANS L'IMAGE).`);
+}
+
 /** Image la plus récente du dossier Téléchargements. */
 function dernierTelechargement(minutes) {
   const dir = env.ILLUS_TELECHARGEMENTS || path.join(os.homedir(), 'Downloads');
@@ -604,6 +648,8 @@ try {
       const consigne = args.slice(3).join(' ').trim();
       await preparerManuel(n, { type: consigne ? 'retouche' : 'generation', page: p, case: c, consigne });
     }
+  } else if (cmd === 'relancer') {
+    await relancer(num(args[0], 'Chapitre'), num(args[1], 'Page'), num(args[2], 'Case'), args.slice(3).join(' ').trim());
   } else if (cmd === 'importer') {
     await importerManuel(num(args[0], 'Chapitre'), num(args[1], 'Page'), num(args[2], 'Case'), args[3]);
   } else if (cmd === 'comparer') {
