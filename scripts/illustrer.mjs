@@ -169,7 +169,6 @@ async function scene(n, panel, service) {
   const k = crypto.createHash('sha1').update(fr).digest('hex').slice(0, 16);
   if (!cache[k]) {
     try { cache[k] = await service.traduire(fr); writeJson(cacheFile, cache); } catch (e) {
-      if (e instanceof ArretQuota) throw e;
       console.log(`   ⚠️ traduction impossible (${masquer(e.message).slice(0, 120)}) : description envoyée en français`);
       return { text: fr, lang: 'fr' };
     }
@@ -457,11 +456,8 @@ function etatLot(n) {
 
 async function preparerManuel(n, t) {
   const chapter = await loadChapter(n);
-  // Traduction de la scène : seulement si une clé existe (les modèles TEXTE sont gratuits) ; sinon description en français.
-  let service = null;
-  const key = env.GEMINI_API_KEY;
-  if (!ESSAI && key) { retenirSecret(key); try { service = choisirFournisseur(env).service; } catch { service = null; } }
-  const c = await construire(n, chapter, t, service, { redimensionner: false });
+  // Mode à la main : jamais de traduction par l'API (description gardée en français, AI Studio la comprend).
+  const c = await construire(n, chapter, t, null, { redimensionner: false });
   if (c.ignore) { console.log(`⏭️  ${c.label} : ${c.ignore}`); return 'ignore'; }
   const { prep, texte } = c;
   const dir = path.join(DOSSIER_PREP, `ch${n}-p${t.page}-c${t.case}`);
@@ -476,8 +472,7 @@ async function preparerManuel(n, t) {
   console.log(`\n📋 MODE À LA MAIN (AI Studio, gratuit)${ESSAI ? ' — ESSAI : rien n\'est copié ni ouvert' : ''}`);
   console.log(`   Dossier des images à joindre : ${dir}`);
   prep.refs.forEach((r, i) => console.log(`   ${noms[i]}   ←  ${rel(r.file)}`));
-  if (c.sc.lang === 'fr' && !ESSAI) console.log('   (description en français : pas de clé ou traduction impossible — AI Studio comprend le français, ça marche aussi)');
-  if (ESSAI && c.sc.lang === 'fr') console.log('   (au vrai lancement, la description est traduite en anglais si une clé est disponible)');
+  if (c.sc.lang === 'fr') console.log('   (description gardée en français : AI Studio la comprend, aucune traduction demandée à Gemini)');
 
   if (!ESSAI) {
     fs.rmSync(dir, { recursive: true, force: true });

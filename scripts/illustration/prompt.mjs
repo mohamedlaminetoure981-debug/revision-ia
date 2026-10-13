@@ -239,6 +239,15 @@ Each character looks where the SCENE says: say it with the direction of the head
 When two characters talk, they look at each other's eyes. Nobody looks at the camera.
 Glasses are transparent: both eyes and pupils visible through the lenses.`;
 
+/** Règles automatiques ajoutées en fin de prompt (génération ET retouche), selon les personnages de la case. */
+export function checksPersonnages(chars) {
+  const out = [];
+  if (chars.includes('kai')) out.push('KAI CHECK: black over-ear headphones resting AROUND HIS NECK, never on his head or ears. White gauze bandage ONLY on his RIGHT hand, the other hand bare. Seen from behind, his right hand is on the RIGHT side of the image; seen from the front, his right hand is on the LEFT side of the image.');
+  if (chars.includes('mory')) out.push('MORY CHECK: glasses with TRANSPARENT lenses, eyes visible.');
+  if (chars.some((id) => id !== 'oubli' && PERSONNAGES[id])) out.push('AGE CHECK: every character is a young adult about 20 years old, adult face.');
+  return out.join('\n');
+}
+
 /**
  * Prompt de GÉNÉRATION d'une case.
  * @param {object} o { scene (texte de la case, en anglais si traduit), sceneLang, chars, decor, refs, consigne }
@@ -255,7 +264,8 @@ export function buildGenerationPrompt(o) {
     `SCENE${o.sceneLang === 'fr' ? ' (written in French: follow it literally)' : ''}\n${o.scene}${o.consigne ? `\nExtra instruction: ${o.consigne}` : ''}`,
     PHYSICS,
     DONOT,
-  ];
+    checksPersonnages(o.chars),
+  ].filter(Boolean);
   return blocks.join('\n\n');
 }
 
@@ -279,7 +289,8 @@ export function buildEditPrompt(o) {
     ordre,
     'DO NOT add any text, letters, speech bubbles or white shapes.',
     'The result MUST be visibly different from the original in the requested area. Returning the same image is a failure.',
-  ].join('\n\n');
+    checksPersonnages(o.chars || []),
+  ].filter(Boolean).join('\n\n');
 }
 
 /** Chemin relatif lisible (affichage). */
