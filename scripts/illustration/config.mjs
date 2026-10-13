@@ -9,6 +9,7 @@
 // =====================================================================
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -16,6 +17,8 @@ export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 export const STORY_DIR = path.join(ROOT, 'public', 'story');
 export const REF_DIR = path.join(ROOT, 'references');
 export const LOT_DIR = path.join(ROOT, 'docs', 'retouches');
+/** Dossier Téléchargements (ILLUS_TELECHARGEMENTS dans .env.local pour en choisir un autre). */
+export const dossierTelechargements = (env) => env.ILLUS_TELECHARGEMENTS || path.join(os.homedir(), 'Downloads');
 export const IMG_EXT = /\.(png|jpe?g|webp)$/i;
 
 /** Variables : process.env, puis .env, puis .env.local (le dernier gagne). */

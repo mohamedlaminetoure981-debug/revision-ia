@@ -131,7 +131,17 @@ exercices, l'examen blanc et « Explique-moi » gardaient déjà leur brouillon.
 Chaque fois que tu envoies (« push ») une modification sur la branche `main`, GitHub
 reconstruit et republie le site tout seul (onglet **Actions** pour suivre).
 
-**Depuis ton ordinateur :**
+**Depuis ton ordinateur (le plus simple) :**
+```bash
+npm run publier                      # git pull + commit + push, message automatique
+npm run publier -- "Ce que j'ai changé"
+```
+`publier` n'envoie jamais `.env`, `.env.local`, `_propositions`, `_sauvegardes` ni `node_modules`, s'arrête
+si une clé API est détectée, et ne force rien en cas de conflit (il explique quoi faire). `npm run accepter`
+(illustrations) et `npm run bulles -- N` (bulles réglées, depuis Téléchargements) publient aussi tout seuls.
+Détails : `docs/outil-illustration.md` § B.
+
+À la main, c'est toujours possible :
 ```bash
 git add .
 git commit -m "Ce que j'ai changé"
@@ -1175,6 +1185,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.23.8** : **`npm run publier`** (git pull + commit + push en une commande, sans jamais envoyer .env / _propositions /
+  _sauvegardes / node_modules, arrêt si clé API détectée, conflits expliqués sans rien forcer) ; `npm run accepter`
+  publie tout seul (`--sans-publier` pour ne pas envoyer) ; `npm run bulles -- N` range le dernier
+  `bulles-chapitre-N*.json` de Téléchargements et publie.
 - ✅ **v1.23.7** : outil d'illustration : le prompt ne désigne plus les images par leur numéro (AI Studio les
   mélange) mais par leur **contenu** (case à retoucher, case de style, fiche de personnage, décor) ; phrase
   « images dans n'importe quel ordre » et « si tu hésites, c'est celle qui correspond à cette description » ;

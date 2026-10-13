@@ -82,7 +82,8 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   `npm run generer|retoucher|illustrer-lot|comparer|accepter|modeles-images` et, sans facturation, le mode gratuit à la main `npm run preparer` / `importer` (AI Studio) (`scripts/illustrer.mjs`,
   `scripts/illustration/`), références dans `references/`, lots dans `docs/retouches/chapitre-N.json`,
   résultats dans `public/story/chapitre-N/_propositions/` (ni publiés ni commités). Dans le cloud : `--essai`.
-  Guide : `docs/outil-illustration.md`.
+  `npm run publier` (`scripts/publier.mjs`) = git pull + add + commit + push sans taper de git (utilisé aussi par `accepter` et
+  `npm run bulles -- N`). Guide : `docs/outil-illustration.md`.
   Cases dessinées par l'appli (écrans de téléphone `ecran`, cahier `cahier`) : jamais d'illustration.
   Textes posés sur une illustration sans texte (carte…) : `labels` dans la case (éditeur de bulles, traduits).
   Formule à la main sur une image : `formules` dans la case (KaTeX). Espace insécable avant ? ! : ; automatique. Les révisions donnent des points

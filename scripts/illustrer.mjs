@@ -10,7 +10,8 @@
 //   npm run generer   -- 3 5 2        (la case 2 de la page 5)
 //   npm run illustrer-lot -- 3        (les tâches de docs/retouches/chapitre-3.json)
 //   npm run comparer  -- 3            (page avant / après dans le navigateur)
-//   npm run accepter  -- 3 5 2        (la proposition remplace l'image, l'ancienne est sauvegardée)
+//   npm run accepter  -- 3 5 2        (la proposition remplace l'image, l'ancienne est sauvegardée,
+//                                      puis publication automatique ; --sans-publier pour ne pas envoyer)
 //   npm run modeles-images            (modèles d'images ouverts à ta clé)
 // MODE GRATUIT À LA MAIN (si ta clé n'ouvre aucun modèle d'images) :
 //   npm run preparer -- 3 4 2 "consigne"   prompt copié + images à joindre dans un dossier numéroté
@@ -56,7 +57,7 @@ const USAGE = `Commandes (voir docs/outil-illustration.md) :
   npm run generer -- <chapitre> [page] [case] [--essai] [--toutes]
   npm run illustrer-lot -- <chapitre> [--essai] [--refaire]
   npm run comparer -- <chapitre>
-  npm run accepter -- <chapitre> <page> <case> [fichier]
+  npm run accepter -- <chapitre> <page> <case> [fichier] [--sans-publier]   (puis publie tout seul sur GitHub)
   npm run modeles-images
 Mode gratuit à la main (AI Studio) :
   npm run preparer -- <chapitre> <page> <case> ["consigne"] [--essai]
@@ -358,7 +359,16 @@ async function accepter(n, p, c, fichier) {
   if (meta.type) noter(n, { type: meta.type, page: p, case: c, consigne: meta.consigne }, 'fait', { accepte: choix });
   const m = await sharp(png).metadata();
   console.log(`✅ ${rel(dest)} remplacée par ${choix} (${m.width} × ${m.height}, 16:9).`);
-  console.log(`Ensuite : npm run verifier-bulles -- ${n}  (les bulles de cette case sont peut-être à replacer), puis commit + push.`);
+  if (flags.has('--sans-publier')) {
+    console.log(`Ensuite : npm run verifier-bulles -- ${n}  (les bulles de cette case sont peut-être à replacer), puis npm run publier.`);
+    return;
+  }
+  // Publication automatique : git pull, commit, push (voir scripts/publier.mjs).
+  const { publier } = await import('./publier.mjs');
+  const quoi = meta.type === 'generation' ? 'illustration' : 'retouche';
+  console.log('');
+  try { await publier({ message: `Chapitre ${n} : ${quoi} page ${p} case ${c}` }); } catch { console.log('\n⚠️ L\'image est bien remplacée sur ton PC, mais pas envoyée. Corrige le point ci-dessus puis lance : npm run publier'); process.exit(1); }
+  console.log(`Ensuite : npm run verifier-bulles -- ${n}  (les bulles de cette case sont peut-être à replacer ; bulles réglées : npm run bulles -- ${n}).`);
 }
 
 // ---------------------------------------------------------------------

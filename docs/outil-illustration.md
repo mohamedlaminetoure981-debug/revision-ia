@@ -17,12 +17,54 @@ Si `npm run modeles-images` ne te donne rien (ou que l'outil dit « indisponible
 le **mode gratuit à la main** : va directement au **§ A** ci-dessous. Tout le reste (références, lots,
 `comparer`, `accepter`, sauvegardes) marche pareil dans les deux modes.
 
-Toutes les commandes se tapent dans **PowerShell**, dans le dossier du projet :
+Toutes les commandes se tapent dans **PowerShell**, dans le dossier du projet. Pour **envoyer** tes
+changements sur GitHub, une seule commande : **`npm run publier`** (§ B).
 
 ```powershell
 cd "$HOME\Desktop\Nouveau dossier\revision-ia"
 git pull
 ```
+
+---
+
+## B. ENVOYER SUR GITHUB EN UNE COMMANDE (`npm run publier`)
+
+Fini `git add`, `git commit`, `git push` : une seule commande, après n'importe quel changement.
+
+```powershell
+npm run publier                              # message automatique en français
+npm run publier -- "Chapitre 3 : nouvelles bulles"   # ton propre message
+npm run publier -- --essai                   # montre ce qui serait envoyé, sans rien faire
+```
+
+Dans l'ordre, l'outil :
+1. fait **`git pull`** (récupère ce qui a été fait ailleurs : cloud, autre PC) ;
+2. prépare **les fichiers modifiés du projet** — **jamais** `.env`, `.env.local`, `_propositions/`,
+   `_sauvegardes/`, `node_modules` (même si tu les avais ajoutés par erreur) ; si une **clé API** est
+   trouvée dans ce qui va partir, **tout s'arrête** avant d'enregistrer ;
+3. fait le **commit** (message automatique du genre « Mise à jour : Chapitre 3 : image page 4 case 2 ;
+   documentation » si tu n'en donnes pas) ;
+4. fait le **push** sur `main` (quelques nouveaux essais si ta connexion est mauvaise).
+
+Il affiche ensuite : « ✅ Envoyé sur GitHub : … » avec la liste des fichiers (le site se met à jour tout
+seul en 3 à 4 minutes : onglet **Actions** de GitHub), ou « ✅ Rien à envoyer » s'il n'y a rien de nouveau,
+ou une explication simple de l'erreur (pas de connexion, identifiants GitHub expirés, nom Git absent…).
+
+**En cas de conflit** (les mêmes fichiers modifiés ici ET sur GitHub), ou si un fichier que tu as modifié
+a aussi changé sur GitHub : l'outil **ne force rien**, remet ton dossier comme avant (rien n'est perdu),
+t'indique les fichiers concernés et te dit quoi faire : ouvrir Claude Code dans le dossier et écrire
+« Conflit git sur … : aide-moi à garder les deux versions sans rien perdre ».
+
+Autres commandes qui publient toutes seules :
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `npm run accepter -- 3 4 2` | remplace l'image, puis publie (`--sans-publier` pour ne pas envoyer) |
+| `npm run bulles -- 3` | prend le **dernier** `bulles-chapitre-3*.json` de Téléchargements (même « bulles-chapitre-3 (1).json »), le copie dans `public/story/chapitre-3/bulles-chapitre-3.json`, puis publie (`--sans-publier`, `--essai`) |
+
+Pour les bulles : Panneau créateur → ✏️ Éditer les bulles → 💾 Enregistrer (le fichier se télécharge),
+puis `npm run bulles -- 3`. Le dossier Téléchargements est celui de Windows ; un autre dossier :
+`ILLUS_TELECHARGEMENTS=D:\Telechargements` dans `.env.local`.
 
 ---
 
@@ -87,12 +129,12 @@ Options :
 
 ```powershell
 npm run comparer -- 3
-npm run accepter -- 3 4 2
+npm run accepter -- 3 4 2        # remplace l'image ET l'envoie sur GitHub tout seul
 npm run verifier-bulles -- 3
-git add public/story/chapitre-3
-git commit -m "Chapitre 3 : retouche page 4 case 2"
-git push
 ```
+
+(`accepter` lance `npm run publier` : plus aucune commande git à taper — voir le **§ B**.
+Pour ne pas envoyer tout de suite : `npm run accepter -- 3 4 2 --sans-publier`.)
 
 ### A5. Plusieurs cases à la suite (lot)
 
@@ -258,13 +300,12 @@ npm run accepter -- 3 4 2
 
 → l'ancienne image part dans `public/story/chapitre-3/_sauvegardes/`, la proposition (la plus
 récente, ou celle dont tu donnes le nom de fichier en 4ᵉ argument) devient `page-4-case-2.png`,
-recadrée en 16:9 si besoin. Ensuite :
+recadrée en 16:9 si besoin. Puis **`accepter` publie tout seul** sur GitHub avec le message
+« Chapitre 3 : retouche page 4 case 2 » (ou « illustration … » pour une génération) — voir le **§ B**.
+Option `--sans-publier` pour garder le changement sur ton PC sans l'envoyer. Ensuite :
 
 ```powershell
 npm run verifier-bulles -- 3
-git add public/story/chapitre-3
-git commit -m "Chapitre 3 : retouche page 4 case 2"
-git push
 ```
 
 Les dossiers `_propositions/` et `_sauvegardes/` ne sont ni publiés dans l'appli, ni envoyés sur GitHub.
