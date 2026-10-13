@@ -19,7 +19,7 @@ tenue complète (voir `docs/methode-illustration.md` §1.1). Nom du fichier = id
 | `mory.png` | Mory |
 | `nia.png` | Nia |
 | `binta.png` | Binta |
-| `sora.png`, `ren.png`, `awa.png`, `tidiane.png` | les autres membres de l'équipe |
+| `sora.png`, `ren.png`, `awa.png`, `tidiane.png` | les autres membres de l'équipe (la fiche de Sora paraît jeune : le prompt impose un visage adulte) |
 | `bibliothecaire.png`, `etudiant_jaune.png`… | figurants (facultatif) |
 
 - Une 2ᵉ vue est possible : `kai-2.png`, `nia-2.png` (2 fichiers au plus par personnage).
@@ -39,7 +39,7 @@ du décor utilisé dans les chapitres (`bg: { id: '…' }`) :
 | `rue.jpg` | rue ou campus de Conakry |
 | `classe.jpg` | amphithéâtre, salle de cours |
 | `marche.jpg` | le marché de Madina |
-| `corniche.jpg` | la corniche |
+| `corniche.jpg` | la corniche (sans ce fichier : la dernière case du chapitre 3, `DECOR_REF_DEFAUT` dans `config.mjs`) |
 | `chambre.jpg` | la chambre de Kaï |
 | `toit.jpg` | le toit-terrasse |
 

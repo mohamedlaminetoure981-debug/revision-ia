@@ -41,5 +41,6 @@ export const EXTRA_LOOKS = {
   bibliothecaire: { build: 'f', skin: '#5e3a24', hair: '#1a110c', hairStyle: 'foulard', wrap: '#1f2a5c', outfit: 'tee', top: '#f2f0fa', top2: '#1f2a5c', skirt: '#1f2a5c', skirt2: '#2f3a6c', pants: '#1f2a5c', shoes: '#2a1d14', sole: '#3a2a1a' },
   etudiante_hijab: { build: 'f', skin: '#7a4a2e', hair: '#1a110c', hairStyle: 'foulard', wrap: '#1f9d55', outfit: 'tee', top: '#f2f0fa', top2: '#1f9d55', pants: '#2f2f3a', shoes: '#f2f0fa', sole: '#1f9d55' },
   etudiant_jaune: { build: 'm', skin: '#4a2c1d', hair: '#120c09', hairStyle: 'court', outfit: 'tee', top: '#f5c518', top2: '#e0a800', pants: '#23264a', shoes: '#2f2f3a', sole: '#f2f0fa' },
+  fatou: { build: 'f', skin: '#5e3a24', hair: '#140d0a', hairStyle: 'chignon', outfit: 'tee', top: '#d8c4a0', top2: '#b9a37c', pants: '#6b6f78', shoes: '#f2f0fa', sole: '#7a1f2b' }, // chapitre 4 : étudiante en médecine (gilet beige, sac bordeaux)
   passante: { build: 'f', skin: '#8d5a3b', hair: '#1f140e', hairStyle: 'chignon', outfit: 'tee', top: '#ff8a3d', top2: '#ffffff', pants: '#23264a', shoes: '#f2f0fa', sole: '#ff8a3d' },
 };

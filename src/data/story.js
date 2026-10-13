@@ -77,19 +77,19 @@ export const CHAPTERS = [
   },
   {
     id: 4, emoji: '⚡', title: 'Éclair sur la corniche',
-    teaser: '5 h 40, sur la corniche : quelqu’un court plus vite que l’Oubli.',
+    teaser: '5 h 40, sur la corniche : l’Oubli vide la mémoire d’une étudiante de moitié toutes les sept secondes. Une seule personne court assez vite.',
     strips: [
       { title: 'Ch. 4 — Sora', panels: [
-        c('sora', 'celebration', 'Question ! Réponse ! Suivante ! Trop lents, tout le monde !', 'Dans un éclair…', 'ZIP!'),
-        c('mory', 'surprise', 'Elle a révisé 200 fiches pendant que je disais bonjour.'),
-        c('sora', 'clin', 'Répétition espacée, mon pote. Un peu chaque jour, et le cerveau garde tout.'),
-        c('kai', 'reflexion', 'Tu pourrais aider {prenom} à retenir ses fiches ?'),
+        c('sora', 'clin', 'Trop lents ! Dix kilomètres tous les matins, avant les cours.', '5 h 40. La corniche.', 'ZIP!'),
+        c('mory', 'surprise', 'Deux cents fiches ?! Toutes en même temps ?'),
+        c('sora', 'joie', 'Jamais. Dix minutes par jour. Le cerveau garde ce qu’on lui redemande.'),
+        c('nia', 'reflexion', 'Répétition espacée… Chaque rappel double la demi-vie.'),
       ] },
       { title: 'Ch. 4 — Gardienne', panels: [
-        c('sora', 'reflexion', 'Ça dépend. {prenom} swipe vite ?'),
-        c('nia', 'joie', 'On pourrait dire que tu es la gardienne de la mémoire.'),
-        c('sora', 'joie', 'Gardienne de la mémoire… j’aime bien. Ça claque.'),
-        c('sora', 'celebration', 'OK, j’en suis ! Mais personne ne me ralentit.', '', 'SWOOSH!'),
+        c('mory', 'concentration', 'Sept ! Quatorze ! Vingt-huit ! Elle tient toute seule !', 'L’Oubli maigrit…'),
+        c('kai', 'joie', 'Une suite géométrique ! Comme au marché !', '', 'BADABOOM!'),
+        c('nia', 'joie', 'Il lui faut un titre : gardienne de la mémoire.'),
+        c('sora', 'celebration', 'Ça claque. Règle numéro un, {prenom} : dix minutes par jour.'),
       ] },
     ],
   },

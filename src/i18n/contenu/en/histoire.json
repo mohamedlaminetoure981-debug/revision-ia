@@ -128,23 +128,23 @@
   },
   {
    "title": "Lightning on the Corniche",
-   "teaser": "5:40 AM, on the Corniche: someone is running faster than Oblivion.",
+   "teaser": "5:40 AM on the Corniche: Oblivion is wiping out half of a student's memory every seven seconds. Only one person runs fast enough.",
    "strips": [
     {
      "title": "Ch. 4 — Sora",
      "panels": [
       {
-       "line": "Question! Answer! Next! Too slow, everyone!",
-       "narration": "In a flash…"
+       "line": "Too slow! Ten kilometers every morning, before class.",
+       "narration": "5:40 AM. The Corniche."
       },
       {
-       "line": "She reviewed 200 flashcards while I was just saying hi."
+       "line": "Two hundred flashcards?! All at once?"
       },
       {
-       "line": "Spaced repetition, my friend. A little bit every day, and your brain locks it in."
+       "line": "Never. Ten minutes a day. Your brain keeps what you keep asking it for."
       },
       {
-       "line": "Could you help {prenom} remember their flashcards?"
+       "line": "Spaced repetition… Each recall doubles the half-life."
       }
      ]
     },
@@ -152,16 +152,17 @@
      "title": "Ch. 4 — Guardian",
      "panels": [
       {
-       "line": "Depends. Does {prenom} swipe fast?"
+       "line": "Seven! Fourteen! Twenty-eight! She's holding on by herself!",
+       "narration": "Oblivion is shrinking…"
       },
       {
-       "line": "You could say you're the guardian of memory."
+       "line": "A geometric sequence! Like at the market!"
       },
       {
-       "line": "Guardian of memory… I like it. Has a nice ring to it."
+       "line": "She needs a title: guardian of memory."
       },
       {
-       "line": "OK, I'm down! But nobody slows me down."
+       "line": "Sounds epic. Rule number one, {prenom}: ten minutes a day."
       }
      ]
     }

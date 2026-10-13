@@ -11,7 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PERSONNAGES, HEROS, DECORS, DECORS_COURT, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT } from './config.mjs';
+import { PERSONNAGES, HEROS, DECORS, DECORS_COURT, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT, decorRefDefaut } from './config.mjs';
 
 /** Description de la case sans les marqueurs [ILLUSTRATION], [DESSIN APPLI]… */
 export const cleanAction = (a) => String(a || '').replace(/\[[A-ZÉÈ ]+\]\s*/g, '').trim();
@@ -71,13 +71,19 @@ export function characterRefs(id) {
   return listImages(path.join(REF_DIR, 'personnages')).filter((f) => re.test(path.basename(f))).slice(0, 2);
 }
 
-/** Références d'un décor : d'abord chapitre-N-<décor>*, sinon <décor>* (2 au plus). */
+/**
+ * Références d'un décor : d'abord chapitre-N-<décor>*, sinon <décor>* (2 au plus), sinon la case
+ * illustrée choisie par défaut pour ce lieu (DECOR_REF_DEFAUT, config.mjs).
+ */
 export function decorRefs(decor, n) {
   if (!decor) return [];
   const all = listImages(path.join(REF_DIR, 'decors'));
   const own = all.filter((f) => path.basename(f).toLowerCase().startsWith(`chapitre-${n}-${decor}`));
   const gen = all.filter((f) => new RegExp(`^${decor}(-\\d+)?\\.`, 'i').test(path.basename(f)));
-  return (own.length ? own : gen).slice(0, 2);
+  const found = (own.length ? own : gen).slice(0, 2);
+  if (found.length) return found;
+  const def = decorRefDefaut(decor);
+  return def ? [def] : [];
 }
 
 /**
@@ -85,7 +91,7 @@ export function decorRefs(decor, n) {
  * (même page d'abord). `exclude` = la case traitée (sa propre image n'est pas une référence de style).
  * Repli sur le chapitre précédent si le chapitre n'a encore aucune image (avec un avertissement).
  */
-export function styleRefs(n, p, c, count = 1, memeDecor = null) {
+export function styleRefs(n, p, c, count = 1, memeDecor = null, prefer = []) {
   // Même décor d'abord (memeDecor(p, c) → vrai), puis la plus proche.
   const dist = (x) => (memeDecor && !memeDecor(x.p, x.c) ? 10000 : 0) + Math.abs(x.p - p) * 100 + Math.abs(x.c - c);
   let pool = chapterImages(n).filter((x) => !(x.p === p && x.c === c));
@@ -94,6 +100,19 @@ export function styleRefs(n, p, c, count = 1, memeDecor = null) {
     for (let k = n - 1; k >= 1 && !pool.length; k--) {
       pool = chapterImages(k);
       if (pool.length) warn = `aucune case du chapitre ${n} n'est encore illustrée : référence de style prise dans le chapitre ${k}`;
+    }
+    // Chapitre sans image : la case de référence du décor (si elle existe) passe en premier,
+    // pour que la référence de style montre aussi le bon lieu.
+    const pref = prefer.map((f) => path.resolve(f));
+    const extra = pref.filter((f) => fs.existsSync(f) && !pool.some((x) => path.resolve(x.file) === f)).map((file) => ({ p: 0, c: 0, file }));
+    if (pref.length) {
+      const first = [...pool.filter((x) => pref.includes(path.resolve(x.file))), ...extra];
+      if (first.length) {
+        const others = pool.filter((x) => !pref.includes(path.resolve(x.file))).sort((a, b) => Math.abs(a.p - p) * 100 + Math.abs(a.c - c) - (Math.abs(b.p - p) * 100 + Math.abs(b.c - c)));
+        if (!warn) warn = `aucune case du chapitre ${n} n'est encore illustrée`;
+        warn += ` (en premier : ${rel(first[0].file)}, même décor)`;
+        return { files: [...first, ...others].slice(0, count).map((x) => x.file), warn };
+      }
     }
   }
   return { files: pool.sort((a, b) => dist(a) - dist(b)).slice(0, count).map((x) => x.file), warn };
@@ -191,11 +210,12 @@ export function resumeCase({ chars, decor, texte }) { // texte vide : sans la sc
  */
 export function decrireRef(r) {
   if (r.kind === 'edit') return `the 16:9 comic panel showing ${r.resume} (the image to EDIT)`;
+  if (r.kind === 'style' && r.decor) return `another finished panel of the same comic (a DIFFERENT scene) showing the ${DECORS_COURT[r.decor] || r.decor} — use it for the drawing style AND for the look of this place (layout, objects, light, orientation), never for its characters, poses or composition`;
   if (r.kind === 'style') return `another finished panel of the same comic, a DIFFERENT scene${r.pourRetouche ? ' from the panel to edit' : ''}${r.resume ? `, showing ${r.resume}` : ''} — use it for the drawing style only, never for its content, characters, poses or composition`;
   if (r.kind === 'character') {
     const p = PERSONNAGES[r.charId];
     const c = r.charId === 'kai' && r.variante === 'kai-bande' ? PERSONNAGES['kai-bande'].court : p.court;
-    return `the character sheet of ${c} (${p.nom.replace(/ \(.*\)/, '')}) on a plain background: use it for the face, hair and clothes of ${p.nom.replace(/ \(.*\)/, '')} only, ignoring its pose and framing`;
+    return `the character sheet of ${c} (${p.nom.replace(/ \(.*\)/, '')}) on a plain background: use it for the face, hair and clothes of ${p.nom.replace(/ \(.*\)/, '')} only${p.refNote ? `, ${p.refNote}` : ''}, ignoring its pose and framing`;
   }
   if (r.kind === 'decor') return `the empty ${DECORS_COURT[r.decor] || r.decor || 'setting'} with no people: use it for the layout and objects of the place only, drawn in the manga style of the style panel`;
   return 'an extra reference image given by the author';
@@ -228,7 +248,7 @@ export function buildGenerationPrompt(o) {
     `TASK\nDraw ONE comic panel for the manga "Révision IA — La Jeunesse de 2026" (Conakry, Guinea).${o.refs.length ? `\n\n${legend(o.refs)}` : ''}`,
     STYLE,
     REALISM,
-    `SCENE LOCK / INVENTORY\n${o.decor && DECORS[o.decor] ? DECORS[o.decor] : 'Use only the setting described in the SCENE.'}\nNothing else added to the setting.`,
+    `SCENE LOCK / INVENTORY\n${o.decorLock || (o.decor && DECORS[o.decor]) || 'Use only the setting described in the SCENE.'}\nNothing else added to the setting.`,
     characterLock(o.chars),
     ...(o.chars.length ? [EYELINE] : []),
     AGE,

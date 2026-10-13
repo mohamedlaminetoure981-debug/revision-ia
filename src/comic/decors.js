@@ -618,7 +618,7 @@ function cahier(w, h, o) {
 /**
  * Croquis à main levée sur papier quadrillé (dessin de l'appli, pas d'illustration) :
  *   origin : [x, y] origine des axes (fractions de la case) ; axes tracés avec flèches
- *   curve  : [[x, y], …] points de la courbe (lissée)
+ *   curve  : [[x, y], …] points de la courbe (lissée) ; curves : [curve, curve, …] plusieurs morceaux
  *   segs   : [{ a: [x, y], b: [x, y], color, dash }] droites (corde, tangentes)
  *   dots   : [[x, y, color], …] points marqués
  * Les mots du croquis (« vitesse moyenne »…) sont des labels de style 'main' (traduits).
@@ -636,15 +636,18 @@ function croquis(w, h, o) {
     s += `<path d="M${f(ox)},${f(oy)} H${f(w * 0.95)} M${f(w * 0.95 - a)},${f(oy - a * 0.6)} L${f(w * 0.95)},${f(oy)} L${f(w * 0.95 - a)},${f(oy + a * 0.6)}
       M${f(ox)},${f(oy)} V${f(h * 0.06)} M${f(ox - a * 0.6)},${f(h * 0.06 + a)} L${f(ox)},${f(h * 0.06)} L${f(ox + a * 0.6)},${f(h * 0.06 + a)}" fill="none" stroke="${ink}" stroke-width="${f(lw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
-  const pts = (o.curve || []).map(P);
-  if (pts.length > 1) {
-    // Courbe lissée (Catmull-Rom → Bézier)
-    let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[i - 1] || pts[i]; const p1 = pts[i]; const p2 = pts[i + 1]; const p3 = pts[i + 2] || p2;
-      d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)},${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)},${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])},${f(p2[1])}`;
+  // curve : une courbe ; curves : plusieurs morceaux (courbe en dents de scie, chapitre 4)
+  for (const curve of o.curves || [o.curve || []]) {
+    const pts = curve.map(P);
+    if (pts.length > 1) {
+      // Courbe lissée (Catmull-Rom → Bézier)
+      let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i]; const p1 = pts[i]; const p2 = pts[i + 1]; const p3 = pts[i + 2] || p2;
+        d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)},${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)},${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])},${f(p2[1])}`;
+      }
+      s += `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${f(lw * 1.5)}" stroke-linecap="round"/>`;
     }
-    s += `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${f(lw * 1.5)}" stroke-linecap="round"/>`;
   }
   for (const sg of o.segs || []) {
     const [x1, y1] = P(sg.a); const [x2, y2] = P(sg.b);

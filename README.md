@@ -1185,6 +1185,15 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.24.0** : **chapitre 4 réécrit** d'après `docs/scenario-ch04-v2.md` (« Éclair sur la corniche », 12 pages,
+  60 cases ; il reprend juste après la dernière case du chapitre 3 : « Le lendemain. 5 h 40. La corniche. »). Sora,
+  Fatou (figurante, `looks.js`), courbe de l'oubli R(t) = 100 × 2^(−t/7) et rappels espacés 7, 14, 28, 56 s dessinés par
+  l'appli (croquis + KaTeX ; `curves` = plusieurs morceaux de courbe), « 4 sur 8 » sur le téléphone, affiche du tournoi
+  en surimpression (`labels`). 56 cases à illustrer (`public/story/chapitre-4/page-P-case-C`) : en attendant, l'appli
+  dessine la case. Outil d'illustration : Sora (visage adulte imposé) et Fatou dans `config.mjs`, décor de la corniche
+  propre au chapitre 4 (`DECORS_CHAPITRES` : route à gauche, mer à droite) et référence par défaut
+  `DECOR_REF_DEFAUT` (dernière case du chapitre 3, aussi référence de style tant que le chapitre 4 n'a aucune image).
+  Teaser, version courte et traduction anglaise du chapitre 4 mis à jour.
 - ✅ **v1.23.9** : outil d'illustration : **prompt de retouche court** (« EDIT THIS PANEL: … » en majuscules, « Change ONLY that »,
   « le résultat doit être visiblement différent ») ; en retouche, seules la case et les fiches des personnages
   concernés sont jointes ; consignes écrites avec les **positions dans l'image** (docs/retouches/chapitre-3.json réécrit en

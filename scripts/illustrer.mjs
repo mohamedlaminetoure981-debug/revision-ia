@@ -34,7 +34,7 @@ import { execFile } from 'node:child_process';
 import sharp from 'sharp';
 import {
   ROOT, LOT_DIR, readEnv, retenirSecret, masquer, loadChapter, caseImage, isAppDrawn,
-  propDir, saveDir, caseName, PERSONNAGES, IMG_EXT,
+  propDir, saveDir, caseName, PERSONNAGES, IMG_EXT, decorRefDefaut, decorLock,
 } from './illustration/config.mjs';
 import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, resumeCase, decrireRef, rel } from './illustration/prompt.mjs';
 import { choisirFournisseur } from './illustration/fournisseurs/index.mjs';
@@ -120,7 +120,8 @@ async function preparer(n, chapter, t) {
     persosRetouche = chars.filter((id) => nomme.has(id) || (id === 'kai-bande' && nomme.has('kai')));
     if (!persosRetouche.includes('kai-bande') && bandage && chars.includes('kai-bande')) persosRetouche.push('kai-bande');
   }
-  const st = retouche && !parleStyle ? { files: [] } : styleRefs(n, t.page, t.case, retouche ? 1 : Math.max(1, Number(env.ILLUS_STYLE_REFS) || 1), memeDecor);
+  const pref = decorRefDefaut(decor);
+  const st = retouche && !parleStyle ? { files: [] } : styleRefs(n, t.page, t.case, retouche ? 1 : Math.max(1, Number(env.ILLUS_STYLE_REFS) || 1), memeDecor, pref ? [pref] : []);
   if (st.warn) avert.push(st.warn);
   if (!retouche && !st.files.length) avert.push('aucune case illustrée trouvée pour la référence de STYLE : risque de photoréalisme');
   st.files.forEach((f) => prio.push({ kind: 'style', file: f }));
@@ -142,6 +143,12 @@ async function preparer(n, chapter, t) {
     dr = await decorPanelsElsewhere(decor, n, loadChapter);
   }
   if (decor && !dr.length && !retouche) avert.push(`pas de référence de décor « ${decor} » : tu peux déposer references/decors/${decor}.jpg`);
+  // Une image déjà jointe comme référence de style n'est pas jointe une 2e fois : elle sert aussi pour le décor.
+  dr = dr.filter((f) => {
+    const s = prio.find((r) => r.kind === 'style' && path.resolve(r.file) === path.resolve(f));
+    if (s) s.decor = decor;
+    return !s;
+  });
   dr.forEach((f, k) => (k ? rest : prio).push({ kind: 'decor', decor, file: f }));
   for (const f of t.references || []) {
     const abs = path.resolve(ROOT, f);
@@ -218,7 +225,7 @@ async function construire(n, chapter, t, service, { redimensionner = true } = {}
   if (prep.ignore) return { ignore: prep.ignore, label };
   const sc = t.type === 'retouche' ? { text: '', lang: 'fr' } : await scene(n, prep.panel, service); // retouche : pas de description de scène (prompt court)
   await decrireRefs(n, chapter, t, prep, sc);
-  const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, refs: prep.refs, consigne: t.consigne || '' };
+  const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, decorLock: decorLock(prep.decor, n), refs: prep.refs, consigne: t.consigne || '' };
   const texte = t.type === 'retouche' ? buildEditPrompt(o) : buildGenerationPrompt(o);
   const images = redimensionner ? await Promise.all(prep.refs.map((r, i) => charger(r, t.type === 'retouche' && i === 0))) : [];
   return { prep, sc, texte, images, label };

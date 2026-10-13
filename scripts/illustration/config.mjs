@@ -118,8 +118,9 @@ export const PERSONNAGES = {
   },
   sora: {
     nom: 'Sora', re: /\bsora\b/i,
-    court: 'a young woman with two round afro puffs with lime star clips and an olive-green hoodie',
-    lock: 'Sora: young Black woman about 20, two round afro puffs with small lime-green star clips, olive-green hoodie with lime trims; playful.',
+    court: 'a young woman with two round curly afro puffs, neon-lime star clips and a dark olive hoodie with neon-lime trims',
+    lock: 'Sora: young Black woman about 20 with an ADULT face (her character sheet looks younger than she is: draw a 20-year-old university student, adult face shape, defined cheekbones and jaw, adult body proportions, never a child or a teenager), dark-brown skin, two big round curly afro puffs high on her head, small neon-lime star-shaped hair clips, dark olive-green hoodie with neon-lime drawstrings and neon-lime stripes on the cuffs and the hem, khaki cargo pants, olive sneakers, a thick stack of white index cards held by a rubber band in her hoodie pocket; playful, confident; her speed trail is neon lime green.',
+    refNote: 'but give her an ADULT face of about 20 (the sheet looks younger)',
   },
   ren: {
     nom: 'Ren', re: /\bren\b/i,
@@ -141,6 +142,7 @@ export const PERSONNAGES = {
   etudiante_hijab: { nom: 'l’étudiante au hijab', court: 'a young woman wearing a green hijab', lock: 'A female student about 20 wearing a hijab.' },
   etudiant_jaune: { nom: 'l’étudiant au t-shirt jaune', court: 'a young man in a yellow t-shirt', lock: 'A male student about 20 in a yellow t-shirt.' },
   etudiant: { nom: 'un étudiant', court: 'a young male student', lock: 'A male student about 20.' },
+  fatou: { nom: 'Fatou', re: /\bfatou\b/i, court: 'a young woman with braids tied in a bun, white earbuds, a beige cardigan and a burgundy backpack', lock: 'Fatou: young Black woman about 20 (medical student), dark-brown skin, braided hair tied up in a bun, white wired earbuds, beige cardigan, grey trousers, burgundy backpack; adult face.' },
   etudiante: { nom: 'une étudiante', court: 'a young female student', lock: 'A female student about 20.' },
   oubli: { nom: 'l’Oubli', court: 'a huge shadow creature made of violet letters, with a glowing violet crystal core', lock: 'The Oblivion ("l’Oubli"): a huge shadow entity made of violet letters and pixels, with a glowing violet crystal core; NOT a human.' },
 };
@@ -168,5 +170,33 @@ export const DECORS = {
   chambre: 'A student bedroom in Conakry at night: bed, desk with a computer, ceiling fan, window on the city.',
   toit: 'A rooftop terrace with a water tank above the market street of Conakry.',
 };
+/**
+ * Décor propre à un chapitre (remplace DECORS pour ce chapitre seulement) : même lieu, autre heure
+ * ou orientation imposée (la corniche du chapitre 1 a la mer à GAUCHE, celle du chapitre 4 à DROITE).
+ */
+export const DECORS_CHAPITRES = {
+  4: {
+    corniche: 'The Corniche of Conakry at dawn, ALWAYS with the same orientation: the wet road (dew) with low houses, palm trees and street lamps still lit on the LEFT of the picture; on the RIGHT, the low concrete sea wall, then dark volcanic rocks and the ocean; a few benches along the sea wall. Dawn sky: deep night blue at the top, orange and pink at the horizon over the sea (when the SCENE says so: the sun rising over the sea on the right, golden light).',
+  },
+};
+/** Verrou de décor d'un chapitre : celui du chapitre s'il existe, sinon le verrou général. */
+export const decorLock = (decor, n) => DECORS_CHAPITRES[n]?.[decor] ?? DECORS[decor];
+/**
+ * Référence de décor par défaut quand references/decors/<décor>.* n'existe pas : une case déjà
+ * illustrée (chemin sans extension). Elle sert aussi de référence de STYLE pour un chapitre qui n'a
+ * encore aucune image (la corniche à l'aube, dernière case du chapitre 3, pour le chapitre 4).
+ */
+export const DECOR_REF_DEFAUT = {
+  corniche: 'public/story/chapitre-3/page-12-case-6',
+};
+/** Fichier de la référence de décor par défaut (ou null). */
+export function decorRefDefaut(decor) {
+  const base = DECOR_REF_DEFAUT[decor];
+  if (!base) return null;
+  const dir = path.join(ROOT, path.dirname(base));
+  if (!fs.existsSync(dir)) return null;
+  const f = fs.readdirSync(dir).find((x) => x.replace(IMG_EXT, '') === path.basename(base) && IMG_EXT.test(x));
+  return f ? path.join(dir, f) : null;
+}
 /** Fonds « abstraits » (aplat, flash…) : on reprend le décor d'une case voisine. */
 export const ABSTRAIT = ['aplat', 'flash', 'oubli'];

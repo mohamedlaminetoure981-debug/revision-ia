@@ -7,21 +7,49 @@
      {
       "captions": [
        {
-        "text": "Corniche, 5:40 AM. Team training (Kaï's brilliant idea)."
+        "text": "The next day. 5:40 AM. The Corniche."
+       },
+       {
+        "text": "Morning training: Kaï's idea."
        }
-      ],
+      ]
+     },
+     {
       "bubbles": [
        {
-        "text": "Why... are we running... before the sun is even up?!"
+        "text": "Why… are we running… before sunrise?"
+       },
+       {
+        "text": "Because Oblivion never sleeps."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "I walk. It's a matter of principle."
        }
       ]
      },
      {
       "sfx": [
        {
-        "text": "ZOOM!"
+        "text": "ZIP!"
        }
-      ],
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "What was THAT?!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
       "bubbles": [
        {
         "text": "Too slow!"
@@ -29,29 +57,39 @@
       ]
      },
      {
-      "bg": {
-       "lines": "#c6ff3d"
-      },
       "bubbles": [
        {
-        "text": "What was THAT?!"
+        "text": "Sora. Ten kilometers every morning, before class."
        }
       ]
      },
      {
       "bubbles": [
        {
-        "text": "Sora. 10k before class. Plus 200 flashcards in the taxi."
+        "text": "And two hundred flashcards in the taxi."
        }
       ]
      },
      {
       "bubbles": [
        {
-        "text": "200 flashcards?!"
+        "text": "Two hundred flashcards?!"
        },
        {
-        "text": "A little bit every day: your brain locks it in."
+        "text": "All at once?"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Never. Ten minutes a day. Your brain keeps what you keep asking it for."
+       },
+       {
+        "text": "Spaced repetition…"
+       },
+       {
+        "text": "Dunno what it's called. I just know it works."
        }
       ]
      }
@@ -62,55 +100,364 @@
      {
       "sfx": [
        {
-        "text": "SHHRAAA"
+        "text": "BEEP BEEP BEEP"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "Signal! From the sea!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "SHHHHH…"
+       }
+      ]
+     },
+     null,
+     {
+      "bg": {
+       "lines": [
+        "Facial nerve (VII)",
+        "Humerus",
+        "Femur: the longest bone"
+       ]
+      },
+      "sfx": [
+       {
+        "text": "VMMMM"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "The nerve… the nerve that… I… I don't remember. I don't remember ANYTHING."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "She's 300 meters away!"
        }
       ]
      },
      {
       "bg": {
-       "lines": "#c6ff3d"
-      },
+       "text": "Target's memory:\n100% (0 s)\n50% (7 s)\n25% (14 s)",
+       "from": "MORY'S ANTENNA"
+      }
+     },
+     {
       "bubbles": [
        {
-        "text": "He's targeting that girl over there!"
+        "text": "She loses half of what she knows every seven seconds! We'll never make it!"
        }
       ]
      },
      {
       "bubbles": [
        {
-        "text": "Way too far! We'll never make it!"
+        "text": "You won't, maybe."
        }
       ]
-     },
+     }
+    ]
+   },
+   {
+    "panels": [
      {
       "sfx": [
        {
         "text": "ZZZIIIIP"
        }
       ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "KRAK!"
+       }
+      ]
+     },
+     null,
+     {
+      "bubbles": [
+       {
+        "text": "Hey. Look at me. Question: the nerve that makes you smile?"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "TCHING!"
+       }
+      ],
+      "bubbles": [
+       {
+        "text": "The… the facial nerve!"
+       }
+      ]
      }
     ]
    },
    {
     "panels": [
      {
-      "bg": {
-       "lines": "#26330f"
-      },
+      "sfx": [
+       {
+        "text": "SHHHRAAA!"
+       }
+      ]
+     },
+     null,
+     {
       "bubbles": [
        {
-        "text": "Left! Right! Left! It's all about rhythm, just like my flashcards."
+        "text": "Sora! You okay?!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Her memory's back up to a hundred percent! … But it's already dropping."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It keeps coming back."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "labels": [
+       {
+        "text": "half-life = 7 s"
+       },
+       {
+        "text": "memory (%)"
+       },
+       {
+        "text": "time (s)"
+       },
+       {
+        "text": "50%"
+       },
+       {
+        "text": "7"
+       },
+       {
+        "text": "14"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "She loses half of what she knows every seven seconds. That's a half-life."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Then we ask her a question every seven seconds!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "No. Not always seven. Every time she remembers on her own, it lasts longer."
        }
       ]
      },
      {
       "bg": {
-       "lines": "#22d3ee"
+       "lines": "#c6ff3d"
       },
       "bubbles": [
        {
-        "text": "NOW! Together!"
+        "text": "Each recall doubles the half-life…"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "labels": [
+       {
+        "text": "7 s"
+       },
+       {
+        "text": "14 s"
+       },
+       {
+        "text": "28 s"
+       },
+       {
+        "text": "56 s"
+       },
+       {
+        "text": "recall!"
+       },
+       {
+        "text": "ratio 2"
+       },
+       {
+        "text": "100%"
+       },
+       {
+        "text": "50%"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "A geometric sequence! Like at the market!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "After four recalls, she holds on for almost a minute by herself. It'll have nothing left to eat."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "And an Oblivion with nothing left to eat…"
+       },
+       {
+        "text": "… condenses. And falls."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "I ask the questions. You keep it away from her."
+       },
+       {
+        "text": "Timer's running!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Left! Right!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "SEVEN!"
+       },
+       {
+        "text": "The humerus!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Back off!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "FOURTEEN!"
+       },
+       {
+        "text": "The femur! The longest bone in the body!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "It's shrinking."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "TWENTY-EIGHT!"
+       },
+       {
+        "text": "Twelve pairs of cranial nerves!"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "KRRRK…"
+       }
+      ]
+     },
+     {
+      "sfx": [
+       {
+        "text": "BOOM!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "If it falls in the water, the sea will rebuild it!"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "On three!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "THREE!"
        }
       ]
      },
@@ -125,22 +472,78 @@
       ]
      },
      {
-      "bubbles": [
+      "sfx": [
        {
-        "text": "You'd make a legendary memory guardian."
-       },
-       {
-        "text": "That sounds epic. I'm in!"
+        "text": "SHHHRRRAAA"
        }
       ]
      },
      {
-      "captions": [
+      "bubbles": [
        {
-        "text": "QUIZ TOURNAMENT — Undefeated Champion: REN"
+        "text": "My exam… I remember everything."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "panels": [
+     {
+      "bubbles": [
+       {
+        "text": "Thank you! Gotta run, it's at eight!"
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Join us."
        },
        {
-        "text": "To be continued..."
+        "text": "A team that runs at 5:40 in the morning? … I like it."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "Rule number one: ten minutes a day. No more, no less."
+       }
+      ]
+     },
+     {
+      "bubbles": [
+       {
+        "text": "She needs a title."
+       },
+       {
+        "text": "Guardian of memory."
+       },
+       {
+        "text": "Sounds epic."
+       }
+      ]
+     },
+     {
+      "bg": {
+       "text": "4 out of 8.",
+       "from": "THE CREATOR"
+      }
+     },
+     {
+      "labels": [
+       {
+        "text": "QUIZ TOURNAMENT"
+       },
+       {
+        "text": "Undefeated champion: REN"
+       }
+      ],
+      "captions": [
+       {
+        "text": "To be continued…"
        }
       ]
      }

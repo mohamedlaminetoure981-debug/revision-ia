@@ -392,6 +392,10 @@ Les dossiers `_propositions/` et `_sauvegardes/` ne sont ni publiés dans l'appl
 
 `scripts/illustrer.mjs` (commandes), `scripts/illustration/config.mjs` (clé, personnages, décors),
 `scripts/illustration/prompt.mjs` (détection des personnages, références, prompts),
+Décor propre à un chapitre : `DECORS_CHAPITRES` (ex. corniche du chapitre 4 : route à gauche, mer à droite) ;
+référence de décor par défaut quand `references/decors/` n'a rien : `DECOR_REF_DEFAUT` (corniche = dernière case du
+chapitre 3, jointe aussi comme référence de style tant que le chapitre n'a aucune image, une seule fois).
+Figurante avec un nom : `fatou` (chapitre 4) ; `refNote` ajoute une précision à la légende d'une fiche (Sora : visage adulte).
 Le mode à la main (`preparer`, `importer`) est dans `scripts/illustrer.mjs` et réutilise la même construction de prompt que le mode API (`construire`).
 `scripts/illustration/fournisseurs/` (un fichier par service : `gemini.mjs` ; pour en ajouter un,
 copier son interface et l'inscrire dans `index.mjs`).
