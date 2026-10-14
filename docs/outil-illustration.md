@@ -59,7 +59,7 @@ Autres commandes qui publient toutes seules :
 
 | Commande | Ce qu'elle fait |
 |---|---|
-| `npm run accepter -- 3 4 2` | remplace l'image, puis publie (`--sans-publier` pour ne pas envoyer) |
+| `npm run accepter -- 3 4 2` | remplace l’image (convertie en JPG qualité 88, 1920 px max, 16:9 : page-P-case-C.jpg), puis publie (`--sans-publier` pour ne pas envoyer) |
 | `npm run bulles -- 3` | prend le **dernier** `bulles-chapitre-3*.json` de Téléchargements (même « bulles-chapitre-3 (1).json »), le copie dans `public/story/chapitre-3/bulles-chapitre-3.json`, puis publie (`--sans-publier`, `--essai`) |
 
 Pour les bulles : Panneau créateur → ✏️ Éditer les bulles → 💾 Enregistrer (le fichier se télécharge),

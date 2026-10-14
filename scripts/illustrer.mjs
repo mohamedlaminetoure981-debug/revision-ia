@@ -183,14 +183,18 @@ async function charger(ref, edit) {
   return { mime: 'image/jpeg', data, nom: rel(ref.file) };
 }
 
-/** Recadre au format 16:9 (centre) si l'image n'y est pas. */
-async function seize9(buf) {
+/** Recadre au format 16:9 (centre), limite à 1920 px de large et compresse en JPG (qualité 88). */
+async function seize9(buf, jpg = false) {
   const m = await sharp(buf).metadata();
   const r = m.width / m.height;
-  if (Math.abs(r - 16 / 9) < 0.01) return sharp(buf).png().toBuffer();
-  const w = r > 16 / 9 ? Math.round(m.height * 16 / 9) : m.width;
-  const h = r > 16 / 9 ? m.height : Math.round(m.width * 9 / 16);
-  return sharp(buf).extract({ left: Math.round((m.width - w) / 2), top: Math.round((m.height - h) / 2), width: w, height: h }).png().toBuffer();
+  let img = sharp(buf).rotate().flatten({ background: '#ffffff' });
+  if (Math.abs(r - 16 / 9) >= 0.01) {
+    const w = r > 16 / 9 ? Math.round(m.height * 16 / 9) : m.width;
+    const h = r > 16 / 9 ? m.height : Math.round(m.width * 9 / 16);
+    img = img.extract({ left: Math.round((m.width - w) / 2), top: Math.round((m.height - h) / 2), width: w, height: h });
+  }
+  if (!jpg) return img.png().toBuffer();
+  return img.resize({ width: 1920, withoutEnlargement: true }).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
 }
 
 // ---------------------------------------------------------------------
@@ -374,8 +378,8 @@ async function accepter(n, p, c, fichier) {
     fs.rmSync(path.join(chDir, f));
     console.log(`   💾 ancienne image sauvegardée : ${rel(dest)}`);
   }
-  const png = await seize9(fs.readFileSync(path.join(dir, choix)));
-  const dest = path.join(chDir, `${caseName(p, c)}.png`);
+  const png = await seize9(fs.readFileSync(path.join(dir, choix)), true);
+  const dest = path.join(chDir, `${caseName(p, c)}.jpg`);
   fs.writeFileSync(dest, png);
   const meta = readJson(path.join(dir, choix.replace(/\.png$/, '.json')), {});
   if (meta.type) noter(n, { type: meta.type, page: p, case: c, consigne: meta.consigne }, 'fait', { accepte: choix });

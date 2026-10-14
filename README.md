@@ -1211,7 +1211,7 @@ La clé API et les photos ne sont pas incluses.
   `--suivante` pour un lot) puis `npm run importer` (image la plus récente de Téléchargements → `_propositions/`) ;
   si tous les modèles de l'API sont refusés, l'outil propose ce mode. Guide : `docs/outil-illustration.md`.
 - ✅ **v1.23.5** : **outil d'illustration** (sur le PC, clé dans `.env.local`) : `npm run generer`, `retoucher`,
-  `illustrer-lot`, `comparer`, `accepter`, `modeles-images` ; prompts automatiques (règles de
+  `illustrer-lot`, `comparer`, `accepter`, `modeles-images` ; prompts automatiques (règles de `accepter` convertit en JPG optimisé (qualité 88, ≤ 1920 px, 16:9) ; l’appli trouve png ou jpg.
   `methode-illustration.md`), références jointes selon la case (`references/`), propositions jamais publiées,
   arrêt propre et reprise en cas de quota, mode `--essai` sans clé. Guide : `docs/outil-illustration.md`.
 - ✅ **v1.23.4** : portraits de **Binta entiers** (queue de cheval, poing, pouces visibles ; option `"entier"` de
