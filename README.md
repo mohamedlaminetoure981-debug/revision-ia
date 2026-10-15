@@ -138,7 +138,7 @@ npm run publier -- "Ce que j'ai changé"
 ```
 `publier` n'envoie jamais `.env`, `.env.local`, `_propositions`, `_sauvegardes` ni `node_modules`, s'arrête
 si une clé API est détectée, et ne force rien en cas de conflit (il explique quoi faire). `npm run accepter`
-(illustrations) et `npm run bulles -- N` (bulles réglées, depuis Téléchargements) publient aussi tout seuls.
+(illustrations : commit local, envoi seulement à la dernière case de la page ou avec `--publier`) et `npm run bulles -- N` (bulles réglées, depuis Téléchargements) publient tout seuls.
 Détails : `docs/outil-illustration.md` § B.
 
 À la main, c'est toujours possible :
@@ -1200,7 +1200,7 @@ La clé API et les photos ne sont pas incluses.
   regardant chaque image) ; `npm run relancer -- N P C` copie le message de relance pour la même discussion AI Studio.
 - ✅ **v1.23.8** : **`npm run publier`** (git pull + commit + push en une commande, sans jamais envoyer .env / _propositions /
   _sauvegardes / node_modules, arrêt si clé API détectée, conflits expliqués sans rien forcer) ; `npm run accepter`
-  publie tout seul (`--sans-publier` pour ne pas envoyer) ; `npm run bulles -- N` range le dernier
+  fait un commit local et ne publie que sur la dernière case de la page ou avec `--publier` (`npm run publier` envoie tout à la main) ; `npm run bulles -- N` range le dernier
   `bulles-chapitre-N*.json` de Téléchargements et publie.
 - ✅ **v1.23.7** : outil d'illustration : le prompt ne désigne plus les images par leur numéro (AI Studio les
   mélange) mais par leur **contenu** (case à retoucher, case de style, fiche de personnage, décor) ; phrase

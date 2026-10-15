@@ -59,7 +59,7 @@ Autres commandes qui publient toutes seules :
 
 | Commande | Ce qu'elle fait |
 |---|---|
-| `npm run accepter -- 3 4 2` | remplace l’image (convertie en JPG qualité 88, 1920 px max, 16:9 : page-P-case-C.jpg), puis publie (`--sans-publier` pour ne pas envoyer) |
+| `npm run accepter -- 3 4 2` | remplace l’image (convertie en JPG qualité 88, 1920 px max, 16:9 : page-P-case-C.jpg), puis commit local (publie seulement si dernière case de la page ou `--publier` ; `--sans-publier` : ni commit ni envoi) |
 | `npm run bulles -- 3` | prend le **dernier** `bulles-chapitre-3*.json` de Téléchargements (même « bulles-chapitre-3 (1).json »), le copie dans `public/story/chapitre-3/bulles-chapitre-3.json`, puis publie (`--sans-publier`, `--essai`) |
 
 Pour les bulles : Panneau créateur → ✏️ Éditer les bulles → 💾 Enregistrer (le fichier se télécharge),
@@ -129,12 +129,12 @@ Options :
 
 ```powershell
 npm run comparer -- 3
-npm run accepter -- 3 4 2        # remplace l'image ET l'envoie sur GitHub tout seul
+npm run accepter -- 3 4 2        # remplace l'image + commit LOCAL (n'envoie rien, sauf dernière case de la page)
 npm run verifier-bulles -- 3
 ```
 
-(`accepter` lance `npm run publier` : plus aucune commande git à taper — voir le **§ B**.
-Pour ne pas envoyer tout de suite : `npm run accepter -- 3 4 2 --sans-publier`.)
+(`accepter` n'envoie plus rien après chaque case, pour ne pas bloquer ta connexion : voir le
+**§ 7** pour le détail. `npm run publier` envoie tout d'un coup — **§ B**.)
 
 ### A4 bis. Gemini a renvoyé la même image ?
 
@@ -351,9 +351,17 @@ npm run accepter -- 3 4 2
 
 → l'ancienne image part dans `public/story/chapitre-3/_sauvegardes/`, la proposition (la plus
 récente, ou celle dont tu donnes le nom de fichier en 4ᵉ argument) devient `page-4-case-2.png`,
-recadrée en 16:9 si besoin. Puis **`accepter` publie tout seul** sur GitHub avec le message
-« Chapitre 3 : retouche page 4 case 2 » (ou « illustration … » pour une génération) — voir le **§ B**.
-Option `--sans-publier` pour garder le changement sur ton PC sans l'envoyer. Ensuite :
+recadrée en 16:9 si besoin. Puis `accepter` fait un **commit LOCAL** (message « Chapitre 3 :
+retouche page 4 case 2 », ou « illustration … » pour une génération) **sans envoyer** sur GitHub :
+- **Dernière case de la page** (d'après les données du chapitre) → publication automatique de
+  toute la page (pull + push, comme `npm run publier`). Affiche « Page complète : publication en cours… ».
+- **Autre case** → affiche « Case enregistrée localement (X cases en attente d'envoi) ».
+- `--publier` force l'envoi tout de suite, même pour une case au milieu de la page :
+  `npm run accepter -- 3 4 2 --publier`.
+- `npm run publier` envoie à tout moment tous les commits en attente (voir le **§ B**).
+- `--sans-publier` : ni commit ni envoi (le changement reste juste dans le dossier).
+
+Ensuite :
 
 ```powershell
 npm run verifier-bulles -- 3

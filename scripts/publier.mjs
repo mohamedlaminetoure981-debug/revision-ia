@@ -130,6 +130,42 @@ function cleDetectee() {
   return !!l;
 }
 
+/** Nombre de commits locaux pas encore envoyés sur GitHub (0 si inconnu). */
+export function commitsEnAttente() {
+  let r = git(['rev-list', '--count', '@{u}..HEAD'], { ok: true });
+  if (r.code !== 0) r = git(['rev-list', '--count', `origin/${BRANCHE}..HEAD`], { ok: true });
+  return r.code === 0 ? +r.out.trim() || 0 : 0;
+}
+
+/**
+ * Commit LOCAL seulement (pas de pull, pas de push) : mêmes protections que « publier »
+ * (fichiers interdits, clé API). Renvoie true si un commit a été créé.
+ */
+export function enregistrerLocal({ message }) {
+  try {
+    const branche = git(['rev-parse', '--abbrev-ref', 'HEAD']).out.trim();
+    if (branche !== BRANCHE) throw new Explique(`Tu es sur la branche « ${branche} », pas sur « ${BRANCHE} ».`, [`Tape : git checkout ${BRANCHE}  (puis relance).`]);
+    if (git(['rev-parse', '-q', '--verify', 'MERGE_HEAD'], { ok: true }).code === 0 || etat().some(enConflit)) {
+      throw new Explique('Un conflit git est déjà en cours dans ce dossier.', ['Ne touche à rien. Ouvre Claude Code dans ce dossier et demande de l’aide.']);
+    }
+    const noms = etat().filter((x) => !enConflit(x) && !estInterdit(x.f)).map((x) => x.f);
+    if (!noms.length) return false;
+    git(['add', '-A', '--', ...noms]);
+    if (cleDetectee()) {
+      git(['reset', '-q'], { ok: true });
+      throw new Explique('STOP : une clé API a été trouvée dans les fichiers à enregistrer.', ['Retire la clé du fichier (elle doit rester dans .env.local), puis relance.']);
+    }
+    const c = git(['commit', '-q', '-m', message], { ok: true });
+    if (c.code !== 0) { const ex = expliquerGit(c.out); throw ex || new Explique('git commit a échoué.', c.out.trim().split('\n').slice(0, 6)); }
+    return true;
+  } catch (e) {
+    const ex = e instanceof Explique ? e : (expliquerGit(e.git?.out || e.message) || new Explique('Erreur inattendue pendant l’enregistrement.', String(e.message).trim().split('\n').slice(0, 5)));
+    console.log(`\n❌ ${ex.message}`);
+    ex.conseils.filter(Boolean).forEach((x) => console.log(x.startsWith('  ') ? x : `   ${x}`));
+    const err = new Error(ex.message); err.explique = true; throw err;
+  }
+}
+
 /**
  * Pull → add → commit → push. Renvoie { statut: 'envoye' | 'rien', message, fichiers }.
  * @param {object} o { message, essai, silencieux }
