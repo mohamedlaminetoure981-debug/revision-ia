@@ -1185,6 +1185,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.24.2** : **chapitre 4 terminé** : passe de vérification finale. Zones protégées (`illus.keep` : visages, mains
+  importantes, fiches dorées, cristal/noyau) et points focaux notés pour les 56 cases illustrées ; bulles déplacées pour ne
+  plus couvrir de visage ni déborder, queues de bulles toutes dirigées vers le personnage qui parle (Kaï « Rejoins-nous »
+  page 12, Sora « TROIS ! » page 11…), onomatopées hors des visages et des fiches, « BADABOOM ! » plus coupé.
+  `npm run verifier-bulles -- 4` et `verifier-nettete -- 4` : aucun problème. Textes conformes au scénario ; traduction
+  anglaise complète (« Maybe not you. » page 4). Lecture testée de bout en bout : 60 cases, 56 images, 4 cases dessinées.
 - ✅ **v1.24.1** : outil d'illustration plus rapide (leçons du chapitre 4) : **verrous automatiques** en fin de prompt
   (`FINAL LOCKS` : main droite bandée de Kaï, verres transparents de Mory, Sora adulte, pas de traînée verte si Sora ne
   court pas, jamais de texte ni de clone, disposition de la corniche), champ **`composition`** par case (en tête du prompt,
