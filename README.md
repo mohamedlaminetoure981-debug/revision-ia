@@ -1185,6 +1185,12 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.24.1** : outil d'illustration plus rapide (leçons du chapitre 4) : **verrous automatiques** en fin de prompt
+  (`FINAL LOCKS` : main droite bandée de Kaï, verres transparents de Mory, Sora adulte, pas de traînée verte si Sora ne
+  court pas, jamais de texte ni de clone, disposition de la corniche), champ **`composition`** par case (en tête du prompt,
+  « COMPOSITION LOCK » ; rempli pour les 56 cases illustrées du chapitre 4, modèle pour la suite), **checklist** en
+  français après `npm run preparer`, et **`npm run retouche -- <nom>`** (bandage, lunettes, sora-adulte, sans-vert,
+  sans-texte, sans-clone, decor) qui copie une correction toute prête. Guide : `docs/outil-illustration.md` § A1 et A4 ter.
 - ✅ **v1.24.0** : **chapitre 4 réécrit** d'après `docs/scenario-ch04-v2.md` (« Éclair sur la corniche », 12 pages,
   60 cases ; il reprend juste après la dernière case du chapitre 3 : « Le lendemain. 5 h 40. La corniche. »). Sora,
   Fatou (figurante, `looks.js`), courbe de l'oubli R(t) = 100 × 2^(−t/7) et rappels espacés 7, 14, 28, 56 s dessinés par

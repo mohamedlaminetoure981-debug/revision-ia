@@ -179,6 +179,26 @@ export const DECORS_CHAPITRES = {
     corniche: 'The Corniche of Conakry at dawn, ALWAYS with the same orientation: the wet road (dew) with low houses, palm trees and street lamps still lit on the LEFT of the picture; on the RIGHT, the low concrete sea wall, then dark volcanic rocks and the ocean; a few benches along the sea wall. Dawn sky: deep night blue at the top, orange and pink at the horizon over the sea (when the SCENE says so: the sun rising over the sea on the right, golden light).',
   },
 };
+/**
+ * Verrous FINAUX (fin du prompt anglais, ajoutés seulement si le personnage ou la situation est dans
+ * la case) : les erreurs que Gemini refaisait le plus au chapitre 4 (main bandée, lunettes, âge de Sora,
+ * traînée verte partout, texte, clones, décor de la corniche). Voir verrousFinaux() dans prompt.mjs.
+ */
+export const KAI_BANDE_DEPUIS = 2; // la main droite de Kaï est bandée à partir de ce chapitre
+export const VERROUS_PERSONNAGES = {
+  kai: 'KAI: ONLY his RIGHT hand has a white bandage; his LEFT hand is bare skin. Headphones around his neck, never on his ears. If he faces the camera, his right hand is on the LEFT side of the image.',
+  kaiSansBandage: 'KAI: Headphones around his neck, never on his ears.',
+  mory: 'MORY: Clear transparent lenses, thin dark frames, no tint, no glow, eyes clearly visible.',
+  sora: 'SORA: Adult woman about 20, adult face (defined cheekbones and jawline, no big childish eyes), same height as the others, NO glasses, two afro puffs with green star clips.',
+};
+export const VERROU_SANS_VERT = 'NO green lightning, NO green trails, NO green sparks anywhere.';
+export const VERROU_TOUJOURS = 'NO text, NO letters, NO words, NO title, NO panel border. No clones, no duplicated characters.';
+/** Verrou de disposition d'un décor (fin du prompt), par chapitre : orientation qui ne doit jamais changer. */
+export const VERROUS_DECOR = {
+  4: {
+    corniche: 'SETTING LAYOUT: the road, the street lamps and the houses on the LEFT of the image; ONE single low sea wall, then rocks and the sea on the RIGHT of the image; one single wooden bench, against the sea wall (only if a bench is visible).',
+  },
+};
 /** Verrou de décor d'un chapitre : celui du chapitre s'il existe, sinon le verrou général. */
 export const decorLock = (decor, n) => DECORS_CHAPITRES[n]?.[decor] ?? DECORS[decor];
 /**

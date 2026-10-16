@@ -51,6 +51,7 @@ export default {
       panels: [
         {
           action: `Plan large de la corniche à l’aube (5 h 40), vue dans l’axe de la route, vers le fond. Au centre de l’image, Kaï (à gauche) et Mory (à droite) courent côte à côte en s’éloignant vers le fond, vus de trois quarts dos ; Mory traîne déjà un peu. Au premier plan à gauche de l’image, Nia marche tranquillement derrière eux, un livre sous le bras, sans se presser. Personne ne regarde vers nous. Bande de ciel bleu nuit unie en haut de l’image (place des cartouches). ${CORNICHE} ${KAI} ${MORY} ${NIA} ${ADULTES}`,
+          composition: `Wide shot at eye level, looking straight down the road toward the horizon (one-point perspective, vanishing point at the centre). Nia in the LEFT third, full body, walking toward the camera, book under her arm. Kaï (centre) and Mory (just right of centre) seen from behind, running AWAY from the camera toward the horizon. Road and houses on the left, sea wall and sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.55 },
           chars: [
             { id: 'nia', pose: 'marche', expr: 'neutre', shot: 'pied', x: 0.18, y: 0.98, fill: 0.56 },
@@ -65,6 +66,7 @@ export default {
         },
         {
           action: `À gauche de l’image, Mory, à bout de souffle, plié en deux, les deux mains sur les genoux, sueur sur le front, lève les yeux vers Kaï. À droite de l’image, Kaï trottine sur place, tourné vers Mory (vers la gauche), le regard sur lui, sourire motivé, le poing GAUCHE serré à hauteur de poitrine, la main droite bandée le long du corps. Derrière eux : route, maisons et lampadaires allumés à gauche ; muret et mer à droite. ${CORNICHE} ${MORY} ${KAI} ${ADULTES}`,
+          composition: `Medium-wide shot at eye level down the road. Mory in the LEFT half, full body, bent over with both hands on his knees, three-quarter front. Kaï in the RIGHT half, full body, jogging in place, three-quarter front, body and eyes turned toward Mory (toward the left of the image). Vanishing point between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'tete_mains', expr: 'surprise', shot: 'americain', x: 0.28, y: 0.3, fill: 0.66 },
@@ -77,12 +79,14 @@ export default {
         },
         {
           action: `Nia, plan taille, marche calmement le long de la route, un livre tenu sous le bras gauche, le dos droit, un petit sourire tranquille ; elle regarde de côté, vers la droite de l’image (vers Kaï et Mory, hors champ). Derrière elle : lampadaires allumés et maisons à gauche, muret et mer à droite. ${CORNICHE} ${NIA} ${ADULTES}`,
+          composition: `Single character. Nia in the RIGHT half (right of centre), knees-up, three-quarter front, walking toward the camera, book under her left arm, eyes turned to the right of the image. Empty road vanishing at the centre-left, sea wall along the right edge.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.4 },
           chars: [{ id: 'nia', pose: 'marche', expr: 'clin', shot: 'taille', x: 0.42, y: 0.2, fill: 0.82 }],
           bubbles: [{ type: 'parole', text: 'Moi, je marche. C’est un principe.', x: 0.74, y: 0.16, w: 0.44, who: 0 }],
         },
         {
           action: `Kaï (à gauche de l’image) et Mory (à droite de l’image), vus de trois quarts dos, courent vers le fond de la corniche. Entre eux, au centre, un éclair vert fluo passe à toute vitesse vers le fond : une longue traînée lumineuse vert fluo, avec, à sa pointe, une silhouette floue en vert olive dont on ne voit pas le visage. Le souffle fait claquer leurs vêtements : le sweat de Kaï et la veste de Mory se gonflent, Mory perd l’équilibre. Ils tournent la tête vers l’éclair, surpris. Gouttes de rosée soulevées sur la route mouillée, lignes de vitesse. ${CORNICHE} ${KAI} ${MORY} ${ADULTES}`,
+          composition: `Low camera just behind the two boys, looking down the road. Kaï in the LEFT half and Mory in the RIGHT half, both seen from behind, running away from the camera. A green lightning streak runs from the bottom centre of the image to a tiny blurred figure at the vanishing point, between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [
             { id: 'kai', pose: 'course', expr: 'surprise', shot: 'pied', x: 0.22, y: 0.97, fill: 0.7 },
@@ -94,6 +98,7 @@ export default {
         },
         {
           action: `Gros plan de Kaï, sidéré : yeux écarquillés, bouche ouverte, il tourne la tête vers la droite de l’image pour suivre du regard la traînée vert fluo qui s’éloigne au fond ; ses cheveux et les cordons de son sweat encore soulevés par le souffle, casque autour du cou. Fond : lampadaires et maisons à gauche, muret et mer à droite, reflets verts. ${CORNICHE} ${KAI} ${ADULTES}`,
+          composition: `Over-the-shoulder close-up. Kaï in the LEFT half, three-quarter back view, head turned toward the RIGHT of the image, mouth open, following with his eyes the green streak that runs along the sea wall on the right toward the horizon.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.6 },
           chars: [{ id: 'kai', pose: 'choc', expr: 'surprise', shot: 'buste', x: 0.4, y: 0.16, fill: 0.84 }],
           fx: [{ type: 'lueur', color: VERT, x: 0.85, y: 0.5, size: 0.3 }],
@@ -113,6 +118,7 @@ export default {
       panels: [
         {
           action: `Vingt mètres plus loin sur la route, au centre de l’image (plan moyen, en pied), Sora s’est arrêtée net et s’est retournée vers nous : elle trottine sur place, nous fait un clin d’œil avec un sourire joueur et lève deux doigts en salut. Derrière elle, la traînée vert fluo retombe en étincelles sur la route mouillée. Elle regarde vers le bas de l’image (vers les garçons, hors champ, au premier plan). ${CORNICHE} ${SORA} ${ADULTES}`,
+          composition: `Single character. Sora just right of centre, full body, facing the camera, jogging toward us, two-finger salute, winking. The green trail and sparks come from the bottom-left corner to her feet.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [{ id: 'sora', pose: 'course', expr: 'clin', shot: 'pied', x: 0.5, y: 0.94, fill: 0.72 }],
           fx: [{ type: 'lueur', color: VERT, x: 0.5, y: 0.8, size: 0.3 }],
@@ -120,6 +126,7 @@ export default {
         },
         {
           action: `À gauche de l’image, Kaï rejoint Sora, essoufflé, penché en avant, la main GAUCHE sur la hanche, la main droite bandée le long du corps ; il la regarde. À droite de l’image, Sora, pas du tout essoufflée, décontractée, une main sur la hanche, sourit en le regardant, sûre d’elle. Ils se regardent. Fond : lampadaires allumés à gauche, muret et mer à droite. ${CORNICHE} ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Medium-wide shot down the road. Kaï in the LEFT half, full body, bent forward to catch his breath, three-quarter profile facing right. Sora in the RIGHT half, full body, standing with hands on her hips, facing Kaï (toward the left). Vanishing point between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'kai', pose: 'tete_mains', expr: 'surprise', shot: 'americain', x: 0.28, y: 0.26, fill: 0.7 },
@@ -129,12 +136,14 @@ export default {
         },
         {
           action: `Gros plan : la main droite de Sora sort de la poche ventrale de son sweat vert olive un épais paquet de fiches bristol blanches tenu par un élastique (les fiches sans texte lisible). En haut à droite de l’image, son visage souriant, en partie coupé par le cadre, un clin d’œil. Fond flou : muret et mer à droite, lumière d’aube. ${SORA} ${ADULTES}`,
+          composition: `Tight insert: the torso of Sora fills the centre, facing the camera, head cut off by the top edge; her hand on the LEFT of the image pulls a stack of white index cards out of her hoodie pocket. Sea wall in the background on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'sora', pose: 'debout', expr: 'clin', shot: 'buste', x: 0.62, y: 0.12, fill: 0.84 }],
           bubbles: [{ type: 'parole', text: 'Et deux cents fiches dans le taxi.', x: 0.26, y: 0.16, w: 0.44, who: 0 }],
         },
         {
           action: `Mory et Nia arrivent. À gauche de l’image, Mory, essoufflé, les yeux ronds derrière ses lunettes, fixe le paquet de fiches. Au centre, Nia, calme, un sourcil levé, intéressée, regarde Sora. À droite de l’image, Sora, de trois quarts dos, en amorce, tient son paquet de fiches. Fond : route et lampadaires à gauche, muret et mer à droite. ${CORNICHE} ${MORY} ${NIA} ${SORA} ${ADULTES}`,
+          composition: `Three characters at different depths. Mory standing at the LEFT edge, facing the camera; Nia in the centre-left, facing the camera; Sora in the RIGHT foreground, seen over her shoulder (back three-quarter), holding out a stack of index cards toward Nia (toward the left).`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'choc', expr: 'surprise', shot: 'taille', x: 0.24, y: 0.3, fill: 0.7 },
@@ -147,6 +156,7 @@ export default {
         },
         {
           action: `Sora, malicieuse, plan taille, au centre-droit de l’image, l’index levé, un clin d’œil, regarde Nia. À gauche de l’image, Nia, de profil tournée vers Sora, pensive, la main sous le menton, la regarde. Fond : lampadaires allumés à gauche, muret et mer à droite, ciel qui rosit. ${CORNICHE} ${NIA} ${SORA} ${ADULTES}`,
+          composition: `Close two-shot, chest-up. Nia in the LEFT half, profile facing right, finger on her chin, looking at Sora. Sora in the RIGHT half, three-quarter front facing left, winking, finger on her lips.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'nia', pose: 'penseur', expr: 'reflexion', shot: 'taille', x: 0.2, y: 0.4, fill: 0.62 },
@@ -172,6 +182,7 @@ export default {
       panels: [
         {
           action: `Mory, plan taille, à gauche de l’image, tend à bout de bras sa petite antenne portable vers la droite de l’image (vers la mer) : la diode de l’antenne clignote ROUGE et de petites ondes en sortent. Il regarde la mer, l’air tendu, les sourcils froncés. Derrière lui : muret et mer à droite, route et lampadaires à gauche. ${CORNICHE} ${MORY} ${ADULTES}`,
+          composition: `Single character. Mory in the LEFT third, waist-up, three-quarter front, arm stretched toward the RIGHT of the image, pointing his little antenna toward the sea wall and the horizon. Road vanishing behind him.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.3 },
           chars: [{ id: 'mory', pose: 'telephone', expr: 'concentration', shot: 'taille', x: 0.34, y: 0.3, fill: 0.7 }],
           fx: [{ type: 'lueur', color: '#ef4444', x: 0.72, y: 0.5, size: 0.18 }],
@@ -181,6 +192,7 @@ export default {
         },
         {
           action: `Plan large sur l’océan, vu depuis la promenade : le muret de béton traverse l’image en diagonale, la mer occupe la droite et le fond, un bout de route et un lampadaire allumé à gauche. Une brume violette monte des vagues et rampe vers le muret ; dans la brume tourbillonnent des fiches blanches et des pages déchirées (sans texte lisible). Aucun personnage. ${CORNICHE} ${VIOLET_LUM}`,
+          composition: `No character. Wide shot: road on the left, sea wall running diagonally from the bottom centre to the horizon. In the RIGHT half, over the rocks and the sea, a swirl of violet mist with floating white paper sheets.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.45, vp: 0.2 },
           fx: [{ type: 'teinte', color: '#7c3aed', opacity: 0.22 }, { type: 'glitch', n: 12 }],
           sfx: [{ text: 'SHHHHH…', x: 0.3, y: 0.2, size: 40, rot: -4, color: VIOLET }],
@@ -188,18 +200,21 @@ export default {
         },
         {
           action: `Plan large. Sur un banc de la promenade, adossé au muret (à droite de l’image), Fatou est assise de profil, tournée vers la gauche de l’image (vers la route), penchée sur ses fiches d’anatomie, écouteurs blancs dans les oreilles, son sac à dos bordeaux posé à côté d’elle. Elle ne voit pas, derrière elle, la brume violette qui passe par-dessus le muret en longs filaments et descend vers elle depuis la droite. Route et lampadaires allumés à gauche, mer derrière le muret à droite. Aucun autre personnage. ${CORNICHE} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Wide shot down the road. Fatou small in the RIGHT half, sitting on a wooden bench against the sea wall, three-quarter front, looking down at a card in her hands; violet wisps behind her. Empty road on the left.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.4 },
           chars: [{ id: 'fatou', pose: 'assis_bureau', expr: 'concentration', shot: 'pied', x: 0.62, y: 0.92, fill: 0.5, flip: true }],
           fx: [{ type: 'teinte', color: '#7c3aed', opacity: 0.18 }],
         },
         {
           action: `[ILLUSTRATION] Gros plan sur les fiches bristol de Fatou, tenues dans ses mains (peau brun foncé, manches de gilet beige) : les lignes manuscrites (illisibles, sans lettres) et un petit schéma de squelette se défont en pixels violets qui s’envolent vers la droite de l’image. Fond flou : muret et mer à droite, brume violette. (En attendant l’image, l’appli dessine une fiche qui s’efface.) ${VIOLET_LUM}`,
+          composition: `Point-of-view insert: two hands in beige cardigan sleeves hold a stack of index cards in the centre (illegible scribbles and a small skeleton drawing); the right edge of the top card dissolves into violet pixels drifting to the RIGHT.`,
           bg: { id: 'cahier', lines: ['Nerf facial (VII)', 'Humérus', 'Fémur : l’os le plus long'], fade: true, keep: [] },
           fx: [{ type: 'glitch', n: 20 }],
           sfx: [{ text: 'VMMMM', x: 0.3, y: 0.16, size: 36, rot: -8, color: VIOLET }],
         },
         {
           action: `Fatou, plan buste, figée, le regard vide, la bouche entrouverte ; elle tient une fiche devenue toute blanche. Ses écouteurs blancs pendent. Des volutes de brume violette l’entourent. Fond : muret et mer à droite, lampadaire allumé à gauche. ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character, camera on the road side looking toward the sea. Fatou centred, chest-up, facing the camera, sitting on the bench, staring in shock at a blank card held in both hands; violet wisps on both sides; sea and distant city behind her.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [{ id: 'fatou', pose: 'lire', expr: 'surprise', shot: 'taille', x: 0.5, y: 0.24, fill: 0.8 }],
           fx: [{ type: 'teinte', color: '#7c3aed', opacity: 0.25 }, { type: 'glitch', n: 10 }],
@@ -219,6 +234,7 @@ export default {
       panels: [
         {
           action: `Au premier plan à gauche de l’image, Kaï, de trois quarts dos, démarre en courant, le bras GAUCHE tendu vers le fond, la main droite bandée serrée contre lui. Loin devant, à droite de l’image, le long du muret, le banc de Fatou, tout petit, noyé dans la brume violette (on devine une minuscule silhouette assise). Route et lampadaires allumés à gauche, mer à droite. ${CORNICHE} ${KAI} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character. Kaï left of centre, full body, running toward the RIGHT and away from the camera (three-quarter back), his LEFT arm stretched toward a small violet cloud at the vanishing point near the sea wall, his bandaged right hand held against his body.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.7 },
           chars: [{ id: 'kai', pose: 'course', expr: 'concentration', shot: 'americain', x: 0.24, y: 0.22, fill: 0.78 }],
           fx: [{ type: 'lueur', color: '#7c3aed', x: 0.8, y: 0.5, size: 0.2 }],
@@ -232,6 +248,7 @@ export default {
         },
         {
           action: `Mory, plan buste, livide, les yeux écarquillés derrière ses lunettes, tient sa tablette noire à deux mains ; l’écran éclaire son visage en cyan par en dessous ; une goutte de sueur. Fond flou : muret et mer à droite, brume violette au loin. ${MORY} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Close-up of Mory, centred, chest-up, facing the camera, tablet held low in both hands lighting his face cyan from below; violet fog over the road (left) and the sea wall (right).`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'mory', pose: 'telephone', expr: 'surprise', shot: 'buste', x: 0.5, y: 0.2, fill: 0.84 }],
           fx: [{ type: 'lueur', color: '#22d3ee', x: 0.5, y: 0.85, size: 0.3 }],
@@ -239,6 +256,7 @@ export default {
         },
         {
           action: `Sora, accroupie en position de départ de sprint au milieu de la route mouillée, au centre-gauche de l’image, vue de profil tournée vers la droite de l’image : un genou au sol, le bout des doigts posé sur le bitume, le dos tendu, les yeux fixés au loin sur le banc noyé dans la brume violette (petit, à droite de l’image, le long du muret). Expression concentrée, petit sourire en coin. Étincelles vert fluo autour de ses baskets. ${CORNICHE} ${SORA} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character. Sora left of centre, full body, crouched in a sprinter start position, three-quarter back, facing the vanishing point; green sparks at her feet; violet mist at the end of the road.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.75 },
           chars: [{ id: 'sora', pose: 'genou', expr: 'concentration', shot: 'pied', x: 0.36, y: 0.95, fill: 0.62 }],
           fx: [{ type: 'lueur', color: VERT, x: 0.36, y: 0.9, size: 0.2 }],
@@ -258,6 +276,7 @@ export default {
       panels: [
         {
           action: `GRANDE CASE. Sora part comme une flèche sur la route mouillée, de gauche à droite de l’image et vers le fond : corps très penché en avant, bras qui fendent l’air, une longue traînée de lumière vert fluo derrière elle, la rosée gicle en gerbes sous ses baskets olive ; lignes de vitesse. Au loin, à droite de l’image, le long du muret, la brume violette autour d’un petit banc. Personne d’autre. ${CORNICHE} ${SORA} ${ADULTES}`,
+          composition: `Single character seen from behind. Sora at the centre, kneeling in a sprint start position, facing away toward the horizon; green sparks at her feet; tiny violet figure at the vanishing point.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.7 },
           chars: [{ id: 'sora', pose: 'course', expr: 'concentration', shot: 'pied', x: 0.5, y: 0.94, fill: 0.7, blur: -140, aura: VERT }],
           fx: [{ type: 'vitesse', angle: 0, n: 40, opacity: 0.6, color: VERT, layer: 'front' }],
@@ -266,6 +285,7 @@ export default {
         },
         {
           action: `Un tentacule de brume violette, sorti de la mer à droite de l’image, s’abat sur le haut du muret, à l’endroit où la coureuse se trouvait une seconde plus tôt : le béton se fissure en étoile, éclats et poussière. Il ne reste d’elle qu’une traînée vert fluo qui sort déjà du cadre par la gauche. Aucun personnage visible. Mer et rochers à droite, route à gauche. ${CORNICHE} ${VIOLET_LUM}`,
+          composition: `No full character. A green lightning streak rushes from the bottom centre toward the RIGHT and smashes into a dark violet tentacle rising above the sea wall, right of centre; debris flying.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.4 },
           fx: [{ type: 'impact', x: 0.6, y: 0.6 }, { type: 'fissure', x: 0.6, y: 0.62 }, { type: 'teinte', color: '#7c3aed', opacity: 0.2 }],
           sfx: [{ text: 'KRAK !', x: 0.28, y: 0.24, size: 56, rot: -8, color: OR, impact: true }],
@@ -273,6 +293,7 @@ export default {
         },
         {
           action: `Sora freine en glissant sur la route mouillée (gerbe d’eau, traînée vert fluo qui s’éteint) à côté d’un banc et se met à genoux, à gauche de l’image, tournée vers la droite ; elle ramasse par terre une fiche encore lisible. À droite de l’image, Fatou, assise sur le banc adossé au muret, figée, le regard vide, enveloppée de brume violette. Mer derrière le muret à droite. ${CORNICHE} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Camera on the road looking at the sea wall (sea behind). Fatou in the LEFT half, sitting on a bench, facing the camera. Sora in the RIGHT half, braking into a crouch, three-quarter front facing LEFT, picking up a card from the ground; her green trail arrives from the RIGHT edge (she moved right to left); splash at her feet.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'genou', expr: 'concentration', shot: 'pied', x: 0.3, y: 0.95, fill: 0.62, blur: -60 },
@@ -282,6 +303,7 @@ export default {
         },
         {
           action: `Plan rapproché. À gauche de l’image, Sora, à genoux, de profil tournée vers la droite, tient une fiche devant les yeux de Fatou et la regarde droit dans les yeux, sérieuse et douce. À droite de l’image, Fatou, assise sur le banc, de trois quarts tournée vers Sora, le regard encore vague. Brume violette autour d’elles, muret et mer à droite. ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Two-shot. Sora in the LEFT half, crouching, three-quarter back, holding up a white card toward Fatou. Fatou in the RIGHT half, sitting on the bench, three-quarter profile facing LEFT, looking at the card.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'main_tendue', expr: 'concentration', shot: 'taille', x: 0.28, y: 0.3, fill: 0.7 },
@@ -291,6 +313,7 @@ export default {
         },
         {
           action: `Fatou, plan buste, cligne des yeux, lutte… puis trouve : son visage se ranime, les sourcils se lèvent. Sur la fiche qu’elle tient devant elle, des traits dorés lumineux reviennent se poser (lueur dorée, sans lettres lisibles). La brume violette recule autour d’elle. Fond : muret et mer à droite. ${FATOU} ${ADULTES}`,
+          composition: `Single character, camera on the road side looking toward the sea. Fatou centred, chest-up, facing the camera, sitting on the bench, soft smile, holding a glowing golden card in front of her chest; rocks and sea behind.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'fatou', pose: 'lire', expr: 'joie', shot: 'taille', x: 0.5, y: 0.26, fill: 0.78 }],
           fx: [{ type: 'lueur', color: OR, x: 0.5, y: 0.75, size: 0.3 }],
@@ -312,6 +335,7 @@ export default {
       panels: [
         {
           action: `GRANDE CASE. L’Oubli surgit de la mer, à droite de l’image, derrière le muret : une immense masse de brume violette et de fiches déchirées, haute comme un immeuble, qui se penche au-dessus de la promenade ; au milieu, son noyau violet brille, encore flou. Ses tentacules de brume descendent vers un banc au pied du muret, où l’on voit deux toutes petites silhouettes (de dos, sans détail). Route et lampadaires allumés à gauche, ciel d’aube assombri. ${CORNICHE} ${VIOLET_LUM}`,
+          composition: `Wide shot down the road, no close character. In the RIGHT half, above the sea wall, the Oblivion (shadow creature of violet pixels with tentacles) towers over two tiny figures on a bench.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.62, vp: 0.3 },
           chars: [{ id: 'oubli', pose: 'cri', shot: 'taille', x: 0.68, y: 0.03, fill: 1.0, seed: 17 }],
           fx: [{ type: 'glitch', n: 18 }, { type: 'teinte', color: '#1a0b2e', opacity: 0.25 }],
@@ -320,6 +344,7 @@ export default {
         },
         {
           action: `Les tentacules de brume violette enroulés autour de Fatou se desserrent d’un coup, comme brûlés : ils se rétractent vers la droite de l’image (vers le muret) en fumant, avec des étincelles dorées. Fatou, assise sur le banc à droite de l’image, reprend son souffle, une main sur la poitrine. À gauche de l’image, Sora, à genoux, une fiche à la main, la regarde. ${CORNICHE} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Sora in the LEFT third, kneeling, three-quarter front facing RIGHT, one hand raised. Fatou in the centre, sitting on a bench, clutching her chest, a glowing card in her hand. Violet tentacles attack from the RIGHT edge over the sea wall.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'genou', expr: 'concentration', shot: 'pied', x: 0.26, y: 0.95, fill: 0.6 },
@@ -329,6 +354,7 @@ export default {
         },
         {
           action: `Kaï, Mory et Nia arrivent en courant jusqu’au banc, depuis la gauche de l’image : Kaï en tête (au centre), inquiet, la main GAUCHE tendue en avant, la main droite bandée le long du corps ; Mory derrière lui à gauche, essoufflé ; Nia à droite de Kaï, qui court cette fois. Ils regardent tous vers la droite de l’image (vers Sora, hors champ). Fond : lampadaires et maisons à gauche, muret et brume violette à droite. ${CORNICHE} ${KAI} ${MORY} ${NIA} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Nia, Mory and Kaï run in from the LEFT toward the RIGHT (three-quarter front, Kaï leading, closest to the centre). Sora kneeling and Fatou on the bench in the RIGHT third. Violet tentacles at the right edge.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.3 },
           chars: [
             { id: 'mory', pose: 'course', expr: 'surprise', shot: 'pied', x: 0.18, y: 0.94, fill: 0.56 },
@@ -339,6 +365,7 @@ export default {
         },
         {
           action: `Mory, plan buste, regarde sa tablette noire (l’écran éclaire son visage en cyan) : d’abord soulagé, il fronce déjà les sourcils, inquiet. Fond flou : muret, brume violette et mer à droite. ${MORY} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Close-up of Mory, centred, chest-up, facing the camera, looking down at his tablet; violet fog hides the background.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'mory', pose: 'telephone', expr: 'concentration', shot: 'buste', x: 0.52, y: 0.22, fill: 0.82 }],
           fx: [{ type: 'lueur', color: '#22d3ee', x: 0.5, y: 0.85, size: 0.28 }],
@@ -346,6 +373,7 @@ export default {
         },
         {
           action: `Les tentacules de brume violette repoussent par-dessus le muret, à droite de l’image, et reviennent vers Fatou, assise sur le banc (à droite, effrayée, ses fiches serrées contre elle). À gauche de l’image, Sora, à genoux, tourne la tête et fixe les tentacules, sérieuse, les sourcils froncés. ${CORNICHE} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Camera close to the sea wall. Sora in the LEFT half, kneeling, three-quarter front facing RIGHT, frowning at the tentacles. Fatou in the RIGHT half, sitting on the bench, clutching her cards to her chest, scared. Violet tentacles rise from the rocks between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'genou', expr: 'concentration', shot: 'pied', x: 0.26, y: 0.95, fill: 0.6 },
@@ -398,6 +426,7 @@ export default {
         },
         {
           action: `À gauche de l’image, Nia, calme, montre du doigt (index droit) la courbe sur la tablette que tient Mory, à droite de l’image ; tous deux regardent l’écran (lumière cyan sur leurs visages). Fond : muret, mer et brume violette à droite, lampadaire allumé à gauche. ${CORNICHE} ${NIA} ${MORY} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Two-shot, full body, down the road. Nia left of centre and Mory right of centre, side by side facing the camera, both looking down at the glowing tablet held by Mory between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'nia', pose: 'pointer', expr: 'concentration', shot: 'taille', x: 0.3, y: 0.3, fill: 0.68 },
@@ -407,12 +436,14 @@ export default {
         },
         {
           action: `Kaï, plan buste, déterminé, le poing GAUCHE serré levé devant lui ; sa main droite bandée reste le long du corps. Il regarde vers la droite de l’image (vers la brume). Fond : lampadaires allumés à gauche, brume violette au-dessus du muret à droite. ${KAI} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character. Kaï centred, waist-up, facing the camera: his LEFT fist raised on the RIGHT side of the image, his bandaged RIGHT hand low on the LEFT side. Violet fog behind him.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'kai', pose: 'poing_leve', expr: 'concentration', shot: 'buste', x: 0.42, y: 0.2, fill: 0.84 }],
           bubbles: [{ type: 'cri', text: 'Alors on lui pose une question toutes les sept secondes !', x: 0.5, y: 0.17, w: 0.86, size: 13, who: 0 }],
         },
         {
           action: `À gauche de l’image, Sora, à genoux près du banc, tourne la tête vers la gauche (vers Kaï, hors champ) et secoue la tête en souriant, une fiche à la main. À droite de l’image, Fatou, assise sur le banc, ses fiches sur les genoux, écoute. Muret et mer à droite, brume violette. ${CORNICHE} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Sora in the LEFT half, kneeling, three-quarter front facing RIGHT, holding up a card and smiling. Fatou in the RIGHT half, sitting on a bench against the sea wall, facing LEFT toward Sora.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'genou', expr: 'clin', shot: 'pied', x: 0.3, y: 0.95, fill: 0.62, flip: true },
@@ -422,6 +453,7 @@ export default {
         },
         {
           action: `Gros plan sur Nia : son regard s’illumine (reflets vert fluo et violets dans les yeux), petit sourire de quelqu’un qui vient de comprendre. Fond flou : lampadaire à gauche, brume violette à droite. ${NIA} ${ADULTES}`,
+          composition: `Close-up of Nia, centred, chest-up, facing the camera, calm confident smile; road and sea wall blurred behind her in violet mist.`,
           bg: { id: 'flash', color: '#1a0b2e', lines: VERT, cx: 0.5, cy: 0.5 },
           chars: [{ id: 'nia', pose: 'debout', expr: 'joie', shot: 'gros', x: 0.5, y: 0.2, fill: 0.78 }],
           bubbles: [{ type: 'parole', text: 'Le rappel double la demi-vie…', x: 0.5, y: 0.12, w: 0.8, size: 14, who: 0 }],
@@ -476,18 +508,21 @@ export default {
         },
         {
           action: `Kaï, plan buste, grand sourire, l’index GAUCHE levé (il a compris) ; la main droite bandée contre la poitrine. Il regarde vers la droite de l’image (vers Nia et Mory, hors champ). Fond : lampadaires à gauche, mer à droite, ciel qui s’éclaircit. ${KAI} ${ADULTES}`,
+          composition: `Single character. Kaï right of centre, chest-up, three-quarter front, big smile, looking toward the RIGHT of the image: his LEFT index finger raised, his bandaged RIGHT hand against his chest. Road on the left, sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [{ id: 'kai', pose: 'pointer', expr: 'joie', shot: 'buste', x: 0.44, y: 0.2, fill: 0.84 }],
           bubbles: [{ type: 'parole', text: 'Une suite géométrique ! Comme au marché !', x: 0.5, y: 0.12, w: 0.9, size: 14, who: 0 }],
         },
         {
           action: `Mory, plan taille, calcule sur sa tablette en tapant de l’index, concentré, la lumière cyan de l’écran sur ses lunettes (verres transparents, yeux visibles) ; un petit sourire en coin. Fond : muret et brume violette à droite. ${MORY} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character. Mory right of centre, waist-up, three-quarter front facing left, tapping on his glowing tablet; road on the left, sea wall on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [{ id: 'mory', pose: 'telephone', expr: 'concentration', shot: 'taille', x: 0.5, y: 0.3, fill: 0.7 }],
           bubbles: [{ type: 'parole', text: 'Après quatre rappels, elle tient presque une minute toute seule. Il n’aura plus rien à manger.', x: 0.5, y: 0.12, w: 0.94, size: 13, who: 0 }],
         },
         {
           action: `Nia (à gauche de l’image) et Kaï (à droite de l’image), face à face, de profil, se regardent dans les yeux, complices, un léger sourire. Entre eux, au loin, la brume violette au-dessus du muret. ${CORNICHE} ${NIA} ${KAI} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Close two-shot, chest-up. Nia in the LEFT half, three-quarter profile facing right. Kaï in the RIGHT half, three-quarter profile facing left. They look at each other.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'nia', pose: 'debout', expr: 'clin', shot: 'taille', x: 0.24, y: 0.36, fill: 0.64 },
@@ -500,6 +535,7 @@ export default {
         },
         {
           action: `Au centre de l’image, Sora, debout devant le banc, son paquet de fiches bristol à la main (élastique enlevé), tournée vers la gauche, parle d’un ton décidé. Derrière elle, à droite de l’image, Fatou, assise sur le banc, ses fiches à la main. À gauche de l’image, Mory lance le chrono sur sa tablette, le pouce sur l’écran. Muret, brume violette et mer à droite. ${CORNICHE} ${MORY} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Three characters in depth. Mory in the LEFT third, waist-up, using his tablet. Sora in the centre, holding a stack of cards. Fatou in the RIGHT third, sitting on the bench against the sea wall, looking at her cards.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'telephone', expr: 'concentration', shot: 'americain', x: 0.14, y: 0.3, fill: 0.66 },
@@ -526,6 +562,7 @@ export default {
       panels: [
         {
           action: `Les tentacules de brume violette fouettent l’air depuis la droite de l’image (au-dessus du muret). Au centre, Sora tient Fatou par le poignet et la tire vivement sur le côté pour esquiver ; images fantômes de leur mouvement (à gauche, puis à droite), traînée vert fluo. Fatou serre ses fiches contre elle. Route à gauche, muret et mer à droite. ${CORNICHE} ${SORA} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Sora left of centre, lunging toward the RIGHT in a burst of speed (faint green after-image behind her on the left), grabbing the wrist of Fatou. Fatou right of centre, three-quarter front facing left. Violet tentacles come from the RIGHT side over the sea.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [
             { id: 'sora', pose: 'esquive', expr: 'concentration', shot: 'pied', x: 0.4, y: 0.95, fill: 0.7, blur: 60 },
@@ -536,6 +573,7 @@ export default {
         },
         {
           action: `Mory, à gauche de l’image, plan taille, crie le compte en brandissant sa tablette (chrono). À droite de l’image, derrière lui, Fatou répond, une fiche à la main sur laquelle brillent des traits dorés (sans lettres lisibles). Brume violette au fond à droite. ${MORY} ${FATOU} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Mory left of centre, stepping toward the RIGHT, holding his tablet up beside Fatou. Fatou right of centre, holding a glowing card. Violet tentacles from the RIGHT side over the sea.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'telephone', expr: 'celebration', shot: 'taille', x: 0.3, y: 0.3, fill: 0.7 },
@@ -549,6 +587,7 @@ export default {
         },
         {
           action: `Kaï, au centre de l’image, dévie un tentacule de brume violette d’un grand coup de pied (jambe tendue vers la droite de l’image) ; sa main droite bandée reste en retrait, serrée contre sa poitrine ; il tourne la tête vers la gauche (vers Fatou, hors champ). Muret et mer à droite. ${CORNICHE} ${KAI} ${VIOLET_LUM} ${ADULTES}`,
+          composition: `Single character. Kaï at the centre-left, full body, high side kick toward the RIGHT, foot striking a violet tentacle right of centre; his bandaged right hand kept back against his chest; his head turned toward the LEFT.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [{ id: 'kai', pose: 'coup_de_pied', expr: 'concentration', shot: 'pied', x: 0.44, y: 0.95, fill: 0.74 }],
           fx: [{ type: 'impact', x: 0.75, y: 0.45 }],
@@ -557,6 +596,7 @@ export default {
         },
         {
           action: `À gauche de l’image, Mory, de profil, crie le compte, la tablette levée. À droite de l’image, Fatou, debout près du banc, répond sans regarder la fiche, les yeux fermés, sûre d’elle, l’index levé ; une lueur dorée autour de ses fiches. Brume violette qui s’amincit. ${MORY} ${FATOU} ${ADULTES}`,
+          composition: `Two characters. Mory in the LEFT half, three-quarter front facing RIGHT, holding up his tablet. Fatou in the RIGHT half, three-quarter front, holding glowing notes and raising one finger. A single concrete bench at the bottom right against the sea wall.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'telephone', expr: 'celebration', shot: 'taille', x: 0.24, y: 0.34, fill: 0.66 },
@@ -569,6 +609,7 @@ export default {
         },
         {
           action: `Nia, debout à côté du banc, au centre-gauche de l’image, lit à voix haute ses propres notes dans un petit carnet. Autour d’elle, la brume violette s’amincit en filaments transparents ; au fond à droite, au-dessus de la mer, l’Oubli rapetisse. Le ciel s’éclaircit. ${CORNICHE} ${NIA} ${ADULTES}`,
+          composition: `Single character. Nia left of centre, full body, standing on the road, reading a sheet of notes; a single concrete bench against the sea wall on the right; a small dark violet figure floats over the sea in the RIGHT third.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'nia', pose: 'lire', expr: 'concentration', shot: 'americain', x: 0.36, y: 0.2, fill: 0.74 },
@@ -591,6 +632,7 @@ export default {
       panels: [
         {
           action: `Fatou, debout au centre de l’image, plan américain, sûre d’elle, répond seule, la tête haute, ses fiches serrées dans une main (lueur dorée). En amorce à gauche de l’image, Mory, de trois quarts dos, crie le compte, la tablette levée. Brume violette qui recule vers le muret à droite. ${CORNICHE} ${MORY} ${FATOU} ${ADULTES}`,
+          composition: `Mory in the LEFT half, seen from behind (three-quarter back), arm raised high holding his tablet up. Fatou right of centre, three-quarter front, holding glowing cards. Violet tentacles at the RIGHT edge over the sea.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5 },
           chars: [
             { id: 'mory', pose: 'telephone', expr: 'celebration', shot: 'americain', x: 0.12, y: 0.3, fill: 0.66 },
@@ -603,6 +645,7 @@ export default {
         },
         {
           action: `L’Oubli se contracte au-dessus du muret, à droite de l’image : toute la brume violette est aspirée en spirale vers un noyau de verre violet, qui devient solide et brillant. Fiches et pages déchirées aspirées dans le tourbillon. Mer et rochers à droite, route à gauche. Aucun personnage. ${CORNICHE}`,
+          composition: `No hero. The Oblivion, a hooded shadow with a glowing violet crystal core, spinning in a vortex of letters and paper sheets, right of centre above the road and the sea wall.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.4 },
           chars: [{ id: 'oubli', pose: 'recul', shot: 'taille', x: 0.62, y: 0.08, fill: 0.7, seed: 23 }],
           fx: [{ type: 'concentration', opacity: 0.3 }, { type: 'teinte', color: '#7c3aed', opacity: 0.2 }],
@@ -610,6 +653,7 @@ export default {
         },
         {
           action: `Le noyau de l’Oubli, un gros cristal de verre violet devenu lourd, tombe sur le haut du muret (à droite de l’image) : le béton se fend en étoile, éclats et anneau de poussière. Mer derrière le muret à droite, route à gauche. Aucun personnage. ${CORNICHE}`,
+          composition: `No character. The violet crystal crashes into the road near the sea wall, right of centre, the asphalt cracked around it; paper sheets scattered.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.4 },
           fx: [{ type: 'impact', x: 0.6, y: 0.55 }, { type: 'fissure', x: 0.6, y: 0.6 }],
           sfx: [{ text: 'BOUM !', x: 0.32, y: 0.24, size: 50, rot: -8, color: OR, impact: true }],
@@ -617,6 +661,7 @@ export default {
         },
         {
           action: `Le cristal violet roule lentement sur le haut du muret vers le bord côté mer, à droite de l’image (les vagues en contrebas). Au premier plan à gauche de l’image, Nia tend la main vers lui, alarmée, les yeux écarquillés. ${CORNICHE} ${NIA} ${ADULTES}`,
+          composition: `Single character. Nia in the LEFT third, full body, three-quarter front facing RIGHT, lunging and reaching toward the violet crystal lying by the sea wall right of centre; paper sheets flying.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.5 },
           chars: [{ id: 'nia', pose: 'main_tendue', expr: 'surprise', shot: 'taille', x: 0.22, y: 0.3, fill: 0.7 }],
           fx: [{ type: 'lueur', color: '#a78bfa', x: 0.74, y: 0.55, size: 0.18 }],
@@ -624,6 +669,7 @@ export default {
         },
         {
           action: `Kaï (à gauche de l’image) et Sora (à droite de l’image), plan buste, échangent un regard décidé et hochent la tête en même temps ; silence. Kaï serre le poing GAUCHE, sa main droite bandée visible. Lueur violette entre eux, ciel qui s’éclaircit derrière. ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Close two-shot, chest-up. Kaï in the LEFT half, three-quarter front facing right, his LEFT fist clenched, his bandaged right hand visible. Sora in the RIGHT half, three-quarter front facing left, determined. They look at each other; violet light between them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.65, vp: 0.5 },
           chars: [
             { id: 'kai', pose: 'debout', expr: 'concentration', shot: 'buste', x: 0.28, y: 0.24, fill: 0.74 },
@@ -644,6 +690,7 @@ export default {
       panels: [
         {
           action: `Plan large. Le cristal violet est posé au bord du muret, au centre-droit de l’image. Sora sprinte le long du muret vers lui depuis le fond de l’image (traînée vert fluo) ; Kaï court vers lui depuis le premier plan à gauche, de l’autre côté, la main GAUCHE serrée, la main droite bandée. Mer et rochers à droite, route et lampadaires à gauche ; le ciel rosit à l’horizon. ${CORNICHE} ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Kaï in the LEFT half, full body, running toward the RIGHT. Sora in the centre, further back, running toward the camera with a green curved trail. The violet crystal on the road between them, near the sea wall.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.6 },
           chars: [
             { id: 'kai', pose: 'course', expr: 'concentration', shot: 'pied', x: 0.24, y: 0.97, fill: 0.66 },
@@ -654,6 +701,7 @@ export default {
         },
         {
           action: `Sora bondit dans les airs, à gauche de l’image, pour un coup de pied sauté vers la droite (jambe tendue, traînée vert fluo). En bas, au premier plan au centre, Kaï arme son poing GAUCHE nu, le bras gauche tiré en arrière, la main droite bandée ramenée contre la hanche ; il regarde le cristal violet posé sur le muret à droite de l’image. ${CORNICHE} ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Kaï in the LEFT half, full body, punching toward the RIGHT with his LEFT fist. Sora in the RIGHT half, leaping over the crystal with a big green curved trail; the crystal low right of centre.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.5, vp: 0.6 },
           chars: [
             { id: 'sora', pose: 'saut', expr: 'celebration', shot: 'pied', x: 0.3, y: 0.62, fill: 0.56, aura: VERT },
@@ -663,6 +711,7 @@ export default {
         },
         {
           action: `GRANDE CASE. Double impact sur le cristal violet, au bord du muret (au centre-droit de l’image), juste avant qu’il tombe dans la mer. À gauche de l’image, Sora, en l’air, le frappe d’un coup de pied sauté, longue traînée vert fluo derrière elle. Au centre-gauche, Kaï, au sol en fente avant, frappe du poing GAUCHE nu (le bras gauche tendu vers la droite) ; sa main droite bandée est ramenée contre sa hanche. Grande onde de choc blanche, éclats violets qui volent vers la droite au-dessus de la mer. Mer et rochers à droite, route à gauche ; le soleil commence à se lever à l’horizon. ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Combined attack moving left to right. Kaï in the LEFT half, lunging, LEFT fist forward; Sora leaping above him, green curved trail behind them on the left. The violet crystal shatters in the RIGHT half with a white burst.`,
           bg: { id: 'flash', color: '#fffdf2', lines: '#7c3aed', cx: 0.62, cy: 0.45 },
           chars: [
             { id: 'kai', pose: 'coup_de_poing', expr: 'celebration', shot: 'pied', x: 0.38, y: 1.02, fill: 0.78, aura: '#8b5cf6', break: true },
@@ -674,6 +723,7 @@ export default {
         },
         {
           action: `Le cristal éclate en pixels violets qui se changent en lettres dorées lumineuses et filent en rubans vers la gauche de l’image (vers les fiches de Fatou, hors champ). Au-dessus de la mer, à droite, le soleil se lève. Aucun personnage. ${SOLEIL}`,
+          composition: `No character. Golden glowing ribbons of light flow from the LEFT half to the violet crystal shattering at the RIGHT edge; sunrise over the sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5, sunX: 0.8 },
           fx: [{ type: 'glitch', n: 24 }, { type: 'lueur', color: OR, x: 0.5, y: 0.45, size: 0.4 }],
           sfx: [{ text: 'SHHHRRRAAA', x: 0.32, y: 0.84, size: 30, rot: -6, color: OR }],
@@ -681,6 +731,7 @@ export default {
         },
         {
           action: `Fatou, debout à côté du banc, au centre de l’image, serre contre sa poitrine ses fiches redevenues pleines (lueur dorée), émue, les yeux brillants, un sourire. Derrière elle à droite, le soleil se lève sur la mer, au-dessus du muret. ${SOLEIL} ${FATOU} ${ADULTES}`,
+          composition: `Single character. Fatou left of centre, knees-up, three-quarter front, smiling, holding her cards wrapped in a golden glow; sunrise over the sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5, sunX: 0.82 },
           chars: [{ id: 'fatou', pose: 'debout', expr: 'joie', shot: 'taille', x: 0.44, y: 0.26, fill: 0.74 }],
           fx: [{ type: 'lueur', color: OR, x: 0.44, y: 0.7, size: 0.25 }],
@@ -701,12 +752,14 @@ export default {
       panels: [
         {
           action: `Fatou s’éloigne en courant vers la gauche de l’image (vers la route et les maisons), son sac à dos bordeaux sur le dos, et se retourne pour faire un grand signe de la main, souriante. Le soleil se lève sur la mer derrière le muret, à droite ; lampadaires qui s’éteignent. Personne d’autre. ${SOLEIL} ${FATOU} ${ADULTES}`,
+          composition: `Single character. Fatou right of centre, full body, seen from behind running away toward the horizon along the sea wall, turning her head and waving back with her right hand; the sun rising over the sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.55, vp: 0.5, sunX: 0.85 },
           chars: [{ id: 'fatou', pose: 'course', expr: 'joie', shot: 'pied', x: 0.34, y: 0.95, fill: 0.7, flip: true }],
           bubbles: [{ type: 'parole', text: 'Merci ! Je file, c’est à huit heures !', x: 0.68, y: 0.2, w: 0.4, who: 0 }],
         },
         {
           action: `Les quatre assis côte à côte sur le muret, au soleil levant, de trois quarts, les jambes pendantes côté route ; de gauche à droite de l’image : Mory, Nia, Kaï et Sora. Kaï est tourné vers Sora et la regarde ; Sora lui répond d’un sourire en coin. Le soleil se lève sur la mer derrière eux, à droite (contre-jour doré). ${SOLEIL} ${MORY} ${NIA} ${KAI} ${SORA} ${ADULTES}`,
+          composition: `Four characters sitting in a row on the low sea wall in the RIGHT half, facing the camera at three-quarter left, from left to right: Mory, Nia, Kaï, Sora. Empty road on the left, sunrise behind them.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5, sunX: 0.8 },
           chars: [
             { id: 'mory', pose: 'assis_bureau', expr: 'joie', shot: 'taille', x: 0.14, y: 0.42, fill: 0.5 },
@@ -721,6 +774,7 @@ export default {
         },
         {
           action: `Sora, debout au centre de l’image, tend une fiche bristol blanche à chacun, d’un geste théâtral. À gauche de l’image, Kaï prend la sienne de sa main GAUCHE (main droite bandée). À droite de l’image, Mory et Nia tendent la main, amusés. Lumière dorée du soleil levant à droite. ${SOLEIL} ${KAI} ${SORA} ${MORY} ${NIA} ${ADULTES}`,
+          composition: `Four characters, full body. Sora standing in the centre, handing out white index cards with a theatrical gesture. Kaï at the LEFT edge, facing right, taking his card with his LEFT hand (bandaged right hand down). Mory and Nia in the RIGHT third, sitting on the sea wall, reaching out. Sunrise on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5, sunX: 0.85 },
           chars: [
             { id: 'kai', pose: 'main_tendue', expr: 'joie', shot: 'taille', x: 0.16, y: 0.36, fill: 0.6 },
@@ -732,6 +786,7 @@ export default {
         },
         {
           action: `À gauche de l’image, Mory, une fiche bristol à la main, l’air sérieux ; au centre, Nia, un léger sourire, la regarde ; à droite de l’image, Sora fait un clin d’œil, ravie. Lumière dorée du matin, mer et soleil levant à droite. ${SOLEIL} ${MORY} ${NIA} ${SORA} ${ADULTES}`,
+          composition: `Close three-shot. Mory in the LEFT third, holding an index card, serious. Nia in the centre, slight smile, looking at him. Sora in the RIGHT third, winking. Sunrise over the sea on the right.`,
           bg: { id: 'corniche', time: 'aube', horizon: 0.6, vp: 0.5, sunX: 0.85 },
           chars: [
             { id: 'mory', pose: 'debout', expr: 'concentration', shot: 'taille', x: 0.16, y: 0.36, fill: 0.6 },
@@ -751,6 +806,7 @@ export default {
         },
         {
           action: `[ILLUSTRATION + SURIMPRESSION] Plus tard, dans un couloir de l’université (lumière de jour qui entre par une fenêtre au fond) : au centre-gauche de l’image, un grand panneau d’affichage en liège avec une grande affiche de tournoi VIERGE (couleurs vives rouge et or, trophée dessiné, AUCUN texte : l’appli ajoute le texte par-dessus). Devant, à droite de l’image, en contre-jour, Ren : silhouette d’un jeune homme bras croisés, appuyé contre le mur, sourire en coin. Couloir vide. ${ADULTES}`,
+          composition: `Different setting: a university corridor in perspective, vanishing point at the right of centre. A bulletin board with a trophy poster on the LEFT half. Ren in the RIGHT third, waist-up, leaning against the wall, arms crossed, smirking.`,
           bg: { id: 'classe', time: 'jour', horizon: 0.5, vp: 0.85 },
           chars: [{ id: 'ren', pose: 'bras_croises', expr: 'clin', shot: 'americain', x: 0.8, y: 0.16, fill: 0.8, light: 'contre' }],
           labels: [

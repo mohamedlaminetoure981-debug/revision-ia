@@ -80,7 +80,7 @@ hébergement GitHub Pages, déploiement par GitHub Actions (`.github/workflows/d
   (`bdReprise`, `src/comic/reader.js`). `npm run verifier-bulles -- N` contrôle aussi les cases dessinées.
   Guide pour illustrer les prochains chapitres avec Gemini : `docs/methode-illustration.md`.
   **Outil d'illustration** (sur le PC de l'utilisateur, clé dans `.env.local`, jamais affichée) :
-  `npm run generer|retoucher|illustrer-lot|comparer|accepter|modeles-images` et, sans facturation, le mode gratuit à la main `npm run preparer` / `importer` (AI Studio) (`scripts/illustrer.mjs`,
+  `npm run generer|retoucher|illustrer-lot|comparer|accepter|modeles-images` et, sans facturation, le mode gratuit à la main `npm run preparer` / `importer` (AI Studio) ; corrections toutes prêtes `npm run retouche -- <nom>` ; verrous finaux automatiques et champ `composition` (anglais, en tête du prompt) par case dans `chNN.js` (`scripts/illustrer.mjs`,
   `scripts/illustration/`), références dans `references/`, lots dans `docs/retouches/chapitre-N.json`,
   résultats dans `public/story/chapitre-N/_propositions/` (ni publiés ni commités). Dans le cloud : `--essai`.
   Retouches : consignes avec les positions DANS L'IMAGE (jamais « sa main gauche »), `npm run relancer` si Gemini renvoie l'image inchangée. `npm run publier` (`scripts/publier.mjs`) = git pull + add + commit + push sans taper de git (utilisé aussi par `accepter` et

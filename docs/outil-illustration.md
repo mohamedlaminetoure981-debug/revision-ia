@@ -11,7 +11,7 @@ Deux façons de s'en servir :
 | Qui génère l'image ? | l'outil, en appelant Gemini | **toi, dans AI Studio** (gratuit) |
 | Clé API | obligatoire | inutile |
 | Prérequis | un modèle d'images ouvert à ta clé (souvent la **facturation**) | rien |
-| Commandes | `retoucher`, `generer`, `illustrer-lot` | `preparer` puis `importer` |
+| Commandes | `retoucher`, `generer`, `illustrer-lot` | `preparer` puis `importer` (+ `retouche` pour les corrections toutes prêtes) |
 
 Si `npm run modeles-images` ne te donne rien (ou que l'outil dit « indisponible pour ta clé »), prends
 le **mode gratuit à la main** : va directement au **§ A** ci-dessous. Tout le reste (références, lots,
@@ -94,6 +94,35 @@ npm run preparer -- 3 5 2
 
 Pour voir tout ça **sans rien copier ni ouvrir** : ajoute `--essai`.
 
+**Verrous automatiques (depuis le chapitre 4).** Pendant le chapitre 4, presque toutes les retouches venaient
+des mêmes erreurs de Gemini. Le prompt se termine donc par un bloc **FINAL LOCKS**, avec seulement ce qui
+concerne la case :
+
+| Si… | Verrou ajouté (en anglais) |
+| --- | --- |
+| Kaï est dans la case (chapitre 2 et suivants) | seule la main **droite** bandée, la gauche nue ; casque au cou ; de face, la main droite est à **gauche** de l'image |
+| Mory est dans la case | verres **transparents**, montures fines, sans teinte ni lueur, yeux visibles |
+| Sora est dans la case | femme **adulte** de 20 ans (pommettes, mâchoire, pas de grands yeux d'enfant), même taille, **sans lunettes**, deux chignons + barrettes étoiles vertes |
+| la description ne dit **pas** que Sora court / saute / sprinte (ni « traînée / éclair / étincelles vertes ») | **aucun** éclair, traînée ou étincelle verte |
+| toujours | pas de texte, de lettre, de titre ni de bordure ; pas de clone |
+| case de la corniche (chapitre 4) | route, lampadaires et maisons à **gauche** ; un seul muret bas, puis rochers et mer à **droite** ; un seul banc en bois contre le muret |
+
+**Composition (champ `composition` d'une case).** Si la case a un champ `composition` dans
+`src/data/comic/chapitres/chNN.js` (texte **anglais** : angle de caméra, qui est dans quelle moitié de
+l'image, sens de déplacement), il est mis **en tête** du prompt, sous « COMPOSITION LOCK (most important): ».
+Le chapitre 4 sert de modèle (toutes ses cases illustrées en ont un). Exemple :
+
+```js
+composition: `Two-shot. Sora in the LEFT half, crouching, three-quarter back, holding up a white card toward Fatou. Fatou in the RIGHT half, sitting on the bench, three-quarter profile facing LEFT, looking at the card.`,
+```
+
+Écris-la pour chaque case d'un nouveau chapitre **avant** de l'illustrer : c'est elle qui évite les images
+« à l'envers » (personnages inversés, course dans le mauvais sens).
+
+**Checklist.** À la fin, `preparer` affiche **« À VÉRIFIER SUR L'IMAGE AVANT DE L'ACCEPTER »** : les points
+à contrôler pour CETTE case (composition, main bandée de Kaï, lunettes de Mory, âge de Sora, sens de course,
+pas de vert, pas de texte, pas de clone, décor), chacun avec la commande de correction toute prête.
+
 ### A2. Dans AI Studio (aistudio.google.com)
 
 1. **Nouvelle discussion** (une par case, voir `methode-illustration.md` §4).
@@ -142,6 +171,31 @@ Reste dans la **même discussion AI Studio** et lance `npm run relancer -- 3 4 2
 copié dans le presse-papiers, tu le colles, puis `npm run importer -- 3 4 2` (voir le § 4, « Gemini a renvoyé
 l'image inchangée »). Écris tes consignes avec les **positions dans l'image** (« the hand on the LEFT side of
 the image »), pas « sa main gauche ».
+
+### A4 ter. Corrections toutes prêtes (`npm run retouche`)
+
+Un point de la checklist est faux ? Ne réécris pas la consigne : une commande copie un message de correction
+**dans le presse-papiers** (et l'affiche). Colle-le dans la **même discussion** Gemini, juste après l'image ratée.
+
+```powershell
+npm run retouche              # la liste des corrections
+npm run retouche -- bandage   # Kaï : bandage sur la main DROITE seulement
+```
+
+| Nom | Ce que ça corrige |
+| --- | --- |
+| `bandage` | Kaï : bandage sur la main droite seulement, la gauche nue |
+| `lunettes` | Mory : verres transparents, yeux visibles |
+| `sora-adulte` | Sora : visage et taille d'adulte, sans lunettes |
+| `sans-vert` | retirer tout éclair / traînée / étincelle verte |
+| `sans-texte` | retirer tout texte, lettre, titre, bordure |
+| `sans-clone` | retirer le personnage en double |
+| `decor` | corniche : route à gauche, un seul muret, rochers et mer à droite, un seul banc |
+
+Chaque message commence par « Keep everything exactly the same. Change ONE thing: » et finit par
+« Returning the same image is a failure. ». Une seule correction à la fois ; ensuite
+`npm run importer -- <chapitre> <page> <case>` comme d'habitude. (Dans PowerShell, si `--` est mangé,
+écris `npm run retouche '--' bandage`.)
 
 ### A5. Plusieurs cases à la suite (lot)
 
@@ -403,6 +457,10 @@ Les dossiers `_propositions/` et `_sauvegardes/` ne sont ni publiés dans l'appl
 Décor propre à un chapitre : `DECORS_CHAPITRES` (ex. corniche du chapitre 4 : route à gauche, mer à droite) ;
 référence de décor par défaut quand `references/decors/` n'a rien : `DECOR_REF_DEFAUT` (corniche = dernière case du
 chapitre 3, jointe aussi comme référence de style tant que le chapitre n'a aucune image, une seule fois).
+Verrous finaux : `VERROUS_PERSONNAGES`, `VERROU_SANS_VERT`, `VERROU_TOUJOURS`, `VERROUS_DECOR` (par chapitre) et
+`KAI_BANDE_DEPUIS` dans `config.mjs` ; `verrousFinaux()`, `soraEnCourse()`, `checklistFr()` et `RETOUCHES_TYPES`
+(messages de `npm run retouche`) dans `prompt.mjs`. Champ `composition` d'une case : en tête du prompt de génération
+(pas en retouche) ; les verrous finaux sont aussi ajoutés en retouche, sans la disposition du décor.
 Figurante avec un nom : `fatou` (chapitre 4) ; `refNote` ajoute une précision à la légende d'une fiche (Sora : visage adulte).
 Le mode à la main (`preparer`, `importer`) est dans `scripts/illustrer.mjs` et réutilise la même construction de prompt que le mode API (`construire`).
 `scripts/illustration/fournisseurs/` (un fichier par service : `gemini.mjs` ; pour en ajouter un,

@@ -11,7 +11,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PERSONNAGES, HEROS, DECORS, DECORS_COURT, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT, decorRefDefaut } from './config.mjs';
+import { PERSONNAGES, HEROS, DECORS, DECORS_COURT, ABSTRAIT, REF_DIR, IMG_EXT, chapterImages, caseImage, ROOT, decorRefDefaut,
+  KAI_BANDE_DEPUIS, VERROUS_PERSONNAGES, VERROU_SANS_VERT, VERROU_TOUJOURS, VERROUS_DECOR } from './config.mjs';
 
 /** Description de la case sans les marqueurs [ILLUSTRATION], [DESSIN APPLI]… */
 export const cleanAction = (a) => String(a || '').replace(/\[[A-ZÉÈ ]+\]\s*/g, '').trim();
@@ -239,21 +240,82 @@ Each character looks where the SCENE says: say it with the direction of the head
 When two characters talk, they look at each other's eyes. Nobody looks at the camera.
 Glasses are transparent: both eyes and pupils visible through the lenses.`;
 
-/** Règles automatiques ajoutées en fin de prompt (génération ET retouche), selon les personnages de la case. */
-export function checksPersonnages(chars) {
-  const out = [];
-  if (chars.includes('kai')) out.push('KAI CHECK: black over-ear headphones resting AROUND HIS NECK, never on his head or ears. White gauze bandage ONLY on his RIGHT hand, the other hand bare. Seen from behind, his right hand is on the RIGHT side of the image; seen from the front, his right hand is on the LEFT side of the image.');
-  if (chars.includes('mory')) out.push('MORY CHECK: glasses with TRANSPARENT lenses, eyes visible.');
-  if (chars.some((id) => id !== 'oubli' && PERSONNAGES[id])) out.push('AGE CHECK: every character is a young adult about 20 years old, adult face.');
-  return out.join('\n');
+/**
+ * Vrai si la description dit que Sora court, saute ou sprinte (ou parle de sa traînée / de son éclair
+ * vert) : alors la traînée verte est permise. Phrase par phrase : « Sora … court », « elle saute »…
+ */
+export function soraEnCourse(texte) {
+  const t = String(texte || '');
+  if (/(tra[îi]n[ée]e|[ée]clair|[ée]tincelles?|sillage)[^.;]{0,30}vert/i.test(t)) return true;
+  const verbe = /\b(cour[st]?|courent|courir|course|sprint\w*|saut\w*|bondi\w*|bond|fonce|file|trottine|acc[ée]l[èe]re|d[ée]colle|s[’']?[ée]lance|run\w*|sprint\w*|jump\w*|dash\w*|leap\w*)\b/i;
+  return t.split(/[.;!?]+/).some((ph) => /\b(sora|elle|she)\b/i.test(ph) && verbe.test(ph));
 }
 
 /**
+ * Verrous FINAUX (fin du prompt anglais), seulement si le personnage ou la situation est dans la case :
+ * Kaï (main droite bandée, casque au cou), Mory (verres transparents), Sora (adulte), pas de vert si Sora
+ * ne court pas, jamais de texte ni de clone, disposition du décor (o.decorFinal : retouche = sans).
+ * o = { chars, n (chapitre), texte (description FR + consigne), decor, decorFinal }
+ */
+export function verrousFinaux(o) {
+  const chars = o.chars || [];
+  const out = [];
+  if (chars.includes('kai')) out.push(chars.includes('kai-bande') || (o.n || 0) >= KAI_BANDE_DEPUIS ? VERROUS_PERSONNAGES.kai : VERROUS_PERSONNAGES.kaiSansBandage);
+  if (chars.includes('mory')) out.push(VERROUS_PERSONNAGES.mory);
+  if (chars.includes('sora')) out.push(VERROUS_PERSONNAGES.sora);
+  if (chars.some((id) => id !== 'oubli' && PERSONNAGES[id])) out.push('AGE: every character is a young adult about 20 years old, adult face.');
+  if (!soraEnCourse(o.texte)) out.push(VERROU_SANS_VERT);
+  out.push(VERROU_TOUJOURS);
+  const dec = o.decorFinal !== false && VERROUS_DECOR[o.n]?.[o.decor];
+  if (dec) out.push(dec);
+  return `FINAL LOCKS (check before drawing)\n${out.join('\n')}`;
+}
+
+/** Points à vérifier sur l'image reçue (en français, affichés après « npm run preparer »). */
+export function checklistFr(o) {
+  const chars = o.chars || [];
+  const l = [];
+  if (o.composition) l.push('Composition : qui est à gauche / à droite, angle et sens de déplacement comme dans « COMPOSITION LOCK ».');
+  if (chars.includes('kai')) {
+    l.push(chars.includes('kai-bande') || (o.n || 0) >= KAI_BANDE_DEPUIS
+      ? 'Kaï : SEULE la main DROITE bandée, la gauche nue (de face : la main bandée est à GAUCHE de l’image) ; casque autour du cou, pas sur les oreilles.   → npm run retouche -- bandage'
+      : 'Kaï : casque autour du cou, pas sur les oreilles.');
+  }
+  if (chars.includes('mory')) l.push('Mory : verres transparents, yeux bien visibles, pas de teinte ni de lueur.   → npm run retouche -- lunettes');
+  if (chars.includes('sora')) l.push('Sora : visage d’adulte (environ 20 ans), même taille que les autres, pas de lunettes, deux chignons avec barrettes étoiles vertes.   → npm run retouche -- sora-adulte');
+  if (soraEnCourse(o.texte) || /\b(cour[st]?|courent|course|sprint\w*|trottine|s[’']?[ée]loign\w*|fonce)\b/i.test(o.texte || '')) l.push('Sens de course : ils courent dans le sens écrit dans la description (vers le fond, vers la droite…).');
+  if (!soraEnCourse(o.texte)) l.push('Pas d’éclair, de traînée ni d’étincelles vertes (personne ne court en éclair dans cette case).   → npm run retouche -- sans-vert');
+  l.push('Aucun texte, aucune lettre, pas de titre ni de bordure de case.   → npm run retouche -- sans-texte');
+  if (chars.filter((id) => id !== 'kai-bande').length) l.push('Pas de clone : chaque personnage n’apparaît qu’une fois.   → npm run retouche -- sans-clone');
+  if (VERROUS_DECOR[o.n]?.[o.decor]) l.push('Décor : route, lampadaires et maisons à GAUCHE ; un seul muret, puis rochers et mer à DROITE ; un seul banc.   → npm run retouche -- decor');
+  return l;
+}
+
+/**
+ * Messages de correction prêts à coller dans la MÊME discussion Gemini (npm run retouche -- <nom>).
+ * Toujours : « Keep everything exactly the same. Change ONE thing: » … « Returning the same image is a failure. »
+ */
+const RET_DEBUT = 'Keep everything exactly the same. Change ONE thing:';
+const RET_FIN = 'Returning the same image is a failure.';
+export const RETOUCHES_TYPES = {
+  bandage: { fr: 'Kaï : bandage sur la main DROITE seulement', en: 'Kaï must have a white bandage on his RIGHT hand ONLY; his LEFT hand is bare skin with no bandage at all. If he faces the camera, his bandaged right hand is on the LEFT side of the image; seen from behind, it is on the RIGHT side.' },
+  lunettes: { fr: 'Mory : verres transparents, yeux visibles', en: 'Mory\'s glasses must have clear transparent lenses with thin dark frames: no tint, no glow, no white reflection; both eyes and pupils clearly visible through the lenses.' },
+  'sora-adulte': { fr: 'Sora : visage et taille d’adulte, sans lunettes', en: 'Sora must look like an adult woman about 20: adult face with defined cheekbones and jawline, normal adult eyes (no big childish eyes), the same height as the other characters, NO glasses. Keep her two afro puffs with green star clips, her pose and her clothes.' },
+  'sans-vert': { fr: 'Retirer tout éclair / traînée / étincelle verte', en: 'Remove ALL green lightning, green trails, green sparks and green glow from the image, and repaint the background behind them as it should be.' },
+  'sans-texte': { fr: 'Retirer tout texte, lettre, titre, bordure', en: 'Remove ALL text, letters, words, numbers, titles and panel borders, and repaint those areas with the surrounding background.' },
+  'sans-clone': { fr: 'Retirer le personnage en double', en: 'One character appears twice: remove the extra copy so that each character appears only ONCE, and repaint the background there.' },
+  decor: { fr: 'Corniche : route à gauche, un muret, rochers et mer à droite', en: 'Fix the layout of the setting: the road, the street lamps and the houses on the LEFT side of the image; ONE single low sea wall, then rocks and the sea on the RIGHT side; one single wooden bench, against the sea wall. Keep the characters exactly as they are.' },
+};
+export const messageRetouche = (nom) => (RETOUCHES_TYPES[nom] ? `${RET_DEBUT} ${RETOUCHES_TYPES[nom].en} ${RET_FIN}` : null);
+
+/**
  * Prompt de GÉNÉRATION d'une case.
- * @param {object} o { scene (texte de la case, en anglais si traduit), sceneLang, chars, decor, refs, consigne }
+ * @param {object} o { scene (texte de la case, en anglais si traduit), sceneLang, chars, decor, refs, consigne,
+ *   composition (champ « composition » de la case, en tête du prompt), n (chapitre), texte (description FR) }
  */
 export function buildGenerationPrompt(o) {
   const blocks = [
+    o.composition ? `COMPOSITION LOCK (most important):\n${String(o.composition).trim()}` : '',
     `TASK\nDraw ONE comic panel for the manga "Révision IA — La Jeunesse de 2026" (Conakry, Guinea).${o.refs.length ? `\n\n${legend(o.refs)}` : ''}`,
     STYLE,
     REALISM,
@@ -264,7 +326,7 @@ export function buildGenerationPrompt(o) {
     `SCENE${o.sceneLang === 'fr' ? ' (written in French: follow it literally)' : ''}\n${o.scene}${o.consigne ? `\nExtra instruction: ${o.consigne}` : ''}`,
     PHYSICS,
     DONOT,
-    checksPersonnages(o.chars),
+    verrousFinaux(o),
   ].filter(Boolean);
   return blocks.join('\n\n');
 }
@@ -289,7 +351,7 @@ export function buildEditPrompt(o) {
     ordre,
     'DO NOT add any text, letters, speech bubbles or white shapes.',
     'The result MUST be visibly different from the original in the requested area. Returning the same image is a failure.',
-    checksPersonnages(o.chars || []),
+    verrousFinaux({ ...o, decorFinal: false }), // retouche : sans la disposition du décor (prompt court)
   ].filter(Boolean).join('\n\n');
 }
 

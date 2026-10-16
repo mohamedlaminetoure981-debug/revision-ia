@@ -16,6 +16,7 @@
 // MODE GRATUIT À LA MAIN (si ta clé n'ouvre aucun modèle d'images) :
 //   npm run preparer -- 3 4 2 "consigne"   prompt copié + images à joindre dans un dossier numéroté
 //   npm run importer -- 3 4 2              ramène l'image téléchargée dans _propositions/
+//   npm run retouche -- bandage            message de correction tout prêt (sans nom : la liste)
 // Options : --essai (montre ce qui serait envoyé, SANS appeler l'API ni avoir de clé),
 //           --refaire (refait aussi les tâches déjà faites), --toutes (generer : aussi les cases
 //           déjà illustrées), --forcer (ignore l'arrêt pour quota enregistré).
@@ -36,7 +37,7 @@ import {
   ROOT, LOT_DIR, readEnv, retenirSecret, masquer, loadChapter, caseImage, isAppDrawn,
   propDir, saveDir, caseName, PERSONNAGES, IMG_EXT, decorRefDefaut, decorLock,
 } from './illustration/config.mjs';
-import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, resumeCase, decrireRef, rel } from './illustration/prompt.mjs';
+import { cleanAction, detectCharacters, detectDecor, characterRefs, decorRefs, styleRefs, decorPanelsElsewhere, buildGenerationPrompt, buildEditPrompt, resumeCase, decrireRef, rel, checklistFr, RETOUCHES_TYPES, messageRetouche } from './illustration/prompt.mjs';
 import { choisirFournisseur } from './illustration/fournisseurs/index.mjs';
 import { ArretQuota, ErreurCase, quandFr } from './illustration/fournisseurs/erreurs.mjs';
 
@@ -63,7 +64,8 @@ Mode gratuit à la main (AI Studio) :
   npm run preparer -- <chapitre> <page> <case> ["consigne"] [--essai]
   npm run preparer -- <chapitre> --suivante      (prochaine tâche de docs/retouches/chapitre-N.json)
   npm run importer -- <chapitre> <page> <case> [--essai]
-  npm run relancer -- <chapitre> <page> <case> ["consigne"]   (message de relance à coller dans la MÊME discussion)`;
+  npm run relancer -- <chapitre> <page> <case> ["consigne"]   (message de relance à coller dans la MÊME discussion)
+  npm run retouche -- <nom>       (correction toute prête : bandage, lunettes, sora-adulte, sans-vert, sans-texte, sans-clone, decor ; sans nom = la liste)`;
 
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return d; } };
 const writeJson = (f, v) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`); };
@@ -228,10 +230,13 @@ async function construire(n, chapter, t, service, { redimensionner = true } = {}
   if (prep.ignore) return { ignore: prep.ignore, label };
   const sc = t.type === 'retouche' ? { text: '', lang: 'fr' } : await scene(n, prep.panel, service); // retouche : pas de description de scène (prompt court)
   await decrireRefs(n, chapter, t, prep, sc);
-  const o = { scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, decorLock: decorLock(prep.decor, n), refs: prep.refs, consigne: t.consigne || '' };
+  const o = {
+    scene: sc.text, sceneLang: sc.lang, chars: prep.chars, decor: prep.decor, decorLock: decorLock(prep.decor, n), refs: prep.refs, consigne: t.consigne || '',
+    n, composition: prep.panel.composition || '', texte: `${cleanAction(prep.panel.action)} ${t.consigne || ''}`, // texte : décide des verrous (traînée verte…)
+  };
   const texte = t.type === 'retouche' ? buildEditPrompt(o) : buildGenerationPrompt(o);
   const images = redimensionner ? await Promise.all(prep.refs.map((r, i) => charger(r, t.type === 'retouche' && i === 0))) : [];
-  return { prep, sc, texte, images, label };
+  return { prep, sc, texte, images, label, o };
 }
 
 function afficherTache(n, t, c) {
@@ -520,7 +525,29 @@ async function preparerManuel(n, t) {
      (dossier ${ESSAI ? 'qui s\'ouvrira' : 'qui vient de s\'ouvrir'} ; le prompt décrit chaque image par son contenu : si AI Studio les mélange, ce n'est pas grave)
   3. Vérifie que le modèle « Image » est sélectionné, clique sur Générer, puis télécharge l'original.
   4. Reviens ici : npm run importer -- ${n} ${t.page} ${t.case}`);
+  afficherChecklist(c.o);
   return 'fait';
+}
+
+/** Checklist en français des points à vérifier sur l'image reçue (selon les personnages de la case). */
+function afficherChecklist(o) {
+  const l = checklistFr(o);
+  console.log(`\n✅ À VÉRIFIER SUR L'IMAGE AVANT DE L'ACCEPTER :\n${l.map((x) => `  [ ] ${x}`).join('\n')}\n  Un point faux → colle la correction dans la MÊME discussion : npm run retouche -- <nom>  (liste : npm run retouche)`);
+}
+
+/** npm run retouche -- <nom> : message de correction tout prêt (copié + affiché). Sans nom : la liste. */
+async function messageCorrection(nom) {
+  const liste = () => Object.entries(RETOUCHES_TYPES).map(([k, v]) => `  npm run retouche -- ${k.padEnd(12)} ${v.fr}`).join('\n');
+  if (!nom) { console.log(`Messages de correction (à coller dans la MÊME discussion Gemini, après l'image ratée) :\n${liste()}`); return; }
+  const message = messageRetouche(nom);
+  if (!message) { console.log(`❌ Correction inconnue : « ${nom} ». Noms possibles :\n${liste()}`); process.exit(1); }
+  console.log(`🩹 Correction « ${nom} » (${RETOUCHES_TYPES[nom].fr}) :\n\n${message}\n`);
+  if (ESSAI) { console.log('🧪 ESSAI : rien n\'est copié.'); return; }
+  const f = path.join(DOSSIER_PREP, 'retouche.txt');
+  fs.mkdirSync(DOSSIER_PREP, { recursive: true });
+  fs.writeFileSync(f, message);
+  console.log((await presserPapiers(f)) ? '✅ Copié dans le presse-papiers (Ctrl+V).' : `⚠️ Copie automatique impossible ici : copie le message ci-dessus (ou ouvre ${f}).`);
+  console.log('À FAIRE : colle-le dans la MÊME discussion (sans nouvelle image), génère, télécharge l\'original, puis npm run importer -- <chapitre> <page> <case>.\nSi Gemini renvoie la même image : npm run relancer -- <chapitre> <page> <case> "…".');
 }
 
 /**
@@ -666,6 +693,8 @@ try {
       const consigne = args.slice(3).join(' ').trim();
       await preparerManuel(n, { type: consigne ? 'retouche' : 'generation', page: p, case: c, consigne });
     }
+  } else if (cmd === 'retouche') {
+    await messageCorrection(args[0]);
   } else if (cmd === 'relancer') {
     await relancer(num(args[0], 'Chapitre'), num(args[1], 'Page'), num(args[2], 'Case'), args.slice(3).join(' ').trim());
   } else if (cmd === 'importer') {
