@@ -1185,6 +1185,10 @@ La clé API et les photos ne sont pas incluses.
 - ✅ **v1.5** : duels entre amis par lien (sans serveur), image de statut WhatsApp.
 - ✅ **v1.6** : cartes à collectionner (raretés, paquets, classeur), mode Focus (dojo d'Awa).
 - ✅ **v1.7** : « Explique-moi comme si j'étais nul » (Ren), veille d'examen (plan intensif).
+- ✅ **v1.24.3** : chapitre 1 : les 4 problèmes de `verifier-bulles -- 1` corrigés (bulles seulement, images intactes).
+  Page 2 case 3 : bulles du chauffeur et de Kaï plus grandes (texte lisible sur un téléphone de 360 px), zone protégée
+  du taxi précisée (visage du chauffeur + gant levé, carrosserie) ; page 8 case 2 et page 12 case 2 : bulle de Kaï
+  décalée/réduite pour ne plus toucher son visage. `verifier-bulles -- 1` et `verifier-nettete -- 1` : aucun problème.
 - ✅ **v1.24.2** : **chapitre 4 terminé** : passe de vérification finale. Zones protégées (`illus.keep` : visages, mains
   importantes, fiches dorées, cristal/noyau) et points focaux notés pour les 56 cases illustrées ; bulles déplacées pour ne
   plus couvrir de visage ni déborder, queues de bulles toutes dirigées vers le personnage qui parle (Kaï « Rejoins-nous »

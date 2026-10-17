@@ -151,13 +151,13 @@ export default {
           ],
           illus: {
             focus: [0.55, 0.615],
-            keep: [[0.13, 0.46, 0.47, 0.82, 'taxi et chauffeur (gant levé)'], [0.55, 0.4, 0.96, 0.97, 'Kaï à genoux et sac']],
+            keep: [[0.36, 0.5, 0.47, 0.63, 'visage du chauffeur et gant levé'], [0.15, 0.56, 0.47, 0.82, 'taxi'], [0.55, 0.4, 0.96, 0.97, 'Kaï à genoux et sac']],
             free: [[0.1, 0.25, 0.5, 0.45, 'ciel (gauche)'], [0.5, 0.25, 0.78, 0.39, 'ciel (centre)']],
             mouths: [[0.4, 0.52], [0.82, 0.49]],
           },
           bubbles: [
-            { type: 'cri', text: 'Hé, petit ! On dort debout ?!', x: 0.28, y: 0.15, w: 0.3, size: 18, who: 0 },
-            { type: 'parole', text: 'Pardon, tonton !', x: 0.66, y: 0.12, w: 0.2, size: 18, who: 1 },
+            { type: 'cri', text: 'Hé, petit ! On dort debout ?!', x: 0.24, y: 0.2, w: 0.4, size: 22.5, who: 0 },
+            { type: 'parole', text: 'Pardon, tonton !', x: 0.66, y: 0.12, w: 0.24, size: 23, who: 1 },
           ],
         },
         {
@@ -605,7 +605,7 @@ export default {
             free: [[0.4, 0, 0.8, 0.18, 'cheveux (haut)']],
             mouths: [[0.5, 0.64]],
           },
-          bubbles: [{ type: 'pensee', text: 'Le prénom de ma mère… c’est… c’est…', x: 0.5, y: 0.1, w: 0.9, who: 0 }],
+          bubbles: [{ type: 'pensee', text: 'Le prénom de ma mère… c’est… c’est…', x: 0.5, y: 0.1, w: 0.9, size: 15, who: 0 }],
         },
         {
           action: 'Vue depuis les yeux de Kaï, en contre-plongée : l’Oubli a quitté le grand panneau et flotte au-dessus de lui, immense, yeux blancs, contour violet ; au loin, le panneau est déchiré et vide. Les pieds de Kaï en bas de l’image. Ciel bleu, ombre violette.',
@@ -895,7 +895,7 @@ export default {
             mouths: [[0.58, 0.36]],
           },
           bubbles: [
-            { type: 'parole', text: 'Aïe… aïe aïe aïe… Frapper du verre, plus jamais.', x: 0.2, y: 0.2, w: 0.36, size: 15, who: 0 },
+            { type: 'parole', text: 'Aïe… aïe aïe aïe… Frapper du verre, plus jamais.', x: 0.19, y: 0.2, w: 0.34, size: 15, who: 0 },
             { type: 'pensee', text: 'Maman s’appelle… Mariama. … Ouf.', x: 0.2, y: 0.6, w: 0.36, size: 15, who: 0 },
           ],
         },
